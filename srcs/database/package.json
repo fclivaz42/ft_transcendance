@@ -1,0 +1,17 @@
+{
+  "name": "sarif_db",
+  "version": "0.0.1",
+  "description": "SARIF Database module",
+  "main": "index.js",
+  "scripts": {
+	"predebug": "npm i",
+    "debug": "node index.js debug",
+	"preprod": "npm i",
+    "prod": "node index.js"
+  },
+  "author": "fclivaz",
+  "license": "ISC",
+  "dependencies": {
+    "fastify": "^5.2.1"
+  }
+}
