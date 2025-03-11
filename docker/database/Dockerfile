@@ -7,6 +7,6 @@ WORKDIR /sarif
 
 EXPOSE 3000
 
-RUN yarn global add fastify-cli
+# RUN yarn global add fastify-cli
 
 ENTRYPOINT ["sh", "start.sh"]

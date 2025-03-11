@@ -6,13 +6,15 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/22 22:04:45 by fclivaz           #+#    #+#              #
-#    Updated: 2025/03/04 21:08:14 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/03/07 22:21:23 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = sarif
 
 DATADIR = data
+
+SHELL = /bin/bash
 
 ${NAME}: all
 
@@ -23,6 +25,7 @@ build:
 	docker-compose -p ${NAME} -f ./docker/docker-compose.yml build
 
 up: build
+	#API_KEY="$$(uuidgen)" docker-compose -p ${NAME} -f ./docker/docker-compose.yml up -d
 	docker-compose -p ${NAME} -f ./docker/docker-compose.yml up -d
 
 down:
@@ -48,5 +51,11 @@ prune:
 nuke: down prune
 	rm -rf ${DATADIR}
 
-re: nuke
+re: down
 	make all
+
+rebuild: nuke
+	make all
+
+restart: stop
+	make start

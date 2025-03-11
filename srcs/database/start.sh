@@ -10,6 +10,8 @@ cleanup() {
 #Trapping the SIGTERM
 trap 'cleanup' SIGTERM
 
+export API_KEY="$(cat /run/secrets/api-key)"
+
 #Execute a command
 npm run $RUNMODE &
 
