@@ -6,16 +6,16 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/06 01:26:20 by fclivaz           #+#    #+#             //
-//   Updated: 2025/03/09 04:21:18 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/03/14 18:52:43 by SET YOUR USER    ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 //
-import sqlite3 from "sqlite3"
+import Database from "better-sqlite3"
 import { execute, fetchAll, fetchFirst, sortData, checkExists } from "./db_exec.js"
 
 export async function dbget (fastify, options) {
 	fastify.get('/', function handler (request, reply) {
-		const db = new sqlite3.Database("/data/SARIF.db")
+		const db = new Database("/data/SARIF.db")
 		const headers = request.headers;
 		if (!headers["api_key"])
 			return reply.code(401).send({reason: "error.missing.api_key"})
@@ -26,7 +26,7 @@ export async function dbget (fastify, options) {
 
 export async function dbpost (fastify, options) {
 	fastify.post('/', async function handler (request, reply) {
-		const db = new sqlite3.Database("/data/SARIF.db")
+		const db = new Database("/data/SARIF.db")
 		const headers = request.headers;
 		if (!headers["api_key"])
 			return reply.code(401).send({reason: "error.missing.api_key"})
@@ -85,7 +85,7 @@ export async function dbpost (fastify, options) {
 
 export async function dbdel (fastify, options) {
 	fastify.delete('/', function handler (request, reply) {
-		const db = new sqlite3.Database("/data/SARIF.db")
+		const db = new Database("/data/SARIF.db")
 		const headers = request.headers;
 		if (!headers["api_key"])
 			return reply.code(401).send({reason: "error.missing.api_key"})
@@ -96,7 +96,7 @@ export async function dbdel (fastify, options) {
 
 export async function dbput (fastify, options) {
 	fastify.put('/', function handler (request, reply) {
-		const db = new sqlite3.Database("/data/SARIF.db")
+		const db = new Database("/data/SARIF.db")
 		const headers = request.headers;
 		if (!headers["api_key"])
 			return reply.code(401).send({reason: "error.missing.api_key"})
