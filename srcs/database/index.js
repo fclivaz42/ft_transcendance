@@ -6,12 +6,11 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/03/09 03:06:41 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/03/19 21:12:24 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
-import { init_db } from "./db_exec.js"
-import { dbget, dbpost, dbdel, dbput } from "./db_methods.js"
+import { dbget, dbpost, dbdel, dbput, init_db } from "./db_methods.js"
 import Fastify from 'fastify'
 
 const fastify = Fastify({
