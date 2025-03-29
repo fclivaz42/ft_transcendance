@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/03/19 21:12:24 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/03/25 18:08:02 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -19,7 +19,8 @@ const fastify = Fastify({
 
 init_db()
 
-console.log(process.env.API_KEY)
+if (process.env.RUNMODE === "debug")
+	console.log(process.env.API_KEY)
 
 fastify.register(dbget)
 fastify.register(dbpost)

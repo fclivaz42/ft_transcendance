@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/03/19 22:29:14 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/03/25 18:19:10 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -132,7 +132,8 @@ export function init_db() {
 				PhoneNumber TEXT NOT NULL,
 				RealName TEXT NOT NULL,
 				Surname TEXT NOT NULL,
-				Bappy INTEGER NOT NULL);`).run();
+				Bappy INTEGER NOT NULL,
+				Admin INTEGER NOT NULL);`).run();
 		db.prepare(
 			`CREATE TABLE IF NOT EXISTS Matches (
 				MatchID TEXT PRIMARY KEY,
