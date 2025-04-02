@@ -45,6 +45,9 @@ export class Paddle {
 			this._keys[e.key.toLowerCase()] = false;
 		});
 	}
+	getMesh() {
+		return this.mesh;
+	}
 
 	update() {
 		this._direction.set(0, 0, 0);
