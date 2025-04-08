@@ -34,7 +34,7 @@ export class PlayField {
 	}
 
 	_setupLight() {
-		const light = new HemisphericLight("light", new Vector3(1, 1, 0), this.scene);
+		const light = new HemisphericLight("light", new Vector3(0, 0.5, -1), this.scene);
 		return light;
 	}
 

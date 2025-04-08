@@ -18,11 +18,11 @@ export class Wall extends Paddle {
 			ball.setLastHit(this.mesh.name)
 			ball._direction.z *= -1;
 			ball._direction.normalize();
-			// ball._bounceCooldown = 5;
 		}
 		else {
 			ball.mesh.position.set(0, 0, 0);
 			ball.setSpeed(0);
+			ball.setLastHit("");
 		}
 	}
 }

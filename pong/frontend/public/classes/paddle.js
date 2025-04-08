@@ -82,7 +82,6 @@ export class Paddle {
 		ball._direction.x *= -1;
 		ball._direction.z += impact;
 		ball._direction.normalize();
-		// ball._bounceCooldown = 5;
 	}
 
 	update() {

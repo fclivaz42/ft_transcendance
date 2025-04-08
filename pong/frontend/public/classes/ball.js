@@ -8,7 +8,6 @@ export class Ball {
 		position = new Vector3(0, 0, 0),
 		options = {}
 	) {
-		/* Remove options and make it more setter getter */
 		const {
 			color = Color3.White(),
 			diameter = 0.05,
@@ -20,7 +19,7 @@ export class Ball {
 		this._position = position;
 		this._baseSpeed = 0.15;
 		this._speed = 0.0;
-		this._direction = new Vector3((Math.random() * 99) < 50 ? 1 : -1, 0, 0);
+		this._direction = new Vector3((Math.random() * 99) < 50 ? 1 : -1, 0, 0).normalize();
 		
 		this.mesh = MeshBuilder.CreateSphere(name, { diameter, segments }, scene);
 		this.mesh.position = position.clone();
@@ -30,7 +29,7 @@ export class Ball {
 		this.mesh.material = material;
 
 		this._colliders = [];
-		this._lastHit = "";
+		this._lastHit = null;
 		this._bounceCooldown = 0;
 		this._keys = {};
 		this._setupInput();
@@ -40,7 +39,6 @@ export class Ball {
 	_setupInput() {
 		window.addEventListener("keydown", (e) => {
 			this._keys[e.key] = true;
-			console.log(e.key);
 		});
 		window.addEventListener("keyup", (e) => {
 			this._keys[e.key] = false;
@@ -60,13 +58,11 @@ export class Ball {
 	update() {
 		this.mesh.position.addInPlace(this._direction.scale(this._speed));
 
-		// if (this._bounceCooldown > 0) {
-		// 	this._bounceCooldown--;
-		// 	return;
-		// }
-
 		if (this._keys[" "] && this._speed === 0.0) {
 			this._speed = this._baseSpeed;
+			this._lastHit = null;
+
+			this._direction = new Vector3(Math.random() < 0.5 ? -1 : 1, 0, 0);
 		}
 		for (const collider of this._colliders) {
 			let boxA = this.getCollisionBox();
