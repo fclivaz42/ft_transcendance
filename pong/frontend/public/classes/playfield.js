@@ -58,6 +58,10 @@ export class PlayField {
 	getCamera() {
 		return this.camera;
 	}
+
+	getLight() {
+		return this.light;
+	}
 	
 	addUpdatable(obj) {
 		if (typeof obj.update === "function") {
