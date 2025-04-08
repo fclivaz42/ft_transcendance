@@ -20,7 +20,7 @@ export class Wall extends Paddle {
 		}
 		else {
 			ball.mesh.position.set(0, 0, 0);
-			ball.mesh.position.addInPlace(new Vector3(0, 0, 0).scale(this._speed));
+			ball.setSpeed(0);
 		}
 	}
 }

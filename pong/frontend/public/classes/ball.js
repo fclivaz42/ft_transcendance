@@ -20,7 +20,8 @@ export class Ball {
 		this.scene = scene;
 		this.name = name;
 		this._position = position;
-		this._speed = speed;
+		this._baseSpeed = speed;
+		this._speed = this._baseSpeed;
 		this._direction = startDir.normalize();
 		
 		this.mesh = MeshBuilder.CreateSphere(name, { diameter, segments }, scene);
@@ -32,7 +33,19 @@ export class Ball {
 
 		this._colliders = [];
 		this._bounceCooldown = 0;
+		this._keys = {};
+		this._setupInput();
 
+	}
+
+	_setupInput() {
+		window.addEventListener("keydown", (e) => {
+			this._keys[e.key] = true;
+			console.log(e.key);
+		});
+		window.addEventListener("keyup", (e) => {
+			this._keys[e.key] = false;
+		});
 	}
 
 	getCollisionBox()		{ return this.mesh.getBoundingInfo().boundingBox; }
@@ -50,6 +63,9 @@ export class Ball {
 			return;
 		}
 
+		if (this._keys[" "] && this._speed === 0.0) {
+			this._speed = this._baseSpeed;
+		}
 		for (const collider of this._colliders) {
 			let boxA = this.getCollisionBox();
 			let boxB = collider.mesh.getBoundingInfo().boundingBox;
