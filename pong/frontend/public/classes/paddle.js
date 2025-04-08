@@ -15,7 +15,8 @@ export class Paddle {
 			depth = 0.5,
 			speed = 0.05,
 			controls = "ws",
-			isAi = false
+			isAi = false,
+			directionalBounce = true
 	} = options;
 		
 		this.scene = scene;
@@ -25,6 +26,7 @@ export class Paddle {
 		this._direction = new Vector3(0, 0, 0);
 		this._controls = controls;
 		this._isAi = isAi;
+		this._directionalBounce = directionalBounce;
 		
 		this.mesh = MeshBuilder.CreateBox(name, { size, width, depth }, scene);
 		this.mesh.position = position.clone();
@@ -35,6 +37,7 @@ export class Paddle {
 
 		this._keys = {};
 		this._setupInput();
+		this
 	}
 	
 	_setupInput() {

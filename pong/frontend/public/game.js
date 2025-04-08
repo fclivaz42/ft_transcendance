@@ -13,7 +13,7 @@ let player1Paddle = new Paddle(
 	new Vector3(-14, 0, 0), {
 		color: Color3.Red(),
 		speed: 0.2,
-		depth: 3
+		depth: 2.8
 });
 player1Paddle.mesh.showBoundingBox = true;
 let player2Paddle = new Paddle(
@@ -23,7 +23,7 @@ let player2Paddle = new Paddle(
 		color: Color3.Green(),
 		speed: 0.2,
 		controls: "ik",
-		depth: 3
+		depth: 2.8
 });
 player2Paddle.mesh.showBoundingBox = true;
 let ball = new Ball(
@@ -32,12 +32,39 @@ let ball = new Ball(
 	new Vector3(0, 0, 0),
 	{ diameter: 0.8, speed: 0.2}
 );
-player1Paddle.mesh.getBoundingInfo().boundingBox
-ball.setColliders([player1Paddle, player2Paddle]);
+let northWall = new Paddle(
+	scene,
+	"northWall",
+	new Vector3(0,0,8), {
+		color: Color3.Black(),
+		width: 30,
+		directionalBounce: false
+	}
+);
+northWall.mesh.showBoundingBox = true;
+let southWall = new Paddle(
+	scene,
+	"southWall",
+	new Vector3(0,0,-8), {
+		color: Color3.Black(),
+		width: 30,
+		directionalBounce: false
+	}
+);
+southWall.mesh.showBoundingBox = true;
+// player1Paddle.mesh.getBoundingInfo().boundingBox
 ball.mesh.showBoundingBox = true;
+ball.setColliders([
+	player1Paddle, 
+	player2Paddle,
+	northWall,
+	southWall
+]);
+
 field.addUpdatable(player1Paddle);
 field.addUpdatable(player2Paddle);
 field.addUpdatable(ball);
+
 field.start();
 
 /* Defining crucial elements */

@@ -41,7 +41,7 @@ export class PlayField {
 	_setupFloor() {
 		const ground = MeshBuilder.CreateGround(
 			"ground",
-			{ width: 30, height: 20 },
+			{ width: 30, height: 16.67 },
 			this.scene
 		)
 		const groundMaterial = new StandardMaterial("groundMat", this.scene);
@@ -72,5 +72,9 @@ export class PlayField {
 			}
 			this.scene.render();
 		});
+
+		// window.addEventListener("resize", function () {
+		// 	this.engine.resize();
+		// });
 	}
 }

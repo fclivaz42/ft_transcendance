@@ -1,5 +1,5 @@
 
-import { MeshBuilder, Vector3, Color3, StandardMaterial } from "@babylonjs/core";
+import { MeshBuilder, Vector3, Color3, StandardMaterial, PickingInfo } from "@babylonjs/core";
 
 export class Ball {
 	constructor(
@@ -51,6 +51,8 @@ export class Ball {
 
 		for (const collider of this._colliders) {
 			if (this._isIntersecting(this.mesh, collider.mesh)) {
+				// let intersection = this._isIntersecting(this.mesh, collider.mesh);
+				// console.log(intersection);
 				this._direction.x *= -1;
 				this._direction.normalize();
 				this._bounceCooldown = 2;
@@ -60,6 +62,6 @@ export class Ball {
 		
 	}
 	_isIntersecting(meshA, meshB) {
-		return meshA.intersectsMesh(meshB);
+		return meshA.intersectsMesh(meshB, true);
 	}
 }
