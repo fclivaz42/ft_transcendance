@@ -41,22 +41,21 @@ let player2Paddle = new Paddle(
 		controls: {"up": "ArrowUp", "down": "ArrowDown"},
 		depth: 2.8,
 		width: 0.2
-});
-// player2Paddle.mesh.showBoundingBox = true;
-
-// Create ball and add it to scene
-let ball = new Ball(
+	});
+	// player2Paddle.mesh.showBoundingBox = true;
+	
+	// Create ball and add it to scene
+	let ball = new Ball(
 	scene,
 	"ball",
 	new Vector3(0, 0, 0), {
-		diameter: 0.6,
-		speed: 0.3,
-		startDir: new Vector3(1, 0, 0)
-});
-// ball.mesh.showBoundingBox = false;
-
-// Create top and bottom walls
-let northWall = new Wall(
+		diameter: 0.6
+	});
+	ball.setBaseSpeed(0.3);
+	// ball.mesh.showBoundingBox = false;
+	
+	// Create top and bottom walls
+	let northWall = new Wall(
 	scene,
 	"wallNorth",
 	new Vector3(0,0,8), {
@@ -99,6 +98,8 @@ let westWall = new Wall(
 westWall.setPassThrough(true);
 
 // Add colliders to the ball
+player1Paddle.setColliders([northWall, southWall]);
+player2Paddle.setColliders([northWall, southWall]);
 ball.setColliders([
 	player1Paddle, 
 	player2Paddle,

@@ -1,5 +1,5 @@
 
-import { MeshBuilder, Vector3, Color3, StandardMaterial } from "@babylonjs/core";
+import { MeshBuilder, Vector3, Color3, StandardMaterial, BoundingBox } from "@babylonjs/core";
 
 export class Paddle {
 	constructor(
@@ -35,6 +35,7 @@ export class Paddle {
 		this.mesh.material = material;
 		
 		this._keys = {};
+		this._colliders = [];
 		this._setupInput();
 	}
 	
@@ -47,19 +48,33 @@ export class Paddle {
 		});
 	}
 
-	getMesh() 			{ return this.mesh; }
-	getPosition()		{ return this._position; }
-	getSpeed()			{ return this._speed; }
-	getDirection()		{ return this._direction; }
-	getControls()		{ return this._controls; }
-	getCollisionBox()	{ return this.mesh.getBoundingInfo().boundingBox; }
+	_touchingWall() {
+		for (let i of this._colliders) {
+			let boxA = this.getCollisionBox();
+			let boxB = i.getCollisionBox();
+			if (BoundingBox.Intersects(boxA, boxB, true)) {
+				return i.mesh.name;
+			}
+		}
+	}
 
-	setSpeed(speed)		{ this._speed = speed; }
-	setControls(obj)	{ this._controls = obj; }
-	setAI(io)			{ this._isAi = io; }
-	setPassThrough(io)	{ this._passThrough = io; }
+	getMesh() 				{ return this.mesh; }
+	getPosition()			{ return this._position; }
+	getSpeed()				{ return this._speed; }
+	getDirection()			{ return this._direction; }
+	getControls()			{ return this._controls; }
+	getCollisionBox()		{ return this.mesh.getBoundingInfo().boundingBox; }
+
+	setSpeed(speed)			{ this._speed = speed; }
+	setControls(obj)		{ this._controls = obj; }
+	setColliders(colliders) { this._colliders = colliders; }
+	setAI(io)				{ this._isAi = io; }
+	setPassThrough(io)		{ this._passThrough = io; }
+
 
 	calculateBounce(ball)	{
+		if (ball.getLastHit() === this.name) return;
+		ball.setLastHit(this.name);
 		const collisionBox = this.mesh.getBoundingInfo().boundingBox;
 		const collisionCenter = collisionBox.centerWorld;
 		const collisionHeight = collisionBox.extendSizeWorld.z * 2;
@@ -67,14 +82,20 @@ export class Paddle {
 		ball._direction.x *= -1;
 		ball._direction.z += impact;
 		ball._direction.normalize();
-		ball._bounceCooldown = 5;
+		// ball._bounceCooldown = 5;
 	}
 
 	update() {
 		this._direction.set(0, 0, 0);
 
-		if (this._keys[this._controls.up]) this._direction.z += 1;
-		if (this._keys[this._controls.down]) this._direction.z -= 1;
+		if (this._keys[this._controls.up] &&
+			this._touchingWall() !== "wallNorth"
+		) 
+			this._direction.z += 1;
+		if (this._keys[this._controls.down] &&
+			this._touchingWall() !== "wallSouth"
+		) 
+			this._direction.z -= 1;
 
 		this.mesh.position.addInPlace(this._direction.scale(this._speed));
 	}

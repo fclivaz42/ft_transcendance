@@ -12,17 +12,15 @@ export class Ball {
 		const {
 			color = Color3.White(),
 			diameter = 0.05,
-			segments = 32,
-			speed = 0.15, // can remove and replace with setter
-			startDir = new Vector3(1, 0, 0) // can remove and replace with setter
+			segments = 32
 	} = options;
 
 		this.scene = scene;
 		this.name = name;
 		this._position = position;
-		this._baseSpeed = speed;
-		this._speed = this._baseSpeed;
-		this._direction = startDir.normalize();
+		this._baseSpeed = 0.15;
+		this._speed = 0.0;
+		this._direction = new Vector3((Math.random() * 99) < 50 ? 1 : -1, 0, 0);
 		
 		this.mesh = MeshBuilder.CreateSphere(name, { diameter, segments }, scene);
 		this.mesh.position = position.clone();
@@ -32,6 +30,7 @@ export class Ball {
 		this.mesh.material = material;
 
 		this._colliders = [];
+		this._lastHit = "";
 		this._bounceCooldown = 0;
 		this._keys = {};
 		this._setupInput();
@@ -49,7 +48,10 @@ export class Ball {
 	}
 
 	getCollisionBox()		{ return this.mesh.getBoundingInfo().boundingBox; }
+	getLastHit()			{ return this._lastHit; }
 
+	setLastHit(lastHit)		{ this._lastHit = lastHit; }
+	setBaseSpeed(baseSpeed)	{ this._baseSpeed = baseSpeed; }
 	setSpeed(speed)			{ this._speed = speed; }
 	setStartDir(dir)		{ this._direction = dir.normalize(); }
 	setDirection(vector)	{ this._direction = vector.normalize(); }
@@ -58,10 +60,10 @@ export class Ball {
 	update() {
 		this.mesh.position.addInPlace(this._direction.scale(this._speed));
 
-		if (this._bounceCooldown > 0) {
-			this._bounceCooldown--;
-			return;
-		}
+		// if (this._bounceCooldown > 0) {
+		// 	this._bounceCooldown--;
+		// 	return;
+		// }
 
 		if (this._keys[" "] && this._speed === 0.0) {
 			this._speed = this._baseSpeed;
