@@ -13,9 +13,9 @@ export class Paddle {
 			size = 0.5,
 			width = 0.5,
 			depth = 0.5,
-			speed = 0.05,
-			controls = { "up" : "w", "down" : "s"},
-			isAi = false
+			speed = 0.05, // can remove and replace with setter
+			controls = { "up" : "w", "down" : "s"}, // can remove and replace with setter
+			isAi = false // can remove and replace with setter
 	} = options;
 		
 		this.scene = scene;
@@ -24,6 +24,7 @@ export class Paddle {
 		this._speed = speed;
 		this._direction = new Vector3(0, 0, 0);
 		this._controls = controls;
+		this._passThrough = false;
 		this._isAi = isAi;
 		
 		this.mesh = MeshBuilder.CreateBox(name, { size, width, depth }, scene);
@@ -39,10 +40,10 @@ export class Paddle {
 	
 	_setupInput() {
 		window.addEventListener("keydown", (e) => {
-			this._keys[e.key.toLowerCase()] = true;
+			this._keys[e.key] = true;
 		});
 		window.addEventListener("keyup", (e) => {
-			this._keys[e.key.toLowerCase()] = false;
+			this._keys[e.key] = false;
 		});
 	}
 
@@ -50,14 +51,24 @@ export class Paddle {
 	getPosition()		{ return this._position; }
 	getSpeed()			{ return this._speed; }
 	getDirection()		{ return this._direction; }
-	getControls()		{ return this._controls; } 
+	getControls()		{ return this._controls; }
+	getCollisionBox()	{ return this.mesh.getBoundingInfo().boundingBox; }
 
-	setPosition(vect)	{ this._position = vect; }
 	setSpeed(speed)		{ this._speed = speed; }
-	setDirection(vect)	{ this._direction = vect; }
 	setControls(obj)	{ this._controls = obj; }
 	setAI(io)			{ this._isAi = io; }
+	setPassThrough(io)	{ this._passThrough = io; }
 
+	calculateBounce(ball)	{
+		const collisionBox = this.mesh.getBoundingInfo().boundingBox;
+		const collisionCenter = collisionBox.centerWorld;
+		const collisionHeight = collisionBox.extendSizeWorld.z * 2;
+		let impact = (ball.mesh.position.z - collisionCenter.z) / (collisionHeight / 2);
+		ball._direction.x *= -1;
+		ball._direction.z += impact;
+		ball._direction.normalize();
+		ball._bounceCooldown = 5;
+	}
 
 	update() {
 		this._direction.set(0, 0, 0);

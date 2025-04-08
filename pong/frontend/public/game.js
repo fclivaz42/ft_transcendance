@@ -25,11 +25,11 @@ let player1Paddle = new Paddle(
 	"player1",
 	new Vector3(-14.5, 0, 0), {
 		color: Color3.Red(),
-		speed: 0.4,
+		speed: 0.25,
 		depth: 2.8,
 		width: 0.2
 });
-player1Paddle.mesh.showBoundingBox = true;
+// player1Paddle.mesh.showBoundingBox = true;
 
 // Create right Paddle and add it to scene
 let player2Paddle = new Paddle(
@@ -37,12 +37,12 @@ let player2Paddle = new Paddle(
 	"player2",
 	new Vector3(14.5, 0, 0), {
 		color: Color3.Green(),
-		speed: 0.4,
-		controls: "ik",
+		speed: 0.25,
+		controls: {"up": "ArrowUp", "down": "ArrowDown"},
 		depth: 2.8,
 		width: 0.2
 });
-player2Paddle.mesh.showBoundingBox = true;
+// player2Paddle.mesh.showBoundingBox = true;
 
 // Create ball and add it to scene
 let ball = new Ball(
@@ -53,7 +53,7 @@ let ball = new Ball(
 		speed: 0.3,
 		startDir: new Vector3(1, 0, 0)
 });
-ball.mesh.showBoundingBox = false;
+// ball.mesh.showBoundingBox = false;
 
 // Create top and bottom walls
 let northWall = new Wall(
@@ -65,7 +65,7 @@ let northWall = new Wall(
 		directionalBounce: false
 	}
 );
-northWall.mesh.showBoundingBox = true;
+// northWall.mesh.showBoundingBox = true;
 
 let southWall = new Wall(
 	scene,
@@ -76,17 +76,37 @@ let southWall = new Wall(
 		directionalBounce: false
 	}
 );
-southWall.mesh.showBoundingBox = true;
+// southWall.mesh.showBoundingBox = true;
+
+let eastWall = new Wall(
+	scene,
+	"wallEast",
+	new Vector3(15.2, 0, 0), {
+		color: Color3.Magenta(),
+		depth: 16.6,
+	}
+);
+eastWall.setPassThrough(true);
+
+let westWall = new Wall(
+	scene,
+	"wallWest",
+	new Vector3(-15.2, 0, 0), {
+		color: Color3.Magenta(),
+		depth: 16.6,
+	}
+);
+westWall.setPassThrough(true);
 
 // Add colliders to the ball
 ball.setColliders([
 	player1Paddle, 
 	player2Paddle,
 	northWall,
-	southWall
+	southWall,
+	eastWall,
+	westWall
 ]);
-
-
 
 field.addUpdatable(player1Paddle);
 field.addUpdatable(player2Paddle);

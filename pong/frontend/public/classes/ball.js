@@ -1,5 +1,5 @@
 
-import { MeshBuilder, Vector3, Color3, StandardMaterial } from "@babylonjs/core";
+import { MeshBuilder, Vector3, Color3, StandardMaterial, BoundingBox } from "@babylonjs/core";
 
 export class Ball {
 	constructor(
@@ -8,12 +8,13 @@ export class Ball {
 		position = new Vector3(0, 0, 0),
 		options = {}
 	) {
+		/* Remove options and make it more setter getter */
 		const {
 			color = Color3.White(),
 			diameter = 0.05,
 			segments = 32,
-			speed = 0.15,
-			startDir = new Vector3(1, 0, 0)
+			speed = 0.15, // can remove and replace with setter
+			startDir = new Vector3(1, 0, 0) // can remove and replace with setter
 	} = options;
 
 		this.scene = scene;
@@ -34,15 +35,12 @@ export class Ball {
 
 	}
 
-	setDirection(vector) {
-		this._direction = vector.normalize();
-	}
+	getCollisionBox()		{ return this.mesh.getBoundingInfo().boundingBox; }
 
-	setColliders(colliders) {
-		this._colliders = colliders;
-	}
-
-	/* possibility to do addCollider for .push() */
+	setSpeed(speed)			{ this._speed = speed; }
+	setStartDir(dir)		{ this._direction = dir.normalize(); }
+	setDirection(vector)	{ this._direction = vector.normalize(); }
+	setColliders(colliders)	{ this._colliders = colliders; }
 
 	update() {
 		this.mesh.position.addInPlace(this._direction.scale(this._speed));
@@ -52,41 +50,14 @@ export class Ball {
 			return;
 		}
 
-
 		for (const collider of this._colliders) {
-			if (this._isIntersecting(this.mesh, collider.mesh)) {
-				/* Encapsulate this into their classes so they can be easily accessed */
-				/* This information should be handled on the backend ? */
-				const ballPos = this.mesh.position;
-				if (collider.mesh.name.startsWith("player")) {
-					const paddleBox = collider.mesh.getBoundingInfo().boundingBox;
-					const paddleCenter = paddleBox.centerWorld;
-					const paddleHeight = paddleBox.extendSizeWorld.z * 2;
-					let hitZ = (ballPos.z - paddleCenter.z) / (paddleHeight / 2);
-					if (hitZ > 1) hitZ = 0.95;
-					if (hitZ < -1) hitZ = -0.95;
-					console.log(`Hit position on paddle ${collider.name} -> ${hitZ}`);
-					this._direction.x *= -1;
-					this._direction.z += hitZ;
-					this._direction.normalize();
-					this._bounceCooldown = 2;
-				}
-				else if (collider.mesh.name.startsWith("wall")) {
-					const wallBox = collider.mesh.getBoundingInfo().boundingBox;
-					const wallCenter = wallBox.centerWorld;
-					const wallWidth = wallBox.extendSizeWorld.x * 2;
-					let hitX = (ballPos.z - wallCenter.z) / (wallWidth / 2);
-					console.log(`Hit position on paddle ${collider.name} -> ${hitX}`);
-					this._direction.z *= -1;
-					this._bounceCooldown = 2;
-				}
-				/* ------------------------------------------------------------------ */
+			let boxA = this.getCollisionBox();
+			let boxB = collider.mesh.getBoundingInfo().boundingBox;
+			if (BoundingBox.Intersects(boxA, boxB, true)) {
+				collider.calculateBounce(this);
 				break;
 			}
 		}
 		
-	}
-	_isIntersecting(meshA, meshB) {
-		return meshA.intersectsMesh(meshB, true);
 	}
 }

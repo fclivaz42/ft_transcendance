@@ -27,7 +27,7 @@ export class PlayField {
 			new Vector3(0, 30, 0),
 			this.scene
 		);
-		camera.attachControl(this.canvas, true);
+		// camera.attachControl(this.canvas, true);
 		camera.setTarget( new Vector3(0, 0, 0));
 		camera.upVector = ( new Vector3(0, -1, 0));
 		return camera;
