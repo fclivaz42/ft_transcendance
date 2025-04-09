@@ -2,6 +2,7 @@
 import { Engine } from "@babylonjs/core";
 import { Scene } from "@babylonjs/core";
 import { FreeCamera } from "@babylonjs/core";
+import { ArcRotateCamera } from "@babylonjs/core";
 import { HemisphericLight } from "@babylonjs/core";
 import { Vector3 } from "@babylonjs/core";
 import { MeshBuilder } from "@babylonjs/core";
@@ -22,14 +23,16 @@ export class PlayField {
 	};
 
 	_setupCamera() {
-		const camera = new FreeCamera(
+		const camera = new ArcRotateCamera(
 			"mainCam",
-			new Vector3(0, 30, 0),
+			Math.PI * 1.5, 0, 30,
+			new Vector3(0, 0, 0),
 			this.scene
 		);
+		// camera.attachControl(this.canvas, useControlForPanning);
 		// camera.attachControl(this.canvas, true);
-		camera.setTarget( new Vector3(0, 0, 0));
-		camera.upVector = ( new Vector3(0, -1, 0));
+		// camera.setTarget( new Vector3(0, 0, 0));
+		// camera.upVector = ( new Vector3(0, -1, 0));
 		return camera;
 	}
 
