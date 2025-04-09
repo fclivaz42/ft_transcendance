@@ -1,6 +1,6 @@
 
 services:
-  gameBackend:
+  gamebackend:
     build:
      context: .
      dockerfile: backend/Dockerfile.backend
@@ -11,11 +11,11 @@ services:
     ports:
      - "3000:3000"
     depends_on:
-      - gameFrontend
+      - gamefrontend
     environment:
       - NODE_ENV=development
 
-  gameFrontend:
+  gamefrontend:
     image: node:23-alpine3.20
     working_dir: /app/frontend
     volumes:
