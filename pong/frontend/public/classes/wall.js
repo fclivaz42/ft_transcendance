@@ -1,6 +1,7 @@
 
 import { Vector3 } from "@babylonjs/core";
 import { Paddle } from "./paddle.js";
+import { Logger } from "./logger.js";
 
 export class Wall extends Paddle {
 	constructor(scene, name, position = new Vector3(0, 0, 0), options = {}) {

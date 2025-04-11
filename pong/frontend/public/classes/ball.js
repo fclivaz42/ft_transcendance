@@ -1,5 +1,6 @@
 
 import { MeshBuilder, Vector3, Color3, StandardMaterial, BoundingBox } from "@babylonjs/core";
+import { Logger } from "./logger.js";
 
 export class Ball {
 	constructor(
@@ -19,6 +20,7 @@ export class Ball {
 		this._position = position;
 		this._baseSpeed = 0.15;
 		this._speed = 0.0;
+		this._playerBounces = 0;
 		this._direction = new Vector3((Math.random() * 99) < 50 ? 1 : -1, 0, 0).normalize();
 		
 		this.mesh = MeshBuilder.CreateSphere(name, { diameter, segments }, scene);
@@ -47,6 +49,8 @@ export class Ball {
 
 	getCollisionBox()		{ return this.mesh.getBoundingInfo().boundingBox; }
 	getLastHit()			{ return this._lastHit; }
+	getPlayerBounces()		{ return this._playerBounces; }
+	getBaseSpeed()			{ return this._baseSpeed; }
 
 	setLastHit(lastHit)		{ this._lastHit = lastHit; }
 	setBaseSpeed(baseSpeed)	{ this._baseSpeed = baseSpeed; }
@@ -54,8 +58,11 @@ export class Ball {
 	setStartDir(dir)		{ this._direction = dir.normalize(); }
 	setDirection(vector)	{ this._direction = vector.normalize(); }
 	setColliders(colliders)	{ this._colliders = colliders; }
+	incrPlayerBounce()		{ this._playerBounces++; }
 
 	update() {
+		if (this._playerBounces % 8 === 0 && this._playerBounces !== 0) 
+			this._speed += 0.0005;
 		this.mesh.position.addInPlace(this._direction.scale(this._speed));
 
 		if (this._keys[" "] && this._speed === 0.0) {

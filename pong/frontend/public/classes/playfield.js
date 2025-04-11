@@ -1,13 +1,13 @@
 
 import { Engine } from "@babylonjs/core";
 import { Scene } from "@babylonjs/core";
-import { FreeCamera } from "@babylonjs/core";
 import { ArcRotateCamera } from "@babylonjs/core";
 import { HemisphericLight } from "@babylonjs/core";
 import { Vector3 } from "@babylonjs/core";
 import { MeshBuilder } from "@babylonjs/core";
 import { StandardMaterial } from "@babylonjs/core";
 import { Color3 } from "@babylonjs/core";
+import { Logger } from "./logger.js";
 
 export class PlayField {
 	constructor(canvasId = "renderCanvas") {
@@ -19,7 +19,7 @@ export class PlayField {
 
 		this.camera = this._setupCamera();
 		this.light = this._setupLight();
-		this.floor = this._setupFloor();
+		// this.floor = this._setupFloor();
 	};
 
 	_setupCamera() {
@@ -29,10 +29,7 @@ export class PlayField {
 			new Vector3(0, 0, 0),
 			this.scene
 		);
-		// camera.attachControl(this.canvas, useControlForPanning);
-		// camera.attachControl(this.canvas, true);
-		// camera.setTarget( new Vector3(0, 0, 0));
-		// camera.upVector = ( new Vector3(0, -1, 0));
+		// camera.attachControl(this.canvas, false); // <--- Comment for prod
 		return camera;
 	}
 

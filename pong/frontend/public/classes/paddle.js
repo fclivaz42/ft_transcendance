@@ -1,5 +1,6 @@
 
 import { MeshBuilder, Vector3, Color3, StandardMaterial, BoundingBox } from "@babylonjs/core";
+import { Logger } from "./logger.js";
 
 export class Paddle {
 	constructor(
@@ -74,13 +75,24 @@ export class Paddle {
 
 	calculateBounce(ball)	{
 		if (ball.getLastHit() === this.name) return;
+		if (ball.getLastHit() && ball.getLastHit().startsWith("player")) {
+			ball.incrPlayerBounce();
+			Logger.info(ball.getPlayerBounces());
+		}
 		ball.setLastHit(this.name);
+		Logger.info(ball.getLastHit());
 		const collisionBox = this.mesh.getBoundingInfo().boundingBox;
 		const collisionCenter = collisionBox.centerWorld;
 		const collisionHeight = collisionBox.extendSizeWorld.z * 2;
 		let impact = (ball.mesh.position.z - collisionCenter.z) / (collisionHeight / 2);
+		impact = Math.max(-1, Math.min(impact, 1));
 		ball._direction.x *= -1;
-		ball._direction.z += impact;
+		ball._direction.z = (impact * 0.7 + ball._direction.z * 0.3); //weighted average for bounce
+		/* To prevent too much of a vertical bounce */
+		if (impact !== 0 && Math.abs(ball._direction.z) < 0.1) {
+			ball._direction.z = 0.1 * Math.sign(ball._direction.z || 1);
+		}
+		/* **************************************** */
 		ball._direction.normalize();
 	}
 
