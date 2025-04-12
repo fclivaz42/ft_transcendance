@@ -15,14 +15,18 @@ const scene = field.getScene();
 // let camera = field.getCamera();
 
 /* CHANGEABLE VARS ********************************************************* */
+const frames = 30;
+const frameLimiter = frames / 100;
+
 
 const player1Color = Color3.Red();
 const player2Color = Color3.Green();
 const wallsColor = Color3.White();
 const ballColor = Color3.Blue();
-const playerSpeed = 0.45;
-const ballBaseSpeed = 0.3;
+const playerSpeed = 0.2 * frameLimiter;
+const ballBaseSpeed = 0.2 * frameLimiter;
 const boxes = false;
+
 
 /* CREATING PLAYER 1 PADDLE ************************************************ */
 let player1Paddle = new Paddle(
