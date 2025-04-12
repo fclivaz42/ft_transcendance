@@ -78,6 +78,8 @@ export class Paddle {
 		if (ball.getLastHit() && ball.getLastHit().startsWith("player")) {
 			ball.incrPlayerBounce();
 			Logger.info(ball.getPlayerBounces());
+			if (ball.getPlayerBounces() % 6 === 0) ball.incrSpeed(0.005);
+			console.log(ball.getSpeed());
 		}
 		ball.setLastHit(this.name);
 		Logger.info(ball.getLastHit());

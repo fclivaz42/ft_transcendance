@@ -12,16 +12,25 @@ import { Logger } from "./classes/logger.js";
 /* SETTING UP FIELD ******************************************************** */
 const field = new PlayField();
 const scene = field.getScene();
-const boxes = false;
 // let camera = field.getCamera();
+
+/* CHANGEABLE VARS ********************************************************* */
+
+const player1Color = Color3.Red();
+const player2Color = Color3.Green();
+const wallsColor = Color3.White();
+const ballColor = Color3.Blue();
+const playerSpeed = 0.45;
+const ballBaseSpeed = 0.3;
+const boxes = false;
 
 /* CREATING PLAYER 1 PADDLE ************************************************ */
 let player1Paddle = new Paddle(
 	scene,
 	"player1",
 	new Vector3(-14.5, 0, 0), {
-		color: Color3.Red(),
-		speed: 0.25,
+		color: player1Color,
+		speed: playerSpeed,
 		depth: 2.8,
 		width: 0.3
 });
@@ -32,8 +41,8 @@ let player2Paddle = new Paddle(
 	scene,
 	"player2",
 	new Vector3(14.5, 0, 0), {
-		color: Color3.Green(),
-		speed: 0.25,
+		color: player2Color,
+		speed: playerSpeed,
 		controls: {"up": "ArrowUp", "down": "ArrowDown"},
 		depth: 2.8,
 		width: 0.3
@@ -45,9 +54,10 @@ let ball = new Ball(
 	scene,
 	"ball",
 	new Vector3(0, 0, 0), {
+		color: ballColor,
 		diameter: 0.6
 	});
-	ball.setBaseSpeed(0.3);
+	ball.setBaseSpeed(ballBaseSpeed);
 	ball.mesh.showBoundingBox = boxes;
 	
 /* CREATING WALL OBJECTS *************************************************** */
@@ -55,7 +65,7 @@ let northWall = new Wall(
 	scene,
 	"wallNorth",
 	new Vector3(0,0,8.05), {
-		color: Color3.White(),
+		color: wallsColor,
 		width: 30
 	}
 );
@@ -64,7 +74,7 @@ let southWall = new Wall(
 	scene,
 	"wallSouth",
 	new Vector3(0,0,-8.05), {
-		color: Color3.White(),
+		color: wallsColor,
 		width: 30
 	}
 );
@@ -73,7 +83,7 @@ let eastWall = new Wall(
 	scene,
 	"wallEast",
 	new Vector3(15.2, 0, 0), {
-		color: Color3.White(),
+		color: wallsColor,
 		depth: 16.6,
 	}
 );
@@ -82,7 +92,7 @@ let westWall = new Wall(
 	scene,
 	"wallWest",
 	new Vector3(-15.2, 0, 0), {
-		color: Color3.White(),
+		color: wallsColor,
 		depth: 16.6,
 	}
 );

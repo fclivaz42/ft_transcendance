@@ -51,23 +51,23 @@ export class Ball {
 	getLastHit()			{ return this._lastHit; }
 	getPlayerBounces()		{ return this._playerBounces; }
 	getBaseSpeed()			{ return this._baseSpeed; }
+	getSpeed()				{ return this._speed; }
 
 	setLastHit(lastHit)		{ this._lastHit = lastHit; }
 	setBaseSpeed(baseSpeed)	{ this._baseSpeed = baseSpeed; }
 	setSpeed(speed)			{ this._speed = speed; }
+	incrSpeed(increment)	{ this._speed += increment };
 	setStartDir(dir)		{ this._direction = dir.normalize(); }
 	setDirection(vector)	{ this._direction = vector.normalize(); }
 	setColliders(colliders)	{ this._colliders = colliders; }
 	incrPlayerBounce()		{ this._playerBounces++; }
 
 	update() {
-		if (this._playerBounces % 8 === 0 && this._playerBounces !== 0) 
-			this._speed += 0.0005;
 		this.mesh.position.addInPlace(this._direction.scale(this._speed));
 
 		if (this._keys[" "] && this._speed === 0.0) {
 			this._speed = this._baseSpeed;
-			this._lastHit = null;
+			this._lastHit = null; 
 
 			this._direction = new Vector3(Math.random() < 0.5 ? -1 : 1, 0, 0);
 		}
