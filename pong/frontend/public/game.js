@@ -15,7 +15,7 @@ const scene = field.getScene();
 // let camera = field.getCamera();
 
 /* CHANGEABLE VARS ********************************************************* */
-const frames = 30;
+const frames = 60;
 const frameLimiter = frames / 100;
 
 
@@ -23,8 +23,8 @@ const player1Color = Color3.Red();
 const player2Color = Color3.Green();
 const wallsColor = Color3.White();
 const ballColor = Color3.Blue();
-const playerSpeed = 0.2 * frameLimiter;
-const ballBaseSpeed = 0.2 * frameLimiter;
+const playerSpeed = 0.4 * frameLimiter;
+const ballBaseSpeed = 0.4 * frameLimiter;
 const boxes = false;
 
 
