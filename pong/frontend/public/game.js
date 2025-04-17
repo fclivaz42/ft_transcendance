@@ -18,11 +18,10 @@ const scene = field.getScene();
 const frames = 60;
 const frameLimiter = frames / 100;
 
-
-const player1Color = Color3.Red();
-const player2Color = Color3.Green();
+const player1Color = Color3.White();
+const player2Color = Color3.White();
 const wallsColor = Color3.White();
-const ballColor = Color3.Blue();
+const ballColor = Color3.White();
 const playerSpeed = 0.4 * frameLimiter;
 const ballBaseSpeed = 0.4 * frameLimiter;
 const boxes = false;

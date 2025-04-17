@@ -89,7 +89,7 @@ export class Paddle {
 		let impact = (ball.mesh.position.z - collisionCenter.z) / (collisionHeight / 2);
 		impact = Math.max(-1, Math.min(impact, 1));
 		ball._direction.x *= -1;
-		ball._direction.z = (impact * 0.7 + ball._direction.z * 0.3); //weighted average for bounce
+		ball._direction.z = (impact * 0.8 + ball._direction.z * 0.2); //weighted average for bounce
 		/* To prevent too much of a vertical bounce */
 		if (impact !== 0 && Math.abs(ball._direction.z) < 0.1) {
 			ball._direction.z = 0.1 * Math.sign(ball._direction.z || 1);
