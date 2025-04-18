@@ -6,34 +6,50 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/03/25 18:19:10 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/04/18 21:13:39 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import Database from "better-sqlite3"
+import SqliteError from "better-sqlite3"
 
-function checkRequestFormat (headers, body) {
+const pfs = ["PlayerID", "DisplayName", "PassHash", "ActiveTokens", "EmailAddress", "PhoneNumber", "RealName", "Surname", "Bappy", "Admin"]
+const mfs = ["MatchID", "PlayerOneID", "PlayerTwoID", "WinnerPlayerID", "ScoreOne", "ScoreTwo", "StartTime", "EndTime"]
+
+function checkRequestFormat(headers, method) {
 	if (!headers["api_key"])
-		throw {code: 401, string: "error.missing.api_key"}
+		throw { code: 401, string: "error.missing.api_key" }
 	if (headers["api_key"] !== process.env.API_KEY)
-		throw {code: 401, string: "error.invalid.api_key"}
-	if (headers["content-type"] !== "application/json")
-		throw {code: 400, string: "error.invalid.content-type"}
-	if (!body["table"])
-		throw {code: 400, string: "error.invalid.format"}
-	if (!(body["table"] == "Players" || body["table"] == "Matches"))
-		throw {code: 400, string: "error.invalid.table"}
+		throw { code: 401, string: "error.invalid.api_key" }
+	if ((method === "POST" || method === "PUT") && headers["content-type"] !== "application/json")
+		throw { code: 400, string: "error.invalid.content-type" }
+	if (!headers["table"])
+		throw { code: 400, string: "error.missing.table" }
+	if (!(headers["table"] == "Players" || headers["table"] == "Matches"))
+		throw { code: 400, string: "error.invalid.table" }
 }
 
-export async function dbget (fastify, options) {
-	fastify.get('/', function handler (request, reply) {
-		const db = new Database("/data/SARIF.db", {readonly: true});
+export async function dbget(fastify) {
+	fastify.get('/', function handler(request, reply) {
+		const db = new Database("/data/SARIF.db", { readonly: true });
 		let response;
 		try {
-			checkRequestFormat(request.headers, request.body)
-			const body = request.body;
-			let sql;
+			checkRequestFormat(request.headers, request.method)
+			if (!request.headers["field"])
+				throw { code: 400, string: "error.missing.field" }
+			if (request.headers["table"] === "Players" && pfs.indexOf(request.headers["field"]) == -1)
+				throw { code: 400, string: "error.invalid.field" }
+			if (request.headers["table"] === "Matches" && mfs.indexOf(request.headers["field"]) == -1)
+				throw { code: 400, string: "error.invalid.field" }
+			if (!request.headers["query"])
+				throw { code: 400, string: "error.missing.query" }
+			let sql = db.prepare(`SELECT * from ${request.headers["table"]} WHERE ${request.headers["field"]} = ?`);
+			response = sql.get(request.headers["query"]);
+			if (response === undefined)
+				throw { code: 404, string: "error.value.notfound" }
 		} catch (exception) {
+			if (typeof exception.code === "string")
+				return reply.code(500).send(exception.code)
 			return reply.code(exception.code).send(exception.string)
 		} finally {
 			db.close()
@@ -42,41 +58,42 @@ export async function dbget (fastify, options) {
 	})
 }
 
-export async function dbpost (fastify, options) {
-	fastify.post('/', function handler (request, reply) {
+export async function dbpost(fastify) {
+	fastify.post('/', function handler(request, reply) {
 		const db = new Database("/data/SARIF.db");
 		try {
-			checkRequestFormat(request.headers, request.body)
+			checkRequestFormat(request.headers, request.method)
 			const body = request.body;
-			let sql, rcode;
-			if (body["table"] === "Players") {
-				if (!body["ActiveTokens"])
-					body["ActiveTokens"] = "NULL"
-				const findID = db.prepare('SELECT * FROM Players WHERE PlayerID = ?')
-				if (findID.get(body["PlayerID"]) !== undefined)
-					throw {code: 409, string: "error.uuid.exists"}
-				const findName = db.prepare('SELECT * FROM Players WHERE DisplayName = ?')
-				if (findName.get(body["DisplayName"]) !== undefined)
-					throw {code: 409, string: "error.nameid.exists"}
-				sql = db.prepare(`INSERT INTO Players VALUES (@PlayerID, @DisplayName, @PassHash, @ActiveTokens, @EmailAddress, @PhoneNumber, @RealName, @Surname, @Bappy)`);
+			let sql;
+			if (request.headers["table"] === "Players") {
+				if (!body[pfs[3]])
+					body[pfs[3]] = "NULL"
+				if (db.prepare(`SELECT * FROM Players WHERE ${pfs[0]} = ?`).get(body[pfs[0]]) !== undefined)
+					throw { code: 409, string: "error.uuid.exists" }
+				if (db.prepare(`SELECT * FROM Players WHERE ${pfs[1]} = ?`).get(body[pfs[1]]) !== undefined)
+					throw { code: 409, string: "error.nameid.exists" }
+				sql = db.prepare(`INSERT INTO Players VALUES (@${pfs[0]}, @${pfs[1]}, @${pfs[2]}, @${pfs[3]}, @${pfs[4]}, @${pfs[5]}, @${pfs[6]}, @${pfs[7]}, @${pfs[8]}, @${pfs[9]})`);
 			}
-			else if (body["table"] === "Matches") {
-				const findID = db.prepare('SELECT * FROM Matches WHERE MatchID = ?')
-				if (findID.get(body["MatchID"]) !== undefined)
-					throw {code: 409, string: "error.uuid.exists"}
-				sql = db.prepare(`INSERT INTO Players VALUES (@MatchID, @PlayerOneID, @PlayerTwoID, @WinnerPlayerID, @ScoreOne, @ScoreTwo, @StartTime, @EndTime)`);
+			else if (request.headers["table"] === "Matches") {
+				if (db.prepare(`SELECT * FROM Matches WHERE ${mfs[0]} = ?`).get(body[mfs[0]]) !== undefined)
+					throw { code: 409, string: "error.uuid.exists" }
+				sql = db.prepare(`INSERT INTO Matches VALUES (@${mfs[0]}, @${mfs[1]}, @${mfs[2]}, @${mfs[3]}, @${mfs[4]}, @${mfs[5]}, @${mfs[6]}, @${mfs[7]})`);
 			}
 			else
-				throw {code: 400, string: "error.invalid.table"}
+				throw { code: 400, string: "error.invalid.table" }
 			try {
-				rcode = sql.run(body)
+				sql.run(body)
 			}
 			catch (error) {
 				if (error instanceof RangeError)
-					throw {code: 400, string: "error.missing.entries"}
-				throw {code: 500, string: "error.database.fucked"}
+					throw { code: 400, string: "error.missing.entries" }
+				if (typeof error.code === "string")
+					throw { code: 500, string: error.code }
+				throw { code: 500, string: "error.database.fucked" }
 			}
 		} catch (exception) {
+			if (typeof exception.code === "string")
+				return reply.code(500).send(exception.code)
 			return reply.code(exception.code).send(exception.string)
 		} finally {
 			db.close()
@@ -85,37 +102,67 @@ export async function dbpost (fastify, options) {
 	})
 }
 
-export async function dbdel(fastify, options) {
-	fastify.delete('/', function handler (request, reply) {
+export async function dbdel(fastify) {
+	fastify.delete('/', function handler(request, reply) {
 		const db = new Database("/data/SARIF.db");
 		let response;
 		try {
-			checkRequestFormat(request.headers, request.body)
-			const body = request.body;
-			let sql;
+			checkRequestFormat(request.headers, request.method)
+			if (request.headers["table"] === "Matches")
+				throw { code: 400, string: "error.unsupported.table" }
+			if (!request.headers["field"])
+				throw { code: 400, string: "error.missing.field" }
+			if (request.headers["table"] === "Players" && pfs.indexOf(request.headers["field"]) == -1)
+				throw { code: 400, string: "error.invalid.field" }
+			if (!request.headers["query"])
+				throw { code: 400, string: "error.missing.query" }
+			let sql = db.prepare(`DELETE from ${request.headers["table"]} WHERE ${request.headers["field"]} = ?`);
+			response = sql.run(request.headers["query"]);
+			if (response === undefined)
+				throw { code: 404, string: "error.value.notfound" }
 		} catch (exception) {
+			if (typeof exception.code === "string")
+				return reply.code(500).send(exception.code)
 			return reply.code(exception.code).send(exception.string)
 		} finally {
 			db.close()
 		}
-		return reply.code(200).send(response)
+		return reply.code(202).send(response)
 	})
 }
 
-export async function dbput (fastify, options) {
-	fastify.put('/', function handler (request, reply) {
+export async function dbput(fastify) {
+	fastify.put('/', function handler(request, reply) {
 		const db = new Database("/data/SARIF.db");
 		let response;
 		try {
-			checkRequestFormat(request.headers, request.body)
+			let sql = `UPDATE Players\nSET`;
+			checkRequestFormat(request.headers, request.method)
 			const body = request.body;
-			let sql;
+			if (request.headers["table"] === "Matches")
+				throw { code: 400, string: "error.static.table" }
+			if (body["PlayerID"] === undefined)
+				throw { code: 400, string: "error.no.uuid" }
+			if (db.prepare(`SELECT * FROM Players WHERE ${pfs[0]} = ?`).get(body[pfs[0]]) === undefined)
+				throw { code: 404, string: "error.invalid.uuid" }
+			for (let key in body) {
+				if (pfs.indexOf(key) == 0 )
+					continue ;
+				else if (pfs.indexOf(key) == -1 )
+					throw { code: 400, string: "error.invalid.field" }
+				else
+					sql += ` ${key} = @${key},`
+			}
+			sql = sql.slice(0, -1)
+			sql += `\nWHERE ${pfs[0]} = @${pfs[0]}`
+			console.log(sql)
+			response = db.prepare(sql).run(body)
 		} catch (exception) {
 			return reply.code(exception.code).send(exception.string)
 		} finally {
 			db.close()
 		}
-		return reply.code(200).send(response)
+		return reply.code(205).send(response)
 	})
 }
 
@@ -124,29 +171,29 @@ export function init_db() {
 	try {
 		db.prepare(
 			`CREATE TABLE IF NOT EXISTS Players (
-				PlayerID TEXT PRIMARY KEY,
-				DisplayName TEXT UNIQUE NOT NULL,
-				PassHash TEXT NOT NULL,
-				ActiveTokens TEXT,
-				EmailAddress TEXT NOT NULL,
-				PhoneNumber TEXT NOT NULL,
-				RealName TEXT NOT NULL,
-				Surname TEXT NOT NULL,
-				Bappy INTEGER NOT NULL,
-				Admin INTEGER NOT NULL);`).run();
+				${pfs[0]} TEXT PRIMARY KEY,
+				${pfs[1]} TEXT UNIQUE NOT NULL,
+				${pfs[2]} TEXT NOT NULL,
+				${pfs[3]} TEXT,
+				${pfs[4]} TEXT NOT NULL,
+				${pfs[5]} TEXT NOT NULL,
+				${pfs[6]} TEXT NOT NULL,
+				${pfs[7]} TEXT NOT NULL,
+				${pfs[8]} INTEGER NOT NULL,
+				${pfs[9]} INTEGER NOT NULL)`).run();
 		db.prepare(
 			`CREATE TABLE IF NOT EXISTS Matches (
-				MatchID TEXT PRIMARY KEY,
-				PlayerOneID TEXT NOT NULL,
-				PlayerTwoID TEXT NOT NULL,
-				WinnerPlayerID TEXT NOT NULL,
-				ScoreOne INTEGER NOT NULL,
-				ScoreTwo INTEGER NOT NULL,
-				StartTime INTEGER NOT NULL,
-				EndTime INTEGER NOT NULL,
-				FOREIGN KEY (WinnerPlayerID) REFERENCES players(PlayerID) ON DELETE CASCADE,
-				FOREIGN KEY (PlayerOneID) REFERENCES players(PlayerID) ON DELETE CASCADE,
-				FOREIGN KEY (PlayerTwoID) REFERENCES players(PlayerID) ON DELETE CASCADE)`).run();
+				${mfs[0]} TEXT PRIMARY KEY,
+				${mfs[1]} TEXT,
+				${mfs[2]} TEXT,
+				${mfs[3]} TEXT,
+				${mfs[4]} INTEGER NOT NULL,
+				${mfs[5]} INTEGER NOT NULL,
+				${mfs[6]} INTEGER NOT NULL,
+				${mfs[7]} INTEGER NOT NULL,
+				FOREIGN KEY (${mfs[1]}) REFERENCES Players(${pfs[0]}) ON DELETE SET NULL
+				FOREIGN KEY (${mfs[2]}) REFERENCES Players(${pfs[0]}) ON DELETE SET NULL,
+				FOREIGN KEY (${mfs[3]}) REFERENCES Players(${pfs[0]}) ON DELETE SET NULL)`).run();
 	} catch (error) {
 		console.log(error);
 	} finally {
