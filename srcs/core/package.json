@@ -1,7 +1,7 @@
 {
-  "name": "sarif_db",
+  "name": "sarif_core",
   "version": "0.0.1",
-  "description": "SARIF Database module",
+  "description": "SARIF Core module",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -11,9 +11,9 @@
     "prod": "node index.js"
   },
   "author": "fclivaz",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "dependencies": {
-    "better-sqlite3": "^11.9.0",
+    "axios": "^1.8.4",
     "fastify": "^5.3.1"
   }
 }

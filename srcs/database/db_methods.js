@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/04/18 21:13:39 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/04/18 23:42:10 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -98,7 +98,7 @@ export async function dbpost(fastify) {
 		} finally {
 			db.close()
 		}
-		return reply.code(201).send(request.body)
+		return reply.code(201).send(JSON.stringify(request.body))
 	})
 }
 

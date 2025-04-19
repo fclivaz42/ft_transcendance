@@ -1,8 +1,10 @@
-FROM node:22.13.1-alpine
+FROM node:23.10.0-alpine
 
 RUN apk update
 RUN apk upgrade
 
 WORKDIR /sarif
 
-RUN npx i fastify
+EXPOSE 443
+
+ENTRYPOINT ["sh", "start.sh"]

@@ -6,7 +6,7 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/22 22:04:45 by fclivaz           #+#    #+#              #
-#    Updated: 2025/03/07 22:21:23 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/04/18 21:55:53 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,8 +25,7 @@ build:
 	docker-compose -p ${NAME} -f ./docker/docker-compose.yml build
 
 up: build
-	#API_KEY="$$(uuidgen)" docker-compose -p ${NAME} -f ./docker/docker-compose.yml up -d
-	docker-compose -p ${NAME} -f ./docker/docker-compose.yml up -d
+	API_KEY="$$(uuidgen)" docker-compose -p ${NAME} -f ./docker/docker-compose.yml up -d
 
 down:
 	docker-compose -p ${NAME} -f ./docker/docker-compose.yml down -v

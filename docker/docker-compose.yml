@@ -6,7 +6,7 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/28 19:14:22 by fclivaz           #+#    #+#              #
-#    Updated: 2025/03/05 19:04:13 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/04/18 22:31:07 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,27 +23,28 @@ services:
     volumes:
       - dbsrcs:/sarif
       - data:/data
-    ports:
-      - "3000:3000"
     build: database
     env_file: .env
     secrets:
       - api-key
-    # restart: on-failure
+    restart: on-failure
 
-  # sarif_core:
-  #   container_name: sarif_core
-  #   networks:
-  #     - sarifntw
-  #   build: core
-  #   ports:
-  #     - "443:443"
-  #   env_file: .env
-  #   environment:
-  #     API-KEY: /run/secrets/api-key
-  #   depends_on:
-  #     - sarif_db
-  #   restart: on-failure
+  sarif_core:
+    container_name: sarif_core
+    networks:
+      - sarifntw
+    volumes:
+      - coresrcs:/sarif
+      - data:/data
+    ports:
+      - "443:443"
+    build: core
+    env_file: .env
+    secrets:
+      - api-key
+    depends_on:
+      - sarif_db
+    # restart: on-failure
 
 volumes:
   data:
