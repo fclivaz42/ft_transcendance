@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/04/18 23:42:10 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/04/19 03:33:55 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -136,26 +136,30 @@ export async function dbput(fastify) {
 		const db = new Database("/data/SARIF.db");
 		let response;
 		try {
-			let sql = `UPDATE Players\nSET`;
 			checkRequestFormat(request.headers, request.method)
 			const body = request.body;
 			if (request.headers["table"] === "Matches")
 				throw { code: 400, string: "error.static.table" }
 			if (body["PlayerID"] === undefined)
-				throw { code: 400, string: "error.no.uuid" }
+				throw { code: 400, string: "error.missing.uuid" }
 			if (db.prepare(`SELECT * FROM Players WHERE ${pfs[0]} = ?`).get(body[pfs[0]]) === undefined)
 				throw { code: 404, string: "error.invalid.uuid" }
+			let sql = `UPDATE ${request.headers["table"]}\nSET`;
+			let count = 0;
 			for (let key in body) {
 				if (pfs.indexOf(key) == 0 )
 					continue ;
 				else if (pfs.indexOf(key) == -1 )
 					throw { code: 400, string: "error.invalid.field" }
-				else
+				else {
 					sql += ` ${key} = @${key},`
+					++count
+				}
 			}
+			if (count === 0)
+				throw { code: 400, string: "error.missing.fields" }
 			sql = sql.slice(0, -1)
 			sql += `\nWHERE ${pfs[0]} = @${pfs[0]}`
-			console.log(sql)
 			response = db.prepare(sql).run(body)
 		} catch (exception) {
 			return reply.code(exception.code).send(exception.string)
