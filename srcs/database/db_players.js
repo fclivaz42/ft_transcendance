@@ -1,36 +1,32 @@
 // ************************************************************************** //
 //                                                                            //
 //                                                        :::      ::::::::   //
-//   db_methods.js                                      :+:      :+:    :+:   //
+//   db_players.js                                      :+:      :+:    :+:   //
 //                                                    +:+ +:+         +:+     //
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/04/23 18:59:24 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/04/23 18:45:10 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import Database from "better-sqlite3"
-import SqliteError from "better-sqlite3"
+import { check_get, check_post, check_delete, check_put } from "./db_checks.js"
+import { dbget, dbpost, dbdel, dbput, tables } from "./db_methods.js"
 
-const tables = ["Players", "Matches"]
+const table_fields =	["PlayerID",
+						"DisplayName",
+						"PassHash",
+						"ActiveTokens",
+						"EmailAddress",
+						"PhoneNumber",
+						"RealName",
+						"Surname",
+						"Bappy",
+						"Admin"]
 
-export function dbget(table, field, query) {
-	const db = new Database("/data/SARIF.db", { readonly: true });
-	let response;
-	try {
-		let sql = db.prepare(`SELECT * from ? WHERE ? = ?`);
-		response = sql.get(table, field, query);
-		if (response === undefined)
-			throw { code: 404, string: "error.value.notfound" }
-	} catch (exception) {
-		if (typeof exception.code === "string")
-			return reply.code(500).send(exception.code)
-		return reply.code(exception.code).send(exception.string)
-	} finally {
-		db.close()
-	}
-	return reply.code(200).send(response)
+export async function get_players(fastify) {
+	fastify.get(`/${tables[0]}`, get_db(request, reply, tables[0], table_fields))
 }
 
 export async function dbpost(fastify) {
@@ -122,9 +118,9 @@ export async function dbput(fastify) {
 			let sql = `UPDATE ${request.headers["table"]}\nSET`;
 			let count = 0;
 			for (let key in body) {
-				if (pfs.indexOf(key) === 0 )
+				if (pfs.indexOf(key) == 0 )
 					continue ;
-				else if (pfs.indexOf(key) === -1 )
+				else if (pfs.indexOf(key) == -1 )
 					throw { code: 400, string: "error.invalid.field" }
 				else {
 					sql += ` ${key} = @${key},`
