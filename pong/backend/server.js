@@ -20,7 +20,7 @@ fastify.setNotFoundHandler((request, reply) => {
 	reply.type('text/html').sendFile('index.html');
 });
 
-fastify.listen({ port: 3000, host: '0.0.0.0' }, (err, address) => {
+fastify.listen({ port: 1337, host: '0.0.0.0' }, (err, address) => {
 	if (err) {
 		fastify.log.error(err);
 		process.exit(1);

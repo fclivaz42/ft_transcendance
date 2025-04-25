@@ -7,6 +7,7 @@ import { Vector3 } from "@babylonjs/core";
 import { MeshBuilder } from "@babylonjs/core";
 import { StandardMaterial } from "@babylonjs/core";
 import { Color3 } from "@babylonjs/core";
+import { Camera } from "@babylonjs/core";
 import { Logger } from "./logger.js";
 
 export class PlayField {
@@ -30,6 +31,12 @@ export class PlayField {
 			this.scene
 		);
 		// camera.attachControl(this.canvas, false); // <--- Comment for prod
+		// camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
+		// // const distance = 20; // You can adjust based on your scene
+		// camera.orthoLeft = -20;
+		// camera.orthoRight = 20;
+		// camera.orthoTop = 20;
+		// camera.orthoBottom = -15;
 		return camera;
 	}
 
