@@ -4,10 +4,10 @@ import {
 	Color3,
 	Vector3
 } from "@babylonjs/core";
-import { Paddle } from "./be_classes/be_paddle.js";
-import { Wall } from "./be_classes/be_wall.js";
-import { PlayField } from "./be_classes/be_playfield.js";
-import { Ball } from "./be_classes/be_ball.js";
+import { Paddle } from "./be_Paddle.js";
+import { Wall } from "./be_Wall.js";
+import { PlayField } from "./be_Playfield.js";
+import { Ball } from "./be_Ball.js";
 
 /* SETTING UP FIELD ******************************************************** */
 const field = new PlayField();

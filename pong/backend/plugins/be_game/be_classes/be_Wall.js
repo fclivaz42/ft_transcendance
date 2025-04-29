@@ -1,8 +1,8 @@
 
 import { Vector3 } from "@babylonjs/core";
-import { Paddle } from "./be_paddle.js";
+import { Paddle } from "./be_Paddle.js";
 
-export class Wall extends Paddle {
+export default class Wall extends Paddle {
     constructor(scene, name, position = new Vector3(0, 0, 0), options = {}) {
         super(scene, name, position, options);
         this._keys = {};

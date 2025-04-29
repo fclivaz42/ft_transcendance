@@ -11,7 +11,7 @@ import {
 	StandardMaterial,
 } from "@babylonjs/core";
 
-export class PlayField {
+export default class PlayField {
 	constructor() {
 		this.engine = new NullEngine({
 			renderWidth: 512,

@@ -20,7 +20,7 @@ fastify.register(fastifyWebsocket);
 /* Serving the static page with canvas */
 fastify.register(fastifyStatic, {
 	root: path.join(__dirname, '../frontend/dist'),
-	prefix: '/',
+prefix: '/',
 });
 
 fastify.setNotFoundHandler((request, reply) => {

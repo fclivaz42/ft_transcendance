@@ -1,6 +1,6 @@
 import { MeshBuilder, Vector3, Color3, StandardMaterial, BoundingBox } from "@babylonjs/core";
 
-export class Ball {
+export default class Ball {
 	constructor(
 		scene,
 		name,
@@ -50,6 +50,7 @@ export class Ball {
 	getPlayerBounces()		{ return this._playerBounces; }
 	getBaseSpeed()			{ return this._baseSpeed; }
 	getSpeed()				{ return this._speed; }
+	getPosition()			{ return this._position; }
 
 	setLastHit(lastHit)		{ this._lastHit = lastHit; }
 	setBaseSpeed(baseSpeed)	{ this._baseSpeed = baseSpeed; }

@@ -1,7 +1,7 @@
 
 import { MeshBuilder, Vector3, Color3, StandardMaterial, BoundingBox } from "@babylonjs/core";
 
-export class Paddle {
+export default class Paddle {
     constructor(
         scene,
         name,
