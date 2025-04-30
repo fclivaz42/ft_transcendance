@@ -6,7 +6,7 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/22 22:04:45 by fclivaz           #+#    #+#              #
-#    Updated: 2025/04/18 21:55:53 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/04/25 16:33:45 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,8 @@ NAME = sarif
 DATADIR = data
 
 SHELL = /bin/bash
+
+GENERATOR = dd if=/dev/random of=/dev/stdout bs=256 count=1 2>/dev/null | base64 | tr -d '\n'
 
 ${NAME}: all
 
@@ -25,7 +27,7 @@ build:
 	docker-compose -p ${NAME} -f ./docker/docker-compose.yml build
 
 up: build
-	API_KEY="$$(uuidgen)" docker-compose -p ${NAME} -f ./docker/docker-compose.yml up -d
+	API_KEY="$$($(GENERATOR))" docker-compose -p ${NAME} -f ./docker/docker-compose.yml up -d
 
 down:
 	docker-compose -p ${NAME} -f ./docker/docker-compose.yml down -v
