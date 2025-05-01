@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/21 21:57:13 by fclivaz           #+#    #+#             //
-//   Updated: 2025/04/30 02:15:59 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/05/01 03:30:26 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -40,7 +40,7 @@ function get_del_db(request, reply, table, table_fields, op) {
 	return reply.code(op === "get" ? 200 : 202).send(response)
 }
 
-export class RequestHandler {
+export default class RequestHandler {
 	constructor() { }
 
 	static get(request, reply, table, table_fields) {
@@ -55,7 +55,7 @@ export class RequestHandler {
 		let response;
 		try {
 			check_request_format(request.headers, request.method)
-			response = DatabaseWorker.post(table, table_fields, body)
+			response = DatabaseWorker.post(table, table_fields, request.body)
 		} catch (exception) {
 			return reply.code(exception.code).send(exception.string)
 		}
@@ -65,12 +65,8 @@ export class RequestHandler {
 		let response;
 		try {
 			check_request_format(request.headers, request.method)
-			if (request.headers["table"] === "Matches")
-				throw { code: 400, string: "error.static.table" }
-			if (request.body["PlayerID"] === undefined)
+			if (request.body[table_fields[0]] === undefined)
 				throw { code: 400, string: "error.missing.uuid" }
-			if (db.prepare(`SELECT * FROM ? WHERE ? = ?`).get(table, table_fields[0], request.body[table_fields[0]]) === undefined)
-				throw { code: 404, string: "error.invalid.uuid" }
 			response = DatabaseWorker.put(table, table_fields, request.body);
 		} catch (exception) {
 			return reply.code(exception.code).send(exception.string)

@@ -5,13 +5,11 @@
   "main": "db_main.js",
   "type": "module",
   "scripts": {
-    "predebug": "npm i",
-    "debug": "RUNMODE='debug' node db_main.js debug",
-    "preprod": "npm i",
-    "prod": "RUNMODE='prod' node db_main.js"
+    "debug": "node db_main.js debug",
+    "prod": "node db_main.js"
   },
   "author": "fclivaz",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "dependencies": {
     "better-sqlite3": "^11.9.0",
     "fastify": "^5.3.2"

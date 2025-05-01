@@ -6,7 +6,7 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/22 22:04:45 by fclivaz           #+#    #+#              #
-#    Updated: 2025/04/25 16:33:45 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/05/01 02:29:44 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,21 +24,20 @@ all: start
 
 build:
 	mkdir -p ${DATADIR}
-	docker-compose -p ${NAME} -f ./docker/docker-compose.yml build
+	docker-compose -p ${NAME} -f ./srcs/docker-compose.yml build
 
 up: build
-	API_KEY="$$($(GENERATOR))" docker-compose -p ${NAME} -f ./docker/docker-compose.yml up -d
+	API_KEY="$$($(GENERATOR))" docker-compose -p ${NAME} -f ./srcs/docker-compose.yml up -d
 
 down:
-	docker-compose -p ${NAME} -f ./docker/docker-compose.yml down -v
-	rm -rf ${DATADIR}
+	docker-compose -p ${NAME} -f ./srcs/docker-compose.yml down -v
 
 start: up
 	mkdir -p ${DATADIR}
-	docker-compose -p ${NAME} -f ./docker/docker-compose.yml start
+	docker-compose -p ${NAME} -f ./srcs/docker-compose.yml start
 
 stop:
-	docker-compose -p ${NAME} -f ./docker/docker-compose.yml stop
+	docker-compose -p ${NAME} -f ./srcs/docker-compose.yml stop
 
 status:
 	docker ps -a
@@ -52,11 +51,9 @@ prune:
 nuke: down prune
 	rm -rf ${DATADIR}
 
-re: down
-	make all
+re: down all
 
 rebuild: nuke
 	make all
 
-restart: stop
-	make start
+restart: stop start

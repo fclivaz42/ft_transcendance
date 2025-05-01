@@ -6,7 +6,7 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/28 19:14:22 by fclivaz           #+#    #+#              #
-#    Updated: 2025/04/18 22:31:07 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/05/01 02:31:06 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,12 +21,11 @@ services:
     networks:
       - sarifntw
     volumes:
-      - dbsrcs:/sarif
       - data:/data
     build: database
     env_file: .env
-    secrets:
-      - api-key
+    environment:
+      - API_KEY
     restart: on-failure
 
   sarif_core:
@@ -34,17 +33,30 @@ services:
     networks:
       - sarifntw
     volumes:
-      - coresrcs:/sarif
       - data:/data
     ports:
       - "443:443"
     build: core
     env_file: .env
-    secrets:
-      - api-key
+    environment:
+      - API_KEY
     depends_on:
       - sarif_db
     # restart: on-failure
+
+  # sarif_{MODULE}:
+  #   container_name: sarif_{MODULE}
+  #   networks:
+  #     - sarifntw
+  #   volumes:
+  #     - data:/data
+  #   build: {MODULE}
+  #   env_file: .env
+  #   environment:
+  #     - API_KEY
+  #   depends_on:
+  #     - sarif_{DEPENDMODULE}
+  #   restart: on-failure
 
 volumes:
   data:
@@ -54,30 +66,3 @@ volumes:
       type: none
       o: bind
       device: ../data/
-
-  coresrcs:
-    name: "SARIF_core_srcs"
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ../srcs/core
-
-  dbsrcs:
-    name: "SARIF_db_srcs"
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ../srcs/database
-
-  # srcs:
-  #   name: ""
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     o: bind
-  #     device: ../srcs/{PATH}
-secrets:
-  api-key:
-    environment: API_KEY

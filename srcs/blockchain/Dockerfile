@@ -5,6 +5,8 @@ RUN apk upgrade
 
 WORKDIR /sarif
 
-EXPOSE 443
+COPY srcs/ /sarif
 
-ENTRYPOINT ["sh", "start.sh"]
+RUN npm i
+
+ENTRYPOINT ["sh", "-c", "npm run ${RUNMODE}"]

@@ -3,10 +3,10 @@
 This document provides information about the database's API.
 
 - [HTTP Headers](#http-headers)
-- [`GET`](#get-)
-- [`POST`](#post-)
-- [`DELETE`](#delete-)
-- [`PUT`](#put-)
+- [`GET`](#get)
+- [`POST`](#post)
+- [`DELETE`](#delete)
+- [`PUT`](#put)
 - [Tables and values](#tables-and-values)
 
 # HTTP Headers
@@ -16,10 +16,11 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 | Key            | Expected value                      | Description                                             |
 | -------------- | ----------------------------------- | ------------------------------------------------------- |
 | `api_key`      | whatever `node.env.API_KEY` returns | The global, build-time defined API key used internally. |
-| `table`        | `Players` or `Matches`              | The table on which the operation will take place.       |
 | `Content-Type` | `application/json`                  | `POST` and `PUT` only. Any other type will be rejected. |
 
-# `GET /`
+# `GET`
+
+**Valid table(s): `Players` and `Matches`.**
 
 `GET` is used to retrieve a row from any of the tables of the database.
 
@@ -35,8 +36,6 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 | Return Code                 | Return Content          | Condition                                            |
 | --------------------------- | ----------------------- | ---------------------------------------------------- |
 | `200 OK`                    | JSON Object             | The requested value was found.                       |
-| `400 Bad Request`           | `error.missing.table`   | The request was missing the `table` key.             |
-| `400 Bad Request`           | `error.invalid.table`   | The request had an invalid `table` key.              |
 | `400 Bad Request`           | `error.missing.field`   | The request did not include all the required fields. |
 | `400 Bad Request`           | `error.invalid.field`   | The request had an incorrect search field.           |
 | `400 Bad Request`           | `error.missing.query`   | The request did not include a query.                 |
@@ -45,11 +44,13 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 | `404 Not Found`             | `error.value.notfound`  | The requested value could not be found.              |
 | `500 Internal Server Error` | a lot of things!        | Uhhh can you screenshot and DM me the logs plz? ty   |
 
-# `POST /`
+# `POST`
+
+**Valid table(s): `Players` and `Matches`.**
 
 `POST` is used to create a new entry in one of the tables. For updating already existing entries, please use `PUT` instead.
 
-## `POST` requires a valid `application/json` body.
+## `POST` requires a valid `application/json` body. Every field must be present.
 
 ### If the table is `Players`:
 
@@ -57,8 +58,8 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 | -------------- | -------------- | ------------------------------------------ | ----------------------------------------------------------------------------- |
 | `PlayerID`     | UUIDv4 String  | `f4d122ff-c1b1-4f69-a04d-e63044a3b052`     | The player's Unique Identifier (created with uuidv4();).                      |
 | `DisplayName`  | String         | `Broller`                                  | The player's display name.                                                    |
-| `PassHash`     | String         | `d1aa1db20f1ec7ec04c12e1bc5b5f01c653543b4` | The player's hashed password.                                                 |
-| `ActiveTokens` | String or NULL | `f5242535f238ecfeff5df5938e26d2a3257c1676` | The player's active tokens. This field is not required!                       |
+| `PassHash`     | Hashed String  | `d1aa1db20f1ec7ec04c12e1bc5b5f01c653543b4` | The player's hashed password.                                                 |
+| `ActiveTokens` | String         | `f5242535f238ecfeff5df5938e26d2a3257c1676` | The player's active tokens. Set to the string `NULL` if empty.                |
 | `EmailAddress` | String         | `fclivaz@email.com`                        | The player's email address.                                                   |
 | `PhoneNumber`  | String         | `00411234567890`                           | The player's phone number.                                                    |
 | `RealName`     | String         | `Rui`                                      | The player's real name.                                                       |
@@ -84,10 +85,9 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 | Return Code                 | Return Content               | Condition                                                                                     |
 | --------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------- |
 | `201 Created`               | JSON Object                  | The request was completed and inserted into the table.                                        |
-| `400 Bad Request`           | `error.missing.table`        | The request was missing the `table` key.                                                      |
-| `400 Bad Request`           | `error.invalid.table`        | The request had an invalid `table` key.                                                       |
 | `400 Bad Request`           | `error.invalid.content-type` | The request's content was not `application/json`.                                             |
-| `400 Bad Request`           | `error.missing.entries`      | The request was missing one or more of the required fields.                                   |
+| `400 Bad Request`           | `error.missing.entries`      | The request was missing one or more of the required fields. DM me if this happens tho         |
+| `400 Bad Request`           | `error.missing.fields`       | The request did not include all of the required fields.                                       |
 | `401 Unauthorized`          | `error.missing.api_key`      | The request was missing the API key.                                                          |
 | `401 Unauthorized`          | `error.invalid.api_key`      | The request contained an invalid API key.                                                     |
 | `409 Conflict`              | `error.uuid.exists`          | The request SOMEHOW contained a colliding UUID which already was in the table.                |
@@ -95,9 +95,11 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 | `500 Internal Server Error` | `error.database.fucked`      | i DONT KNOW how you got there. Send me a screenshot of the issue.                             |
 | `500 Internal Server Error` | a lot of things!             | Uhhh can you screenshot and DM me the logs plz? ty                                            |
 
-# `DELETE /`
+# `DELETE`
 
-`DELETE` is used to, well, delete a row from the table. **The `Matches` table cannot be affected.**
+**Valid table(s): `Players`**
+
+`DELETE` is used to, well, delete a row from a table.
 
 ## `DELETE` requires additional headers to function:
 
@@ -111,9 +113,6 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 | Return Code                 | Return Content            | Condition                                            |
 | --------------------------- | ------------------------- | ---------------------------------------------------- |
 | `202 Accepted`              | `SQLite`'s result.        | The requested value was deleted.                     |
-| `400 Bad Request`           | `error.missing.table`     | The request was missing the `table` key.             |
-| `400 Bad Request`           | `error.invalid.table`     | The request had an invalid `table` key.              |
-| `400 Bad Request`           | `error.unsupported.table` | The request tried to modify an immutable table.      |
 | `400 Bad Request`           | `error.missing.field`     | The request did not include all the required fields. |
 | `400 Bad Request`           | `error.invalid.field`     | The request had an incorrect field.                  |
 | `400 Bad Request`           | `error.missing.query`     | The request did not include a query.                 |
@@ -122,9 +121,11 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 | `404 Not Found`             | `error.value.notfound`    | The requested value could not be found.              |
 | `500 Internal Server Error` | a lot of things!          | Uhhh can you screenshot and DM me the logs plz? ty   |
 
-# `PUT /`
+# `PUT`
 
-`PUT` is used to update a row It can contain multiple fields to update in one go. **The `Matches` table cannot be affected.**
+**Valid table(s): `Players`**
+
+`PUT` is used to update a row It can contain multiple fields to update in one go.
 `PUT` requires a valid `PlayerID` to update, as well as any additional fields which need to be changed. Refer to [Tables and values](#tables-and-values) to know which fields are applicable.
 
 ## `PUT` can return the following codes:
@@ -132,9 +133,6 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 | Return Code                 | Return Content            | Condition                                            |
 | --------------------------- | ------------------------- | ---------------------------------------------------- |
 | `202 Accepted`              | `SQLite`'s result.        | The requested value was deleted.                     |
-| `400 Bad Request`           | `error.missing.table`     | The request was missing the `table` key.             |
-| `400 Bad Request`           | `error.invalid.table`     | The request had an invalid `table` key.              |
-| `400 Bad Request`           | `error.static.table`      | The request tried to modify an immutable table.      |
 | `400 Bad Request`           | `error.missing.fields`    | The request did not include fields to modify.        |
 | `400 Bad Request`           | `error.invalid.field`     | The request had an incorrect field.                  |
 | `401 Unauthorized`          | `error.missing.api_key`   | The request was missing the API key.                 |
@@ -145,22 +143,24 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 
 # Tables and values
 
-The Database contains two tables:
+The database contains two tables. In order to perform an operation on a table, you must perform your HTTP request using the table's name as route (case-sensitive.)
+eg. `PUT /Players` will perform an update on the Players table.
+**If you attempt a request on an unsupported table, you will get a Fastify 404 error.**
 
 ## Players:
 
-| Field          | Type           | Example                                    | Description                                                                     |
-| -------------- | -------------- | ------------------------------------------ | ------------------------------------------------------------------------------- |
-| `PlayerID`     | UUIDv4 String  | `f4d122ff-c1b1-4f69-a04d-e63044a3b052`     | The player's Unique Identifier (created with uuidv4();).                        |
-| `DisplayName`  | String         | `Broller`                                  | The player's display name.                                                      |
-| `PassHash`     | String         | `d1aa1db20f1ec7ec04c12e1bc5b5f01c653543b4` | The player's hashed password.                                                   |
-| `ActiveTokens` | String or NULL | `f5242535f238ecfeff5df5938e26d2a3257c1676` | The player's active tokens. This field can be NULL if the player has no tokens. |
-| `EmailAddress` | String         | `fclivaz@email.com`                        | The player's email address.                                                     |
-| `PhoneNumber`  | String         | `00411234567890`                           | The player's phone number.                                                      |
-| `RealName`     | String         | `Rui`                                      | The player's real name.                                                         |
-| `Surname`      | String         | `De Jesus Ferreira`                        | The player's surname.                                                           |
-| `Bappy`        | Integer        | `1745023412`                               | The player's birth date, in UNIX timestamp.                                     |
-| `Admin`        | Integer        | `0` or `1`                                 | Whether or not the player is an admin.                                          |
+| Field          | Type            | Example                                    | Description                                                                     |
+| -------------- | --------------- | ------------------------------------------ | ------------------------------------------------------------------------------- |
+| `PlayerID`     | UUIDv4 String   | `f4d122ff-c1b1-4f69-a04d-e63044a3b052`     | The player's Unique Identifier (created with uuidv4();).                        |
+| `DisplayName`  | String          | `Broller`                                  | The player's display name.                                                      |
+| `PassHash`     | String          | `d1aa1db20f1ec7ec04c12e1bc5b5f01c653543b4` | The player's hashed password.                                                   |
+| `ActiveTokens` | String or NULL  | `f5242535f238ecfeff5df5938e26d2a3257c1676` | The player's active tokens. This field can be NULL if the player has no tokens. |
+| `EmailAddress` | String          | `fclivaz@email.com`                        | The player's email address.                                                     |
+| `PhoneNumber`  | String          | `00411234567890`                           | The player's phone number.                                                      |
+| `RealName`     | String          | `Rui`                                      | The player's real name.                                                         |
+| `Surname`      | String          | `De Jesus Ferreira`                        | The player's surname.                                                           |
+| `Bappy`        | Integer         | `1745023412`                               | The player's birth date, in UNIX timestamp.                                     |
+| `Admin`        | Integer or NULL | `0` or `1`                                 | Whether or not the player is an admin.                                          |
 
 ## Matches:
 

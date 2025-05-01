@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/04/29 17:33:00 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/04/30 18:40:24 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -27,11 +27,11 @@ if (process.env.RUNMODE === "debug")
 	console.log(process.env.API_KEY)
 
 for (const method of methods) {
-	for (const item of tables) {
-		if (item.Methods.indexOf(method) > -1) {
+	for (const item in tables) {
+		if (tables[item].Methods.indexOf(method) > -1) {
 			fastify.register(function tophandler(fastify) {
-				fastify[method.toLowerCase](`/${item.Name}`, function handler(request, reply) {
-					RequestHandler[method.toLowerCase](request, reply, item.Name, item.Fields)
+				fastify[method.toLowerCase()](`/${tables[item].Name}`, function handler(request, reply) {
+					RequestHandler[method.toLowerCase()](request, reply, tables[item].Name, tables[item].Fields)
 				})
 			})
 		}
