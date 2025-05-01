@@ -1,0 +1,29 @@
+{
+  "name": "sarif-frontend",
+  "version": "1.0.0",
+  "description": "Sarif's transcendance frontend",
+  "homepage": "https://github.com/fclivaz42/ft_transcendance#readme",
+  "bugs": {
+    "url": "https://github.com/fclivaz42/ft_transcendance/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fclivaz42/ft_transcendance.git"
+  },
+  "license": "ISC",
+  "author": "RPDJF",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx tailwindcss -i ./srcs/assets/input.css -o ./srcs/assets/tailwind.css --watch",
+    "build": "npx tailwindcss -i ./srcs/assets/input.css -o ./srcs/assets/tailwind.css"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "tailwind-scrollbar": "^3.1.0",
+    "tailwindcss": "^3.4.17"
+  }
+}
