@@ -1,0 +1,40 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/ilkayyanar/Travail/repo_github/ft_transcendance/solidityModule/contracts/test.sol": {
+      "lastModificationDate": 1746197462521,
+      "contentHash": "20f3ab516ea7d2fa1bdf8e26ac605e58",
+      "sourceName": "contracts/test.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.0 <0.9.0"
+      ],
+      "artifacts": [
+        "helloWorld"
+      ]
+    }
+  }
+}
