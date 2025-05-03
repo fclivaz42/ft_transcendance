@@ -7,10 +7,16 @@ class ServerConfig {
 	private _api_key: string;
 
 	constructor() {
-		if (!process.env.OAUTH_PORT) throw new Error("Missing OAUTH_PORT env");
+		if (!process.env.OAUTH_PORT) {
+			console.warn("Missing OAUTH_PORT env, using default port 3000");
+			process.env.OAUTH_PORT = "3000";
+		}
 		this._port = parseInt(process.env.OAUTH_PORT);
 		if (isNaN(this._port)) throw new Error("OAUTH_PORT must be an integer");
-		if (!process.env.OAUTH_LOGGER) throw new Error("Missing OAUTH_LOGGER env");
+		if (!process.env.OAUTH_LOGGER) {
+			console.warn("Missing OAUTH_LOGGER env, using default 'true'");
+			process.env.OAUTH_LOGGER = "true";
+		}
 		this._logger = process.env.OAUTH_LOGGER.toLowerCase() === "true";
 		if (!process.env.API_KEY) {
 			console.warn("Missing API_KEY env, setting a random key...");
