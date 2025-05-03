@@ -38,7 +38,7 @@ Gets the URL to redirect the user to the 42 OAuth authorization server.
 
 ### HTTP Headers
 
-| Key             | Requiered | Expected value                         | Description                                             |
+| Key             | Required | Expected value                         | Description                                             |
 | --------------- | --------- | -------------------------------------- | ------------------------------------------------------- |
 | `authorization` | yes       | whatever `process.env.API_KEY` returns | The global, build-time defined API key used internally. |
 
@@ -84,5 +84,7 @@ These variables are defined in the `.env` file and used for configuration.
 | `OAUTH_SERVER`     | `https://api.intra.42.fr/oauth`             | Local  | The base URL of 42’s OAuth server.                                                                       |
 | `OAUTH_CLIENT_ID`  | (string)                                    | Local  | The client ID provided by 42's API.                                                                      |
 | `OAUTH_SECRET`     | (string)                                    | Local  | The secret associated with the OAuth client.                                                             |
+
+To get 
 
 > ⚠️ The default `OAUTH_CALLBACK` is set to `http://127.0.0.1:3000/oauth/callback` for local development. You'll need to change it to a public URL later in production, by redirecting it to the core server.
