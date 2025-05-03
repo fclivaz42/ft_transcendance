@@ -1,16 +1,15 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import axios from "axios";
 import fastify from "fastify";
-
 import oauthRoutes from "./routes/oauth.ts";
+import ConfigManager from "./managers/ConfigManager.ts";
 
-const server = fastify({logger: true});
+const config = new ConfigManager;
+
+const server = fastify({logger: config.ServerConfig.logger});
 
 server.register(oauthRoutes, {prefix: "/oauth"});
 
-server.listen({ port: process.env.PORT }, (err, address) => {
+server.listen({ port: config.ServerConfig.port }, (err, address) => {
 	if (err) {
 		server.log.error(err);
 		process.exit(1);
