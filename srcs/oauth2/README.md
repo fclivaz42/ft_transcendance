@@ -66,12 +66,12 @@ This endpoint handles the callback from 42's OAuth server. It expects a `code` i
 #### Example Response:
 ```json
 {
-  access_token: "d67b7a7...",
-  token_type: "bearer",
-  expires_in: 7092,
-  scope: "public",
-  created_at: 1746294668,
-  secret_valid_until: 1748616213
+  "access_token": "d67b7a7...",
+  "token_type": "bearer",
+  "expires_in": 7092,
+  "scope": "public",
+  "created_at": 1746294668,
+  "secret_valid_until": 1748616213
 }
 ```
 
