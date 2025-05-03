@@ -75,13 +75,14 @@ This endpoint handles the callback from 42's OAuth server. It expects a `code` i
 
 These variables are defined in the `.env` file and used for configuration.
 
-| Variable           | Example Value                               | Description                                                           |
-| ------------------ | ------------------------------------------- | --------------------------------------------------------------------- |
-| `OAUTH_LOGGER`     | `true`                                      | Enables or disables logging for the OAuth module.                     |
-| `OAUTH_PORT`       | `3000`                                      | The port the OAuth server listens on.                                 |
-| `OAUTH_CALLBACK`   | `http://127.0.0.1:3000/oauth/callback`       | The callback URL where the OAuth server redirects users after login. (⚠️ see notes at the end of README) |
-| `OAUTH_SERVER`     | `https://api.intra.42.fr/oauth`             | The base URL of 42’s OAuth server.                                    |
-| `OAUTH_CLIENT_ID`  | (string)                                    | The client ID provided by 42's API.                                   |
-| `OAUTH_SECRET`     | (string)                                    | The secret associated with the OAuth client.                          |
+| Variable           | Example Value                               | Scope  | Description                                                                                              |
+| ------------------ | ------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
+| `API_KEY`          | (string)                                    | Global | The key to authorize sensitive endpoints                                                                 |
+| `OAUTH_LOGGER`     | `true`                                      | Local  | Enables or disables logging for the OAuth module.                                                        |
+| `OAUTH_PORT`       | `3000`                                      | Local  | The port the OAuth server listens on.                                                                    |
+| `OAUTH_CALLBACK`   | `http://127.0.0.1:3000/oauth/callback`      | Local  | The callback URL where the OAuth server redirects users after login. (⚠️ see notes at the end of README) |
+| `OAUTH_SERVER`     | `https://api.intra.42.fr/oauth`             | Local  | The base URL of 42’s OAuth server.                                                                       |
+| `OAUTH_CLIENT_ID`  | (string)                                    | Local  | The client ID provided by 42's API.                                                                      |
+| `OAUTH_SECRET`     | (string)                                    | Local  | The secret associated with the OAuth client.                                                             |
 
 > ⚠️ The default `OAUTH_CALLBACK` is set to `http://127.0.0.1:3000/oauth/callback` for local development. You'll need to change it to a public URL later in production, by redirecting it to the core server.
