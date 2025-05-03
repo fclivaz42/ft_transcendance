@@ -1,18 +1,14 @@
 import dotenv from "dotenv";
 
 class ServerConfig {
-	private _port: number;
 	private _logger: boolean;
 
 	constructor() {
-		if (!process.env.OAUTH_PORT) throw new Error("Missing OAUTH_PORT env");
-		this._port = parseInt(process.env.OAUTH_PORT);
 		if (isNaN(this._port)) throw new Error("OAUTH_PORT must be an integer");
 		if (!process.env.OAUTH_LOGGER) throw new Error("Missing OAUTH_LOGGER env");
 		this._logger = process.env.OAUTH_LOGGER.toLowerCase() === "true";
 	}
 
-	public get port(): number { return this._port; }
 	public get logger(): boolean { return this._logger; }
 }
 
