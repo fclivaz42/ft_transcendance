@@ -30,7 +30,7 @@ Gets the URL to redirect the user to the 42 OAuth authorization server.
 
 ```json
 {
-  "url": "https://api.intra.42.fr/oauth/authorize?client_id=YOUR_CLIENT_ID&callback_uri=http://127.0.0.1:3000/oauth/callback&response_type=code"
+	"url":"https://accounts.google.com/o/oauth2/v2/auth?client_id=someid.apps.googleusercontent.com&redirect_uri=someurl&scope=openid+email+profile&response_type=code"
 }
 ```
 
@@ -79,19 +79,28 @@ This endpoint handles the callback from 42's OAuth server. It expects a `code` i
 
 These variables are defined in the `.env` file and used for configuration.
 
-| Variable           | Example Value                               | Scope  | Description                                                                                              |
-| ------------------ | ------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
-| `API_KEY`          | (string)                                    | Global | The key to authorize sensitive endpoints                                                                 |
-| `OAUTH_LOGGER`     | `true`                                      | Local  | Enables or disables logging for the OAuth module.                                                        |
-| `OAUTH_PORT`       | `3000`                                      | Local  | The port the OAuth server listens on.                                                                    |
-| `OAUTH_CALLBACK`   | `http://127.0.0.1:3000/oauth/callback`      | Local  | The callback URL where the OAuth server redirects users after login. (⚠️ see notes at the end of README) |
-| `OAUTH_SERVER`     | `https://api.intra.42.fr/oauth`             | Local  | The base URL of 42’s OAuth server.                                                                       |
-| `OAUTH_CLIENT_ID`  | (string)                                    | Local  | The client ID provided by 42's API.                                                                      |
-| `OAUTH_SECRET`     | (string)                                    | Local  | The secret associated with the OAuth client.                                                             |
+- **Global scope**: the environment variable should be defined in the root (global) `.env` file, shared across multiple modules.
+- **Local scope**: the environment variable is specific to this module and should be defined in its local `.env` file.
 
-## OUATH_CLIENT_ID and OAUTH_SECRET
+| Variable                 | Example Value                                  | Scope  | Description                                                                                              |
+| ------------------------ | ---------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
+| `API_KEY`                | (string)                                       | Global | The key to authorize sensitive endpoints                                                                 |
+| `OAUTH_LOGGER`           | `true`                                         | Local  | Enables or disables logging for the OAuth module.                                                        |
+| `OAUTH_PORT`             | `3000`                                         | Local  | The port the OAuth server listens on.                                                                    |
+| `OAUTH_CALLBACK`         | `http://127.0.0.1:3000/oauth/callback`         | Local  | The callback URL where the OAuth server redirects users after login. (⚠️ see notes at the end of README) |
+| `OAUTH_AUTHORIZATION_EP` | `https://accounts.google.com/o/oauth2/v2/auth` | Local  | The base URL for Google's OAuth authorization endpoint.                                                  |
+| `OAUTH_TOKEN_EP`         | `https://oauth2.googleapis.com/token`          | Local  | The endpoint for exchanging the authorization code for an access token.                                  |
+| `OAUTH_SCOPE`            | `"openid email profile"`                       | Local  | The OAuth scopes for requesting user data (openid, email, and profile).                                  |
+| `OAUTH_GRANT_TYPE`       | `"authorization_code"`                         | Local  | The grant type for OAuth, which is "authorization_code" for this flow.                                   |
+| `OAUTH_CLIENT_ID`        | (string)                                       | Local  | The client ID provided by 42's API.                                                                      |
+| `OAUTH_SECRET`           | (string)                                       | Local  | The secret associated with the OAuth application.                                                        |
 
-They are generated through https://profile.intra.42.fr/oauth/applications
+
+## OAUTH configuration
+
+This project is using Google remote sign-in oauth.
+
+Documentation: https://developers.google.com/identity/protocols/oauth2?hl=fr
 
 ## ⚠️ Important
 

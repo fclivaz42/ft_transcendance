@@ -13,32 +13,35 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 		const params = new URLSearchParams({
 			client_id: config.OauthConfig.client_id,
 			redirect_uri: config.OauthConfig.callback,
+			scope: config.OauthConfig.scope,
 			response_type: "code"
 		});
-		const url = new URL(`${config.OauthConfig.server}/authorize?${params.toString()}`);
+		const url = new URL(`${config.OauthConfig.authorization_ep}?${params.toString()}`);
 		return {url}
 	});
 	app.get("/callback", async(req, rep) => {
 		checkRequestAuthorization(req, rep);
 		const query = req.query as OauthRequest;
-		if (!query.code)
-			throw new Error("Missing code query");
-		const reqToken = await axios.request({
-			url: `${config.OauthConfig.server}/token`,
-			method: "post",
-			auth: {
-				username: config.OauthConfig.client_id,
-				password: config.OauthConfig.secret
-			},
-			data: { "grant_type": "client_credentials" }
-		});
-		if (reqToken.status !== 200) {
-			console.dir(reqToken.statusText);
-			throw new Error("couldn't fetch access_token");
+		if (!query.code) {
+			rep.status(400).send({ statusCode: 400, error: "Bad Request", message: "Missing code query from request"});
+			return;
 		}
-		const token = reqToken.data as OauthToken;
-		return {...token};
-	})
+
+		const reqToken = axios.post(config.OauthConfig.token_ep, {
+			code: query.code,
+			client_id: config.OauthConfig.client_id,
+			client_secret: config.OauthConfig.secret,
+			redirect_uri: config.OauthConfig.callback,
+			grant_type: config.OauthConfig.grant_type
+		}, { validateStatus: (status) => status >= 200 && status < 300 });
+
+		await reqToken
+			.then(resp => { rep.status(200).send({...(resp.data as OauthToken)}); })
+			.catch(err => {
+				console.error(err);
+				rep.status(500).send({ statusCode: 500, error: "Internal Server Error", message: "Could not fetch access_token"});
+			});
+	});
 }
 
 export default oauthRoutes;

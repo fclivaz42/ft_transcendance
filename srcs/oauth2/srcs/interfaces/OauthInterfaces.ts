@@ -7,5 +7,5 @@ export interface OauthToken {
 	token_type: string;
 	expires_in: number;
 	scope: string;
-	created_at: number;
+	id_token: string;
 }
