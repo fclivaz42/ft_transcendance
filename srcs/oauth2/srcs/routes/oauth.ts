@@ -10,7 +10,13 @@ import checkRequestAuthorization from '../managers/AuthorizationManager.ts';
 
 async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.get("/login", async(req, rep) => {
-		return {url: `${config.OauthConfig.server}/authorize?client_id=${config.OauthConfig.client_id}&callback_uri=${config.OauthConfig.callback}&response_type=code`}
+		const params = new URLSearchParams({
+			client_id: config.OauthConfig.client_id,
+			redirect_uri: config.OauthConfig.callback,
+			response_type: "code"
+		});
+		const url = new URL(`${config.OauthConfig.server}/authorize?${params.toString()}`);
+		return {url}
 	});
 	app.get("/callback", async(req, rep) => {
 		checkRequestAuthorization(req, rep);
