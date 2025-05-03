@@ -58,16 +58,20 @@ This endpoint handles the callback from 42's OAuth server. It expects a `code` i
 
 | Return Code                 | Return Content                         | Condition                                              |
 | --------------------------- | -------------------------------------- | ------------------------------------------------------ |
-| `200 OK`                    | `{ "access_token": "..." }`           | Successfully retrieved the access token.               |
+| `200 OK`                    | `{ "access_token": "...", ... }`           | Successfully retrieved the access token.               |
 | `400 Bad Request`           | `error: Missing code query`           | The request was missing the `code` query param.  
 | `401 Unauthorized`           | `error: Unauthorized`           | The request was missing the `code` query param.        |
 | `500 Internal Server error` | `error: couldn't fetch access_token`  | Something went wrong during the token request process. |
 
 #### Example Response:
-
 ```json
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIsIn..."
+  access_token: 'd67b7a7...',
+  token_type: 'bearer',
+  expires_in: 7092,
+  scope: 'public',
+  created_at: 1746294668,
+  secret_valid_until: 1748616213
 }
 ```
 
@@ -85,6 +89,10 @@ These variables are defined in the `.env` file and used for configuration.
 | `OAUTH_CLIENT_ID`  | (string)                                    | Local  | The client ID provided by 42's API.                                                                      |
 | `OAUTH_SECRET`     | (string)                                    | Local  | The secret associated with the OAuth client.                                                             |
 
-To get 
+## OUATH_CLIENT_ID and OAUTH_SECRET
+
+They are generated through https://profile.intra.42.fr/oauth/applications
+
+## ⚠️ Important
 
 > ⚠️ The default `OAUTH_CALLBACK` is set to `http://127.0.0.1:3000/oauth/callback` for local development. You'll need to change it to a public URL later in production, by redirecting it to the core server.

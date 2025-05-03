@@ -1,6 +1,6 @@
 // import type converts commonjs to module
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import type { OauthRequest } from '../interfaces/OauthInterfaces';
+import type { OauthRequest, OauthToken } from '../interfaces/OauthInterfaces';
 
 import axios from 'axios';
 import { config } from "../managers/ConfigManager.ts";
@@ -17,7 +17,7 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 		const query = req.query as OauthRequest;
 		if (!query.code)
 			throw new Error("Missing code query");
-		const access_token = await axios.request({
+		const reqToken = await axios.request({
 			url: `${config.OauthConfig.server}/token`,
 			method: "post",
 			auth: {
@@ -26,11 +26,12 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 			},
 			data: { "grant_type": "client_credentials" }
 		});
-		if (access_token.status !== 200) {
-			console.dir(access_token.statusText);
+		if (reqToken.status !== 200) {
+			console.dir(reqToken.statusText);
 			throw new Error("couldn't fetch access_token");
 		}
-		return {access_token: access_token.data.access_token};
+		const token = reqToken.data as OauthToken;
+		return {...token};
 	})
 }
 
