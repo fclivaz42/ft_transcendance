@@ -1,9 +1,7 @@
 import axios from "axios";
 import fastify from "fastify";
 import oauthRoutes from "./routes/oauth.ts";
-import ConfigManager from "./managers/ConfigManager.ts";
-
-const config = new ConfigManager;
+import { config } from "./managers/ConfigManager.ts";
 
 const server = fastify({logger: config.ServerConfig.logger});
 
