@@ -65,7 +65,9 @@ This endpoint handles the callback from 42's OAuth server. It expects a `code` i
 
 #### Example Response:
 
-> Note that jwt_decode.subject can be used as an user identifier
+> jwt_decode will only be present if the used OAuth service is google
+
+> Note that jwt_decode.subject can be used as a google account identifier
 
 
 ```json
