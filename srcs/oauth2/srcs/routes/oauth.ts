@@ -4,6 +4,7 @@ import type { OauthRequest } from '../interfaces/OauthInterfaces';
 
 import axios from 'axios';
 import { config } from "../managers/ConfigManager.ts";
+import checkRequestAuthorization from '../managers/AuthorizationManager.ts';
 
 // login, callback, logout, me
 
@@ -12,6 +13,7 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 		return {url: `${config.OauthConfig.server}/authorize?client_id=${config.OauthConfig.client_id}&callback_uri=${config.OauthConfig.callback}&response_type=code`}
 	});
 	app.get("/callback", async(req, rep) => {
+		checkRequestAuthorization(req, rep);
 		const query = req.query as OauthRequest;
 		if (!query.code)
 			throw new Error("Missing code query");

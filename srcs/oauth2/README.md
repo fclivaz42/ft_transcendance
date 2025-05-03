@@ -6,7 +6,6 @@ This document provides information about the internal Oauth2 module's API used f
 
 ---
 
-- [HTTP Headers](#http-headers)
 - [`GET /login`](#get-login)
 - [`GET /callback`](#get-callback)
 - [Environment Variables](#environment-variables)
@@ -14,14 +13,6 @@ This document provides information about the internal Oauth2 module's API used f
 # 🔐 Overview
 
 This module lets users log in using their 42 account. It does that by redirecting users to 42’s login page and then getting an access token from 42 after they log in.
-
-# HTTP Headers
-
-⚠️ Although not yet implemented, the following header **will be required in future versions**.
-
-| Key       | Expected value               | Description                                             |
-| --------- | ---------------------------- | ------------------------------------------------------- |
-| `api_key` | whatever `process.env.API_KEY` returns | The global, build-time defined API key used internally. |
 
 # Endpoints
 
@@ -45,6 +36,12 @@ Gets the URL to redirect the user to the 42 OAuth authorization server.
 
 ## `GET /callback`
 
+### HTTP Headers
+
+| Key             | Requiered | Expected value                         | Description                                             |
+| --------------- | --------- | -------------------------------------- | ------------------------------------------------------- |
+| `authorization` | yes       | whatever `process.env.API_KEY` returns | The global, build-time defined API key used internally. |
+
 Fetch and return the access token from user.
 
 This endpoint handles the callback from 42's OAuth server. It expects a `code` in the query string and will return an access token.
@@ -62,8 +59,9 @@ This endpoint handles the callback from 42's OAuth server. It expects a `code` i
 | Return Code                 | Return Content                         | Condition                                              |
 | --------------------------- | -------------------------------------- | ------------------------------------------------------ |
 | `200 OK`                    | `{ "access_token": "..." }`           | Successfully retrieved the access token.               |
-| `400 Bad Request`           | `Error: Missing code query`           | The request was missing the `code` query param.        |
-| `500 Internal Server Error` | `Error: couldn't fetch access_token`  | Something went wrong during the token request process. |
+| `400 Bad Request`           | `error: Missing code query`           | The request was missing the `code` query param.  
+| `401 Unauthorized`           | `error: Unauthorized`           | The request was missing the `code` query param.        |
+| `500 Internal Server error` | `error: couldn't fetch access_token`  | Something went wrong during the token request process. |
 
 #### Example Response:
 

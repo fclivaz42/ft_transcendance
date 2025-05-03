@@ -1,8 +1,10 @@
 import dotenv from "dotenv";
+import crypto from "crypto";
 
 class ServerConfig {
 	private _port: number;
 	private _logger: boolean;
+	private _api_key: string;
 
 	constructor() {
 		if (!process.env.OAUTH_PORT) throw new Error("Missing OAUTH_PORT env");
@@ -10,10 +12,17 @@ class ServerConfig {
 		if (isNaN(this._port)) throw new Error("OAUTH_PORT must be an integer");
 		if (!process.env.OAUTH_LOGGER) throw new Error("Missing OAUTH_LOGGER env");
 		this._logger = process.env.OAUTH_LOGGER.toLowerCase() === "true";
+		if (!process.env.API_KEY) {
+			console.warn("Missing API_KEY env, setting a random key...");
+			process.env.API_KEY = crypto.randomBytes(32).toString("hex");
+			console.info(`API_KEY for Authorization header: ${process.env.API_KEY}`)	
+		}
+		this._api_key = process.env.API_KEY;
 	}
 
 	public get port(): number { return this._port; }
 	public get logger(): boolean { return this._logger; }
+	public get api_key(): string { return this._api_key; }
 }
 
 class OauthConfig {
