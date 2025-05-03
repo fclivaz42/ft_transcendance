@@ -17,14 +17,14 @@ class ServerConfig {
 }
 
 class OauthConfig {
-	private _redirect: string;
+	private _callback: string;
 	private _server: string;
 	private _client_id: string;
 	private _secret: string;
 
 	constructor() {
-		if (!process.env.OAUTH_REDIRECT) throw new Error("Missing OAUTH_REDIRECT env");
-		this._redirect = process.env.OAUTH_REDIRECT;
+		if (!process.env.OAUTH_CALLBACK) throw new Error("Missing OAUTH_CALLBACK env");
+		this._callback = process.env.OAUTH_CALLBACK;
 		if (!process.env.OAUTH_SERVER) throw new Error("Missing OAUTH_SERVER env");
 		this._server = process.env.OAUTH_SERVER;
 		if (!process.env.OAUTH_CLIENT_ID) throw new Error("Missing OAUTH_CLIENT_ID env");
@@ -33,7 +33,7 @@ class OauthConfig {
 		this._secret = process.env.OAUTH_SECRET;
 	}
 
-	public get redirect() : string { return this._redirect; }
+	public get callback() : string { return this._callback; }
 	public get server() : string { return this._server; }
 	public get client_id(): string { return this._client_id; }
 	public get secret(): string { return this._secret; }

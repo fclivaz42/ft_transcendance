@@ -9,7 +9,7 @@ import { config } from "../managers/ConfigManager.ts";
 
 async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.get("/login", async(req, rep) => {
-		return {url: `${process.env.OAUTH_SERVER}/authorize?client_id=${process.env.OAUTH_CLIENT_ID}&redirect_uri=${process.env.OAUTH_REDIRECT}&response_type=code`}
+		return {url: `${config.OauthConfig.server}/authorize?client_id=${config.OauthConfig.client_id}&callback_uri=${config.OauthConfig.callback}&response_type=code`}
 	});
 	app.get("/callback", async(req, rep) => {
 		const query = req.query as OauthRequest;
