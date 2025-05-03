@@ -21,7 +21,7 @@ This module lets users log in using their 42 account. It does that by redirectin
 
 | Key       | Expected value               | Description                                             |
 | --------- | ---------------------------- | ------------------------------------------------------- |
-| `api_key` | whatever `node.env.API_KEY` returns | The global, build-time defined API key used internally. |
+| `api_key` | whatever `process.env.API_KEY` returns | The global, build-time defined API key used internally. |
 
 # Endpoints
 
