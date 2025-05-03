@@ -64,14 +64,32 @@ This endpoint handles the callback from 42's OAuth server. It expects a `code` i
 | `500 Internal Server error` | `error: couldn't fetch access_token`  | Something went wrong during the token request process. |
 
 #### Example Response:
+
+> Note that jwt_decode.subject can be used as an user identifier
+
+
 ```json
 {
-  "access_token": "d67b7a7...",
-  "token_type": "bearer",
-  "expires_in": 7092,
-  "scope": "public",
-  "created_at": 1746294668,
-  "secret_valid_until": 1748616213
+   "access_token": "f43th43ui...",
+   "expires_in": 3572,
+   "scope": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
+   "token_type": "Bearer",
+   "id_token": "fjoi3jji2ee3...",
+   "jwt_decode": {
+      "issuer": "https://accounts.google.com",
+      "authorized_party": "someapp.apps.googleusercontent.com",
+      "audience": "someaudience.apps.googleusercontent.com",
+      "subject": "user uid",
+      "email": "user email",
+      "email_verified": true,
+      "accesstoken_hash": "KdS0gvi0Jw8...",
+      "name": "user fullname",
+      "picture": "user picture url",
+      "given_name": "first name",
+      "family_name": "last name",
+      "issued_at": 1746304625,
+      "expiration": 1746308225
+   }
 }
 ```
 
