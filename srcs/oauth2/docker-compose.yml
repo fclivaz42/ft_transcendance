@@ -1,0 +1,12 @@
+services:
+  oauth2:
+    build: ./
+    container_name: oauth2
+    environment:
+      - TZ=Europe/Zurich
+    env_file:
+      - .env
+      - ./../.env
+    restart: always
+    networks:
+      - sarifntw
