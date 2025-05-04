@@ -6,44 +6,21 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/28 19:14:22 by fclivaz           #+#    #+#              #
-#    Updated: 2025/05/01 02:31:06 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/05/04 22:30:20 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
+
+include:
+  - ./core/docker-compose.yml
+  - ./database/docker-compose.yml
+  - ./oauth2/docker-compose.yml
 
 networks:
   sarifntw:
     name: "SARIF Bridge"
     driver: bridge
 
-services:
-  sarif_db:
-    container_name: sarif_db
-    networks:
-      - sarifntw
-    volumes:
-      - data:/data
-    build: database
-    env_file: .env
-    environment:
-      - API_KEY
-    restart: on-failure
-
-  sarif_core:
-    container_name: sarif_core
-    networks:
-      - sarifntw
-    volumes:
-      - data:/data
-    ports:
-      - "443:443"
-    build: core
-    env_file: .env
-    environment:
-      - API_KEY
-    depends_on:
-      - sarif_db
-    # restart: on-failure
-
+# services:
   # sarif_{MODULE}:
   #   container_name: sarif_{MODULE}
   #   networks:
