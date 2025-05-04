@@ -8,7 +8,7 @@ This document provides information about the internal Oauth2 module's API used f
 
 - [`GET /login`](#get-login)
 - [`GET /callback`](#get-callback)
-- [`DELETE /sessions/:state`](#delete-sessionsstate)
+- [`GET /sessions/:state`](#get-sessionsstate)
 - [Environment Variables](#environment-variables)
 
 # 🔐 Overview
@@ -19,7 +19,7 @@ This module lets users log in using their provider account. It does that by redi
 
 ## `GET /login`
 
-Gets the URL to redirect the user to the provider's OAuth authorization server and it's state identifier to use with `DELETE /sessions/:state` endpoint
+Gets the URL to redirect the user to the provider's OAuth authorization server and it's state identifier to use with `GET /sessions/:state` endpoint
 
 ### HTTP Queries
 
