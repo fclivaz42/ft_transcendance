@@ -1,4 +1,3 @@
-import axios from "axios";
 import fastify from "fastify";
 import oauthRoutes from "./routes/oauth.ts";
 import { config } from "./managers/ConfigManager.ts";
