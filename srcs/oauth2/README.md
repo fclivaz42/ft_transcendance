@@ -27,11 +27,11 @@ Gets the URL to redirect the user to the provider's OAuth authorization server a
 
 ### HTTP Queries
 
-| Query     | Required | Example  | Description                                                          |
-| --------- | -------- | -------- | -------------------------------------------------------------------- |
-| ?clientid | yes      | (string) | Identify the client, so newer states will force older ones to close. |
+| Query       | Required | Example  | Description                                                          |
+| ----------- | -------- | -------- | -------------------------------------------------------------------- |
+| `?clientid` | yes      | (string) | Identify the client, so newer states will force older ones to close. |
 
-The clientid can be anything as long as the client (browser) can be identified (a cookie perhaps ?)
+The `clientid` can be any unique id value as long as the client (browser) can be identified by it.
 
 ### HTTP Headers
 
@@ -59,16 +59,16 @@ The clientid can be anything as long as the client (browser) can be identified (
 
 Fetch and return the access token from user.
 
-This endpoint handles the callback from Procider's OAuth server. It expects a `code` in the query string and will return an access token.
+This endpoint handles the callback from provider's OAuth server. It expects a `code` in the query string and will return an access token.
 
 Token can also be fetched using `GET /sessions/:state` endpoint for a more simple usage.
 
 ### HTTP Queries
 
-| Query  | Required | Example  | Description                                   |
-| ------ | -------- | -------- | --------------------------------------------- |
-| ?code  | yes      | (string) | The code provided by the user login callback  |
-| ?state | yes      | (string) | The state provided by the user login callback |
+| Query    | Required | Example  | Description                                   |
+| -------- | -------- | -------- | --------------------------------------------- |
+| `?code`  | yes      | (string) | The code provided by the user login callback  |
+| `?state` | yes      | (string) | The state provided by the user login callback |
 
 ### HTTP Headers
 
@@ -145,8 +145,8 @@ Gets the session status. Sessions have a storage limit of 500 elements; once it'
 | Return Code        | Return Content                                                                                           | Description                                        |
 | ------------------ | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
 | `200 OK`           | `{ "state": "r3fjf...", "clientid": "f233...", ...`                                                      | Temporary session status and it's token.           |
-| `202 Accepted`     | `{ statusCode: 202, message: "Session is still being processed"}`                                        | The user didn't logged in yet.                     |
-| `401 Unauthorized` | `{ statusCode: 401, error: "Unauthorized", message: "You are not authorized to access this ressource" }` | Authorization header does not comply with API_KEY. |
+| `202 Accepted`     | `{ statusCode: 202, message: "Session is still being processed"}`                                        | The user hasn't logged in yet.                     |
+| `401 Unauthorized` | `{ statusCode: 401, error: "Unauthorized", message: "You are not authorized to access this resource" }`  | Authorization header does not comply with API_KEY. |
 | `404 Not Found`    | `{ statusCode: 404, error: "Not Found", message: "Session not found" }`                                  | Session was not found, you can delete this state.  |
 
 #### Example Response:
