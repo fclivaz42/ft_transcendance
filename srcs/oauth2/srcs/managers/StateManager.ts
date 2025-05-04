@@ -33,13 +33,11 @@ class StateManager {
 			state = crypto.randomUUID();
 		} while (this.states.has(state));
 		this.states.set(state, clientid);
-		console.log(`added ${state}`);
 		return state;
 	}
 
 	public removeState(state: string) {
 		this.states.delete(state);
-		console.log(`removed ${state}`);
 	}
 
 	public getStateValue(state: string): string | undefined {

@@ -91,7 +91,6 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 		}
 
 		const state = params.state;
-		console.log(`searching ${state}`);
 
 		if (stateManager.getStateValue(state) !== undefined) {
 			httpReply(rep, req, 202, "Session is still being processed");
