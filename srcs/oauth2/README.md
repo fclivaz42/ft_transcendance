@@ -157,26 +157,26 @@ Gets the session status. Sessions have a storage limit of 500 elements; once it'
 	"clientid": "unique_id",
 	"logged": true,
 	"token": {
-	"access_token": "f43th43ui...",
-	"expires_in": 3572,
-	"scope": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
-	"token_type": "Bearer",
-	"id_token": "fjoi3jji2ee3...",
-	"jwt_decode": {
-		"issuer": "https://accounts.google.com",
-		"authorized_party": "someapp.apps.googleusercontent.com",
-		"audience": "someaudience.apps.googleusercontent.com",
-		"subject": "user uid",
-		"email": "user email",
-		"email_verified": true,
-		"accesstoken_hash": "KdS0gvi0Jw8...",
-		"name": "user fullname",
-		"picture": "user picture url",
-		"given_name": "first name",
-		"family_name": "last name",
-		"issued_at": 1746304625,
-		"expiration": 1746308225
-	}
+		"access_token": "f43th43ui...",
+		"expires_in": 3572,
+		"scope": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
+		"token_type": "Bearer",
+		"id_token": "fjoi3jji2ee3...",
+		"jwt_decode": {
+			"issuer": "https://accounts.google.com",
+			"authorized_party": "someapp.apps.googleusercontent.com",
+			"audience": "someaudience.apps.googleusercontent.com",
+			"subject": "user uid",
+			"email": "user email",
+			"email_verified": true,
+			"accesstoken_hash": "KdS0gvi0Jw8...",
+			"name": "user fullname",
+			"picture": "user picture url",
+			"given_name": "first name",
+			"family_name": "last name",
+			"issued_at": 1746304625,
+			"expiration": 1746308225
+		}
 	}
 }
 ```
