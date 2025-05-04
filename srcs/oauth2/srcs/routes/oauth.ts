@@ -7,6 +7,7 @@ import { config } from "../managers/ConfigManager.ts";
 import checkRequestAuthorization from '../managers/AuthorizationManager.ts';
 import { GoogleJwtManager } from '../managers/GoogleJwtManager.ts';
 import { stateManager } from '../managers/StateManager.ts';
+import { httpReply } from '../managers/HttpResponse.ts';
 
 // TODO: logout, me ep
 // TODO: Auto-cleanup for sessions
@@ -17,7 +18,7 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 
 		const query = req.query as OauthLoginRequest;
 		if (!query.clientid) {
-			rep.status(400).send({ statusCode: 400, error: "Bad Request", message: "Missing clientid query from request"});
+			httpReply(rep, req, 400, "Missing clientid query from request");
 			return;
 		}
 
@@ -38,16 +39,16 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 
 		const query = req.query as OauthCallbackRequest;
 		if (!query.code) {
-			rep.status(400).send({ statusCode: 400, error: "Bad Request", message: "Missing code query from request"});
+			httpReply(rep, req, 400, "Missing code query from request");
 			return;
 		}
 		if (!query.state) {
-			rep.status(400).send({ statusCode: 400, error: "Bad Request", message: "Missing state query from request"});
+			httpReply(rep, req, 400, "Missing state query from request");
 			return;
 		}
 
 		if (!stateManager.getStateValue(query.state)) {
-			rep.status(404).send({ statusCode: 404, error: "Not Found", message: "State id was not found."});
+			httpReply(rep, req, 404, "State id was not found");
 			return;
 		}
 
@@ -76,7 +77,7 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 			.catch(err => {
 				console.error(err);
 				stateManager.initSession(state, null);
-				rep.status(500).send({ statusCode: 500, error: "Internal Server Error", message: "Could not fetch access_token"});
+				httpReply(rep, req, 500, "Could not fetch access_token");
 			});
 	});
 
@@ -85,7 +86,7 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 
 		const params = req.params as OauthSessionRequest;
 		if (!params.state) {
-			rep.status(400).send({ statusCode: 400, error: "Bad Request", message: "Missing state param from request"});
+			httpReply(rep, req, 400, "Missing state parameter from request");
 			return;
 		}
 
@@ -93,14 +94,14 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 		console.log(`searching ${state}`);
 
 		if (stateManager.getStateValue(state) !== undefined) {
-			rep.status(202).send({ statusCode: 202, message: "Session is still being processed"});
+			httpReply(rep, req, 202, "Session is still being processed");
 			return;
 		}
 		const session = stateManager.getSession(state);
 		if (session)
 			rep.status(200).send({...session});
 		else
-			rep.status(404).send({statusCode: 404, error: "Not Found", message: "Session not found"});
+			httpReply(rep, req, 404, "Session state id not found");
 	})
 }
 

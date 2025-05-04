@@ -41,10 +41,11 @@ The `clientid` can be any unique id value as long as the client (browser) can be
 
 ### Response:
 
-| Return Code        | Return Content                         | Description                                       |
-| ------------------ | -------------------------------------- | -----------------------------------------------   |
-| `200 OK`           | `{ "url": "..." }`                     | The login URL to redirect the user.               |
-| `401 Unauthorized` | `error: Unauthorized`                  | Authorization header does not comply with API_KEY |
+| Return Code        | Description                                       |
+| ------------------ | -----------------------------------------------   |
+| `200 OK`           | The login URL to redirect the user.               |
+| `400 Bad Request`  | Missing some headers, queries or parameters.      |
+| `401 Unauthorized` | Authorization header does not comply with API_KEY |
 
 #### Example Response:
 
@@ -85,11 +86,13 @@ Token can also be fetched using `GET /sessions/:state` endpoint for a more simpl
 
 ### Response:
 
-| Return Code                 | Return Content                       | Condition                                              |
-| --------------------------- | ------------------------------------ | ------------------------------------------------------ |
-| `200 OK`                    | `{ "access_token": "...", ... }`     | Successfully retrieved the access token.               |
-| `401 Unauthorized`          | `error: Unauthorized`                | Authorization header does not comply with API_KEY      |
-| `500 Internal Server error` | `error: couldn't fetch access_token` | Something went wrong during the token request process. |
+| Return Code                 | Condition                                              |
+| --------------------------- | ------------------------------------------------------ |
+| `200 OK`                    | Successfully retrieved the access token.               |
+| `400 Bad Request`           | Missing some headers, queries or parameters.           |
+| `401 Unauthorized`          | Authorization header does not comply with API_KEY      |
+| `404 Not Found`             | Requested state id was not found, probably timed out.  |
+| `500 Internal Server error` | Something went wrong during the token request process. |
 
 #### Example Response:
 
@@ -142,12 +145,13 @@ Gets the session status. Sessions have a storage limit of 500 elements; once it'
 
 ### Response:
 
-| Return Code        | Return Content                                                                                           | Description                                        |
-| ------------------ | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `200 OK`           | `{ "state": "r3fjf...", "clientid": "f233...", ...`                                                      | Temporary session status and it's token.           |
-| `202 Accepted`     | `{ statusCode: 202, message: "Session is still being processed"}`                                        | The user hasn't logged in yet.                     |
-| `401 Unauthorized` | `{ statusCode: 401, error: "Unauthorized", message: "You are not authorized to access this resource" }`  | Authorization header does not comply with API_KEY. |
-| `404 Not Found`    | `{ statusCode: 404, error: "Not Found", message: "Session not found" }`                                  | Session was not found, you can delete this state.  |
+| Return Code        | Description                                        |
+| ------------------ | -------------------------------------------------- |
+| `200 OK`           | Temporary session status and it's token.           |
+| `202 Accepted`     | The user hasn't logged in yet.                     |
+| `400 Bad Request`  | Missing some headers, queries or parameters.       |
+| `401 Unauthorized` | Authorization header does not comply with API_KEY. |
+| `404 Not Found`    | Session was not found, you can delete this state.  |
 
 #### Example Response:
 
@@ -204,7 +208,7 @@ These variables are defined in the `.env` file and used for configuration.
 
 ## OAUTH configuration
 
-This project is using Google remote sign-in oauth.
+This project is using Google remote sign-in oauth by default, it may break with another provider.
 
 Documentation: https://developers.google.com/identity/protocols/oauth2?hl=fr
 
