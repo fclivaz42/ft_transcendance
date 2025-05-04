@@ -15,6 +15,10 @@ This document provides information about the internal Oauth2 module's API used f
 
 This module lets users log in using their provider account. It does that by redirecting users to provider’s login page and then getting an access token from provider after they log in.
 
+## Flow usage
+
+![OAuth2 Diagram](./docs/OAuth2.scheme.drawio.svg)
+
 # Endpoints
 
 ## `GET /login`
