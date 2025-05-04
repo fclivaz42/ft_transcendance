@@ -16,8 +16,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx tailwindcss -i ./srcs/assets/input.css -o ./srcs/assets/tailwind.css --watch",
-    "build": "npx tailwindcss -i ./srcs/assets/input.css -o ./srcs/assets/tailwind.css"
+    "dev": "npx tsc && npx tailwindcss -i ./public/assets/input.css -o ./public/assets/tailwind.css --watch",
+    "build": "npx tsc && npx tailwindcss -i ./public/assets/input.css -o ./public/assets/tailwind.css"
   },
   "devDependencies": {
     "typescript": "^5.8.3"
