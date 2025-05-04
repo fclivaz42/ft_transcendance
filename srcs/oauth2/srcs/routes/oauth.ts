@@ -1,13 +1,13 @@
 // import type converts commonjs to module
-import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import type { OauthToken, OauthLoginRequest, OauthCallbackRequest, OauthSessionRequest } from '../interfaces/OauthInterfaces';
+import type { FastifyInstance, FastifyPluginOptions } from "fastify";
+import type { OauthToken, OauthLoginRequest, OauthCallbackRequest, OauthSessionRequest } from "../interfaces/OauthInterfaces";
 
-import axios from 'axios';
+import axios from "axios";
 import { config } from "../managers/ConfigManager.ts";
-import checkRequestAuthorization from '../managers/AuthorizationManager.ts';
-import { GoogleJwtManager } from '../managers/GoogleJwtManager.ts';
-import { stateManager } from '../managers/StateManager.ts';
-import { httpReply } from '../managers/HttpResponse.ts';
+import checkRequestAuthorization from "../managers/AuthorizationManager.ts";
+import { GoogleJwtManager } from "../managers/GoogleJwtManager.ts";
+import { stateManager } from "../managers/StateManager.ts";
+import { httpReply } from "../managers/HttpResponse.ts";
 
 // TODO: logout, me ep
 // TODO: Auto-cleanup for sessions

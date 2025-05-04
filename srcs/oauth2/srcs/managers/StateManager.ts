@@ -1,5 +1,5 @@
 import FixedSizeMap from "../class/FixedSizeMap.ts"
-import type { OauthToken } from "../interfaces/OauthInterfaces.ts";
+import type { OauthToken } from "../interfaces/OauthInterfaces";
 
 interface session {
 	state: string,
