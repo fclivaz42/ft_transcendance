@@ -6,43 +6,27 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="./assets/tailwind.css">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-  <script type="module" src="../dist/index.js"></script>
+  <script type="module" src="../dist/app.js"></script>
 </head>
 
 <body class="font-montserrat text-xs bg-gray-200">
-  <button id="clickMe">click me</button>
   <div class="h-screen w-screen flex flex-col fixed">
     <header class="bg-primary p-2 flex justify-between align-middle">
       <div class="flex">
         <h1 class="text-lg my-auto h-fit font-bold">SARIF's PONG</h1>
       </div>
-      <div class="flex gap-x-2">
-        <a class="bg-white rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1" href="#">
-          <img class="h-4 w-4" src="./assets/ui/login-door-1-svgrepo-com.svg">
-          <p>Register</p>
-        </a>
-        <a class="bg-white rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1" href="#">
-          <img class="h-4 w-4" src="./assets/ui/login-door-1-svgrepo-com.svg">
-          <p>Login</p>
-        </a>
-        <!-- hidden logout
-        <a class=" bg-red-300 rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1"
-          href="#">
-          <img class="h-4 w-4" src="./assets/ui/login-door-1-svgrepo-com.svg">
-          <p>Logout</p>
-        </a>
-        -->
+      <div class="flex gap-x-2" id="userMenu">
       </div>
     </header>
     <div class="flex h-full w-full pt-4 gap-x-4">
-      <nav class="h-full w-fit flex">
+      <nav class="h-full w-fit flex delay-1000" id="navBar">
         <div class="flex flex-col justify-between w-fit">
           <div class="flex-col w-fit max-h-[80vh] overflow-y-auto scrollbar-thin">
-            <a class="w-24 h-24 overflow-visible flex flex-col items-center justify-center gap-y-1" href="#">
+            <a class="w-24 h-24 overflow-visible flex flex-col items-center justify-center gap-y-1" href="#" id="btnPong">
               <img class="h-8 w-8" src="./assets/ui/ping-pong-svgrepo-com.svg">
               <p class="text-nowrap">Pong Game</p>
             </a>
-            <a class="w-24 h-24 overflow-visible flex flex-col items-center justify-center gap-y-1" href="#">
+            <a class="w-24 h-24 overflow-visible flex flex-col items-center justify-center gap-y-1" href="#" id="btnBonusGame">
               <img class="h-8 w-8" src="./assets/ui/ping-pong-svgrepo-com.svg">
               <p class="text-nowrap">Bonus Game</p>
             </a>
@@ -58,48 +42,6 @@
             </a>
           </div>
         </div>
-        <div class="bg-white w-64 h-[80%] rounded-xl p-4">
-          <h3 class="text-lg text-center font-bold">Pong Game</h3>
-          <hr class="my-4">
-          <a class="bg-white rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1" href="#">
-            <img class="h-4 w-4" src="./assets/ui/login-door-1-svgrepo-com.svg">
-            <p>Play now</p>
-          </a>
-          <a class="bg-white rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1" href="#">
-            <img class="h-4 w-4" src="./assets/ui/login-door-1-svgrepo-com.svg">
-            <p>Solo mode</p>
-          </a>
-          <a class="bg-white rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1" href="#">
-            <img class="h-4 w-4" src="./assets/ui/login-door-1-svgrepo-com.svg">
-            <p>Join a Private Game</p>
-          </a>
-          <a class="bg-white rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1" href="#">
-            <img class="h-4 w-4" src="./assets/ui/login-door-1-svgrepo-com.svg">
-            <p>Create a Private Game</p>
-          </a>
-        </div>
-        <!-- hidden bonus game
-        <div class="bg-white w-64 h-[80%] rounded-xl p-4">
-          <h3 class="text-lg text-center font-bold">Bonus Game</h3>
-          <hr class="my-4">
-          <a class="bg-white rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1" href="#">
-            <img class="h-4 w-4" src="./assets/ui/login-door-1-svgrepo-com.svg">
-            <p>Play now</p>
-          </a>
-          <a class="bg-white rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1" href="#">
-            <img class="h-4 w-4" src="./assets/ui/login-door-1-svgrepo-com.svg">
-            <p>Solo mode</p>
-          </a>
-          <a class="bg-white rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1" href="#">
-            <img class="h-4 w-4" src="./assets/ui/login-door-1-svgrepo-com.svg">
-            <p>Join a Private Game</p>
-          </a>
-          <a class="bg-white rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1" href="#">
-            <img class="h-4 w-4" src="./assets/ui/login-door-1-svgrepo-com.svg">
-            <p>Create a Private Game</p>
-          </a>
-        </div>
-        -->
       </nav>
       <main class="h-full w-full bg-white p-8">
         <div class="bg-red-200 h-full w-full">
