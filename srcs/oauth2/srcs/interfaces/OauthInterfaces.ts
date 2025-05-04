@@ -14,8 +14,18 @@ export interface GoogleJwtDecoded {
 	expiration: number;
 }
 
-export interface OauthRequest {
+export interface OauthCallbackRequest {
 	code: number | undefined;
+	state: string | undefined;
+}
+
+export interface OauthLoginRequest {
+	clientid: string | undefined;
+	state: string | undefined;
+}
+
+export interface OauthSessionRequest {
+	state: string | undefined;
 }
 
 export interface OauthToken {
