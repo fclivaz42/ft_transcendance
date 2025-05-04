@@ -39,6 +39,7 @@ class OauthConfig {
 	private _secret: string;
 	private _scope: string;
 	private _grant_type: string;
+	private _session_timeout: number;
 
 	constructor() {
 		if (!process.env.OAUTH_CALLBACK) throw new Error("Missing OAUTH_CALLBACK env");
@@ -55,6 +56,12 @@ class OauthConfig {
 		this._client_id = process.env.OAUTH_CLIENT_ID;
 		if (!process.env.OAUTH_SECRET) throw new Error("Missing OAUTH_SECRET env");
 		this._secret = process.env.OAUTH_SECRET;
+		if (!process.env.OAUTH_SESSION_TIMEOUT) {
+			console.warn("Missing OAUTH_SESSION_TIMEOUT env, setting 60000ms as default..");
+			process.env.OAUTH_SESSION_TIMEOUT = "60000";
+		}
+		this._session_timeout = parseInt(process.env.OAUTH_SESSION_TIMEOUT);
+		if (isNaN(this._session_timeout)) throw new Error("OAUTH_SESSION_TIMEOUT must be an integer");
 	}
 
 	public get callback() : string { return this._callback; }
@@ -64,6 +71,7 @@ class OauthConfig {
 	public get secret(): string { return this._secret; }
 	public get scope(): string { return this._scope; }
 	public get grant_type(): string { return this._grant_type; }
+	public get session_timeout(): number { return this._session_timeout; }
 	
 }
 

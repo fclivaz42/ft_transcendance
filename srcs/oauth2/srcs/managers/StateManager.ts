@@ -1,5 +1,6 @@
 import FixedSizeMap from "../class/FixedSizeMap.ts"
 import type { OauthToken } from "../interfaces/OauthInterfaces";
+import { config } from "./ConfigManager.ts";
 
 interface session {
 	state: string,
@@ -33,6 +34,9 @@ class StateManager {
 			state = crypto.randomUUID();
 		} while (this.states.has(state));
 		this.states.set(state, clientid);
+		setTimeout(() => {
+			this.states.delete(state);
+		}, config.OauthConfig.session_timeout);
 		return state;
 	}
 
@@ -53,6 +57,9 @@ class StateManager {
 			token
 		}
 		this.session.set(state, current_session);
+		setTimeout(() => {
+			this.session.delete(state);
+		}, config.OauthConfig.session_timeout);
 		this.removeState(state);
 	}
 

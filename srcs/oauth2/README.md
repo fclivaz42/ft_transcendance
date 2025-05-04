@@ -204,6 +204,7 @@ These variables are defined in the `.env` file and used for configuration.
 | `OAUTH_GRANT_TYPE`       | `"authorization_code"`                         | Local  | The grant type for OAuth, which is "authorization_code" for this flow.                                   |
 | `OAUTH_CLIENT_ID`        | (string)                                       | Local  | The client ID provided by the OAuth service.                                                             |
 | `OAUTH_SECRET`           | (string)                                       | Local  | The secret associated with the OAuth client id.                                                          |
+| `OAUTH_SESSION_TIMEOUT`  | `60000`                                        | Local  | The time to live for pending and active states.                                                          |
 
 
 ## OAUTH configuration
