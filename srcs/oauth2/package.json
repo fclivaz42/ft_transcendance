@@ -1,0 +1,29 @@
+{
+  "name": "oauth2",
+  "version": "1.0.0",
+  "description": "Oauth2 module for transcendance",
+  "main": "main.ts",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node srcs/main.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fclivaz42/ft_transcendance.git"
+  },
+  "author": "RPDJF",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fclivaz42/ft_transcendance/issues"
+  },
+  "homepage": "https://github.com/fclivaz42/ft_transcendance#readme",
+  "dependencies": {
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "fastify": "^5.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3"
+  }
+}

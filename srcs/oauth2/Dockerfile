@@ -1,12 +1,16 @@
 FROM node:23.10.0-alpine
 
+EXPOSE 3000
+
 RUN apk update
-RUN apk upgrade
 
 WORKDIR /sarif
 
-COPY srcs/ /sarif
+COPY srcs ./srcs
+COPY package.json ./
 
 RUN npm i
 
-ENTRYPOINT ["sh", "-c", "npm run ${RUNMODE}"]
+COPY ./docker-entrypoint.sh ./docker-entrypoint.sh
+
+ENTRYPOINT ["/bin/sh", "./docker-entrypoint.sh"]
