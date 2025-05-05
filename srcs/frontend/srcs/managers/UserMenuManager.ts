@@ -18,7 +18,7 @@ function getCookie(name: string): string | null {
 }
 
 export default class UserMenuManager {
-  constructor() {
+  public initialize() {
     const userMenu = document.getElementById("userMenu");
 		if (!getCookie("session")) {
       userMenu?.appendChild(createRegisterButton());

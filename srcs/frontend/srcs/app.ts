@@ -1,13 +1,13 @@
 import FrameManager from "./managers/FrameManager.js";
 import HeaderManager from "./managers/HeaderManager.js";
 import NavbarManager from "./managers/NavbarManager.js";
-import SidePanelManager from "./managers/SidePanelManager.js";
 import UserMenuManager from "./managers/UserMenuManager.js";
 
 // some rework is needed to make the code more readable and maintainable
 
 // Initialize header
 const headerManager = new HeaderManager();
+headerManager.initialize();
 
 // Initialize main container
 const app = document.getElementById("app");
@@ -18,6 +18,8 @@ app?.appendChild(main);
 
 // Initialize the managers
 const navbarManager = new NavbarManager();
+navbarManager.initialize();
 const frameManager = new FrameManager();
-const sidePanelManager = new SidePanelManager();
+frameManager.initialize();
 const userMenuManager = new UserMenuManager();
+userMenuManager.initialize();

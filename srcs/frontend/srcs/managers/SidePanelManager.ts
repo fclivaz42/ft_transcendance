@@ -8,7 +8,7 @@ function clearPanels() {
 }
 
 export default class SidePanelManager {
-	constructor() {
+	public initialize() {
 		const btnPong = document.getElementById("btnPong");
 		btnPong?.addEventListener("pointerenter", () => {
 			const navBar = document.getElementById("navBar");
