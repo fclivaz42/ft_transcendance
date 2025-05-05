@@ -11,21 +11,24 @@ export default class NavbarManager {
   public initialize() {
     const main = document.getElementById("main");
     const navBar = createNavbar({
-      options: [
+      buttons: [
         {
           id: "btnPong",
           title: "Pong",
-          logo: "./assets/ui/ping-pong-svgrepo-com.svg"
+          logo: "./assets/ui/ping-pong-svgrepo-com.svg",
+          panelId: "pongSidePanel"
         },
         {
           id: "btnBonusGame",
           title: "Bonus Game",
-          logo: "./assets/ui/ping-pong-svgrepo-com.svg"
+          logo: "./assets/ui/ping-pong-svgrepo-com.svg",
+          panelId: "bonusGameSidePanel"
         },
         {
           id: "btnLeaderboard",
           title: "Leaderboard",
-          logo: "./assets/ui/leaderboard-svgrepo-com.svg"
+          logo: "./assets/ui/leaderboard-svgrepo-com.svg",
+          panelId: "leaderboardSidePanel"
         }
       ]
     });

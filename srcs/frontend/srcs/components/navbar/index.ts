@@ -1,8 +1,9 @@
 interface NavbarProps {
-  options: {
+  buttons: {
       id: string;
       title: string;
       logo?: string;
+      panelId?: string;
     }[]
 }
 
@@ -13,9 +14,9 @@ export function createNavbar(props: NavbarProps): HTMLElement {
   navBar.id = "navBar";
   navBar.innerHTML = `
         <div class="flex flex-col justify-between w-fit">
-        <div class="flex-col w-fit max-h-[80vh] overflow-y-auto scrollbar-thin">
-          ${props.options.map((option) => `
-            <a class="w-24 h-24 overflow-visible flex flex-col items-center justify-center gap-y-1" href="#" id="${option.id}">
+        <div class="flex-col w-fit max-h-[80vh] overflow-y-auto scrollbar-thin" id="navBarButtons">
+          ${props.buttons.map((option) => `
+            <a class="w-24 h-24 overflow-visible flex flex-col items-center justify-center gap-y-1" href="#" id="${option.id}" data-panel="${option.panelId}">
               ${option.logo ? `<img class="h-8 w-8" src="${option.logo}">` : ""}
               <p class="text-nowrap">${option.title}</p>
             </a>

@@ -1,14 +1,14 @@
+import { createPongSidePanel } from "./pongSidePanel.js";
+import { createBonusGameSidePanel } from "./bonusGameSidePanel.js";
+
 export function createSidePanel(title: string): HTMLElement {
 	const container = document.createElement("div");
 
-	container.className = "src_panel bg-white w-64 h-[80%] rounded-xl p-4 mr-4";
+	container.className = "src_panel w-64 overflow-hidden bg-white h-[80%] rounded-xl p-4";
 	container.innerHTML = `
 		<h3 class="text-lg text-center font-bold">${title}</h3>
         <hr class="my-4">
 	`;
-
-	container.classList.add("animate-fade-right");
-	container.classList.add("animate-duration-300")
 	return container;
 }
 
@@ -21,6 +21,19 @@ export function createSidePanelButton(title: string, logo?: string): HTMLElement
 	`;
 	button.href="#";
 	return button;
+}
+
+export function createSidePanelFromDataPanel(dataPanel: string): HTMLElement | null {
+	switch (dataPanel) {
+		case "pongSidePanel":
+			return createPongSidePanel();
+		case "bonusGameSidePanel":
+			return createBonusGameSidePanel();
+		/*case "leaderboardSidePanel":
+			return createLeaderboardSidePanel();*/
+		default:
+			return null;
+	}
 }
 
 export { createPongSidePanel } from "./pongSidePanel.js";
