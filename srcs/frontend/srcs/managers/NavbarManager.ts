@@ -19,10 +19,10 @@ export default class NavbarManager {
           panelId: "pongSidePanel"
         },
         {
-          id: "btnBonusGame",
-          title: "Bonus Game",
-          logo: "./assets/ui/ping-pong-svgrepo-com.svg",
-          panelId: "bonusGameSidePanel"
+          id: "btnTetris",
+          title: "Tetris",
+          logo: "./assets/ui/tetris-svgrepo-com.svg",
+          panelId: "tetrisSidePanel"
         },
         {
           id: "btnLeaderboard",

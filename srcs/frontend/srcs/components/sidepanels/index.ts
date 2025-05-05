@@ -1,5 +1,5 @@
 import { createPongSidePanel } from "./pongSidePanel.js";
-import { createBonusGameSidePanel } from "./bonusGameSidePanel.js";
+import { createTetrisSidePanel } from "./tetrisSidePanel.js";
 
 export function createSidePanel(title: string): HTMLElement {
 	const container = document.createElement("div");
@@ -27,8 +27,8 @@ export function createSidePanelFromDataPanel(dataPanel: string): HTMLElement | n
 	switch (dataPanel) {
 		case "pongSidePanel":
 			return createPongSidePanel();
-		case "bonusGameSidePanel":
-			return createBonusGameSidePanel();
+		case "tetrisSidePanel":
+			return createTetrisSidePanel();
 		/*case "leaderboardSidePanel":
 			return createLeaderboardSidePanel();*/
 		default:
@@ -37,4 +37,4 @@ export function createSidePanelFromDataPanel(dataPanel: string): HTMLElement | n
 }
 
 export { createPongSidePanel } from "./pongSidePanel.js";
-export { createBonusGameSidePanel }  from "./bonusGameSidePanel.js";
+export { createTetrisSidePanel }  from "./tetrisSidePanel.js";
