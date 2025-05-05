@@ -8,13 +8,18 @@ export default class NavbarManager {
         {
           id: "btnPong",
           title: "Pong",
-          logo: "./assets/ui/leaderboard-svgrepo-com.svg"
+          logo: "./assets/ui/ping-pong-svgrepo-com.svg"
         },
         {
           id: "btnBonusGame",
           title: "Bonus Game",
-          logo: "./assets/ui/leaderboard-svgrepo-com.svg"
+          logo: "./assets/ui/ping-pong-svgrepo-com.svg"
         },
+        {
+          id: "btnLeaderboard",
+          title: "Leaderboard",
+          logo: "./assets/ui/leaderboard-svgrepo-com.svg"
+        }
       ]
     });
     main?.appendChild(navBar);
