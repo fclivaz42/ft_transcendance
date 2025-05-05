@@ -1,4 +1,4 @@
-import { createHeader } from "../components/header";
+import { createHeader } from "../components/header/index.js";
 
 export default class HeaderManager {
   constructor() {
