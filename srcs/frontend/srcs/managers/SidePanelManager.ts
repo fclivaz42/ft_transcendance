@@ -40,7 +40,8 @@ function replacePanel(panel: HTMLElement) {
 	const animator = document.getElementById("panel_animator");
 	if (!animator) return;
 	if (panel.id === animator.children[0]?.id) return;
-	animator.innerHTML = panel.outerHTML;
+	animator.innerHTML = "";
+	animator.appendChild(panel);
 	let animatorWidth: string | undefined = "";
 	while (animatorWidth = classStartingWith("w-", animator.classList)) {
 		animator.classList.remove(animatorWidth);
