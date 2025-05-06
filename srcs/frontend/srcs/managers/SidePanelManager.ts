@@ -1,23 +1,28 @@
 import { createSidePanelFromDataPanel } from "../components/sidepanels/index.js";
 
+function classStartingWith(str: string, classList: DOMTokenList): string | undefined {
+	return Array.from(classList).find((className) => className.startsWith(str));
+}
+
 function clearPanels(animate: boolean = true): boolean {
-	const panels = document.getElementsByClassName("panel_animator");
-	if (panels.length === 0) return false;
-	Array.from(panels).forEach((panel) => {
-		// if animate is false, remove the panel immediately without animation
+	const animatorPanels = document.getElementsByClassName("panel_animator");
+	if (animatorPanels.length === 0) return false;
+	Array.from(animatorPanels).forEach((animator) => {
+		// if animate is false, remove the animator immediately without animation
 		if (!animate) {
-			panel.remove();
+			animator.remove();
 			return;
 		}
-		// animate the panel to remove it
-		panel.classList.remove("w-64");
-		panel.classList.add("w-0");
-		const duration = Array.from(panel.classList).find((className) =>
-			className.startsWith("duration-"));
-		panel.classList.remove(duration || "");
-		panel.classList.add("duration-100");
+		// animate the animator to remove it
+		const widthClass = classStartingWith("w-", animator.classList);
+		if (widthClass != "w-0") {
+			animator.classList.remove(widthClass || "");
+			animator.classList.add("w-0");
+		}
+		animator.classList.remove(classStartingWith("duration-", animator.classList) || "");
+		animator.classList.add("duration-100");
 		setTimeout(() => {
-			panel.remove();
+			animator.remove();
 		}, 100);
 	})
 	return true;
@@ -47,7 +52,8 @@ export default class SidePanelManager {
 
 				// clear panels and add new panel
 				if (clearPanels(false)) {
-					animator.classList.add("w-64");
+					animator.classList.remove("w-0");
+					animator.classList.add(classStartingWith("w-", panel.classList) || "w-64");
 					navBar.appendChild(animator);
 					return;
 				}
@@ -59,9 +65,8 @@ export default class SidePanelManager {
 				requestAnimationFrame(() => {
 					requestAnimationFrame(() => {
 						animator.classList.remove("w-0");
-						const widthClass = Array.from(panel.classList).find((className) =>
-							className.startsWith("w-"));
-						animator.classList.add(widthClass || "");
+						const widthClass = classStartingWith("w-", panel.classList);
+						animator.classList.add(widthClass || "w-64");
 					});
 				});
 			});
