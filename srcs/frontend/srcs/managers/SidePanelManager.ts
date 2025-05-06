@@ -90,14 +90,24 @@ export default class SidePanelManager {
 			});
 		});
 
+		// using timeout to prevent flickering
+		let leaveTimeout: number;
 		navBar.addEventListener("pointerleave", () => {
+			leaveTimeout = setTimeout(() => {
 			clearPanels();
-			Array.from(buttonsParent.children).forEach((btn) => {
-				if (btn.id.startsWith("btn"))
-					btn.classList.remove("bg-panel");
-					btn.classList.remove("dark:bg-panel_dark");
-			});
+				Array.from(buttonsParent.children).forEach((btn) => {
+					if (btn.id.startsWith("btn"))
+						btn.classList.remove("bg-panel");
+						btn.classList.remove("dark:bg-panel_dark");
+				});
+			} , 100);
+		});
 
+		navBar.addEventListener("pointerenter", () => {
+			if (leaveTimeout) {
+				clearTimeout(leaveTimeout);
+				leaveTimeout = 0;
+			}
 		});
 	}
 }
