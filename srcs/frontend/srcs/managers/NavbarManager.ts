@@ -35,7 +35,8 @@ export default class NavbarManager {
           title: "Settings",
           logo: "./assets/ui/settings-svgrepo-com.svg",
           panelId: "settingsSidePanel",
-          bottom: true
+          bottom: true,
+          animation: "group-hover:animate-rotate-180 group-hover:animate-duration-[500ms]"
         }
       ]
     });

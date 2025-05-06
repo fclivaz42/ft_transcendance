@@ -1,4 +1,6 @@
  /** @type {import('tailwindcss').Config} */
+ import animations from '@midudev/tailwind-animations'
+
  export default {
   darkMode: "class",
   content: ["./srcs/**/*.{html,ts,js}", "./public/**/*.{html,ts,js}"],
@@ -23,6 +25,6 @@
   },
   plugins: [
     require("tailwind-scrollbar"),
-		require('tailwindcss-animated')
+		animations
   ],
 }

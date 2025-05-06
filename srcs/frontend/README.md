@@ -10,6 +10,7 @@ This document provides technical information about the internal **frontend modul
 - [🧩 Components & Managers](#-components--managers)
 - [🕹️ Pong Game Integration](#-pong-game-integration)
 - [🛠️ Environment](#-environment)
+- [🎨 Tailwind plugins](#-tailwind-plugins)
 
 ---
 
@@ -112,6 +113,14 @@ This module is dockerized for deployment. Dockerfile builds the frontend and mov
 ```
 /var/www/sarif-frontend
 ```
+
+---
+
+## 🎨 Tailwind plugins
+
+The frontend uses some Tailwind plugins to enhance the design:
+- `@midudev/tailwind-animations`: Provides a set of pre-defined animations. (preview https://tailwindcss-animations.vercel.app/)
+- `@tailwindcss/tailwind-scrollbar`: Adds custom scrollbar styles.
 
 ---
 
