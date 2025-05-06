@@ -36,6 +36,18 @@ function clearPanels(animate: boolean = true): boolean {
 	return true;
 }
 
+function replacePanel(panel: HTMLElement) {
+	const animator = document.getElementById("panel_animator");
+	if (!animator) return;
+	if (panel.id === animator.children[0]?.id) return;
+	animator.innerHTML = panel.outerHTML;
+	let animatorWidth: string | undefined = "";
+	while (animatorWidth = classStartingWith("w-", animator.classList)) {
+		animator.classList.remove(animatorWidth);
+	}
+	animator.classList.add(classStartingWith("w-", panel.classList) || "w-64");
+}
+
 export default class SidePanelManager {
 	public initialize() {
 		const navBar = document.getElementById("navBar");
@@ -70,10 +82,9 @@ export default class SidePanelManager {
 				}
 
 				// clear panels
-				clearPanels(false);
-
-				animator.appendChild(panel);
-				animator.classList.add("mr-4");
+				replacePanel(panel);
+				if (!animator.classList.contains("mr-4"))
+					animator.classList.add("mr-4");
 
 				// sync the animation
 				requestAnimationFrame(() => {
