@@ -29,6 +29,13 @@ export default class NavbarManager {
           title: "Leaderboard",
           logo: "./assets/ui/leaderboard-svgrepo-com.svg",
           panelId: "leaderboardSidePanel"
+        },
+        {
+          id: "btnSettings",
+          title: "Settings",
+          logo: "./assets/ui/settings-svgrepo-com.svg",
+          panelId: "settingsSidePanel",
+          bottom: true
         }
       ]
     });

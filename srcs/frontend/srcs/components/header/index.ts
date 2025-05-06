@@ -1,7 +1,7 @@
 export function createHeader(): HTMLElement {
   const header = document.createElement("header");
 
-  header.className = "bg-primary p-2 flex justify-between align-middle";
+  header.className = "bg-primary dark:bg-primary_dark p-2 flex justify-between align-middle";
   header.id = "header";
   header.innerHTML = `
       <div class="flex">

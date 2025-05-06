@@ -2,6 +2,7 @@ interface ButtonProps {
   title: string;
   logo?: string;
   color?: string;
+  darkColor?: string;
   id?: string;
   href?: string;
 }
@@ -9,9 +10,9 @@ interface ButtonProps {
 export function createButton(props: ButtonProps): HTMLElement {
   const button = document.createElement("a");
 
-  button.className = `bg-${props.color || "white"} rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1`;
+  button.className = `${props.color || "bg-white"} ${props.darkColor || "dark:bg-black"} rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1`;
   button.innerHTML = `
-    ${props.logo ? `<img class="h-4 w-4" src="${props.logo}">` : ""}
+    ${props.logo ? `<img class="h-4 w-4 dark:invert" src="${props.logo}">` : ""}
     <p>${props.title}</p>
   `;
 

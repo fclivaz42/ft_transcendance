@@ -2,8 +2,13 @@ import FrameManager from "./managers/FrameManager.js";
 import HeaderManager from "./managers/HeaderManager.js";
 import NavbarManager from "./managers/NavbarManager.js";
 import UserMenuManager from "./managers/UserMenuManager.js";
+import DarkmodeManager from "./managers/DarkmodeManager.js";
 
 // some rework is needed to make the code more readable and maintainable
+
+// Initialize dark mode
+const darkmodeManager = new DarkmodeManager();
+darkmodeManager.initialize();
 
 // Initialize header
 const headerManager = new HeaderManager();
@@ -12,7 +17,7 @@ headerManager.initialize();
 // Initialize main container
 const app = document.getElementById("app");
 const main = document.createElement("div");
-main.className = "flex h-full w-full";
+main.className = "flex flex-grow h-full w-full";
 main.id = "main";
 app?.appendChild(main);
 
