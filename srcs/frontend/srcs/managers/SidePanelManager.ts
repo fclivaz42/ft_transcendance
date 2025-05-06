@@ -31,7 +31,7 @@ function clearPanels(animate: boolean = true): boolean {
 	// remove the last panel after the animation is done
 	setTimeout(() => {
 		if (lastPanel == animator.children[0]) // only remove the last panel if it is still the same
-			animator.innerHTML = "";
+			clearPanels(false);
 	}, 100);
 	return true;
 }
@@ -97,6 +97,7 @@ export default class SidePanelManager {
 					btn.classList.remove("bg-panel");
 					btn.classList.remove("dark:bg-panel_dark");
 			});
+
 		});
 	}
 }
