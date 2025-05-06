@@ -12,7 +12,7 @@ headerManager.initialize();
 // Initialize main container
 const app = document.getElementById("app");
 const main = document.createElement("div");
-main.className = "flex h-full w-full pt-4";
+main.className = "flex h-full w-full";
 main.id = "main";
 app?.appendChild(main);
 

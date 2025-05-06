@@ -10,7 +10,7 @@ interface NavbarProps {
 export function createNavbar(props: NavbarProps): HTMLElement {
   const navBar = document.createElement("nav");
 
-  navBar.className = "h-full w-fit flex delay-1000";
+  navBar.className = "h-full w-fit flex delay-1000 pt-4";
   navBar.id = "navBar";
   navBar.innerHTML = `
         <div class="flex flex-col justify-between w-fit">

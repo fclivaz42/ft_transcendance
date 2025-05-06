@@ -4,7 +4,7 @@ import { createTetrisSidePanel } from "./tetrisSidePanel.js";
 export function createSidePanel(title: string): HTMLElement {
 	const container = document.createElement("div");
 
-	container.className = "src_panel w-64 overflow-hidden bg-white h-[80%] rounded-xl p-4";
+	container.className = "w-64 overflow-hidden bg-white h-[80%] rounded-xl p-4";
 	container.innerHTML = `
 		<h3 class="text-lg text-center font-bold">${title}</h3>
         <hr class="my-4">
