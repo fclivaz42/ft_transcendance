@@ -53,7 +53,7 @@ export default class SidePanelManager {
 
 		const animator = document.createElement("div");
 		animator.id = "panel_animator";
-		animator.className = "w-0 overflow-hidden transition-all duration-300";
+		animator.className = "w-0 overflow-hidden transition-all duration-200";
 		navBar.appendChild(animator);
 
 		Array.from(buttonsParent.children).forEach((button) => {
