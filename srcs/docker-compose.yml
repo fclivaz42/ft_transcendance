@@ -1,0 +1,68 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    docker-compose.yml                                 :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/02/28 19:14:22 by fclivaz           #+#    #+#              #
+#    Updated: 2025/05/01 02:31:06 by fclivaz          ###   LAUSANNE.ch        #
+#                                                                              #
+# **************************************************************************** #
+
+networks:
+  sarifntw:
+    name: "SARIF Bridge"
+    driver: bridge
+
+services:
+  sarif_db:
+    container_name: sarif_db
+    networks:
+      - sarifntw
+    volumes:
+      - data:/data
+    build: database
+    env_file: .env
+    environment:
+      - API_KEY
+    restart: on-failure
+
+  sarif_core:
+    container_name: sarif_core
+    networks:
+      - sarifntw
+    volumes:
+      - data:/data
+    ports:
+      - "443:443"
+    build: core
+    env_file: .env
+    environment:
+      - API_KEY
+    depends_on:
+      - sarif_db
+    # restart: on-failure
+
+  # sarif_{MODULE}:
+  #   container_name: sarif_{MODULE}
+  #   networks:
+  #     - sarifntw
+  #   volumes:
+  #     - data:/data
+  #   build: {MODULE}
+  #   env_file: .env
+  #   environment:
+  #     - API_KEY
+  #   depends_on:
+  #     - sarif_{DEPENDMODULE}
+  #   restart: on-failure
+
+volumes:
+  data:
+    name: "SARIF_data"
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../data/
