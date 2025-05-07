@@ -49,7 +49,7 @@ export function createSidePanelToggleSlider(title: string): HTMLElement {
 
 	slider.innerHTML = `
 		<span class="text-sm font-medium text-gray-700 dark:text-gray-100">${title}</span>
-		<label class="relative inline-block w-11 h-6">
+		<label class="hover:animate-scale hover:animate-duration-100 cursor-pointer relative inline-block w-11 h-6">
 			<input type="checkbox" class="sr-only peer cursor-pointer">
 			<div class="w-full h-full bg-gray-300 rounded-full peer-checked:bg-indigo-600 transition-colors duration-300"></div>
 			<div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-300 peer-checked:translate-x-5"></div>
