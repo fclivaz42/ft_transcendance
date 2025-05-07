@@ -15,6 +15,16 @@ export function createNavbar(props: NavbarProps): HTMLElement {
 
   const navBar = document.createElement("nav");
 
+  let bottomTrigger = false;
+  props.buttons.forEach((button) => {
+    if (!bottomTrigger) {
+      if (button.bottom == true)
+        bottomTrigger = true;
+    } else {
+      button.bottom = false;
+    }
+  });
+
   navBar.className = "z-0 fixed top-0 bottom-0 flex pt-20 bg-navbar dark:bg-navbar_dark dark:border-panel_dark dark:border-r";
   navBar.id = "navBar";
   navBar.innerHTML = `
