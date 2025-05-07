@@ -23,6 +23,7 @@ export function createSidePanelButton(title: string, logo?: string): HTMLElement
 		logo: logo,
 		color: "bg-background",
 		darkColor: "dark:bg-background_dark",
+		href: "#",
 	})
 	button.classList.add("my-4");
 	return button;
