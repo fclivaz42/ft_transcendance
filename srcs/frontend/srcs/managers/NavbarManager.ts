@@ -1,4 +1,5 @@
 import { createNavbar } from "../components/navbar/index.js";
+import { i18nHandler } from "../handler/i18nHandler.js";
 import SidePanelManager from "./SidePanelManager.js";
 
 export default class NavbarManager {
@@ -14,35 +15,35 @@ export default class NavbarManager {
       buttons: [
         {
           id: "btnPong",
-          title: "Pong",
+          title: i18nHandler.getValue("navbar.pong.label"),
           logo: "./assets/ui/ping-pong-svgrepo-com.svg",
           panelId: "pongSidePanel",
           i18n: "navbar.pong.label",
         },
         {
           id: "btnTetris",
-          title: "Tetris",
+          title: i18nHandler.getValue("navbar.tetris.label"),
           logo: "./assets/ui/tetris-svgrepo-com.svg",
           panelId: "tetrisSidePanel",
           i18n: "navbar.tetris.label"
         },
         {
           id: "btnLeaderboard",
-          title: "Leaderboard",
+          title: i18nHandler.getValue("navbar.leaderboard.label"),
           logo: "./assets/ui/leaderboard-svgrepo-com.svg",
           panelId: "leaderboardSidePanel",
           i18n: "navbar.leaderboard.label"
         },
         {
           id: "btnHistory",
-          title: "History",
+          title: i18nHandler.getValue("navbar.history.label"),
           logo: "./assets/ui/history-svgrepo-com.svg",
           panelId: "historySidePanel",
           i18n: "navbar.history.label"
         },
         {
           id: "btnSettings",
-          title: "Settings",
+          title: i18nHandler.getValue("navbar.settings.label"),
           logo: "./assets/ui/settings-svgrepo-com.svg",
           panelId: "settingsSidePanel",
           bottom: true,

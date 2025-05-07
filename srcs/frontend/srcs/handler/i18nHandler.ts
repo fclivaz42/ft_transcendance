@@ -1,20 +1,23 @@
 class I18nHandler {
-  private _i18n: Record<string, Record<string, string>> = {};
+  private _i18n: Record<string, Record<string, string>>;
   private _currentLang: string;
 
   constructor() {
     this._i18n  = {};
-    this._currentLang = "";
+    this._currentLang = localStorage.getItem("language") || "English";
   }
 
-  public initialize(): void {
-    this.setLanguage(localStorage.getItem("language") || "English");
+  public async initialize() {
+    await this.loadLanguageFile("English");
+    await this.loadLanguageFile(this._currentLang);
   }
 
   public setLanguage(lang: string): void {
     this._currentLang = lang;
     localStorage.setItem("language", lang);
-    this.loadLanguageFile(lang);
+    this.loadLanguageFile(lang).then(() => {
+      this.reload();
+    });
   }
 
   public getValue(key: string): string {
@@ -22,8 +25,13 @@ class I18nHandler {
     if (this._i18n[lang] && this._i18n[lang][key]) {
       return this._i18n[lang][key];
     } else {
-      console.warn(`Missing translation for key: ${key} in language: ${lang}`);
-      return key;
+      console.warn(`Missing translation for key: ${key} in language: ${lang}`, "Fallback to English");
+      if (this._i18n["English"] && this._i18n["English"][key]) {
+        return this._i18n["English"][key];
+      } else {
+        console.warn(`Missing translation for key: ${key} in language: English`);
+        return key;
+      }
     }
   }
 
@@ -35,12 +43,11 @@ class I18nHandler {
     });
   }
 
-  private loadLanguageFile(lang: string): void {
-    fetch(`./assets/i18n/${lang.toLowerCase()}.json`)
+  private async loadLanguageFile(lang: string) {
+    await fetch(`./assets/i18n/${lang.toLowerCase()}.json`)
       .then((response) => response.json())
       .then((data) => {
         this._i18n[lang] = this.flattenJson(data);
-        this.reload();
       })
       .catch((error) => console.error("Error loading language file:", error));
   }
