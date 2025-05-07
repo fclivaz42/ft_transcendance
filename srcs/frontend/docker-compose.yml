@@ -1,0 +1,32 @@
+services:
+  frontend-builder:
+    build: ./
+    container_name: frontend-builder
+    environment:
+      - TZ=Europe/Zurich
+    volumes:
+      - sarif-frontend:/var/www/sarif-frontend
+    networks:
+      - sarifntw
+  lighttpd: # Lighttpd server for development testing
+    image: nginx:latest
+    container_name: sarif-frontend
+    ports:
+      - "80:80"
+    volumes:
+      - sarif-frontend:/usr/share/nginx/html
+      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - sarifntw
+    depends_on:
+      - frontend-builder
+
+volumes:
+  sarif-frontend:
+    name: "sarif-frontend"
+    driver: local
+
+networks:
+  sarifntw:
+    name: "SARIF Bridge"
+    driver: bridge
