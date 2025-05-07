@@ -1,3 +1,4 @@
+import { createButton } from "../buttons/index.js";
 import { createLeaderboardSidePanel } from "./leaderboardSidePanel.js";
 import { createPongSidePanel } from "./pongSidePanel.js";
 import { createSettingsSidePanel } from "./settingsSidePanel.js";
@@ -17,13 +18,13 @@ export function createSidePanel(title: string): HTMLElement {
 }
 
 export function createSidePanelButton(title: string, logo?: string): HTMLElement {
-	const button = document.createElement("a");
-	button.className = "bg-background dark:bg-background_dark my-4 rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-1";
-	button.innerHTML = `
-		${logo? `<img class="h-4 w-4 dark:invert" src="${logo}">`:""}
-		<p>${title}</p>
-	`;
-	button.href="#";
+	const button = createButton({
+		title: title,
+		logo: logo,
+		color: "bg-background",
+		darkColor: "dark:bg-background_dark",
+	})
+	button.classList.add("my-4");
 	return button;
 }
 
