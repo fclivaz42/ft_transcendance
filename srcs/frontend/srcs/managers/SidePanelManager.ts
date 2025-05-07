@@ -66,7 +66,7 @@ export default class SidePanelManager {
 				});
 				button.classList.add("bg-panel", "dark:bg-panel_dark");
 				if (document.getElementById(button.attributes.getNamedItem("data-panel")?.value || "")) return;
-				const panel = createSidePanelFromDataPanel(button.attributes.getNamedItem("data-panel")?.value || "");
+				const panel = createSidePanelFromDataPanel(button.attributes);
 				if (!panel) return;
 
 				// remove top left corner radius

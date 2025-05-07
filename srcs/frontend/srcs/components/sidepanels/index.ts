@@ -58,7 +58,9 @@ export function createSidePanelToggleSlider(title: string): HTMLElement {
 	return slider;
 }
 
-export function createSidePanelFromDataPanel(dataPanel: string): HTMLElement | null {
+export function createSidePanelFromDataPanel(attributes: NamedNodeMap): HTMLElement | null {
+	const dataPanel = attributes.getNamedItem("data-panel")?.value;
+	if (!dataPanel) return null;
 	switch (dataPanel) {
 		case "pongSidePanel":
 			return createPongSidePanel();
