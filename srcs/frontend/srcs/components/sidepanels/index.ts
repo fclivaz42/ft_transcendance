@@ -3,10 +3,12 @@ import { createPongSidePanel } from "./pongSidePanel.js";
 import { createSettingsSidePanel } from "./settingsSidePanel.js";
 import { createTetrisSidePanel } from "./tetrisSidePanel.js";
 
+export const defaultPanelSize = "w-64";
+
 export function createSidePanel(title: string): HTMLElement {
 	const container = document.createElement("div");
 
-	container.className = "w-64 overflow-hidden bg-panel dark:bg-panel_dark h-[80%] rounded-xl p-8";
+	container.className = `${defaultPanelSize} overflow-hidden bg-panel dark:bg-panel_dark h-[80%] rounded-xl p-8`;
 	container.innerHTML = `
 		<h3 class="text-lg text-center font-bold">${title}</h3>
         <hr class="my-4">

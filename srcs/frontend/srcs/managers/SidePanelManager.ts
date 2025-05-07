@@ -1,32 +1,28 @@
-import { createSidePanelFromDataPanel } from "../components/sidepanels/index.js";
-import { classStartingWith } from "../utilities/selectors.js";
+import { createSidePanelFromDataPanel, defaultPanelSize } from "../components/sidepanels/index.js";
+import { classStartingWith, removeClassStartingWith } from "../utilities/selectors.js";
+
+const sidePanelMargin = "mr-4";
 
 // return true if the panels were cleared, false if there was nothing to clear
 function clearPanels(animate: boolean = true): boolean {
 	const animator = document.getElementById("panel_animator");
-	if (!animator || animator?.childElementCount === 0) return false;
+	if (!animator || animator.childElementCount === 0) return false;
 
 	// clear the animator and return if no animation is needed
 	if (!animate) {
-		let animatorWidth: string | undefined = "";
-			while (animatorWidth = classStartingWith("w-", animator.classList)) {
-			animator.classList.remove(animatorWidth);
-		}
+		removeClassStartingWith("w-", animator.classList);
 		animator.classList.add("w-0");
 		animator.innerHTML = "";
-		animator.classList.remove("mr-4");
+		animator.classList.remove(sidePanelMargin);
 		return true;
 	}
 
 	// animate the animator to remove it
-	let animatorWidth: string | undefined = "";
-	while (animatorWidth = classStartingWith("w-", animator.classList)) {
-		animator.classList.remove(animatorWidth);
-	}
+	removeClassStartingWith("w-", animator.classList);
 	animator.classList.add("w-0");
 	animator.classList.remove(classStartingWith("duration-", animator.classList) || "");
 	animator.classList.add("duration-100");
-	animator.classList.remove("mr-4");
+	animator.classList.remove(sidePanelMargin);
 	const lastPanel = animator.children[0];
 	// remove the last panel after the animation is done
 	setTimeout(() => {
@@ -39,14 +35,11 @@ function clearPanels(animate: boolean = true): boolean {
 function replacePanel(panel: HTMLElement) {
 	const animator = document.getElementById("panel_animator");
 	if (!animator) return;
-	if (panel.id === animator.children[0]?.id) return;
+	if (animator.children.length > 0 && panel.id === animator.children[0].id) return;
 	animator.innerHTML = "";
 	animator.appendChild(panel);
-	let animatorWidth: string | undefined = "";
-	while (animatorWidth = classStartingWith("w-", animator.classList)) {
-		animator.classList.remove(animatorWidth);
-	}
-	animator.classList.add(classStartingWith("w-", panel.classList) || "w-64");
+	removeClassStartingWith("w-", animator.classList);
+	animator.classList.add(classStartingWith("w-", panel.classList) || defaultPanelSize);
 }
 
 export default class SidePanelManager {
@@ -66,9 +59,10 @@ export default class SidePanelManager {
 			
 			button.addEventListener("pointerenter", () => {
 				Array.from(buttonsParent.children).forEach((btn) => {
-					if (btn.id !== button.id)
+					if (btn.id !== button.id) {
 						btn.classList.remove("bg-panel");
 						btn.classList.remove("dark:bg-panel_dark");
+					}
 				});
 				button.classList.add("bg-panel", "dark:bg-panel_dark");
 				if (document.getElementById(button.attributes.getNamedItem("data-panel")?.value || "")) return;
@@ -84,19 +78,16 @@ export default class SidePanelManager {
 
 				// clear panels
 				replacePanel(panel);
-				if (!animator.classList.contains("mr-4"))
-					animator.classList.add("mr-4");
+				if (!animator.classList.contains(sidePanelMargin))
+					animator.classList.add(sidePanelMargin);
 
 				// sync the animation
 				requestAnimationFrame(() => {
 					requestAnimationFrame(() => {
-						let animatorWidth: string | undefined = "";
-						while (animatorWidth = classStartingWith("w-", animator.classList)) {
-							animator.classList.remove(animatorWidth);
-						}
+						removeClassStartingWith("w-", animator.classList);
 						animator.classList.remove("w-0");
 						const widthClass = classStartingWith("w-", panel.classList);
-						animator.classList.add(widthClass || "w-64");
+						animator.classList.add(widthClass || defaultPanelSize);
 					});
 				});
 			});
@@ -108,9 +99,10 @@ export default class SidePanelManager {
 			leaveTimeout = setTimeout(() => {
 			clearPanels();
 				Array.from(buttonsParent.children).forEach((btn) => {
-					if (btn.id.startsWith("btn"))
+					if (btn.id.startsWith("btn")) {
 						btn.classList.remove("bg-panel");
 						btn.classList.remove("dark:bg-panel_dark");
+					}
 				});
 			} , 100);
 		});
