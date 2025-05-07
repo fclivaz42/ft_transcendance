@@ -1,4 +1,5 @@
 import { createButton } from "../buttons/index.js";
+import { createHistorySidePanel } from "./historySidePanel.js";
 import { createLeaderboardSidePanel } from "./leaderboardSidePanel.js";
 import { createPongSidePanel } from "./pongSidePanel.js";
 import { createSettingsSidePanel } from "./settingsSidePanel.js";
@@ -71,6 +72,8 @@ export function createSidePanelFromDataPanel(attributes: NamedNodeMap): HTMLElem
 			return createLeaderboardSidePanel();
 		case "settingsSidePanel":
 			return createSettingsSidePanel();
+		case "historySidePanel":
+			return createHistorySidePanel();
 		default:
 			return null;
 	}
@@ -80,3 +83,4 @@ export { createPongSidePanel } from "./pongSidePanel.js";
 export { createTetrisSidePanel }  from "./tetrisSidePanel.js";
 export { createLeaderboardSidePanel } from "./leaderboardSidePanel.js";
 export { createSettingsSidePanel } from "./settingsSidePanel.js";
+export { createHistorySidePanel } from "./historySidePanel.js";

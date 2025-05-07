@@ -32,7 +32,7 @@ export function createNavbar(props: NavbarProps): HTMLElement {
       <div class="flex-col flex-grow flex" id="navBarButtons">
         ${props.buttons.map((option) => `
           <a class="group aspect-square overflow-visible flex flex-col items-center justify-center gap-y-1 cursor-pointer${option.bottom? " mt-auto":""}" id="${option.id}" data-panel="${option.panelId}">
-            ${option.logo ? `<img class="h-8 w-8 dark:invert ${option.animation || " group-hover:animate-squeeze group-hover:animate-duration-300"}" src="${option.logo}">` : ""}
+            ${option.logo ? `<img class="select-none h-8 w-8 dark:invert ${option.animation || " group-hover:animate-squeeze group-hover:animate-duration-300"}" src="${option.logo}">` : ""}
             <p class="text-nowrap">${option.title}</p>
           </a>
         `).join("")}

@@ -31,6 +31,12 @@ export default class NavbarManager {
           panelId: "leaderboardSidePanel"
         },
         {
+          id: "btnHistory",
+          title: "History",
+          logo: "./assets/ui/history-svgrepo-com.svg",
+          panelId: "historySidePanel"
+        },
+        {
           id: "btnSettings",
           title: "Settings",
           logo: "./assets/ui/settings-svgrepo-com.svg",
