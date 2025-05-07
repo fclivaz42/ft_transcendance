@@ -1,5 +1,5 @@
 import { createSidePanelFromDataPanel, defaultPanelSize } from "../components/sidepanels/index.js";
-import { classStartingWith, removeClassStartingWith } from "../utilities/selectors.js";
+import { classStartingWith, removeClassContaining, removeClassStartingWith } from "../utilities/selectors.js";
 
 const sidePanelMargin = "mr-4";
 
@@ -14,13 +14,15 @@ function clearPanels(animate: boolean = true): boolean {
 		animator.classList.add("w-0");
 		animator.innerHTML = "";
 		animator.classList.remove(sidePanelMargin);
+		removeClassStartingWith("duration-", animator.classList);
+		animator.classList.add("duration-200");
 		return true;
 	}
 
 	// animate the animator to remove it
 	removeClassStartingWith("w-", animator.classList);
 	animator.classList.add("w-0");
-	animator.classList.remove(classStartingWith("duration-", animator.classList) || "");
+	removeClassStartingWith("duration-", animator.classList);
 	animator.classList.add("duration-100");
 	animator.classList.remove(sidePanelMargin);
 	const lastPanel = animator.children[0];
@@ -59,10 +61,8 @@ export default class SidePanelManager {
 			
 			button.addEventListener("pointerenter", () => {
 				Array.from(buttonsParent.children).forEach((btn) => {
-					if (btn.id !== button.id) {
-						btn.classList.remove("bg-panel");
-						btn.classList.remove("dark:bg-panel_dark");
-					}
+					if (btn.id !== button.id)
+						removeClassContaining("bg-panel", btn.classList);
 				});
 				button.classList.add("bg-panel", "dark:bg-panel_dark");
 				if (document.getElementById(button.attributes.getNamedItem("data-panel")?.value || "")) return;
@@ -99,10 +99,8 @@ export default class SidePanelManager {
 			leaveTimeout = setTimeout(() => {
 			clearPanels();
 				Array.from(buttonsParent.children).forEach((btn) => {
-					if (btn.id.startsWith("btn")) {
-						btn.classList.remove("bg-panel");
-						btn.classList.remove("dark:bg-panel_dark");
-					}
+					if (btn.id.startsWith("btn"))
+						removeClassContaining("bg-panel", btn.classList);
 				});
 			} , 100);
 		});
