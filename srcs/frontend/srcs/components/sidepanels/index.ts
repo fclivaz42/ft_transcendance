@@ -1,4 +1,4 @@
-import { i18nHandler } from "../../handler/i18nHandler.js";
+import { i18nHandler } from "../../handlers/i18nHandler.js";
 import { ButtonProps, TitleProps } from "../../interfaces/baseProps.js";
 import { createButton } from "../buttons/index.js";
 import { createHistorySidePanel } from "./historySidePanel.js";

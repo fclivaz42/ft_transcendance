@@ -1,5 +1,5 @@
 import { createNavbar } from "../components/navbar/index.js";
-import { i18nHandler } from "../handler/i18nHandler.js";
+import { i18nHandler } from "../handlers/i18nHandler.js";
 import SidePanelManager from "./SidePanelManager.js";
 
 export default class NavbarManager {

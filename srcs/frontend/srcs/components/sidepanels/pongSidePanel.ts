@@ -1,6 +1,6 @@
 import { createSidePanel, createSidePanelButton } from "./index.js";
 
-import { i18nHandler } from "../../handler/i18nHandler.js";
+import { i18nHandler } from "../../handlers/i18nHandler.js";
 
 export function createPongSidePanel() {
 	const sidePanel = createSidePanel({

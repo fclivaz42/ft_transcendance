@@ -1,9 +1,9 @@
-import { i18nHandler } from "./handler/i18nHandler.js";
+import { i18nHandler } from "./handlers/i18nHandler.js";
 import FrameManager from "./managers/FrameManager.js";
 import HeaderManager from "./managers/HeaderManager.js";
 import NavbarManager from "./managers/NavbarManager.js";
 import UserMenuManager from "./managers/UserMenuManager.js";
-import DarkmodeManager from "./handler/DarkmodeHandler.js";
+import DarkmodeManager from "./handlers/DarkmodeHandler.js";
 
 // some rework is needed to make the code more readable and maintainable
 

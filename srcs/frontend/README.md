@@ -38,6 +38,11 @@ The main HTML only contains the root `div`, all content is generated dynamically
 
 - `srcs/components`: Contains reusable UI components using Tailwind.
 - `srcs/managers`: Contains logic that orchestrates components and animations.
+- `srcs/handlers`: Contains logic for specific tasks without UI interaction.
+- `srcs/utilities`: Contains utility functions.
+- `srcs/interfaces`: Contains TypeScript interfaces for reusability.
+- `srcs/public`: Contains static assets (images, fonts, etc.).
+- `srcs/public/assets/i18n`: Contains language json files for internationalization.
 - `srcs/app.ts`: Main entry point for the application.
 
 Animations are **only handled inside managers**, never in components.
@@ -93,6 +98,22 @@ The project is organized into two main layers:
 - Import components and handle logic + animations
 - Responsible for building and controlling the visible UI
 
+### 🛠️ Handlers
+- Located in `srcs/handlers`
+- Handle logic for specific tasks without directly interacting with the UI
+- Should not contain any animation logic
+- Should not import any components
+
+### 🧰 Utilities
+- Located in `srcs/utilities`
+- Contains utility functions that can be used across the project
+
+### 🗂️ Interfaces
+- Located in `srcs/interfaces`
+- Contains TypeScript interfaces that can be used across the project
+- Should not contain any code logic
+- Should mostly contain type definitions for reusability
+
 ---
 
 ## 🕹️ Pong Game Integration
@@ -138,6 +159,8 @@ const languages = ["English", "Spanish", "French", "Portuguese", "Russian"];
 ```
 
 Make sure that the new json file begins with a lowercase letter, and that the setting name includes a capital letter for the first letter.
+
+> ⚠️ The file naming might be changed in the future to match browser language settings. Don't worry about it for now, I will handle it.
 
 ---
 
