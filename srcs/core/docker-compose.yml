@@ -1,0 +1,29 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    docker-compose.yml                                 :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/05/04 22:27:45 by fclivaz           #+#    #+#              #
+#    Updated: 2025/05/04 22:33:42 by fclivaz          ###   LAUSANNE.ch        #
+#                                                                              #
+# **************************************************************************** #
+
+services:
+  sarif_core:
+    container_name: sarif_core
+    networks:
+      - sarifntw
+    volumes:
+      - data:/data
+    ports:
+      - "443:443"
+    build: ./
+    env_file: ../.env
+    environment:
+      - API_KEY
+      - TZ=Europe/Zurich
+    depends_on:
+      - sarif_db
+    # restart: on-failure

@@ -5,8 +5,8 @@
   "main": "core_main.js",
   "type": "module",
   "scripts": {
-    "debug": "node core_main.js debug",
-    "prod": "node core_main.js"
+    "debug": "node srcs/core_main.js debug",
+    "prod": "node srcs/core_main.js"
   },
   "author": "fclivaz",
   "license": "GPL-3.0",
