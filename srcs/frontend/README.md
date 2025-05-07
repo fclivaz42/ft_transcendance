@@ -11,6 +11,7 @@ This document provides technical information about the internal **frontend modul
 - [🕹️ Pong Game Integration](#-pong-game-integration)
 - [🛠️ Environment](#-environment)
 - [🎨 Tailwind plugins](#-tailwind-plugins)
+- [📝 How to contribute](#-how-to-contribute)
 
 ---
 
@@ -121,6 +122,22 @@ This module is dockerized for deployment. Dockerfile builds the frontend and mov
 The frontend uses some Tailwind plugins to enhance the design:
 - `@midudev/tailwind-animations`: Provides a set of pre-defined animations. (preview https://tailwindcss-animations.vercel.app/)
 - `@tailwindcss/tailwind-scrollbar`: Adds custom scrollbar styles.
+
+---
+
+## 📝 How to contribute
+
+You can add anything you want to the frontend, but please take a look at [these guidelines](#-project-structure) before doing so.
+
+That being said, you can also directly contribute to adding language.
+
+- Add a new language file in `public/assets/i18n/`
+- Add the setting in `srcs/components/sidepanels/settingsSidePanel.ts` inside of
+```typescript
+const languages = ["English", "Spanish", "French", "Portuguese", "Russian"];
+```
+
+Make sure that the new json file begins with a lowercase letter, and that the setting name includes a capital letter for the first letter.
 
 ---
 
