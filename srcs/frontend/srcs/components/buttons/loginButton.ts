@@ -7,6 +7,7 @@ export function createLoginButton(): HTMLElement {
     color: "bg-white",
     darkColor: "dark:bg-background_dark",
     id: "loginButton",
-    href: "#"
+    href: "#",
+    i18n: "header.usermenu.login",
   });
 }

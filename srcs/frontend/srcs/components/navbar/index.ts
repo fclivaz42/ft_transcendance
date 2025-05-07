@@ -1,12 +1,15 @@
+import { BaseProps } from "../../interfaces/baseProps.js";
+
+interface NavbarButtonProps extends BaseProps {
+  title: string;
+  logo?: string;
+  panelId?: string;
+  bottom?: boolean;
+  animation?: string;
+}
+
 interface NavbarProps {
-  buttons: {
-      id: string;
-      title: string;
-      logo?: string;
-      panelId?: string;
-      bottom?: boolean;
-      animation?: string;
-    }[]
+  buttons: NavbarButtonProps[]
 }
 
 export function createNavbar(props: NavbarProps): HTMLElement {
@@ -33,7 +36,7 @@ export function createNavbar(props: NavbarProps): HTMLElement {
         ${props.buttons.map((option) => `
           <a class="group aspect-square overflow-visible flex flex-col items-center justify-center gap-y-1 cursor-pointer${option.bottom? " mt-auto":""}" id="${option.id}" data-panel="${option.panelId}">
             ${option.logo ? `<img class="select-none h-8 w-8 dark:invert ${option.animation || " group-hover:animate-squeeze group-hover:animate-duration-300"}" src="${option.logo}">` : ""}
-            <p class="text-nowrap">${option.title}</p>
+            <p class="text-nowrap" ${option.i18n ? ` data-i18n="${option.i18n}"` : ""}>${option.title}</p>
           </a>
         `).join("")}
       </div>

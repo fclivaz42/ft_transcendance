@@ -1,13 +1,38 @@
 import { createSidePanel, createSidePanelButton } from "./index.js";
 
+import { i18nHandler } from "../../handler/i18nHandler.js";
+
 export function createPongSidePanel() {
-	const sidePanel = createSidePanel("Pong Game")
+	const sidePanel = createSidePanel({
+		title: i18nHandler.getValue("navbar.pong.title"),
+		i18n: "navbar.pong.title"
+	});
 	sidePanel.id = "pongSidePanel";
 	const buttonLogo = "./assets/ui/login-door-1-svgrepo-com.svg";
-	sidePanel.appendChild(createSidePanelButton("Play now", buttonLogo))
-	sidePanel.appendChild(createSidePanelButton("Solo mode", buttonLogo))
-	sidePanel.appendChild(createSidePanelButton("Join a Private Game", buttonLogo))
-	sidePanel.appendChild(createSidePanelButton("Create a Private Game", buttonLogo))
+
+	sidePanel.appendChild(createSidePanelButton({
+		title: i18nHandler.getValue("navbar.pong.submenu.play"),
+		i18n: "navbar.pong.submenu.play",
+		logo: buttonLogo
+	}))
+
+	sidePanel.appendChild(createSidePanelButton({
+		title: i18nHandler.getValue("navbar.pong.submenu.solo"),
+		i18n: "navbar.pong.submenu.solo",
+		logo: buttonLogo
+	}))
+
+	sidePanel.appendChild(createSidePanelButton({
+		title: i18nHandler.getValue("navbar.pong.submenu.join"),
+		i18n: "navbar.pong.submenu.join",
+		logo: buttonLogo
+	}))
+
+	sidePanel.appendChild(createSidePanelButton({
+		title: i18nHandler.getValue("navbar.pong.submenu.create"),
+		i18n: "navbar.pong.submenu.create",
+		logo: buttonLogo
+	}))
 
 	return sidePanel;
 }

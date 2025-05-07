@@ -1,9 +1,10 @@
-interface ButtonProps {
+import { BaseProps } from "../../interfaces/baseProps.js";
+
+interface ButtonProps extends BaseProps {
   title: string;
   logo?: string;
   color?: string;
   darkColor?: string;
-  id?: string;
   href?: string;
 }
 
@@ -13,7 +14,7 @@ export function createButton(props: ButtonProps): HTMLAnchorElement {
   button.className = `${props.color || "bg-white"} ${props.darkColor || "dark:bg-black"} hover:animate-scale hover:animate-duration-100 cursor-pointer rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-3`;
   button.innerHTML = `
     ${props.logo ? `<img class="select-none h-4 w-4 dark:invert" src="${props.logo}">` : ""}
-    <p>${props.title}</p>
+    <p${props.i18n ? " data-i18n=" + props.i18n: ""}>${props.title}</p>
   `;
 
   if (props.id)

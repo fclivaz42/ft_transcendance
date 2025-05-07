@@ -2,7 +2,8 @@ import FrameManager from "./managers/FrameManager.js";
 import HeaderManager from "./managers/HeaderManager.js";
 import NavbarManager from "./managers/NavbarManager.js";
 import UserMenuManager from "./managers/UserMenuManager.js";
-import DarkmodeManager from "./managers/DarkmodeManager.js";
+import DarkmodeManager from "./handler/DarkmodeHandler.js";
+import { i18nHandler } from "./handler/i18nHandler.js";
 
 // some rework is needed to make the code more readable and maintainable
 
@@ -28,3 +29,6 @@ const frameManager = new FrameManager();
 frameManager.initialize();
 const userMenuManager = new UserMenuManager();
 userMenuManager.initialize();
+
+// Initialize i18nHandler
+i18nHandler.initialize();

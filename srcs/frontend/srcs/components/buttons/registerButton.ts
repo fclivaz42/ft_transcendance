@@ -7,6 +7,7 @@ export function createRegisterButton(): HTMLElement {
     color: "bg-white",
     darkColor: "dark:bg-background_dark",
     id: "registerButton",
-    href: "#"
+    href: "#",
+    i18n: "header.usermenu.register",
   });
 }
