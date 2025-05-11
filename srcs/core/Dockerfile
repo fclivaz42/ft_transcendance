@@ -5,7 +5,8 @@ RUN apk upgrade
 
 WORKDIR /sarif
 
-COPY srcs/ /sarif
+COPY srcs/ ./srcs
+COPY package.json /sarif
 
 RUN npm i
 
