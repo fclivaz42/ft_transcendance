@@ -1,0 +1,26 @@
+
+services:
+  gamebackend:
+    build:
+     context: .
+     dockerfile: backend/Dockerfile.backend
+    volumes:
+      - ./backend:/app/backend
+    working_dir: /app/backend
+    command: npm run dev
+    ports:
+     - "3000:3000"
+    depends_on:
+      - gamefrontend
+    environment:
+      - NODE_ENV=development
+
+  gamefrontend:
+    image: node:23-alpine3.20
+    working_dir: /app/frontend
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host"
