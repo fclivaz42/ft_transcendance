@@ -1,17 +1,18 @@
 // ************************************************************************** //
 //                                                                            //
 //                                                        :::      ::::::::   //
-//   index.js                                           :+:      :+:    :+:   //
+//   core_main.js                                       :+:      :+:    :+:   //
 //                                                    +:+ +:+         +:+     //
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/18 22:02:50 by fclivaz           #+#    #+#             //
-//   Updated: 2025/04/30 01:01:24 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/05/12 22:55:14 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
-import { dbget, dbpost, dbdel, dbput } from "./core_db.js"
 import Fastify from 'fastify'
+import fs from 'node:fs'
+import path from 'node:path'
 
 const fastify = Fastify({
 	logger: true
@@ -20,12 +21,21 @@ const fastify = Fastify({
 if (process.env.RUNMODE === "debug")
 	console.log(process.env.API_KEY)
 
-fastify.register(dbget)
-fastify.register(dbpost)
-fastify.register(dbdel)
-fastify.register(dbput)
+const subfolder = path.join(import.meta.dirname, "routes")
+const folder = fs.readdirSync(subfolder)
 
-// Run the server!
+const js_files = folder.filter(file => file.endsWith('.js'));
+
+async function load_modules() {
+	for (const file of js_files)
+	{
+		const file_path = path.join(subfolder, file)
+		const module_routes = (await import(`file://${file_path}`))
+		fastify.register(module_routes, {prefix: `/${file.split(".")[0]}`.toLowerCase()})
+	}
+}
+await load_modules()
+
 fastify.listen({ port: 443, host: '::' }, (err) => {
 	if (err) {
 		fastify.log.error(err)
