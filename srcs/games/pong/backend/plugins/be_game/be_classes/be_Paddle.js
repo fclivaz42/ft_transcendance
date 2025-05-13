@@ -36,17 +36,17 @@ export default class Paddle {
         
         this._keys = {};
         this._colliders = [];
-        this._setupInput();
+        // this._setupInput();
     }
     
-    _setupInput() {
-        window.addEventListener("keydown", (e) => {
-            this._keys[e.key] = true;
-        });
-        window.addEventListener("keyup", (e) => {
-            this._keys[e.key] = false;
-        });
-    }
+    // _setupInput() {
+    //     window.addEventListener("keydown", (e) => {
+    //         this._keys[e.key] = true;
+    //     });
+    //     window.addEventListener("keyup", (e) => {
+    //         this._keys[e.key] = false;
+    //     });
+    // }
 
     _touchingWall() {
         for (let i of this._colliders) {
@@ -73,11 +73,13 @@ export default class Paddle {
 
 
     calculateBounce(ball)	{
+        console.log("PADDLE HIT!", this.name, 'ball at', ball.getPosition());
         if (ball.getLastHit() === this.name) return;
         if (ball.getLastHit() && ball.getLastHit().startsWith("player")) {
             ball.incrPlayerBounce();
-            if (ball.getPlayerBounces() % 6 === 0) ball.incrSpeed(0.005);
-            console.log(ball.getSpeed());
+            // if (ball.getPlayerBounces() % 6 === 0) ball.incrSpeed(0.005);
+            // console.log(`Speed: ${ball.getSpeed()}`);
+            // console.log(`Position: ${ball.getPosition()}`);
         }
         ball.setLastHit(this.name);
         const collisionBox = this.mesh.getBoundingInfo().boundingBox;

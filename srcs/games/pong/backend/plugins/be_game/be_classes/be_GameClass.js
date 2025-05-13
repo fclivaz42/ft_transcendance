@@ -27,7 +27,7 @@ export default class Game {
 		this.p2 = new Paddle(
 			this.scene,
 			"player2",
-			new Vector3(-14.5, 0, 0), {
+			new Vector3(14.5, 0, 0), {
 				color: Color3.White(),
 				speed: 0.4,
 				controls: {"up": "ArrowUp", "down": "ArrowDown"},
@@ -43,7 +43,7 @@ export default class Game {
 				color: Color3.White(),
 				diameter: 0.6
 			});
-			this.ball.setBaseSpeed(0.4);
+			this.ball.setBaseSpeed(0.2);
 			this.ball.showBoundingBox = this.showBoxes;
 
 		this.walls = {
@@ -92,6 +92,7 @@ export default class Game {
 			this.walls.eastWall,
 			this.walls.westWall
 		]);
+		console.log(this.ball._colliders.map(c=>c.name));
 
 	};
 
@@ -107,11 +108,11 @@ export default class Game {
 		return this.walls;
 	}
 
-	gameStart() {
+	gameStart(fps=60) {
 		this.field.addUpdatable(this.p1);
 		this.field.addUpdatable(this.p2);
 		this.field.addUpdatable(this.ball);
 
-		this.field.start();
+		this.field.start(fps);
 	}
 }

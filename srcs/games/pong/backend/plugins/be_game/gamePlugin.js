@@ -1,29 +1,30 @@
 
+import { SimplexPerlin3DBlock } from "@babylonjs/core";
 import GameClass from "./be_classes/be_GameClass.js";
 
 export default async function gamePlugin(fastify, options) {
     const game = new GameClass();
-
     fastify.decorate("game", game);
+
+    game.gameStart(60);
+    game.getBall().launch();
     fastify.get("/game/state", async (request, reply) => {
         const Ball = game.getBall();
-        const p1 = game.getPaddles().at(0);
-        const p2 = game.getPaddles().at(1);
-        const walls = game.getWalls();
+        const [p1, p2] = game.getPaddles();
+        // const walls = game.getWalls();
         return {
-            "ball": {
+            ball: {
                 speed: Ball.getSpeed(),
                 position: Ball.getPosition().asArray()
             },
-            "p1": {
+            p1: {
                 speed: p1.getSpeed(),
                 position: p1.getPosition().asArray()
             },
-            "p2": {
-                speed: p1.getSpeed(),
-                position: p1.getPosition().asArray()
-            },
-            "walls": "placeholder"
+            p2: {
+                speed: p2.getSpeed(),
+                position: p2.getPosition().asArray()
+            }
         }; 
     });
 

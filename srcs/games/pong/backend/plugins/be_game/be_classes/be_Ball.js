@@ -19,7 +19,7 @@ export default class Ball {
 		this._baseSpeed = 0.15;
 		this._speed = 0.0;
 		this._playerBounces = 0;
-		this._direction = new Vector3((Math.random() * 99) < 50 ? 1 : -1, 0, 0).normalize();
+		this._direction = new Vector3();
 		
 		this.mesh = MeshBuilder.CreateSphere(name, { diameter, segments }, scene);
 		this.mesh.position = position.clone();
@@ -32,25 +32,26 @@ export default class Ball {
 		this._lastHit = null;
 		this._bounceCooldown = 0;
 		this._keys = {};
-		this._setupInput();
+		// this._setupInput();
 
 	}
 
-	_setupInput() {
-		window.addEventListener("keydown", (e) => {
-			this._keys[e.key] = true;
-		});
-		window.addEventListener("keyup", (e) => {
-			this._keys[e.key] = false;
-		});
-	}
+	// _setupInput() {
+	// 	window.addEventListener("keydown", (e) => {
+	// 		this._keys[e.key] = true;
+	// 	});
+	// 	window.addEventListener("keyup", (e) => {
+	// 		this._keys[e.key] = false;
+	// 	});
+	// }
 
 	getCollisionBox()		{ return this.mesh.getBoundingInfo().boundingBox; }
 	getLastHit()			{ return this._lastHit; }
 	getPlayerBounces()		{ return this._playerBounces; }
 	getBaseSpeed()			{ return this._baseSpeed; }
 	getSpeed()				{ return this._speed; }
-	getPosition()			{ return this._position; }
+	getPosition()			{ return this.mesh.position; }
+	getColliders()			{ return this._colliders; }
 
 	setLastHit(lastHit)		{ this._lastHit = lastHit; }
 	setBaseSpeed(baseSpeed)	{ this._baseSpeed = baseSpeed; }
@@ -61,15 +62,26 @@ export default class Ball {
 	setColliders(colliders)	{ this._colliders = colliders; }
 	incrPlayerBounce()		{ this._playerBounces++; }
 
+	launch() {
+		this._speed = this._baseSpeed;
+		this._direction = new Vector3(
+			Math.random() < 0.5 ? 1 : -1,
+			0,
+			0
+		).normalize();
+		this.mesh.position.addInPlace(this._direction.scale(this._speed));
+	}
+
 	update() {
 		this.mesh.position.addInPlace(this._direction.scale(this._speed));
+		console.log(`Ball position: ${this.getPosition()}`);
 
-		if (this._keys[" "] && this._speed === 0.0) {
-			this._speed = this._baseSpeed;
-			this._lastHit = null; 
+		// if ((this._keys[" "] && this._speed === 0.0)) {
+		// 	this._speed = this._baseSpeed;
+		// 	this._lastHit = null; 
 
-			this._direction = new Vector3(Math.random() < 0.5 ? -1 : 1, 0, 0);
-		}
+		// 	this._direction = new Vector3(Math.random() < 0.5 ? -1 : 1, 0, 0);
+		// }
 		for (const collider of this._colliders) {
 			let boxA = this.getCollisionBox();
 			let boxB = collider.mesh.getBoundingInfo().boundingBox;
