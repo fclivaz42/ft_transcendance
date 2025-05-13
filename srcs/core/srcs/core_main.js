@@ -1,14 +1,6 @@
-// ************************************************************************** //
-//                                                                            //
-//                                                        :::      ::::::::   //
-//   core_main.js                                       :+:      :+:    :+:   //
-//                                                    +:+ +:+         +:+     //
-//   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
-//                                                +#+#+#+#+#+   +#+           //
-//   Created: 2025/04/18 22:02:50 by fclivaz           #+#    #+#             //
-//   Updated: 2025/05/12 22:55:14 by fclivaz          ###   LAUSANNE.ch       //
-//                                                                            //
-// ************************************************************************** //
+//	----------	//
+//	SARIF CORE	//
+//	----------	//
 
 import Fastify from 'fastify'
 import fs from 'node:fs'
@@ -27,11 +19,10 @@ const folder = fs.readdirSync(subfolder)
 const js_files = folder.filter(file => file.endsWith('.js'));
 
 async function load_modules() {
-	for (const file of js_files)
-	{
+	for (const file of js_files) {
 		const file_path = path.join(subfolder, file)
 		const module_routes = (await import(`file://${file_path}`))
-		fastify.register(module_routes, {prefix: `/${file.split(".")[0]}`.toLowerCase()})
+		fastify.register(module_routes, { prefix: `/${file.split(".")[0]}`.toLowerCase() })
 	}
 }
 await load_modules()
