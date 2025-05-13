@@ -1,5 +1,4 @@
 
-import { SimplexPerlin3DBlock } from "@babylonjs/core";
 import GameClass from "./be_classes/be_GameClass.js";
 
 export default async function gamePlugin(fastify, options) {

@@ -74,7 +74,7 @@ export default class Ball {
 
 	update() {
 		this.mesh.position.addInPlace(this._direction.scale(this._speed));
-		console.log(`Ball position: ${this.getPosition()}`);
+		// console.log(`Ball position: ${this.getPosition()}`);
 
 		// if ((this._keys[" "] && this._speed === 0.0)) {
 		// 	this._speed = this._baseSpeed;

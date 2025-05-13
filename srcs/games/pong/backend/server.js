@@ -1,6 +1,7 @@
 
 import fastify from "fastify";
 import gamePlugin from "./plugins/be_game/gamePlugin.js";
+import websocketRoutes from "./plugins/websocketRoutes.js";
 
 const app = fastify({
 	logger: true,
@@ -9,6 +10,7 @@ const app = fastify({
 export default app;
 
 app.register(gamePlugin);
+app.register(websocketRoutes);
 
 app.get('/', async (request, reply) => {
 	return { status: "sarif-pong-backend is up!\n"};

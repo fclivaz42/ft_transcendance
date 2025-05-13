@@ -92,7 +92,7 @@ export default class Game {
 			this.walls.eastWall,
 			this.walls.westWall
 		]);
-		console.log(this.ball._colliders.map(c=>c.name));
+		// console.log(this.ball._colliders.map(c=>c.name));
 
 	};
 

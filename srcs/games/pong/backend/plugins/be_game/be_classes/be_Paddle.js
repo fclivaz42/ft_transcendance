@@ -73,7 +73,7 @@ export default class Paddle {
 
 
     calculateBounce(ball)	{
-        console.log("PADDLE HIT!", this.name, 'ball at', ball.getPosition());
+        // console.log("PADDLE HIT!", this.name, 'ball at', ball.getPosition());
         if (ball.getLastHit() === this.name) return;
         if (ball.getLastHit() && ball.getLastHit().startsWith("player")) {
             ball.incrPlayerBounce();
