@@ -1,12 +1,12 @@
 {
   "name": "sarif_db",
-  "version": "0.0.1",
+  "version": "0.5.0",
   "description": "SARIF Database module",
   "main": "db_main.js",
   "type": "module",
   "scripts": {
-    "debug": "node db_main.js debug",
-    "prod": "node db_main.js"
+    "debug": "node srcs/db_main.js debug",
+    "prod": "node srcs/db_main.js"
   },
   "author": "fclivaz",
   "license": "GPL-3.0",
