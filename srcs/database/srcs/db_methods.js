@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/05/01 03:13:50 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/05/07 18:11:29 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -115,6 +115,11 @@ export default class DatabaseWorker {
 		}
 		return response
 	}
+}
+
+
+function check_db_columns(db) {
+
 }
 
 export function init_db() {

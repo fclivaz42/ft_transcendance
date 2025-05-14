@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/05/12 20:49:27 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/05/13 00:38:55 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -27,7 +27,7 @@ const PlayersTable =
 					"TEXT UNIQUE NOT NULL",
 					"TEXT NOT NULL",
 					"TEXT",
-					"TEXT NOT NULL",
+					"TEXT UNIQUE NOT NULL",
 					"TEXT NOT NULL",
 					"TEXT NOT NULL",
 					"TEXT NOT NULL",
