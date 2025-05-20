@@ -6,8 +6,11 @@ RUN apk upgrade
 WORKDIR /sarif
 
 COPY srcs/ ./srcs
+COPY tsconfig.json /sarif
 COPY package.json /sarif
+COPY hardhat.config.cjs /sarif
 
 RUN npm i
+EXPOSE 80
 
-ENTRYPOINT ["sh", "-c", "npm run ${RUNMODE}"]
+ENTRYPOINT ["sh", "-c", "node srcs/scripts/main.ts"]

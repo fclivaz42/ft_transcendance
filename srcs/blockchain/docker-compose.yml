@@ -1,14 +1,15 @@
 services:
   sarif_blockchain:
-    container_name: sarif_blockchain
-    networks:
-      - sarifntw
-    volumes:
-      - data:/data
+    container_name: blockchain_container
+    image: sarif_blockchain
+    # networks:
+    #   - sarifntw
+    ports:
+      - "80:80"
     build: ./
     env_file: .env
-    environment:
-      - API_KEY
+    # environment:
+    #   - API_KEY
     # depends_on:
     #   - sarif_{DEPENDMODULE}
-    # restart: on-failure
+    restart: on-failure
