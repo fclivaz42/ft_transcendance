@@ -1,0 +1,131 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "tournamentId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "winnerName",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "wins",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "loserName",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "losses",
+          "type": "uint256"
+        }
+      ],
+      "name": "addScore",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "getMatchScore",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "winnerName",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "winnerScore",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "loserName",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "loserScore",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "id",
+          "type": "string"
+        }
+      ],
+      "name": "getTournamentScore",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "player",
+                  "type": "string"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "score",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct TournamentScores.Player",
+              "name": "wins",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "string",
+                  "name": "player",
+                  "type": "string"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "score",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct TournamentScores.Player",
+              "name": "losses",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct TournamentScores.Score[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]
+}
