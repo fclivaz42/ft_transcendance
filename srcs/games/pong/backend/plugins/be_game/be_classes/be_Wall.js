@@ -12,6 +12,10 @@ export default class Wall extends Paddle {
         // Do nothing
     }
 
+    getPassThrough() {
+        return this._passThrough;
+    }
+
     calculateBounce(ball)	{
         if (!this._passThrough) {
             if (ball.getLastHit() === this.name) return ;

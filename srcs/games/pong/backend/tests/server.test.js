@@ -43,3 +43,10 @@ describe('GET /game/state', () => {
 		expect(res.body).toHaveProperty('p2');
 	})
 })
+
+describe('GET /ws/connect', () => {
+	it ('should establish a websocket connection', async () => {
+		const rest = await request(app.server).get('/ws/connect');
+		expect(res.status).toBe(200);
+	})
+})

@@ -1,16 +1,17 @@
 
+import fastifyPlugin from "fastify-plugin";
 import GameClass from "./be_classes/be_GameClass.js";
 
-export default async function gamePlugin(fastify, options) {
+export default fastifyPlugin(async function gamePlugin(fastify, options) {
     const game = new GameClass();
     fastify.decorate("game", game);
 
-    game.gameStart(60);
-    game.getBall().launch();
-    fastify.get("/game/state", async (request, reply) => {
+    game.gameStart(30);
+
+    // once full websocket, will not need, comment for testing
+    /* fastify.get("/game/state", async (request, reply) => {
         const Ball = game.getBall();
         const [p1, p2] = game.getPaddles();
-        // const walls = game.getWalls();
         return {
             ball: {
                 speed: Ball.getSpeed(),
@@ -25,6 +26,5 @@ export default async function gamePlugin(fastify, options) {
                 position: p2.getPosition().asArray()
             }
         }; 
-    });
-
-}
+    }); */
+});

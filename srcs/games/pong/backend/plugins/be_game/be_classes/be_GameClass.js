@@ -4,6 +4,7 @@ import Wall from "./be_Wall.js";
 import Ball from "./be_Ball.js";
 import PlayField from "./be_Playfield.js";
 import { Vector3, Color3 } from "@babylonjs/core";
+import { ThinSSRPostProcess } from "@babylonjs/core/PostProcesses/thinSSRPostProcess.js";
 
 export default class Game {
 	constructor() {
@@ -106,6 +107,43 @@ export default class Game {
 
 	getWalls() {
 		return this.walls;
+	}
+
+	getWallsForWs() {
+		const retWalls = {};
+
+		for (const [name, wall] of Object.entries(this.walls)) {
+			retWalls[name] = {
+				position: wall.getPosition().asArray(),
+				size: [
+					wall.mesh.size,
+					wall.mesh.width,
+					wall.mesh.depth,
+				],
+				isPassthrough: wall.getPassThrough()
+			};
+		}
+		return retWalls;
+	}
+
+	getPlayFieldForWs() {
+		const lightsCamera = {};
+
+		lightsCamera["camera"] = {
+			name: this.field.getCamera().name,
+			position: [
+				this.field.getCamera().alpha,
+				this.field.getCamera().beta,
+				this.field.getCamera().radius
+			],
+			target: this.field.getCamera().target.asArray(),
+			mode: this.field.getCamera().mode, 
+		};
+		lightsCamera["lights"] = {
+			name: this.field.getLight().name,
+			direction: this.field.getLight().direction.asArray()
+		};
+		return lightsCamera;
 	}
 
 	gameStart(fps=60) {
