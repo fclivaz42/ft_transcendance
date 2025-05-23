@@ -4,7 +4,6 @@ import Wall from "./be_Wall.js";
 import Ball from "./be_Ball.js";
 import PlayField from "./be_Playfield.js";
 import { Vector3, Color3 } from "@babylonjs/core";
-import { ThinSSRPostProcess } from "@babylonjs/core/PostProcesses/thinSSRPostProcess.js";
 
 export default class Game {
 	constructor() {
