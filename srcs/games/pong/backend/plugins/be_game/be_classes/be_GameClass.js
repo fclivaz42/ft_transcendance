@@ -13,6 +13,8 @@ export default class Game {
 
 		this.showBoxes = false;
 
+		this._broadcastUpdate = null;
+
 		this.p1 = new Paddle(
 			this.scene,
 			"player1",
@@ -123,6 +125,10 @@ export default class Game {
 			retWalls[name] = wall.getInitInfo()
 		}
 		return retWalls;
+	}
+
+	setBroadcastFunction(func) {
+		this._broadcastUpdate = func;
 	}
 
 	gameStart(fps=60) {

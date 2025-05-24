@@ -5,6 +5,7 @@ export default class PlayerSession {
 		this.userId = userId;
 		this.playerReady = false;
 		this.room = null;
+		this.paddleId = null;
 	}
 	
 	send(message) {

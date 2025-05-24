@@ -5,9 +5,11 @@ export default class GameRoom {
 		this.id = id;
 		this.players = [];
 		this.game = new Game()
+		this.score = {"p1": null, "p2": null};
 	}
 
 	isFull() {
+		console.log(`current players in room: ${this.players.length}`)
 		return this.players.length >= 2;
 	}
 
@@ -15,12 +17,25 @@ export default class GameRoom {
 		this.players.push(playerSession);
 		playerSession.room = this;
 
+		if (this.players.length === 1) {
+			playerSession.paddleId = 'p1';
+		} else if (this.players.length === 2) {
+			playerSession.paddleId = 'p2';
+		}
+
 		if (this.isFull()) {
+			console.log(`Room ${this.id} full with players: [${this.players[0].userId}, ${this.players[1].userId}]`);
+			console.log("GAME READY TO BE STARTED.");
 			this.startGame();
 		}
 	}
 
 	startGame() {
+		
+		this.game.setBroadcastFunction(() => {
+			this.broadcast(this.buildUpdatePayload());
+		});
+
 		this.game.gameStart()
 		this.broadcast(this.buildInitPayload());
 	}
@@ -53,5 +68,31 @@ export default class GameRoom {
                 light: lightsCamera.getLightInitInfo()
             }
         }
+		return initPayload;
+	}
+
+	buildUpdatePayload() {
+		const game = this.game;
+        const ball = game.getBall();
+        const [p1, p2] = game.getPaddles();
+
+		const updatePayload = {
+			type: 'update',
+			payload: {
+				ball: {
+					speed: ball.getSpeed(),
+					position: ball.getPosition().asArray(),
+				},
+				p1: {
+					max_speed: p1.getSpeed(),
+					position: p1.getPosition().asArray()
+				},
+				p2: {
+					max_speed: p2.getSpeed(),
+					position: p2.getPosition().asArray()
+				}
+			}
+		}
+		return updatePayload;
 	}
 }
