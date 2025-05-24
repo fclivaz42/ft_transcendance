@@ -6,8 +6,6 @@ include:
   - ./core/docker-compose.yml
   - ./database/docker-compose.yml
   - ./oauth2/docker-compose.yml
-
-include:
   - ./core/docker-compose.yml
   - ./database/docker-compose.yml
   - ./oauth2/docker-compose.yml
