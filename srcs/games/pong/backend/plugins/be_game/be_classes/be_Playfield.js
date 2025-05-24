@@ -61,8 +61,27 @@ export default class PlayField {
 		return this.camera;
 	}
 
+	getCameraInitInfo() {
+		const initInfo = {
+			name: this.getCamera().name,
+			position: this.getCamera().position.asArray(),
+			target: this.getCamera().target.asArray(),
+		
+			mode: this.getCamera().mode,
+		};
+		return initInfo;
+	}
+
 	getLight() {
 		return this.light;
+	}
+
+	getLightInitInfo() {
+		const initInfo = {
+			name: this.getLight.name,
+			direction: this.getLight().direction.asArray(),
+		};
+		return initInfo;
 	}
 
 	addUpdatable(obj) {

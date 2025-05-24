@@ -4,8 +4,9 @@ import GameClass from "./be_classes/be_GameClass.js";
 
 export default fastifyPlugin(async function gamePlugin(fastify, options) {
     const game = new GameClass();
-    fastify.decorate("game", game);
 
+    fastify.decorate("game", game);
+    // this will only start when both players are ready
     game.gameStart(30);
 
     // once full websocket, will not need, comment for testing

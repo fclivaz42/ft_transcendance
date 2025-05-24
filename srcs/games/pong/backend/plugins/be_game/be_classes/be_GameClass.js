@@ -19,7 +19,7 @@ export default class Game {
 			new Vector3(-14.5, 0, 0), {
 				color: Color3.White(),
 				speed: 0.4,
-				depth: 2.8,
+				height: 2.8,
 				width: 0.3
 			});
 		this.p1.mesh.showBoundingBox = this.showBoxes;
@@ -31,7 +31,7 @@ export default class Game {
 				color: Color3.White(),
 				speed: 0.4,
 				controls: {"up": "ArrowUp", "down": "ArrowDown"},
-				depth: 2.8,
+				height: 2.8,
 				width: 0.3
 			});
 		this.p2.mesh.showBoundingBox = this.showBoxes;
@@ -52,28 +52,36 @@ export default class Game {
 				"northWall",
 				new Vector3(0, 8.05, 0), {
 					color: Color3.White(),
-					width: 30
+					width: 30,
+					height: 0.5,
+					depth: 0.5
 			}),
 			"southWall": new Wall(
 				this.scene,
 				"southWall",
 				new Vector3(0, -8.05, 0), {
 					color: Color3.White(),
-					width: 30
+					width: 30,
+					height: 0.5,
+					depth: 0.5
 			}),
 			"eastWall": new Wall(
 				this.scene,
 				"eastWall",
 				new Vector3(15.2, 0, 0), {
 					color: Color3.White(),
-					height: 16.6
+					width: 0.5,
+					height: 16.6,
+					depth: 0.5
 			}),
 			"westWall": new Wall(
 				this.scene,
 				"westWall",
 				new Vector3(-15.2, 0, 0), {
 					color: Color3.White(),
-					height: 16.6
+					width: 0.5,
+					height: 16.6,
+					depth: 0.5
 			}),
 		}
 		for (let [key, value] of Object.entries(this.walls)) {
@@ -112,37 +120,9 @@ export default class Game {
 		const retWalls = {};
 
 		for (const [name, wall] of Object.entries(this.walls)) {
-			retWalls[name] = {
-				position: wall.getPosition().asArray(),
-				size: [
-					wall.mesh.size,
-					wall.mesh.width,
-					wall.mesh.depth,
-				],
-				isPassthrough: wall.getPassThrough()
-			};
+			retWalls[name] = wall.getInitInfo()
 		}
 		return retWalls;
-	}
-
-	getPlayFieldForWs() {
-		const lightsCamera = {};
-
-		lightsCamera["camera"] = {
-			name: this.field.getCamera().name,
-			position: [
-				this.field.getCamera().alpha,
-				this.field.getCamera().beta,
-				this.field.getCamera().radius
-			],
-			target: this.field.getCamera().target.asArray(),
-			mode: this.field.getCamera().mode, 
-		};
-		lightsCamera["lights"] = {
-			name: this.field.getLight().name,
-			direction: this.field.getLight().direction.asArray()
-		};
-		return lightsCamera;
 	}
 
 	gameStart(fps=60) {

@@ -10,8 +10,8 @@ export default class Paddle {
     ) {
         const {
             color = Color3.White(),
-            size = 0.5,
             width = 0.5,
+            height = 0.5,
             depth = 0.5,
             speed = 0.05, // can remove and replace with setter
             controls = { "up" : "w", "down" : "s"}, // can remove and replace with setter
@@ -27,7 +27,7 @@ export default class Paddle {
         this._passThrough = false;
         this._isAi = isAi;
         
-        this.mesh = MeshBuilder.CreateBox(name, { size, width, depth }, scene);
+        this.mesh = MeshBuilder.CreateBox(name, { width, height, depth }, scene);
         this.mesh.position = position.clone();
         
         const material = new StandardMaterial(`${name}-mat`, scene);
@@ -64,6 +64,15 @@ export default class Paddle {
     getDirection()			{ return this._direction; }
     getControls()			{ return this._controls; }
     getCollisionBox()		{ return this.mesh.getBoundingInfo().boundingBox; }
+    getSize()               { return this.getCollisionBox().extendSize.scale(2) }
+    getInitInfo()           {
+        const initInfo = {
+            max_speed: this.getSpeed(),
+            position: this.getPosition().asArray(),
+            size: this.getSize().asArray(),
+        }
+        return initInfo;
+    }
 
     setSpeed(speed)			{ this._speed = speed; }
     setControls(obj)		{ this._controls = obj; }

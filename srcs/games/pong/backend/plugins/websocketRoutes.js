@@ -11,40 +11,44 @@ import fastifyPlugin from "fastify-plugin";
  */
 export default fastifyPlugin(async function (fastify) {
     fastify.get('/game/ws', {websocket: true}, (conn, req) => {
-
-        console.log("client connected.");
-
+        
         const game = fastify.game;
         const ball = game.getBall();
         const [p1, p2] = game.getPaddles();
-        const walls = game.getWallsForWs();
-        const lightsCamera = game.getPlayFieldForWs();
-        
-        /* Here the game state is grabbed from the game object
-            it is then once sent to all the clients to initialize the game
-            I think after it makes sense to launch the game from here
-        
-        */
+        const walls = game.getWallsForWs()
+        const lightsCamera = game.field;
+
         const initPayload = {
             type: 'init',
             payload: {
-                ball: {
-                    speed: ball.getSpeed(),
-                    position: ball.getPosition().asArray()
-                },
-                p1: {
-                    speed: p1.getSpeed(),
-                    position: p1.getPosition().asArray()
-                },
-                p2: {
-                    speed: p2.getSpeed(),
-                    position: p2.getPosition().asArray()
-                },
+                ball: ball.getBallInitInfo(),
+                p1: p1.getInitInfo(),
+                p2: p2.getInitInfo(),
                 walls: walls,
-                fieldInfo: lightsCamera
+                camera: lightsCamera.getCameraInitInfo(),
+                light: lightsCamera.getLightInitInfo()
             }
         }
 
+        const updatePayload = {
+            type: 'update',
+            payload: {
+                ball: {
+                    speed: ball.getSpeed(),
+                    position: ball.getPosition().asArray(),
+                },
+                p1: {
+                    max_speed: p1.getSpeed(),
+                    position: p1.getPosition().asArray(),
+                },
+                p2: {
+                    max_speed: p1.getSpeed(),
+                    position: p1.getPosition().asArray(),
+                }
+            }
+        }
+
+        console.log(`Player connected to room {PLACEHOLDER} with ID: {PLACEHOLDER}`);
         conn.send(JSON.stringify(initPayload));
 
         conn.on('message', (message) => {
@@ -63,3 +67,11 @@ export default fastifyPlugin(async function (fastify) {
         })
     })
 })
+
+
+// GETTERS FOR:
+//      WALLS: position, size, is passthrough
+//      LIGHTS and CAMERA
+
+//      BALL: position, size, speed
+//      PADDLES: position, size, speed

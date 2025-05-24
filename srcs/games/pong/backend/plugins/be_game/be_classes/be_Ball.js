@@ -52,6 +52,14 @@ export default class Ball {
 	getSpeed()				{ return this._speed; }
 	getPosition()			{ return this.mesh.position; }
 	getColliders()			{ return this._colliders; }
+	getBallInitInfo()		{
+		const initInfo = {
+			curr_speed: this.getSpeed(),
+			curr_position: this.getPosition().asArray(),
+			size: this.getCollisionBox().extendSize.scale(2).asArray()
+		};
+		return initInfo;
+	}
 
 	setLastHit(lastHit)		{ this._lastHit = lastHit; }
 	setBaseSpeed(baseSpeed)	{ this._baseSpeed = baseSpeed; }
