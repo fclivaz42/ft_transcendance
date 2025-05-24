@@ -1,10 +1,16 @@
 import type { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
 import { addScore } from "../interact.ts"
+import dotenv from "dotenv";
+dotenv.config();
 
 export default async function module_routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
 	fastify.post('/', async function handler(request, reply) {
-		const id = "74826787dyauwyds8a7wsd8awd7847627y84y72ihd72t48ydu92"
-		console.log(await addScore(id, "angela", 10, "ilkay", 2));
+		const id = "123";
+		const contract: string | any = process.env.CURRENT_CONTRACT;
+		if (!contract)
+			reply.code(400).send("Bad contract");
+
+		await addScore(contract, id, "angela", 4210, "ilkay", 24);
 		reply.code(200).send("Interact completed");
 	})
 }

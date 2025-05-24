@@ -14,6 +14,7 @@ const abiPath = path.resolve(__dirname, '../artifacts/srcs/contracts/TournamentS
 const jsonString = fs.readFileSync(abiPath, 'utf-8');
 const contractData = JSON.parse(jsonString);
 
+
 export async function deploy() {
 	const privateKey = process.env.PRIVATE_KEY;
 
@@ -25,6 +26,7 @@ export async function deploy() {
 		const wallet = new ethers.Wallet(privateKey, provider);
 		const factory: ContractFactory = new ethers.ContractFactory(contractData.abi, contractData.bytecode, wallet);
 
+		console.log("Try to deploy contract...");
 		const contract: eth.BaseContract = await factory.deploy();
 		await contract.waitForDeployment();
 
@@ -35,28 +37,26 @@ export async function deploy() {
 
 		contract.deploymentTransaction()?.wait;
 		const address = await contract.getAddress();
-		console.log("[ Contract deployed at: ", address, " ]\n");
+		console.log("\n╔════════════════════════════════════");
+		console.log("║ Deployment.");
+		console.log("║");
+		console.log("╠═    Contract deployed at:[", address, "]");
+		console.log("║");
 
 		const receipt: eth.ContractTransactionReceipt | null = await deployed.wait();
 		if (!receipt)
-			throw ("Contract Error: no receipt");
+			throw ("║\tContract Error: no receipt");
 
-		console.log("\n[ DEPLOYED ]");
-		console.log("Is Mined: ", deployed.isMined);
-		console.log("JSON: ", deployed.toJSON);
-		console.log("Number of confirmation: ", deployed.confirmations);
-		console.log("From: ", deployed.from);
-		console.log("Hash: ", deployed.hash);
-		console.log("Index: ", deployed.index);
-		console.log("ChainId", deployed.chainId);
-		console.log("Provider: ", deployed.provider);
-		console.log("BlockNumber: ", deployed.blockNumber);
-		console.log("BlockHash: ", deployed.blockHash);
-
-		console.log("\n\n[ RECEIPT ]");
-		console.log("FROM: ", receipt.from);
-		console.log("BlockNumber", receipt.blockNumber);
-		console.log("BlockHash: ", receipt.blockHash);
+		console.log("╠═    [ RESPONSE ]");
+		console.log("║\t From: ", deployed.from);
+		console.log("║\t Hash: ", deployed.hash);
+		console.log("║\t ChainId: ", deployed.chainId);
+		console.log("║");
+		console.log("╠═    [ RECEIPT ]");
+		console.log("║\t BlockNumber: ", receipt.blockNumber);
+		console.log("║\t BlockHash: ", receipt.blockHash);
+		console.log("║");
+		console.log("╚══════════════════════════════════════\n");
 
 		return address;
 	} catch (error) {

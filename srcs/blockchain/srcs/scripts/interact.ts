@@ -22,39 +22,49 @@ const jsonString = fs.readFileSync(abiPath, 'utf-8');
 const abi = JSON.parse(jsonString);
 
 
-export async function addScore(id: string, winnerName: string, wins: number, loserName: string, losses: number) {
-	const contractAddress = process.env.CURRENT_CONTRACT;
+export async function addScore(contractAddress: string, id: string, winnerName: string, wins: number, loserName: string, losses: number) {
 	const privateKey = process.env.PRIVATE_KEY;
 
-	if (!contractAddress || !privateKey)
-		throw ("CURRENT_CONTRACT or PRIVATE_KEY not defined");
+	if (!privateKey)
+		throw ("PRIVATE_KEY not defined");
 
 	const provider: eth.JsonRpcProvider = new ethers.JsonRpcProvider(process.env.PROVIDER);
 	const wallet = new ethers.Wallet(privateKey, provider);
 	const contract: eth.Contract = new ethers.Contract(contractAddress, abi.abi, wallet);
 
 	try {
+		console.log("Add Score to contract...");
 		const tx: eth.TransactionResponse = await contract.addScore(id, winnerName, wins, loserName, losses);
 
 		if (!tx)
 			throw ("tx null");
-		const reponse: eth.TransactionReceipt | null = await tx.wait();
-		if (!reponse)
-			throw ("reponse null");
-		console.log("[REQUEST]\n: ", " Hash: ", tx.hash, tx.isMined, "\n");
-		console.log("[RESPONSE]\nBlock: ", reponse.blockNumber, " Hash: ",
-			reponse.blockHash, "\nconfirmation: ", reponse.confirmations, "\n");
-		return ("Tournament has been set");
+		const receipt: eth.TransactionReceipt | null = await tx.wait();
+		if (!receipt)
+			throw ("receipt null");
+		console.log("\n╔════════════════════════════════════");
+		console.log("║ AddScore.");
+		console.log("║");
+		console.log("╠═    [ RESPONSE ]");
+		console.log("║\t Hash:\t", tx.hash);
+		console.log("║\t From:\t", tx.from);
+		console.log("║\t To:\t", tx.to);
+		console.log("║");
+		console.log("╠═    [RECEIPT]");
+		console.log("║\t Block:\t", receipt.blockNumber);
+		console.log("║\t Hash:\t", receipt.blockHash);
+		console.log("║\t Confirmation:\t", await receipt.confirmations());
+		console.log("║");
+		console.log("║\t -- [ Score added successfully ] --");
+		console.log("║");
+		console.log("╚══════════════════════════════════════\n");
+		return (contract);
 	}
 	catch (error) {
 		return ("Error with contract interaction");
 	}
 }
 
-export async function getTournamentScore(id: string) {
-	const contractAddress = process.env.CURRENT_CONTRACT;
-	if (!contractAddress)
-		throw ("CURRENT_CONTRACT is not defined");
+export async function getTournamentScore(contractAddress: string, id: string) {
 
 	const provider = new ethers.JsonRpcProvider(process.env.PROVIDER);
 	const contract = new ethers.Contract(contractAddress, abi.abi, provider);
@@ -68,10 +78,7 @@ export async function getTournamentScore(id: string) {
 	}
 }
 
-export async function getMatchScore(id: string, index: number) {
-	const contractAddress = process.env.CURRENT_CONTRACT;
-	if (!contractAddress)
-		throw ("CURRENT_CONTRACT is not defined");
+export async function getMatchScore(contractAddress: string, id: string, index: number) {
 
 	const provider = new ethers.JsonRpcProvider(process.env.PROVIDER);
 	const contract = new ethers.Contract(contractAddress, abi.abi, provider);

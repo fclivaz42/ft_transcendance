@@ -5,12 +5,17 @@ RUN apk upgrade
 
 WORKDIR /sarif
 
-COPY srcs/ ./srcs
 COPY tsconfig.json /sarif
+
 COPY package.json /sarif
+RUN npm i
+
 COPY hardhat.config.cjs /sarif
 
-RUN npm i
+COPY srcs/ ./srcs
+
+# RUN npx hardhat compile
+
 EXPOSE 80
 
 ENTRYPOINT ["sh", "-c", "node srcs/scripts/main.ts"]
