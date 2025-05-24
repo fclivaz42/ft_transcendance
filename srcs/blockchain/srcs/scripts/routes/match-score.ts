@@ -1,8 +1,5 @@
 import type { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
-import { addScore } from "../interact.ts"
-import { getTournamentScore } from "../interact.ts"
 import { getMatchScore } from "../interact.ts"
-import { log } from "console";
 
 export default async function module_routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
 	fastify.post('/', async function handler(request, reply) {

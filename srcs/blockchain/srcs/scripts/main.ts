@@ -6,10 +6,6 @@ import path from 'node:path'
 
 const fastify = Fastify({
 	logger: true,
-	// https: {
-	// 	key: fs.readFileSync('/app/sarif.pem'),
-	// 	cert: fs.readFileSync('/app/sarif.pem')
-	// }
 })
 
 const subfolder = path.join(import.meta.dirname, "routes")

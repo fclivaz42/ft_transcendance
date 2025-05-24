@@ -8,8 +8,8 @@ services:
       - "80:80"
     build: ./
     env_file: .env
-    # environment:
-    #   - API_KEY
+    environment:
+      - API_KEY
     # depends_on:
     #   - sarif_{DEPENDMODULE}
     restart: no
