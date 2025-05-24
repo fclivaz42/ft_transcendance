@@ -1,15 +1,14 @@
-
-services:
-  sarif_pong_backend:
-    build:
-     context: .
-     dockerfile: ./backend/Dockerfile.backend
-    container_name: sarif_pong_backend
-    working_dir: /app/backend
-    command: npm run dev
-    volumes:
-      - ./backend:/app/backend
-    ports:
-     - "1337:1337"
-    environment:
-      - NODE_ENV=development
+# services:
+  # sarif_{MODULE}:
+  #   container_name: sarif_{MODULE}
+  #   networks:
+  #     - sarifntw
+  #   volumes:
+  #     - data:/data
+  #   build: ./
+  #   env_file: .env
+  #   environment:
+  #     - API_KEY
+  #   depends_on:
+  #     - sarif_{DEPENDMODULE}
+  #   restart: on-failure

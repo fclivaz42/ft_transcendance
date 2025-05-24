@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/04/30 01:32:36 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/05/12 20:49:27 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -49,15 +49,17 @@ const MatchesTable =
 					"ScoreOne",
 					"ScoreTwo",
 					"StartTime",
-					"EndTime"],
+					"EndTime",
+					"CryptoHash"],
 	"Arguments":	["TEXT NOT NULL PRIMARY KEY",
-					`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]})`,
-					`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]})`,
-					`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]})`,
+					`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET NULL`,
+					`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET NULL`,
+					`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET NULL`,
 					"INTEGER NOT NULL",
 					"INTEGER NOT NULL",
 					"INTEGER NOT NULL",
-					"INTEGER NOT NULL"],
+					"INTEGER NOT NULL",
+					"TEXT NOT NULL"],
 	"Methods":		["GET",
 					"POST"]
 }
