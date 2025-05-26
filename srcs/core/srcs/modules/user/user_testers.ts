@@ -1,41 +1,34 @@
 // ************************************************************************** //
 //                                                                            //
 //                                                        :::      ::::::::   //
-//   db_testers.js                                      :+:      :+:    :+:   //
+//   user_testers.ts                                    :+:      :+:    :+:   //
 //                                                    +:+ +:+         +:+     //
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/05/12 23:02:45 by fclivaz           #+#    #+#             //
-//   Updated: 2025/05/14 13:48:03 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/05/26 23:30:08 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
-import Axios from 'axios'
 import * as crypto from 'crypto';
+import Connector from "./user_request.ts"
+import type * as fft from 'fastify'
+import type * as at from 'axios'
 
-export async function test_get(request, reply) {
-	let stmt = Axios.create({
-		url: "/Players",
-		baseURL: "http://sarif_db:3000",
-		headers: {
-			'Content-Type': 'application/json',
-			'api_key': process.env.API_KEY,
-			'field': "DisplayName",
-			'query': "Bropler"
-		}
-	})
-
-	stmt.get("http://sarif_db:3000/Players", JSON.stringify(request.body))
-		.then(function(response) {
+export async function test_get(request: fft.FastifyRequest, reply: fft.FastifyReply) {
+	const getter = new Connector("get");
+	getter.get("/Players", JSON.stringify(request.body))
+		.then(function(response: at.AxiosResponse) {
+			console.log("yippie")
 			return reply.code(response.status).send(JSON.stringify(response.data))
 		})
-		.catch(function(error) {
+		.catch(function(error: at.AxiosError) {
 			console.log(error)
 			return reply.code(error.status).send(error.data)
 		})
 }
 
-export async function test_post(request, reply) {
+export async function test_post(request: fft.FastifyRequest, reply: fft.FastifyReply) {
 	let stmt = Axios.create({
 		url: "/Players",
 		baseURL: "http://sarif_db:3000",
@@ -73,7 +66,7 @@ export async function test_post(request, reply) {
 	})
 }
 
-export async function test_delete(request, reply) {
+export async function test_delete(request: fft.FastifyRequest, reply: fft.FastifyReply) {
 	let stmt = Axios.create({
 		url: "/Matches",
 		baseURL: "http://sarif_db:3000",
@@ -94,7 +87,7 @@ export async function test_delete(request, reply) {
 		})
 }
 
-export async function test_put(request, reply) {
+export async function test_put(request: fft.FastifyRequest, reply: fft.FastifyReply) {
 	const plaintext = "ftgilkay"
 
 	let stmt = Axios.create({

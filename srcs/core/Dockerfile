@@ -2,6 +2,7 @@ FROM node:23.10.0-alpine
 
 RUN apk update
 RUN apk upgrade
+RUN apk add curl openssl
 
 ARG KEYPATH
 ARG CERTPATH
