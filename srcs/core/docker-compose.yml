@@ -6,7 +6,7 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/04 22:27:45 by fclivaz           #+#    #+#              #
-#    Updated: 2025/05/04 22:33:42 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/05/26 22:36:35 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,8 +19,14 @@ services:
       - data:/data
     ports:
       - "443:443"
-    build: ./
-    env_file: ../.env
+    build:
+      context: .
+      args:
+        CERTPATH: ${CERTPATH}
+        KEYPATH: ${KEYPATH}
+    env_file:
+      - ../.env
+      - .env
     environment:
       - API_KEY
       - TZ=Europe/Zurich
