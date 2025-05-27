@@ -9,7 +9,7 @@ ARG CERTPATH
 
 WORKDIR /sarif
 
-RUN openssl req -x509 -newkey rsa:2048 -nodes -keyout ${KEYPATH} -out ${CERTPATH} -days 365 -subj "/C=FR/ST=SG/L=St-Gallen/O=Bloem/OU=Dev/CN=localhost"
+RUN openssl req -x509 -newkey rsa:2048 -nodes -keyout ${KEYPATH} -out ${CERTPATH} -days 365 -subj "/C=CH/ST=Vaud/L=Lausanne/O=42/OU=42/CN=42lausanne.ch/UID=SARIF"
 
 COPY package.json /sarif
 RUN npm i

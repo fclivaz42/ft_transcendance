@@ -6,9 +6,44 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/05/26 21:38:11 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/05/27 19:42:03 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
+
+const OauthTable =
+{
+	"Name": "OauthTable",
+	"Fields": [
+		"SubjectID",
+		"IssuerName",
+		"EmailAddress",
+		"FullName",
+		"FirstName",
+		"FamilyName",
+		"TokenHash",
+		"IssueTime",
+		"ExpirationTime",
+		"PRIMARY KEY"
+	],
+	"Arguments": [
+		"TEXT NOT NULL",
+		"TEXT NOT NULL",
+		"TEXT NOT NULL",
+		"TEXT DEFAULT NULL",
+		"TEXT DEFAULT NULL",
+		"TEXT DEFAULT NULL",
+		"TEXT NOT NULL",
+		"INTEGER NOT NULL",
+		"INTEGER DEFAULT 0",
+		"(SubjectID, IssuerName)"
+	],
+	"Methods": [
+		"GET",
+		"POST",
+		"DELETE",
+		"PUT"
+	]
+}
 
 const PlayersTable =
 {
@@ -18,6 +53,7 @@ const PlayersTable =
 		"DisplayName",
 		"EmailAddress",
 		"PassHash",
+		"GoogleID",
 		"ActiveToken",
 		"SessionID",
 		"FriendsList",
@@ -32,6 +68,7 @@ const PlayersTable =
 		"TEXT UNIQUE NOT NULL",
 		"TEXT UNIQUE NOT NULL",
 		"TEXT NOT NULL",
+		`TEXT DEFAULT NULL REFERENCES ${OauthTable.Name}(${OauthTable.Fields[0]}) ON DELETE SET NULL`,
 		"TEXT DEFAULT NULL",
 		"TEXT DEFAULT NULL",
 		"TEXT DEFAULT NULL",
@@ -128,6 +165,7 @@ const CurrentContract =
 
 export const tables =
 {
+	"OauthTable": OauthTable,
 	"Players": PlayersTable,
 	"Matches": MatchesTable,
 	"UIDTable": UIDTable,
