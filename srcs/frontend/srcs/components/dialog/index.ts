@@ -5,8 +5,6 @@ export interface DialogProps {
 
 export function createDialog(props?: DialogProps): HTMLDialogElement {
   const dialog = document.createElement("dialog");
-
-  props?.id && (dialog.id = props.id);
   
   if (props?.allowClose) {
     const closeButton = document.createElement("button");
