@@ -1,12 +1,12 @@
 services:
   oauth2:
     build: ./
-    container_name: oauth2
+    container_name: sarif_oauth2
     environment:
       - TZ=Europe/Zurich
+      - API_KEY
     env_file:
       - .env
-      - ./../.env
-    restart: always
+    restart: on-failure
     networks:
       - sarifntw
