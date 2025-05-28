@@ -39,22 +39,20 @@ export interface Oauth2sdkCallbackResponse {
   };
 }
 
-export function defaultConfig(): Oauth2sdkConfig {
-  return {
-    apiKey: process.env.API_KEY || '',
-    serverUrl: "http://sarif_oauth2:3000",
-  };
+export const defaultConfig: Oauth2sdkConfig = {
+  apiKey: process.env.API_KEY || "",
+  serverUrl: "http://sarif_oauth2:3000",
 }
 
 class Oauth2sdk {
   private _config: Oauth2sdkConfig;
 
   constructor(config? : Oauth2sdkConfig) {
-    this._config = config || defaultConfig();
+    this._config = config || defaultConfig;
   }
 
-  private async apiRequest<T>(method: 'get' | 'post', endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
-    const url = `${this._config.serverUrl}/oauth/${endpoint}${params ? `?${params.toString()}` : ''}`;
+  private async apiRequest<T>(method: "get" | "post", endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
+    const url = `${this._config.serverUrl}/oauth/${endpoint}${params ? `?${params.toString()}` : ""}`;
     return axios({
       method,
       url,
@@ -67,17 +65,17 @@ class Oauth2sdk {
   public async getLogin(clientid: string): Promise<AxiosResponse<Oauth2sdkLoginResponse>> {
     const params = new URLSearchParams({ clientid });
 
-    return this.apiRequest<Oauth2sdkLoginResponse>('get', 'login', params);
+    return this.apiRequest<Oauth2sdkLoginResponse>("get", "login", params);
   }
 
   public async getCallback(code: string, state: string): Promise<AxiosResponse<Oauth2sdkCallbackResponse>> {
     const params = new URLSearchParams({ code, state });
 
-    return this.apiRequest<Oauth2sdkCallbackResponse>('get', 'callback', params);
+    return this.apiRequest<Oauth2sdkCallbackResponse>("get", "callback", params);
   }
 
   public async getSession(state: string): Promise<AxiosResponse<Oauth2sdkCallbackResponse>> {
-    return this.apiRequest<Oauth2sdkCallbackResponse>('get', `session/${state}`);
+    return this.apiRequest<Oauth2sdkCallbackResponse>("get", `session/${state}`);
   }
 }
 
