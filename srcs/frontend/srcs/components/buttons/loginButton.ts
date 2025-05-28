@@ -1,7 +1,8 @@
+import { loginDialogManager } from "../../managers/LoginDialogManager.js";
 import { createButton } from "./index.js";
 
 export function createLoginButton(): HTMLElement {
-  return createButton({
+  const button = createButton({
     title: "Login",
     logo: "./assets/ui/login-door-1-svgrepo-com.svg",
     color: "bg-white",
@@ -10,4 +11,8 @@ export function createLoginButton(): HTMLElement {
     href: "#",
     i18n: "header.usermenu.login",
   });
+  button.onclick = () => {
+    loginDialogManager.initialize();
+  }
+  return button;
 }
