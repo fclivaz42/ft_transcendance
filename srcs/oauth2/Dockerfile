@@ -2,8 +2,6 @@ FROM node:23.10.0-alpine
 
 EXPOSE 3000
 
-RUN apk update
-
 WORKDIR /sarif
 
 COPY srcs ./srcs

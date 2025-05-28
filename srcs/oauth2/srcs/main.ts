@@ -6,7 +6,7 @@ const server = fastify({logger: config.ServerConfig.logger});
 
 server.register(oauthRoutes, {prefix: "/oauth"});
 
-server.listen({ port: config.ServerConfig.port }, (err, address) => {
+server.listen({ port: config.ServerConfig.port, host: "0.0.0.0" }, (err, address) => {
 	if (err) {
 		server.log.error(err);
 		process.exit(1);

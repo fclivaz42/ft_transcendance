@@ -14,8 +14,12 @@ class ServerConfig {
 		this._port = parseInt(process.env.OAUTH_PORT);
 		if (isNaN(this._port)) throw new Error("OAUTH_PORT must be an integer");
 		if (!process.env.OAUTH_LOGGER) {
-			console.warn("Missing OAUTH_LOGGER env, using default 'true'");
-			process.env.OAUTH_LOGGER = "true";
+			if (process.env.LOGGER)
+				process.env.OAUTH_LOGGER = process.env.LOGGER;
+			else {
+				console.warn("Missing OAUTH_LOGGER|LOGGER env, using default 'true'");
+				process.env.OAUTH_LOGGER = "true";
+			}
 		}
 		this._logger = process.env.OAUTH_LOGGER.toLowerCase() === "true";
 		if (!process.env.API_KEY) {

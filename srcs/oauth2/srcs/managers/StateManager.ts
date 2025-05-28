@@ -61,6 +61,7 @@ class StateManager {
 			this.session.delete(state);
 		}, config.OauthConfig.session_timeout);
 		this.removeState(state);
+		return current_session;
 	}
 
 	public getSession(state: string): session | undefined {

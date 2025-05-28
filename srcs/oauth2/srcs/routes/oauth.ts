@@ -71,8 +71,10 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 						token.jwt_decode = googleJwt.jwtDecoded;
 					} catch (err) { token.jwt_decode = null; }
 				}
-				stateManager.initSession(state, token);
-				rep.status(200).send({...(resp.data as OauthToken)});
+				const session = stateManager.initSession(state, token);
+				rep.status(200).send({
+					...session
+				});
 			})
 			.catch(err => {
 				console.error(err);
