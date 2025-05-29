@@ -29,9 +29,9 @@ Gets the URL to redirect the user to the provider's OAuth authorization server a
 
 | Query       | Required | Example  | Description                                                          |
 | ----------- | -------- | -------- | -------------------------------------------------------------------- |
-| `?clientid` | yes      | (string) | Identify the client, so newer states will force older ones to close. |
+| `?client_id` | yes      | (string) | Identify the client, so newer states will force older ones to close. |
 
-The `clientid` can be any unique id value as long as the client (browser) can be identified by it.
+The `client_id` can be any unique id value as long as the client (browser) can be identified by it.
 
 ### HTTP Headers
 
@@ -158,7 +158,7 @@ Gets the session status. Sessions have a storage limit of 500 elements; once it'
 ```json
 {
 	"state": "8fed1ef7-2a51-402b-a901-b83e1872ed50",
-	"clientid": "unique_id",
+	"client_id": "unique_id",
 	"logged": true,
 	"token": {
 		"access_token": "f43th43ui...",

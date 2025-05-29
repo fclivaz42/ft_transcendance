@@ -4,15 +4,15 @@ import { config } from "./ConfigManager.ts";
 
 interface session {
 	state: string,
-	clientid: string,
+	client_id: string,
 	logged: boolean,
 	token: OauthToken | null
 }
 
 class StateManager {
-	/** state:clientid */
+	/** state:client_id */
 	private states: FixedSizeMap<string, string>;
-	/** state:{clientid, status} */
+	/** state:{client_id, status} */
 	private session: FixedSizeMap<string, session>;
 	
 	constructor() {
@@ -20,10 +20,10 @@ class StateManager {
 		this.session = new FixedSizeMap<string, session>(500);
 	}
 
-	public addState(clientid: string) {
+	public addState(client_id: string) {
 		// remove old state from same client
 		for(const pair of this.states) {
-			if (pair[1] === clientid) {
+			if (pair[1] === client_id) {
 				this.initSession(pair[0], null);
 				break;
 			}
@@ -33,7 +33,7 @@ class StateManager {
 		do {
 			state = crypto.randomUUID();
 		} while (this.states.has(state));
-		this.states.set(state, clientid);
+		this.states.set(state, client_id);
 		setTimeout(() => {
 			this.states.delete(state);
 		}, config.OauthConfig.session_timeout);
@@ -52,7 +52,7 @@ class StateManager {
 		const logged = !(token == null);
 		const current_session: session = {
 			state,
-			clientid: this.states.get(state) ?? "",
+			client_id: this.states.get(state) ?? "",
 			logged,
 			token
 		}

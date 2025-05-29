@@ -7,15 +7,15 @@ const oauth2sdk = new Oauth2sdk();
 
 async function oauth_routes(app: FastifyInstance, opts: FastifyPluginOptions) {
   app.get('/login', async (req, rep) => {
-    console.error("Using random clientId for debug purposes");
-    const clientId = crypto.randomBytes(16).toString('hex');
+    console.error("Using random client_id for debug purposes");
+    const client_id = crypto.randomBytes(16).toString('hex');
 
-    if (!clientId) {
-      httpReply(rep, req, 400, "Missing clientId in query parameters");
+    if (!client_id) {
+      httpReply(rep, req, 400, "Missing client_id in query parameters");
       return;
     }
 
-    await oauth2sdk.getLogin(clientId)
+    await oauth2sdk.getLogin(client_id)
       .catch(err => {
         console.error("Error fetching login URL:", err);
         httpReply(rep, req, 500, "Failed to fetch login URL");
@@ -33,7 +33,8 @@ async function oauth_routes(app: FastifyInstance, opts: FastifyPluginOptions) {
     const { code, state } = req.query as { code?: string; state?: string };
 
     if (!code || !state) {
-      return rep.status(400).send({ error: "Missing code or state in query parameters" });
+      httpReply(rep, req, 400, "Missing code or state in query parameters");
+      return;
     }
 
     await oauth2sdk.getCallback(code, state)

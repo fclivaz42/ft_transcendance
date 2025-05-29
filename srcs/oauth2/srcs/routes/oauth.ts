@@ -17,12 +17,12 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 		checkRequestAuthorization(req, rep)
 
 		const query = req.query as OauthLoginRequest;
-		if (!query.clientid) {
-			httpReply(rep, req, 400, "Missing clientid query from request");
+		if (!query.client_id) {
+			httpReply(rep, req, 400, "Missing client_id query from request");
 			return;
 		}
 
-		const state = stateManager.addState(query.clientid);
+		const state = stateManager.addState(query.client_id);
 		const params = new URLSearchParams({
 			client_id: config.OauthConfig.client_id,
 			redirect_uri: config.OauthConfig.callback,

@@ -20,7 +20,7 @@ export interface OauthCallbackRequest {
 }
 
 export interface OauthLoginRequest {
-	clientid: string | undefined;
+	client_id: string | undefined;
 	state: string | undefined;
 }
 

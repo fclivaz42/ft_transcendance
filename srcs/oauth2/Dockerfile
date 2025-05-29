@@ -1,5 +1,8 @@
 FROM node:23.10.0-alpine
 
+RUN apk update
+RUN apk upgrade
+
 RUN apk add openssl
 
 EXPOSE 3000
