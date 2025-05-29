@@ -1,8 +1,15 @@
 import fastify from "fastify";
 import oauthRoutes from "./routes/oauth.ts";
 import { config } from "./managers/ConfigManager.ts";
+import fs from "node:fs";
 
-const server = fastify({logger: config.ServerConfig.logger});
+const server = fastify({
+	logger: config.ServerConfig.logger,
+	https: {
+		key: fs.readFileSync(config.ServerConfig.cert._keypath),
+		cert: fs.readFileSync(config.ServerConfig.cert._certpath)
+	}
+});
 
 server.register(oauthRoutes, {prefix: "/oauth"});
 

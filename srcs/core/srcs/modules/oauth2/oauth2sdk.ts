@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { AxiosResponse } from "axios";
+import https from "https";
 
 export interface Oauth2sdkConfig {
   apiKey: string;
@@ -41,7 +42,7 @@ export interface Oauth2sdkCallbackResponse {
 
 export const defaultConfig: Oauth2sdkConfig = {
   apiKey: process.env.API_KEY || "",
-  serverUrl: "http://sarif_oauth2:3000",
+  serverUrl: "https://sarif_oauth2:3000",
 }
 
 class Oauth2sdk {
@@ -52,8 +53,12 @@ class Oauth2sdk {
   }
 
   private async apiRequest<T>(method: "get" | "post", endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: false,
+    })
     const url = `${this._config.serverUrl}/oauth/${endpoint}${params ? `?${params.toString()}` : ""}`;
     return axios({
+      httpsAgent,
       method,
       url,
       headers: {

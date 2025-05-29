@@ -5,6 +5,10 @@ class ServerConfig {
 	private _port: number;
 	private _logger: boolean;
 	private _api_key: string;
+	private _cert: {
+		_keypath: string;
+		_certpath: string;
+	}
 
 	constructor() {
 		if (!process.env.OAUTH_PORT) {
@@ -28,11 +32,30 @@ class ServerConfig {
 			console.info(`API_KEY for Authorization header: ${process.env.API_KEY}`)	
 		}
 		this._api_key = process.env.API_KEY;
+		if (!process.env.KEYPATH || !process.env.CERTPATH) {
+			console.warn("Missing KEYPATH or CERTPATH env, using default paths.");
+			this._cert = {
+				_keypath: "/etc/ssl/private/sarif.key",
+				_certpath: "/etc/ssl/certs/sarif.crt",
+			};
+		} else {
+			this._cert = {
+				_keypath: process.env.KEYPATH,
+				_certpath: process.env.CERTPATH,
+			};
+		}
+		console.warn(`Loading certificate and key from ${this._cert._certpath} and ${this._cert._keypath}`);
 	}
 
 	public get port(): number { return this._port; }
 	public get logger(): boolean { return this._logger; }
 	public get api_key(): string { return this._api_key; }
+	public get cert(): { _keypath: string; _certpath: string } {
+		return {
+			_keypath: this._cert._keypath,
+			_certpath: this._cert._certpath
+		};
+	}
 }
 
 class OauthConfig {
