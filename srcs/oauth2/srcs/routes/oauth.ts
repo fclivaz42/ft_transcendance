@@ -7,14 +7,15 @@ import { config } from "../managers/ConfigManager.ts";
 import checkRequestAuthorization from "../managers/AuthorizationManager.ts";
 import { GoogleJwtManager } from "../managers/GoogleJwtManager.ts";
 import { stateManager } from "../managers/StateManager.ts";
-import { httpReply } from "../managers/HttpResponse.ts";
+import { httpReply } from "../handlers/HttpResponse.ts";
 
 // TODO: logout, me ep
-// TODO: Auto-cleanup for sessions
 
 async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.get("/login", async(req, rep) => {
-		checkRequestAuthorization(req, rep)
+		const prohibited = checkRequestAuthorization(req, rep);
+		if (prohibited)
+			return prohibited;
 
 		const query = req.query as OauthLoginRequest;
 		if (!query.client_id) {
@@ -35,7 +36,9 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 	});
 
 	app.get("/callback", async(req, rep) => {
-		checkRequestAuthorization(req, rep);
+		const prohibited = checkRequestAuthorization(req, rep);
+		if (prohibited)
+			return prohibited;
 
 		const query = req.query as OauthCallbackRequest;
 		if (!query.code) {
@@ -84,7 +87,9 @@ async function oauthRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
 	});
 
 	app.get("/sessions/:state", async(req, rep) => {
-		checkRequestAuthorization(req, rep);
+		const prohibited = checkRequestAuthorization(req, rep);
+		if (prohibited)
+			return prohibited;
 
 		const params = req.params as OauthSessionRequest;
 		if (!params.state) {

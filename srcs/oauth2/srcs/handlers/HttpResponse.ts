@@ -89,5 +89,5 @@ export function httpError(code: number, message: string, req: FastifyRequest) {
 }
 
 export function httpReply(rep: FastifyReply, req: FastifyRequest, code: number, message: string) {
-	rep.status(code).send(httpError(code, message, req));
+	return rep.status(code).send(httpError(code, message, req));
 }

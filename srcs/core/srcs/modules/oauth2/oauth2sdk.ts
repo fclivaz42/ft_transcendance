@@ -68,7 +68,7 @@ class Oauth2sdk {
       method,
       url,
       headers: {
-        Authorization: this._config.apiKey,
+        Authorization: `Bearer ${this._config.apiKey}`,
       },
     });
   }
