@@ -6,7 +6,11 @@ services:
     #   - sarifntw
     ports:
       - "8080:8080"
-    build: ./
+    build:
+      context: ./
+      args:
+        PROVIDER: ${PROVIDER}
+        PRIVATE_KEY: ${PRIVATE_KEY}
     env_file: .env
     environment:
       - API_KEY

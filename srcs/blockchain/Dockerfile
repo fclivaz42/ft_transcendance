@@ -14,8 +14,16 @@ COPY hardhat.config.cjs /sarif
 
 COPY srcs/ ./srcs
 
+ARG PROVIDER
+ARG PRIVATE_KEY
+ENV PROVIDER=${PROVIDER}
+ENV PRIVATE_KEY=${PRIVATE_KEY}
+
+RUN npx hardhat compile
+
 WORKDIR /sarif
+
 
 EXPOSE 8080
 
-ENTRYPOINT ["node", "srcs/scripts/main.ts"]
+ENTRYPOINT ["npm", "run", "main"]

@@ -1,4 +1,7 @@
+# solidity cache file
 data/
+artifacts/
+cache/
 addscore.json
 *.env
 .env
