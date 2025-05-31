@@ -13,21 +13,6 @@ networks:
     name: "SARIF Bridge"
     driver: bridge
 
-# services:
-  # sarif_{MODULE}:
-  #   container_name: sarif_{MODULE}
-  #   networks:
-  #     - sarifntw
-  #   volumes:
-  #     - data:/data
-  #   build: {MODULE}
-  #   env_file: .env
-  #   environment:
-  #     - API_KEY
-  #   depends_on:
-  #     - sarif_{DEPENDMODULE}
-  #   restart: on-failure
-
 volumes:
   data:
     name: "SARIF_data"
