@@ -1,3 +1,15 @@
+// ************************************************************************** //
+//                                                                            //
+//                                                        :::      ::::::::   //
+//   db_tests.ts                                        :+:      :+:    :+:   //
+//                                                    +:+ +:+         +:+     //
+//   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
+//                                                +#+#+#+#+#+   +#+           //
+//   Created: 2025/05/31 20:07:43 by fclivaz           #+#    #+#             //
+//   Updated: 2025/05/31 20:07:45 by fclivaz          ###   LAUSANNE.ch       //
+//                                                                            //
+// ************************************************************************** //
+
 import Database from "better-sqlite3"
 import { tables } from "./db_vars.ts"
 console.log(process.argv[2])
