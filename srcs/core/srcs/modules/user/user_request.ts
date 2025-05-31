@@ -1,29 +1,35 @@
 // ************************************************************************** //
 //                                                                            //
 //                                                        :::      ::::::::   //
-//   db_testers.js                                      :+:      :+:    :+:   //
+//   user_request.ts                                    :+:      :+:    :+:   //
 //                                                    +:+ +:+         +:+     //
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
-//   Created: 2025/05/12 23:02:45 by fclivaz           #+#    #+#             //
-//   Updated: 2025/05/13 00:30:40 by fclivaz          ###   LAUSANNE.ch       //
+//   Created: 2025/05/12 23:14:45 by fclivaz           #+#    #+#             //
+//   Updated: 2025/05/24 18:03:19 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import Axios from 'axios'
+import type * as at from 'axios'
 
-export function test_get(request, reply)
-{
-}
+export default class Connector {
+	private _request: at.AxiosInstance;
+	constructor(method: string) {
+		this._request = Axios.create({
+			method: method,
+			baseURL: "http://sarif_db:3000",
+			headers: {
+				'Content-Type': 'application/json',
+				'api_key': process.env.API_KEY,
+			}
+		});
 
-export function test_post(request, reply)
-{
-}
+	}
+	modify_data() {
 
-export function test_delete(request, reply)
-{
-}
+	}
+	execute() {
 
-export function test_put(request, reply)
-{
+	}
 }
