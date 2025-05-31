@@ -1,4 +1,5 @@
 data/
+addscore.json
 *.env
 .env
 package-lock.json

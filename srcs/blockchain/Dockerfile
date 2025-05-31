@@ -14,8 +14,8 @@ COPY hardhat.config.cjs /sarif
 
 COPY srcs/ ./srcs
 
-# RUN npx hardhat compile
+WORKDIR /sarif
 
 EXPOSE 80
 
-ENTRYPOINT ["sh", "-c", "node srcs/scripts/main.ts"]
+ENTRYPOINT ["node", "srcs/scripts/main.ts"]

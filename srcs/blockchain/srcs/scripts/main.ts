@@ -1,8 +1,9 @@
+import { ethers } from 'ethers';
 import Fastify from 'fastify'
 import type { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { throws } from 'node:assert';
 import fs from 'node:fs'
 import path from 'node:path'
-
 
 const fastify = Fastify({
 	logger: true,
@@ -22,7 +23,7 @@ async function load_modules() {
 	}
 }
 
-await load_modules()
+await load_modules();
 
 fastify.listen({ port: 80, host: '::' }, (err, address) => {
 	if (err) {

@@ -1,16 +1,34 @@
 import type { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
 import { addScore } from "../interact.ts"
 import dotenv from "dotenv";
+import { currentContract } from "./deploy.ts";
+import { z } from "zod";
 dotenv.config();
+
+const scoreSchema = z.object({
+	id: z.string(),
+	winner: z.string(),
+	winnerScore: z.number(),
+	loser: z.string(),
+	loserScore: z.number()
+});
+
 
 export default async function module_routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
 	fastify.post('/', async function handler(request, reply) {
-		const id = "123";
-		const contract: string | any = process.env.CURRENT_CONTRACT;
-		if (!contract)
-			reply.code(400).send("Bad contract");
 
-		await addScore(contract, id, "angela", 4210, "ilkay", 24);
-		reply.code(200).send("Interact completed");
+		if (request.headers["content-type"] != "application/json")
+			return reply.code(400).send("Need application/json header");
+		if (!currentContract)
+			return reply.code(400).send("No contract has been set");
+
+		try {
+			const body = scoreSchema.parse(await request.body);
+			const address = await addScore(currentContract, body.id, body.winner, body.winnerScore, body.loser, body.loserScore);
+			return reply.code(200).send(`Score added at: ${address}`);
+		}
+		catch (e) {
+			return reply.code(400).send(`Json throw exception: ${e}`);
+		}
 	})
 }

@@ -29,12 +29,12 @@ export async function addScore(contractAddress: string, id: string, winnerName: 
 		throw ("PRIVATE_KEY not defined");
 
 	const provider: eth.JsonRpcProvider = new ethers.JsonRpcProvider(process.env.PROVIDER);
-	const wallet = new ethers.Wallet(privateKey, provider);
+	const wallet: eth.Wallet = new ethers.Wallet(privateKey, provider);
 	const contract: eth.Contract = new ethers.Contract(contractAddress, abi.abi, wallet);
 
 	try {
 		console.log("Add Score to contract...");
-		const tx: eth.TransactionResponse = await contract.addScore(id, winnerName, wins, loserName, losses);
+		const tx: eth.ContractTransactionResponse = await contract.addScore(id, winnerName, wins, loserName, losses);
 
 		if (!tx)
 			throw ("tx null");
@@ -57,7 +57,7 @@ export async function addScore(contractAddress: string, id: string, winnerName: 
 		console.log("║\t -- [ Score added successfully ] --");
 		console.log("║");
 		console.log("╚══════════════════════════════════════\n");
-		return (contract);
+		return (await contract.getAddress());
 	}
 	catch (error) {
 		return ("Error with contract interaction");
@@ -66,12 +66,12 @@ export async function addScore(contractAddress: string, id: string, winnerName: 
 
 export async function getTournamentScore(contractAddress: string, id: string) {
 
-	const provider = new ethers.JsonRpcProvider(process.env.PROVIDER);
-	const contract = new ethers.Contract(contractAddress, abi.abi, provider);
+	const provider: eth.JsonRpcProvider = new ethers.JsonRpcProvider(process.env.PROVIDER);
+	const contract: eth.Contract = new ethers.Contract(contractAddress, abi.abi, provider);
 
 	try {
-		const score = await contract.getTournamentScore(id);
-		return score;
+		const tx = await contract.getTournamentScore(id);
+		return (tx);
 	}
 	catch (error) {
 		console.log("Error to get Tournament score, bad tournament id");
@@ -80,8 +80,8 @@ export async function getTournamentScore(contractAddress: string, id: string) {
 
 export async function getMatchScore(contractAddress: string, id: string, index: number) {
 
-	const provider = new ethers.JsonRpcProvider(process.env.PROVIDER);
-	const contract = new ethers.Contract(contractAddress, abi.abi, provider);
+	const provider: eth.JsonRpcProvider = new ethers.JsonRpcProvider(process.env.PROVIDER);
+	const contract: eth.Contract = new ethers.Contract(contractAddress, abi.abi, provider);
 
 	try {
 		return (await contract.getMatchScore(id, index));
