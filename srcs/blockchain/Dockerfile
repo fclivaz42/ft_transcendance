@@ -16,6 +16,6 @@ COPY srcs/ ./srcs
 
 WORKDIR /sarif
 
-EXPOSE 80
+EXPOSE 8080
 
 ENTRYPOINT ["node", "srcs/scripts/main.ts"]

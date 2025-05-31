@@ -25,7 +25,7 @@ async function load_modules() {
 
 await load_modules();
 
-fastify.listen({ port: 80, host: '::' }, (err, address) => {
+fastify.listen({ port: 8080, host: '::' }, (err, address) => {
 	if (err) {
 		fastify.log.error(err)
 		process.exit(1)
