@@ -1,8 +1,8 @@
 
-import Paddle from "./be_Paddle.js";
-import Wall from "./be_Wall.js";
-import Ball from "./be_Ball.js";
-import PlayField from "./be_Playfield.js";
+import Paddle from "./Paddle.js";
+import Wall from "./Wall.js";
+import Ball from "./Ball.js";
+import PlayField from "./Playfield.js";
 import { Vector3, Color3 } from "@babylonjs/core";
 
 export default class Game {

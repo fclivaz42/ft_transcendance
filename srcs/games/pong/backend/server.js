@@ -1,6 +1,6 @@
 
 import fastify from "fastify";
-import gamePlugin from "./plugins/be_game/gamePlugin.js";
+import gamePlugin from "./plugins/game/gamePlugin.js";
 import websocketRoutes from "./plugins/websocketRoutes.js";
 import websocket from "@fastify/websocket";
 
@@ -11,7 +11,6 @@ const app = fastify({
 export default app;
 
 app.register(websocket);
-
 app.register(gamePlugin);
 app.register(websocketRoutes);
 

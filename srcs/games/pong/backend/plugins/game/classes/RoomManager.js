@@ -1,6 +1,6 @@
 
-import GameRoom from "./be_GameRoom.js";
-import PlayerSession from "./be_PlayerSession.js";
+import GameRoom from "./GameRoom.js";
+import PlayerSession from "./PlayerSession.js";
 
 export default class RoomManager {
 	constructor() {
@@ -105,4 +105,4 @@ export default class RoomManager {
 // TODO: logic for local game, need to adjust controls for 1 keyboard,
 //       listen to different messages on frontend
 // TODO: logic for ai, probably simpler
-// TODO: front ender render of the whole thing
+// TODO: frontend render of the whole thing

@@ -1,11 +1,11 @@
 /**
  * @typedef {import('fastify').FastifyInstance & {
- *   game: import('./be_game/be_classes/be_GameClass.js').default
+ *   game: import('./game/classes/be_GameClass.js').default
  * }} GameFastifyInstance
  */
 
 import fastifyPlugin from "fastify-plugin";
-import RoomManager from "./be_game/be_classes/be_RoomManager.js";
+import RoomManager from "./game/classes/be_RoomManager.js";
 import wsHandlers from "./wsHandlers/routeHandlers.js"
 
 const manager = new RoomManager();

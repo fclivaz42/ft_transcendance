@@ -1,10 +1,10 @@
-import Game from "./be_GameClass.js"
+import Game from "./GameClass.js"
 
 export default class GameRoom {
 	constructor(id) {
 		this.id = id;
 		this.players = [];
-		this.game = new Game()
+		this.game = new Game();
 		this.score = {"p1": null, "p2": null};
 	}
 
