@@ -17,6 +17,7 @@ services:
       - sarifntw
     volumes:
       - data:/data
+      - sarif-frontend:/var/www/sarif-frontend
     ports:
       - "443:443"
     build:

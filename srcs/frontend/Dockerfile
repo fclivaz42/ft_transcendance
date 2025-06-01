@@ -1,13 +1,14 @@
 FROM node:23.10.0-alpine
 
-RUN apk update
-RUN apk upgrade
+WORKDIR /app
 
-WORKDIR /sarif
-
-COPY srcs/ ./srcs
-COPY package.json /sarif
+COPY srcs ./srcs
+COPY public ./public
+COPY package.json ./
+COPY tsconfig.json ./
+COPY tailwind.config.js ./
+COPY docker-entrypoint.sh ./
 
 RUN npm i
 
-ENTRYPOINT ["sh", "-c", "npm run ${RUNMODE}"]
+ENTRYPOINT ["/bin/sh", "./docker-entrypoint.sh"]
