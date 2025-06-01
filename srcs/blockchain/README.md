@@ -1,5 +1,6 @@
 # README - Solidity Blockchain Module
 
+
 Welcome to the Solidity module of the project! This module integrates a complete blockchain infrastructure into the system, enabling smart contract deployment and interaction via a RESTful API. Everything runs inside Docker, and all components are tested and functional.
 
 ---

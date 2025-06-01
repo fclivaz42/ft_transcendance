@@ -1,6 +1,6 @@
 services:
   sarif_blockchain:
-    container_name: blockchain_container
+    container_name: sarif_blockchain
     image: sarif_blockchain
     # networks:
     #   - sarifntw
