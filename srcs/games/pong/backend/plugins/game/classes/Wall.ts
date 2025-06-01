@@ -1,7 +1,7 @@
 
 import { Vector3, Scene, Color3 } from "@babylonjs/core";
-import Paddle from "./Paddle.ts";
-import Ball from "./Ball.ts";
+import Paddle from "./Paddle";
+import Ball from "./Ball";
 
 
 export default class Wall extends Paddle {
@@ -35,11 +35,11 @@ export default class Wall extends Paddle {
         if (!this._passThrough) {
             if (ball.getLastHit() === this._name) return ;
             ball.setLastHit(this._mesh.name)
-            ball._direction.z *= -1;
-            ball._direction.normalize();
+            ball.direction.z *= -1;
+            ball.direction.normalize();
         } else {
-            ball.mesh.position.set(0, 0, 0);
-            ball.setSpeed(0);
+            ball.getMesh().position.set(0, 0, 0);
+            ball.setCurrSpeed(0);
             ball.setLastHit("");
         }
     }

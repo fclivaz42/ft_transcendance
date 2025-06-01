@@ -1,4 +1,3 @@
-import { QueryType } from "@babylonjs/core";
 
 export function createWsHandler({ mode, manager }) {
 	return (socket, req) => {

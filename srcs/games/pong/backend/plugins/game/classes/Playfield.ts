@@ -15,14 +15,14 @@ import {
 const WIDTH: number = 512;
 const HEIGHT: number = 256;
 
-interface CameraInitInfo {
+export interface CameraInitInfo {
 	name: string;
 	position: number[];
 	target: number[];
 	mode: number;
 }
 
-interface LightInitInfo {
+export interface LightInitInfo {
 	name: string;
 	direction: number[];
 }
@@ -112,7 +112,7 @@ export default class PlayField {
 		}
 	}
 
-	public start(fps: number = 60): void {
+	public start(fps: number = 30): void {
 		if (this._intervalId !== null) {
 			this.stop();
 		}
