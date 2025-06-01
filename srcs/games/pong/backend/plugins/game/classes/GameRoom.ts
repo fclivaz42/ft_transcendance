@@ -1,6 +1,6 @@
-import Game from "./GameClass"
-import PlayerSession from "./PlayerSession";
-import { CameraInitInfo, LightInitInfo } from "./Playfield";
+import Game from "./GameClass.ts"
+import PlayerSession from "./PlayerSession.ts";
+import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
 
 interface BallUpdate {
 	curr_speed: number;

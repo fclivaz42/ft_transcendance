@@ -101,12 +101,11 @@ export default class Ball {
 
 		for (const collider of this._colliders) {
 			let boxA = this.getCollisionBox();
-			let boxB = collider.mesh.getBoundingInfo().boundingBox;
+			let boxB = collider.getCollisionBox();
 			if (BoundingBox.Intersects(boxA, boxB)) {
 				collider.calculateBounce(this);
 				break;
 			}
 		}
-		
 	}
 }

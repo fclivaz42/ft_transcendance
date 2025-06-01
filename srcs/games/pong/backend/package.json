@@ -4,8 +4,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node server.ts",
+    "dev": "nodemon server.ts",
     "test": "vitest"
   },
   "keywords": [],
@@ -25,6 +25,7 @@
     "@types/ws": "^8.18.1",
     "nodemon": "^3.1.10",
     "supertest": "^7.1.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "vitest": "^3.1.3"
   }

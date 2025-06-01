@@ -1,9 +1,9 @@
 
-import fastify, { FastifyInstance } from "fastify";
+import fastify, { type FastifyInstance } from "fastify";
 import websocket from "@fastify/websocket";
 
-import gamePlugin from "./plugins/game/gamePlugin.js";
-import websocketRoutes from "./plugins/websocketRoutes.js";
+import gamePlugin from "./plugins/game/gamePlugin.ts";
+import websocketRoutes from "./plugins/websocketRoutes.ts";
 
 const app: FastifyInstance = fastify({
 	logger: true,

@@ -1,6 +1,6 @@
 
 import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh } from "@babylonjs/core";
-import Ball from "./Ball";
+import Ball from "./Ball.ts";
 
 interface PaddleOptions {
     color: Color3;

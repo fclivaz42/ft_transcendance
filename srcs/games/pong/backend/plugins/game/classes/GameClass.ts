@@ -1,8 +1,8 @@
 
-import Paddle from "./Paddle";
-import Wall from "./Wall";
-import Ball from "./Ball";
-import PlayField from "./Playfield";
+import Paddle from "./Paddle.ts";
+import Wall from "./Wall.ts";
+import Ball from "./Ball.ts";
+import PlayField from "./Playfield.ts";
 import { Scene, Vector3, Color3 } from "@babylonjs/core";
 
 const SHOW_BOXES: boolean = false;

@@ -1,6 +1,6 @@
 
-import GameRoom from "./GameRoom.js";
-import PlayerSession from "./PlayerSession.js";
+import GameRoom from "./GameRoom.ts";
+import PlayerSession from "./PlayerSession.ts";
 import fastifyWebsocket, { type WebSocket } from "@fastify/websocket";
 
 type GameMode = 'remote' | 'friend_host' | 'friend_join' | 'local' | 'computer';
@@ -60,11 +60,11 @@ export default class RoomManager {
 		return null;
 	}
 
-	public assignPlayer(socket: WebSocket, options: AssignPlayerOptions): PlayerSession | undefined | null {
+	public assignPlayer(socket: WebSocket, options: AssignPlayerOptions): PlayerSession {
 		const { userId, mode = 'remote', roomId = null } = options;
 		const session = new PlayerSession(socket, userId);
 
-		let room: GameRoom | undefined | null;
+		let room: GameRoom | undefined;
 
 		switch (mode) {
 			case "remote":
@@ -79,7 +79,6 @@ export default class RoomManager {
 				} else {
 					console.log(`Room: ${roomId} not found.`)
 					socket.close();
-					return;
 				}
 				break;
 			case "local":

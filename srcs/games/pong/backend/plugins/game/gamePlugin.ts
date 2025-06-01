@@ -1,7 +1,7 @@
 
-import { FastifyInstance, FastifyPluginAsync } from "fastify";
+import { type FastifyInstance, type FastifyPluginAsync } from "fastify";
 import fastifyPlugin from "fastify-plugin";
-import GameClass from "./classes/GameClass.js";
+import GameClass from "./classes/GameClass.ts";
 
 declare module "fastify" {
     interface FastifyInstance {

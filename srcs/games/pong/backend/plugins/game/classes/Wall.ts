@@ -1,7 +1,7 @@
 
 import { Vector3, Scene, Color3 } from "@babylonjs/core";
-import Paddle from "./Paddle";
-import Ball from "./Ball";
+import Paddle from "./Paddle.ts";
+import Ball from "./Ball.ts";
 
 
 export default class Wall extends Paddle {

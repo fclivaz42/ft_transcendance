@@ -1,4 +1,4 @@
-import GameRoom from "./GameRoom";
+import GameRoom from "./GameRoom.ts";
 import fastifyWebsocket, { type WebSocket } from "@fastify/websocket";
 
 export interface OutgoingMessage {
