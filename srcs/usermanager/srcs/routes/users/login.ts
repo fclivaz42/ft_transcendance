@@ -2,7 +2,7 @@ import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { jwt } from '../../managers/JwtManager.ts';
 import { randomBytes } from 'crypto';
 
-export default async function userLoginEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
+export default async function usersLoginEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
   app.post("/login", async (request, reply) => {
     // TODO: Implement user authentication logic here
     // For now, we will simulate a successful login by generating a fake user ID and JWT token.

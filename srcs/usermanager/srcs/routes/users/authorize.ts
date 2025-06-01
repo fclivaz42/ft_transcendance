@@ -3,7 +3,7 @@ import { httpReply } from '../../handlers/HttpResponse.ts';
 import { jwt } from '../../managers/JwtManager.ts';
 import checkRequestAuthorization from '../../managers/AuthorizationManager.ts';
 
-export default async function userAuthorizeEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
+export default async function usersAuthorizeEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
   app.get("/authorize", async (request, reply) => {
     const req = checkRequestAuthorization(request, reply);
     if (req)

@@ -7,7 +7,7 @@ This document provides information about the internal Usermanager module's API u
 ---
 # Table of Contents
 - [`GET /users/authorize`](#get-users-authorize)
-- [`GET /users/login`](#get-users-login)
+- [`POST /users/login`](#get-users-login)
 - [Environment Variables](#environment-variables)
 
 # 🔐 Overview
@@ -64,7 +64,7 @@ Validates the user's JWT token and returns the user information if valid.
 | `exp`  | number | The expiration timestamp of the JWT, in seconds since the epoch.                       |
 
 
-## `GET /users/login`
+## `POST /users/login`
 
 ### HTTP Headers
 
