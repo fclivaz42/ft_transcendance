@@ -2,7 +2,7 @@ import Game from "./GameClass.ts"
 import PlayerSession from "./PlayerSession.ts";
 import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
 
-const FPS_OVERRIDE: number = 1;
+const FPS_OVERRIDE: number = 30;
 
 interface BallUpdate {
 	curr_speed: number;
