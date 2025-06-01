@@ -173,6 +173,6 @@ export default class Game {
 		this._field.addUpdatable(this._p1);
 		this._field.addUpdatable(this._p2);
 		this._field.addUpdatable(this._ball);
-		this._field.start(fps);
+		this._field.start(fps, this._broadcastUpdate || undefined);
 	}
 }

@@ -15,6 +15,12 @@ import {
 const WIDTH: number = 512;
 const HEIGHT: number = 256;
 
+const DEFAULT_FPS: number = 30;
+
+const ALPHA: number = Math.PI / 2;
+const BETA: number = Math.PI / 2;
+const RADIUS: number = 15;
+
 export interface CameraInitInfo {
 	name: string;
 	position: number[];
@@ -54,7 +60,7 @@ export default class PlayField {
 	private _setupCamera(): ArcRotateCamera {
 		const camera = new ArcRotateCamera(
 			"mainCam",
-			Math.PI / 2, Math.PI / 2, 15, // make variables
+			ALPHA, BETA, RADIUS,
 			Vector3.Zero(),
 			this._scene
 		)
@@ -112,7 +118,7 @@ export default class PlayField {
 		}
 	}
 
-	public start(fps: number = 30): void {
+	public start(fps: number = DEFAULT_FPS, broadCast?: () => void ): void {
 		if (this._intervalId !== null) {
 			this.stop();
 		}
@@ -121,6 +127,7 @@ export default class PlayField {
 			for (const obj of this._updatables) {
 				obj.update();
 			}
+			if (broadCast) broadCast();
 			this._scene.render();
 		}, frameTime);
 	}
