@@ -1,5 +1,5 @@
 
-import { type FastifyRequest } from "fastify";
+import fastify, { type FastifyRequest } from "fastify";
 import fastifyWebsocket, {type WebSocket} from "@fastify/websocket";
 import RoomManager from "../game/classes/RoomManager.ts";
 import PlayerSession from "../game/classes/PlayerSession.ts";
@@ -55,8 +55,17 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 		socket.on('message', (msg) => {
 			try {
 				const { type, payload }: ClientMessage = JSON.parse(msg.toString());
-				if (type === 'move') {
+				if (type === 'move' && payload?.direction) {
 					console.log(`Move command from ${session.getPaddleId()} | user: ${session.getUserId()}`);
+					const paddle = session.getPaddle();
+
+					if (paddle) {
+						if (payload.direction === 'up' || payload.direction === 'down') {
+							paddle.setMoveDirection(payload.direction);
+						} else if (payload.direction === 'stop') {
+							paddle.setMoveDirection(null);
+						}
+					}
 				}
 			} catch (err) {
 				console.error('Invalid message from client:', err);

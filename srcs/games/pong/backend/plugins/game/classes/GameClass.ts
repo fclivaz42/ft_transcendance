@@ -51,38 +51,7 @@ export default class Game {
 		this._field = new PlayField();
 		this._scene = this._field.getScene();
 
-		this._p1 = new Paddle(
-			this._scene,
-			"player1",
-			new Vector3(-14.5, 0, 0), {
-				color: Color3.White(),
-				speed: PADDLE_SPEED,
-				height: PLAYER_HEIGHT,
-				width: PLAYER_WIDTH
-			});
-		this._p1.getMesh().showBoundingBox = SHOW_BOXES;
-
-		this._p2 = new Paddle(
-			this._scene,
-			"player2",
-			new Vector3(14.5, 0, 0), {
-				color: Color3.White(),
-				speed: PADDLE_SPEED,
-				height: PLAYER_HEIGHT,
-				width: PLAYER_WIDTH
-			});
-		this._p2.getMesh().showBoundingBox = SHOW_BOXES;
-
-		this._ball = new Ball(
-			this._scene,
-			"ball",
-			new Vector3(0, 0, 0), {
-				color: Color3.White(),
-				diameter: BALL_DIAMETER
-			});
-			this._ball.setBaseSpeed(BALL_SPEED);
-			this._ball.getMesh().showBoundingBox = SHOW_BOXES;
-
+		/* Building all Walls */
 		this._walls = {
 			"northWall": new Wall(
 				this._scene,
@@ -121,6 +90,44 @@ export default class Game {
 					depth: GOAL_DEPTH
 			}),
 		}
+		const bounds: {minY: number, maxY: number} = this.getVerticalBounds();
+
+		/* Creating Player 1 Paddle */
+		this._p1 = new Paddle(
+			this._scene,
+			"player1",
+			new Vector3(-14.5, 0, 0), {
+				color: Color3.White(),
+				speed: PADDLE_SPEED,
+				height: PLAYER_HEIGHT,
+				width: PLAYER_WIDTH
+			});
+		this._p1.getMesh().showBoundingBox = SHOW_BOXES;
+		this._p1.setVerticalBounds(bounds);
+
+		/* Creating Player 2 Paddle */
+		this._p2 = new Paddle(
+			this._scene,
+			"player2",
+			new Vector3(14.5, 0, 0), {
+				color: Color3.White(),
+				speed: PADDLE_SPEED,
+				height: PLAYER_HEIGHT,
+				width: PLAYER_WIDTH
+			});
+		this._p2.getMesh().showBoundingBox = SHOW_BOXES;
+		this._p2.setVerticalBounds(bounds);
+
+		/* Creating Ball */
+		this._ball = new Ball(
+			this._scene,
+			"ball",
+			new Vector3(0, 0, 0), {
+				color: Color3.White(),
+				diameter: BALL_DIAMETER
+			});
+			this._ball.setBaseSpeed(BALL_SPEED);
+			this._ball.getMesh().showBoundingBox = SHOW_BOXES;
 
 		for (let [key, value] of Object.entries(this._walls)) {
 			value.getMesh().showBoundingBox = SHOW_BOXES;
@@ -128,6 +135,7 @@ export default class Game {
 				value.setPassThrough(true);
 		}
 
+		/* Setting colliders for the paddles and the ball */
 		this._p1.setColliders([this._walls.northWall, this._walls.southWall]);
 		this._p2.setColliders([this._walls.northWall, this._walls.southWall]);
 		this._ball.setColliders([
@@ -140,6 +148,7 @@ export default class Game {
 		]);
 	};
 
+	/* Methods */
 	public getBall(): Ball {
 		return this._ball;
 	}
@@ -156,6 +165,23 @@ export default class Game {
 		return this._walls;
 	}
 
+	public getVerticalBounds(): {minY: number; maxY: number} {
+		const north = this._walls.northWall.getMesh();
+		const south = this._walls.southWall.getMesh();
+
+		if (!north || !south) {
+			return {minY: -7.5, maxY: 7.5}; // un-hardcode later // these are defaults in case something goes wrong
+		}
+
+		const northHalf = (north.scaling.y || 1) * (north.getBoundingInfo()?.boundingBox.extendSize.y ?? 0.25);
+		const maxY = (north.position.y - northHalf);
+
+		const southHalf = (south.scaling.y || 1) * (south.getBoundingInfo()?.boundingBox.extendSize.y ?? 0.25);
+		const minY = (south.position.y - southHalf);
+		
+		return {minY, maxY};
+	}
+
 	public getWallsForWs(): Record<string, ReturnType<Wall["getInitInfo"]>> {
 		const retWalls: Record<string, ReturnType<Wall["getInitInfo"]>> = {};
 
@@ -165,11 +191,11 @@ export default class Game {
 		return retWalls;
 	}
 
-	setBroadcastFunction(func: BroadcastFunction): void {
+	public setBroadcastFunction(func: BroadcastFunction): void {
 		this._broadcastUpdate = func;
 	}
 
-	gameStart(fps: number = FPS) {
+	public gameStart(fps: number = FPS): void {
 		this._field.addUpdatable(this._p1);
 		this._field.addUpdatable(this._p2);
 		this._field.addUpdatable(this._ball);

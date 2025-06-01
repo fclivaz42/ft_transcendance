@@ -2,6 +2,8 @@ import Game from "./GameClass.ts"
 import PlayerSession from "./PlayerSession.ts";
 import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
 
+const FPS_OVERRIDE: number = 1;
+
 interface BallUpdate {
 	curr_speed: number;
 	curr_position: number[];
@@ -68,6 +70,10 @@ export default class GameRoom {
 		return this.players.length >= 2;
 	}
 
+	public getGame(): Game {
+		return this.game;
+	}
+
 	public addPlayer(playerSession: PlayerSession): void {
 		this.players.push(playerSession);
 		playerSession.setRoom(this);
@@ -91,7 +97,7 @@ export default class GameRoom {
 			this.broadcast(this.buildUpdatePayload());
 		});
 
-		this.game.gameStart()
+		this.game.gameStart(FPS_OVERRIDE);
 		this.broadcast(this.buildInitPayload());
 	}
 

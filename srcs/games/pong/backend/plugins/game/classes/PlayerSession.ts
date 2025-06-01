@@ -1,4 +1,5 @@
 import GameRoom from "./GameRoom.ts";
+import Paddle from "./Paddle.ts";
 import fastifyWebsocket, { type WebSocket } from "@fastify/websocket";
 
 export interface OutgoingMessage {
@@ -31,6 +32,17 @@ export default class PlayerSession {
 	public setRoom(room: GameRoom | null): void 		{ this._room = room; }
 	public setPaddleId(paddleId: string | null): void 	{ this._paddleId = paddleId; }
 	
+	public getPaddle(): Paddle | null {
+		const room = this.getRoom();
+		if (!room) return null;
+
+		const game = room.getGame();
+		const [p1, p2] = game.getPaddles();
+
+		if (this._paddleId === "p1") return p1;
+		if (this._paddleId === "p2") return p2;
+		return null;
+	}
 	
 	public send(message: OutgoingMessage): void {
 		try {

@@ -28,6 +28,9 @@ export default class Paddle {
     protected _position: Vector3;
     protected _colliders: any[] = [];
 
+    private _moveDirection:  "up" | "down" | null = null;
+    private _bounds: {minY: number, maxY: number} = {minY: -Infinity, maxY: Infinity};
+
     constructor(
         scene: Scene,
         name: string,
@@ -70,7 +73,7 @@ export default class Paddle {
     }
 
     public getMesh(): Mesh                      { return this._mesh; }
-    public getPosition(): Vector3	            { return this._position; }
+    public getPosition(): Vector3	            { return this.getMesh().position; }
     public getSpeed(): number			        { return this._speed; }
     public getDirection(): Vector3		        { return this._direction; }
     public getCollisionBox(): BoundingBox       { return this._mesh.getBoundingInfo().boundingBox; }
@@ -86,6 +89,12 @@ export default class Paddle {
     public setSpeed(speed: number): void         { this._speed = speed; }
     public setColliders(colliders: any): void    { this._colliders = colliders; }
     public setAI(io: boolean): void              { this._isAi = io; }
+    public setMoveDirection(dir: "up" | "down" | null): void {
+        this._moveDirection = dir;
+    }
+    public setVerticalBounds(bounds: {minY: number; maxY: number}): void {
+        this._bounds = bounds;
+    }
 
 
     public calculateBounce(ball: Ball): void {
@@ -111,10 +120,34 @@ export default class Paddle {
     }
 
     public update(): void {
-        this._direction.set(0, 0, 0);
+        
+        // this._direction.set(0, 0, 0);
+        if (!this._moveDirection) return;
+        console.log("received command to move, attempting to move");
 
-        // add control logic
+        /* TODO: just below this works, test both, see which is better // after tests this is better, gotta fix clamping */
+        /* if (this._moveDirection === "up") {
+            console.log("received command to move UP!");
+            this._direction.y += 1;
+        }
 
-        this._mesh.position.addInPlace(this._direction.scale(this._speed));
+        if (this._moveDirection === "down") {
+            this._direction.y -= 1;
+        }
+
+        this.getMesh().position.addInPlace(this._direction.scale(this._speed)); */
+
+        /* TODO: this here below doesn't work! Compare to other branches to see how to fix // works but clamping is messed up */
+        const deltaY = this._moveDirection === "up" ? this.getSpeed() : -this.getSpeed();
+        const currentY = this.getMesh().position.y;
+        const newY = currentY + deltaY;
+
+        const boundingInfo = this.getMesh().getBoundingInfo();
+        const halfHeight = boundingInfo.boundingBox.extendSize.y;
+
+        const maxY = this._bounds.maxY - halfHeight;
+        const minY = this._bounds.minY + halfHeight;
+
+        this.getMesh().position.y = Math.max(minY, Math.min(maxY, newY));
     }
 }
