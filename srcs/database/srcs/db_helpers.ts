@@ -6,11 +6,13 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/21 21:57:13 by fclivaz           #+#    #+#             //
-//   Updated: 2025/05/31 19:57:17 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/01 19:49:27 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import DatabaseWorker from "./db_methods.ts"
+import Axios from "axios"
+import type * as atype from "axios"
 import type * as fft from 'fastify'
 import { randomUUID } from "node:crypto"
 
@@ -55,8 +57,22 @@ function create_new_uid(request: fft.FastifyRequest, reply: fft.FastifyReply, ta
 }
 
 function check_contract(request: fft.FastifyRequest, reply: fft.FastifyReply, table: string, table_fields: Array<string>) {
-	// Handle creating and checking contract here
-	return reply.code(200).send("not handled yet so imagine i returned a valid contract hash")
+	const tamer: atype.AxiosInstance = Axios.create({
+		method: "post",
+		baseURL: "http://sarif_blockchain:8080",
+		headers: {
+			'Content-Type': 'application/json',
+			'api_key': process.env.API_KEY,
+		}
+	});
+	tamer.post("/deploy", "")
+		.then(function(response: atype.AxiosResponse) {
+			console.log(`yippie ${response.data}`)
+			return reply.code(response.status).send(JSON.stringify(response.data))
+		})
+		.catch(function(error: atype.AxiosError) {
+			console.log(error)
+		})
 }
 
 export default class RequestHandler {

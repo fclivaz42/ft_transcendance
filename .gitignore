@@ -1,4 +1,7 @@
+# solidity cache file
 data/
+artifacts/
+cache/
 .env
 package-lock.json
 

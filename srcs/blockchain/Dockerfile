@@ -5,9 +5,22 @@ RUN apk upgrade
 
 WORKDIR /sarif
 
-COPY srcs/ ./srcs
-COPY package.json /sarif
+COPY tsconfig.json /sarif
 
+COPY package.json /sarif
 RUN npm i
 
-ENTRYPOINT ["sh", "-c", "npm run ${RUNMODE}"]
+COPY hardhat.config.cjs /sarif
+
+COPY srcs/ ./srcs
+
+ARG PROVIDER
+ARG PRIVATE_KEY
+ENV PROVIDER=${PROVIDER}
+ENV PRIVATE_KEY=${PRIVATE_KEY}
+
+RUN npx hardhat compile
+
+WORKDIR /sarif
+
+ENTRYPOINT ["npm", "run", "main"]

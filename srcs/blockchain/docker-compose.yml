@@ -1,14 +1,15 @@
-# services:
-  # sarif_{MODULE}:
-  #   container_name: sarif_{MODULE}
-  #   networks:
-  #     - sarifntw
-  #   volumes:
-  #     - data:/data
-  #   build: ./
-  #   env_file: .env
-  #   environment:
-  #     - API_KEY
-  #   depends_on:
-  #     - sarif_{DEPENDMODULE}
-  #   restart: on-failure
+services:
+  sarif_blockchain:
+    container_name: sarif_blockchain
+    image: sarif_blockchain
+    networks:
+      - sarifntw
+    build:
+      context: ./
+      args:
+        PROVIDER: ${PROVIDER}
+        PRIVATE_KEY: ${PRIVATE_KEY}
+    env_file: .env
+    environment:
+      - API_KEY
+    restart: on-failure
