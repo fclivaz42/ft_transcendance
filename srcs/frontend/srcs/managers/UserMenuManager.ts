@@ -21,7 +21,7 @@ export default class UserMenuManager {
   public initialize() {
     const userMenu = document.getElementById("userMenu");
 		if (!getCookie("session")) {
-      userMenu?.appendChild(createRegisterButton());
+      // userMenu?.appendChild(createRegisterButton());
       userMenu?.appendChild(createLoginButton());
     }
     else {
