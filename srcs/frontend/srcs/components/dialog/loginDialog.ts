@@ -50,6 +50,7 @@
 // components/dialog/loginDialog.ts
 import { createDialog } from "./index.js";
 import { createInfoInput } from "../input/infoInput.js";
+import { createPasswordInput } from "../input/createPasswordInput.js"; // Importer la fonction pour créer le champ de mot de passe
 
 interface LoginDialogOptions 
 {
@@ -104,10 +105,12 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   registerForm.className = "flex flex-col gap-3 "; 
 
   const registerEmailInput = createInfoInput("Adresse e-mail", "email");
-  const registerPasswordInput = createInfoInput("Mot de passe", "password");
-  registerPasswordInput.type = "password";
-  const registerConfirmPasswordInput = createInfoInput("Confirmer mot de passe", "password");
-  registerConfirmPasswordInput.type = "password";
+  // const registerPasswordInput = createInfoInput("Mot de passe", "password");
+  const registerPasswordInput = createPasswordInput("Mot de passe", "password")as HTMLDivElement & { value: string }; //sûr que l'élément est d'un certain type <-- Utilise createPasswordInput
+  const registerConfirmPasswordInput = createPasswordInput("Confirmer mot de passe", "confirmPassword")as HTMLDivElement & { value: string }; // <-- Utilise createPasswordInput
+  // registerPasswordInput.type = "password";
+  // const registerConfirmPasswordInput = createInfoInput("Confirmer mot de passe", "password");
+  // registerConfirmPasswordInput.type = "password";
 
   const registerButton = document.createElement("button");
   registerButton.textContent = "S'inscrire";
@@ -142,8 +145,9 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   loginForm.className = "flex flex-col gap-3 "; // MODIFICATION 4: gap-3 et flex-grow
 
   const loginEmailInput = createInfoInput("Adresse e-mail", "email");
-  const loginPasswordInput = createInfoInput("Mot de passe", "password");
-  loginPasswordInput.type = "password";
+  // const loginPasswordInput = createInfoInput("Mot de passe", "password");
+  // loginPasswordInput.type = "password";
+  const loginPasswordInput = createPasswordInput("Mot de passe", "password") as HTMLDivElement & { value: string }; // <-- Utilise createPasswordInput
 
   const loginButton = document.createElement("button");
   loginButton.textContent = "Connexion";
