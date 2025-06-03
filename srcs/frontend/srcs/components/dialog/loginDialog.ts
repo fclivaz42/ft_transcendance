@@ -46,18 +46,20 @@
 
 
 
-/////////////////////////fenetre 2 en 1 frluide
+/////////////////////////fenetre 2 en 1
 // components/dialog/loginDialog.ts
 import { createDialog } from "./index.js";
 import { createInfoInput } from "../input/infoInput.js";
 
-interface LoginDialogOptions {
+interface LoginDialogOptions 
+{
   initialMode: 'login' | 'register';
   onSubmit: (mode: 'login' | 'register', data: { email: string; password?: string; confirmPassword?: string }) => void;
   onSwitchMode: (newMode: 'login' | 'register') => void;
 }
-
-export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElement {
+  // --- Dialog ---
+export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElement 
+{
   const dialog = createDialog({ allowClose: false });
 
   dialog.classList.add(
@@ -66,40 +68,40 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
     "max-w-full",
     "rounded-xl",
     "bg-gray-900",
-    // --- MODIFICATION 1 : Réduire le padding vertical du dialogue au minimum ---
-    "py-3", // Ancien: py-4 (16px). Nouveau: 12px (0.75rem)
-    "px-6", // Conserve 24px de padding horizontal
+    "px-6", // padding horizontal seulement
+    "pt-1", // petit padding haut
+    "pb-4", // petit padding bas
+    "text-white",
     "shadow-2xl",
     "border",
-    "relative",
-    "flex", "flex-col",
-    "h-auto",        // Permet au dialogue de s'adapter à la hauteur de son contenu
-    "max-h-[90vh]",  // Sécurité pour les petits écrans
-    "my-auto"        // Centre verticalement
   );
 
+  // --- Titre ---
   const dialogTitle = document.createElement("h2");
-  // --- MODIFICATION 2 : Réduire le margin-bottom du titre et ajouter leading-tight ---
-  dialogTitle.className = "text-2xl font-bold text-white mb-2 text-center leading-tight"; // Ancien: mb-4 (16px), text-3xl. Nouveau: mb-2 (8px), text-2xl (plus petit titre), leading-tight
-  // J'ai aussi réduit le 'text-3xl' en 'text-2xl' pour un titre plus compact.
-
+  dialogTitle.className = "text-2xl font-bold text-white mb-2 text-center"; 
+    // --- Container principale[login- register] ---
+  const dialogBody = document.createElement("div");
+  dialogBody.className = "flex flex-col gap-4";
+    // --- Panneau animation [login-Register] ---
   const panelsContainer = document.createElement("div");
   panelsContainer.className = "relative w-full overflow-hidden";
-  // --- MODIFICATION 3 : RETOUR À LA LOGIQUE ADAPTATIVE : Pas de hauteur fixe ici ---
-  // C'est le JS dans switchMode qui va ajuster sa hauteur.
 
-  // --- Panneau d'Inscription (Register) ---
+
+
+
+  // ---Conteneur (Register) ---//
+  //////////////////////////////////////////////////////////////////
+  //!rempli le conteneur parent + info transition
   const registerPanel = document.createElement("div");
   registerPanel.className = `
     absolute inset-0
-    flex flex-col gap-3 // MODIFICATION 4: Réduire le gap (ancien: gap-4 (16px)). Nouveau: 12px (0.75rem)
+    flex flex-col gap-3 
     transition-transform duration-500 ease-in-out transform opacity-0
-    h-full w-full
+    w-full
   `;
-
+// --- Création du formulaire d'inscription[champs, bouton] ---
   const registerForm = document.createElement("form");
-  registerForm.className = "flex flex-col gap-3 flex-grow"; // MODIFICATION 4: gap-3 et flex-grow
-  // flex-grow est nécessaire pour que les boutons/liens soient poussés vers le bas si le formulaire a de l'espace.
+  registerForm.className = "flex flex-col gap-3 "; 
 
   const registerEmailInput = createInfoInput("Adresse e-mail", "email");
   const registerPasswordInput = createInfoInput("Mot de passe", "password");
@@ -111,30 +113,33 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   registerButton.textContent = "S'inscrire";
   registerButton.type = "submit";
   registerButton.className = "bg-green-600 hover:bg-green-700 font-semibold py-2 px-4 rounded mt-auto";
-
+  // Insertion des champs et bouton dans le formulaire
   registerForm.appendChild(registerEmailInput);
   registerForm.appendChild(registerPasswordInput);
   registerForm.appendChild(registerConfirmPasswordInput);
   registerForm.appendChild(registerButton);
   registerPanel.appendChild(registerForm);
 
+  // Lien pour switch au mode connexion
   const switchToLoginLink = document.createElement("a");
   switchToLoginLink.href = "#";
   switchToLoginLink.textContent = "Déjà un compte ? Se connecter";
   switchToLoginLink.className = "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer"; // MODIFICATION 5: Réduire le margin-top du lien (ancien: mt-2). Nouveau: 4px (0.25rem)
   registerPanel.appendChild(switchToLoginLink);
 
-  // --- Panneau de Connexion (Login) ---
+  // ---Conteneur (login) ---//
+  //////////////////////////////////////////////////////////////////
+    //!rempli le conteneur parent + info transition
   const loginPanel = document.createElement("div");
   loginPanel.className = `
     absolute inset-0
-    flex flex-col gap-3 // MODIFICATION 4: Réduire le gap ici aussi
+    flex flex-col gap-3 
     transition-transform duration-500 ease-in-out transform opacity-0
-    h-full w-full
+    w-full
   `;
-
+// --- Création du formulairelogin[champs, bouton] ---
   const loginForm = document.createElement("form");
-  loginForm.className = "flex flex-col gap-3 flex-grow"; // MODIFICATION 4: gap-3 et flex-grow
+  loginForm.className = "flex flex-col gap-3 "; // MODIFICATION 4: gap-3 et flex-grow
 
   const loginEmailInput = createInfoInput("Adresse e-mail", "email");
   const loginPasswordInput = createInfoInput("Mot de passe", "password");
@@ -143,24 +148,28 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   const loginButton = document.createElement("button");
   loginButton.textContent = "Connexion";
   loginButton.type = "submit";
-  loginButton.className = "bg-blue-600 hover:bg-blue-700 font-semibold py-2 px-4 rounded mt-auto";
-
+  loginButton.className = "bg-blue-600 hover:bg-blue-700 font-semibold py-2 px-4 rounded ";
+    // Insertion des champs et bouton dans le formulaire
   loginForm.appendChild(loginEmailInput);
   loginForm.appendChild(loginPasswordInput);
   loginForm.appendChild(loginButton);
   loginPanel.appendChild(loginForm);
-
+// Lien pour switch au mode inscription
   const switchToRegisterLink = document.createElement("a");
   switchToRegisterLink.href = "#";
   switchToRegisterLink.textContent = "Pas encore de compte ? S'inscrire";
   switchToRegisterLink.className = "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer"; // MODIFICATION 5: Réduire le margin-top du lien
   loginPanel.appendChild(switchToRegisterLink);
 
+
+  // Insertion des éléments(createElement ) dans le dialogue principale
   dialog.appendChild(dialogTitle);
   panelsContainer.appendChild(registerPanel);
   panelsContainer.appendChild(loginPanel);
   dialog.appendChild(panelsContainer);
-
+  dialog.appendChild(dialogBody);//Cela permet de séparer la structure du fond (dialog) de celle du contenu (body), ce qui évite que des marges et paddings s’écrasent ou se doublent.
+  
+// --- Gestion des rentrees ---
   registerForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const email = registerEmailInput.value;
@@ -175,12 +184,13 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
     const password = loginPasswordInput.value;
     options.onSubmit('login', { email, password });
   });
-
+  // --- Fonction de changement de panneau[login-Register] ---
   let currentMode: 'login' | 'register';
 
   const switchMode = (mode: 'login' | 'register', animate = true) => {
     if (mode === currentMode) return;
 
+  // Mise à jour du titre
     dialogTitle.textContent = mode === 'login' ? "Se connecter" : "S'inscrire";
 
     const hiddenClass = 'opacity-0';
@@ -203,7 +213,7 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
     } else {
         removeTransitions();
     }
-
+// Animation des panneaux
     if (mode === 'login') {
       registerPanel.classList.remove(slideIn, visibleClass);
       registerPanel.classList.add(slideUp, hiddenClass);
@@ -221,15 +231,14 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
     currentMode = mode;
     options.onSwitchMode(mode);
 
-    // --- MODIFICATION 6 : Rétablissement de l'ajustement dynamique de la hauteur ---
-    // Cette ligne est de nouveau là pour que le panelsContainer s'adapte au contenu.
-    // L'objectif est maintenant que ce *contenu* soit plus petit.
+ 
+  // --- Ajustement dynamique de la hauteur du conteneur ---
     setTimeout(() => {
         const activePanel = (mode === 'login' ? loginPanel : registerPanel);
         panelsContainer.style.height = `${activePanel.scrollHeight}px`;
     }, animate ? 500 : 0);
   };
-
+// --- Gestion des clics sur les liens de changement de mode ---
   switchToLoginLink.addEventListener("click", (e) => {
     e.preventDefault();
     switchMode('login');

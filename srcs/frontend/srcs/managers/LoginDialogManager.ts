@@ -129,6 +129,8 @@
 
 
 ////////////////////mode 2 en 1 frluide
+//chef orchestre (fond flou et fonce) + animation entree + croix
+//inject dans le DOM le Dialog,overlay soomber et blurredBackground
 // LoginDialogManager.ts
 // gere le contenu de la fenetre de connexion
 import { createLoginDialog } from "../components/dialog/loginDialog.js"; // Importe la fonction modifiée
@@ -159,6 +161,7 @@ class LoginDialogManager {
       pointerEvents: "none",
       opacity: "0",
       transition: "opacity 0.4s ease",
+      mindHeight: "unset",
     });
 
     const overlay = document.createElement("div");
@@ -179,10 +182,9 @@ class LoginDialogManager {
       console.log(`Soumission en mode ${mode} pour l'e-mail: ${data.email}`);
 
       // *******************************************************************
-      // REMPLACEZ CE BLOC PAR VOTRE VÉRITABLE LOGIQUE DE CONNEXION/INSCRIPTION
-      // AVEC DES APPELS À VOTRE BACKEND (ex: fetch('/api/login', ...))
+      //APPELS AU BACKEND
       // *******************************************************************
-
+//test
       if (mode === 'login') {
         if (data.email === 'test@example.com' && data.password === 'password123') {
           alert("Connexion réussie (simulée) !");
@@ -222,9 +224,10 @@ class LoginDialogManager {
     Object.assign(dialog.style, {
       maxWidth: "400px",
       position: "relative",
-      // --- AJOUT IMPORTANT ICI ---
-      height: "auto", // Assure que le dialogue s'adapte à son contenu
-      maxHeight: "90vh", // Limite la hauteur maximale
+      height: "auto", //s'adapte à la taille du contenu
+      maxHeight: "60vh",       // <-- heeeeeeeere :limite haute raisonnable
+      overflow: "visible",     // <-- permet au contenu de dépasser si besoin
+      padding: "1.5rem",       
     });
 
     // 4. Bouton de fermeture (la croix)
