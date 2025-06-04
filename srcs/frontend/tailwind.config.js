@@ -1,7 +1,7 @@
- /** @type {import('tailwindcss').Config} */
- import animations from '@midudev/tailwind-animations'
+/** @type {import('tailwindcss').Config} */
+import animations from '@midudev/tailwind-animations'
 
- export default {
+export default {
   darkMode: "class",
   content: ["./srcs/**/*.{html,ts,js}", "./public/**/*.{html,ts,js}"],
   theme: {
@@ -20,11 +20,22 @@
       backgroundImage: {
         primary: "linear-gradient(to right, #34D399, #22D3EE)",
         primary_dark: "linear-gradient(to right, #1B1A55, #9290C3)"
-      }
+      },
+      animation: {
+        moveVertical: 'moveVertical 30s ease infinite',
+        spin: 'spin 20s linear infinite',
+      },
+      keyframes: {
+        moveVertical: {
+          '0%': { transform: 'translateY(-50%)' },
+          '50%': { transform: 'translateY(50%)' },
+          '100%': { transform: 'translateY(-50%)' },
+        },
+      },
     },
   },
   plugins: [
     require("tailwind-scrollbar"),
-		animations
+    animations
   ],
-}
+};

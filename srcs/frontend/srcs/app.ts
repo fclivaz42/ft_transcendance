@@ -4,6 +4,8 @@ import HeaderManager from "./managers/HeaderManager.js";
 import NavbarManager from "./managers/NavbarManager.js";
 import UserMenuManager from "./managers/UserMenuManager.js";
 import DarkmodeManager from "./handlers/DarkmodeHandler.js";
+// import BackgroundManager from "./managers/BackgroundManager.js";
+
 
 // some rework is needed to make the code more readable and maintainable
 
@@ -16,6 +18,12 @@ app?.appendChild(main);
 
 // Initialize i18nHandler (language handler)
 await i18nHandler.initialize().finally(() => {
+  
+
+  // Injecter le background ici
+  // const backgroundManager = new BackgroundManager(); // <--- NOUVELLE INITIALISATION
+  // backgroundManager.initialize();
+// 
   // Initialize dark mode
   const darkmodeManager = new DarkmodeManager();
   darkmodeManager.initialize();
