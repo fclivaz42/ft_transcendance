@@ -1,9 +1,15 @@
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { jwt } from '../../managers/JwtManager.ts';
 import { randomBytes } from 'crypto';
+import checkRequestAuthorization from '../../managers/AuthorizationManager.ts';
 
 export default async function usersLoginEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
   app.post("/login", async (request, reply) => {
+    if (process.env.RUNMODE?.toLowerCase() === "debug")
+      console.debug("POST /users/login called");
+    const authorization = checkRequestAuthorization(request, reply);
+    if (authorization)
+      return authorization;
     // TODO: Implement user authentication logic here
     // For now, we will simulate a successful login by generating a fake user ID and JWT token.
     // sub property in JWT payload should be the user ID.

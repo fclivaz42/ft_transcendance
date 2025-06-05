@@ -29,7 +29,7 @@ Validates the user's JWT token and returns the user information if valid.
 
 | Key             | Required  | Expected value      | Description                                             |
 | --------------- | --------- | ------------------- | ------------------------------------------------------- |
-| `authorization` | yes       | `Bearer process.API_KEY` | Project API key to authorize the internal request. |
+| `authorization` | yes       | `process.API_KEY` | Project API key to authorize the internal request. |
 | `X-JWT-Token`   | yes       | `Bearer {jwtToken}` | User jwt token to authorize ~~authenticate~~ him        |
 
 ### Response:

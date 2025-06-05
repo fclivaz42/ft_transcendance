@@ -102,11 +102,12 @@ class UsersSdk {
       method,
       url,
       headers: {
-        Authorization: `Bearer ${this._config.apiKey}`,
+        Authorization: this._config.apiKey,
         ...options?.headers,
       },
       data: options?.data,
       params: options?.params,
+      validateStatus: (status => (status >= 200 && status < 300) || status === 401 || status === 403),
     });
   }
 
@@ -116,11 +117,11 @@ class UsersSdk {
    * @returns a promise with the authorization response from axios
    */
   public async getAuthorize(token: string): Promise<AxiosResponse<UsersSdkAuthorizeResponse>> {
-    return (this.apiRequest<UsersSdkAuthorizeResponse>("get", "authorize", {
+    return this.apiRequest<UsersSdkAuthorizeResponse>("get", "authorize", {
       headers: {
         "X-JWT-Token": token
       }
-    }));
+    });
   }
 
   // TODO: Create an interface for the response to replace `any`

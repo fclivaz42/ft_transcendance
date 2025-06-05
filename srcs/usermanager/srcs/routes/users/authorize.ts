@@ -5,6 +5,8 @@ import checkRequestAuthorization from '../../managers/AuthorizationManager.ts';
 
 export default async function usersAuthorizeEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
   app.get("/authorize", async (request, reply) => {
+    if (process.env.RUNMODE?.toLowerCase() === "debug")
+      console.debug("GET /users/authorize called");
     const req = checkRequestAuthorization(request, reply);
     if (req)
       return req;

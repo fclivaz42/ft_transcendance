@@ -80,7 +80,7 @@ function httpStandard(code: number): string {
 
 export function httpError(code: number, message: string, req: FastifyRequest) {
 	return {
-		type: "https://raw.githubusercontent.com/fclivaz42/ft_transcendance/refs/heads/main/srcs/oauth2/README.md",
+		type: "https://raw.githubusercontent.com/fclivaz42/ft_transcendance/refs/heads/main/srcs/usermanager/README.md",
 		title: httpStandard(code),
 		status: code,
 		detail: message,
