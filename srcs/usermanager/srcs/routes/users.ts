@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import usersLoginEndpoint from "./users/login.ts";
 import usersAuthorizeEndpoint from "./users/authorize.ts";
+import usersRegisterEndpoint from "./users/register.ts";
 
 export default async function initializeRoute(app: FastifyInstance, opts: FastifyPluginOptions) {
   app.get("/:uuid", async (request, reply) => {
@@ -20,7 +21,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 
   usersAuthorizeEndpoint(app, opts);
   usersLoginEndpoint(app, opts);
-  //usersRegisterEndpoint(app, opts);
+  usersRegisterEndpoint(app, opts);
   //usersLoginOauth2Endpoint(app, opts);
   //usersRegisterOauth2Endpoint(app, opts);
 }
