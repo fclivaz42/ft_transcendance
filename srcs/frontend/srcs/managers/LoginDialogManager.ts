@@ -49,22 +49,22 @@ class LoginDialogManager {
     });
 
     // --- Fonction de gestion de la soumission (Login ou Register) ---
-    const handleAuthSubmit = async (mode: 'login' | 'register', data: { email: string; password?: string; confirmPassword?: string }) => {
-      console.log(`Soumission en mode ${mode} pour l'e-mail: ${data.email}`);
+    const handleAuthSubmit = async (mode: 'login' | 'register', data: { displayName: string; password?: string; confirmPassword?: string }) => {
+      console.log(`Soumission en mode ${mode} pour l'e-mail: ${data.displayName}`);
 
       // *******************************************************************
       //APPELS AU BACKEND
       // *******************************************************************
 //test
       if (mode === 'login') {
-        if (data.email === 'test@example.com' && data.password === 'password123') {
+        if (data.displayName === 'test@example.com' && data.password === 'password123') {
           alert("Connexion réussie (simulée) !");
           this.closeAllCallback?.();
         } else {
           alert("Connexion échouée : E-mail ou mot de passe incorrect.");
         }
       } else if (mode === 'register') {
-        if (data.email === 'newuser@example.com' && data.password === 'newpass' && data.password === data.confirmPassword) {
+        if (data.displayName === 'newuser@example.com' && data.password === 'newpass' && data.password === data.confirmPassword) {
           alert("Inscription réussie (simulée) !");
           this.closeAllCallback?.();
         } else {
