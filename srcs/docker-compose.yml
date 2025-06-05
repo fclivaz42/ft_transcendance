@@ -6,10 +6,7 @@ include:
   - ./core/docker-compose.yml
   - ./database/docker-compose.yml
   - ./oauth2/docker-compose.yml
-  - ./core/docker-compose.yml
-  - ./database/docker-compose.yml
-  - ./oauth2/docker-compose.yml
-  - ./games/pong/docker-compose.yml
+  - ./blockchain/docker-compose.yml
 
 networks:
   sarifntw:
