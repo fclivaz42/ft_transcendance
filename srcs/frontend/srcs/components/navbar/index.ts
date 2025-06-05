@@ -28,7 +28,7 @@ export function createNavbar(props: NavbarProps): HTMLElement {
     }
   });
 
-  navBar.className = "z-0 fixed top-0 bottom-0 flex pt-20 bg-navbar dark:bg-navbar_dark dark:border-panel_dark dark:border-r";
+  navBar.className = "z-10 fixed top-0 bottom-0 flex pt-20 bg-navbar dark:bg-navbar_dark dark:border-panel_dark dark:border-r";
   navBar.id = "navBar";
   navBar.innerHTML = `
     <div class="w-24 flex flex-col flex-grow">
