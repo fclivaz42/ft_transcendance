@@ -632,6 +632,39 @@
 // }
 
 // 
+type BaseBlob = {
+  id: string
+  element: HTMLDivElement | null
+  currentX: number
+  currentY: number
+  isAttracted: boolean
+  attractionSpeed: number
+  animPhase: number
+  baseX: number
+  baseY: number
+}
+
+type VerticalBlob = BaseBlob & {
+  animType: 'vertical'
+  animAmplitude: number
+  animSpeed: number
+}
+
+type HorizontalBlob = BaseBlob & {
+  animType: 'horizontal'
+  animAmplitude: number
+  animSpeed: number
+}
+
+type CircularBlob = BaseBlob & {
+  animType: 'circle'
+  animRadius: number
+  animSpeed: number
+}
+
+type BlobData = VerticalBlob | HorizontalBlob | CircularBlob
+
+
 
 export function createFrame(): HTMLElement {
   const frame = document.createElement("div");
@@ -689,7 +722,7 @@ export function createFrame(): HTMLElement {
   // Chaque blob a ses propres paramètres d'animation JS
   const backgroundBlobsData = [
     {
-      id: "blob-bg-1", element: null as HTMLDivElement,
+      id: "blob-bg-1", element: null as HTMLDivElement | null,
       currentX: 0, currentY: 0, // Position JS actuelle
       isAttracted: false, attractionSpeed: 30, // Paramètres d'attraction
       // Paramètres d'animation JS : Vertical
@@ -697,7 +730,7 @@ export function createFrame(): HTMLElement {
       baseX: 0.25 * window.innerWidth, baseY: 0.5 * window.innerHeight // Point central pour l'animation
     },
     {
-      id: "blob-bg-2", element: null as HTMLDivElement,
+      id: "blob-bg-2", element: null as HTMLDivElement | null,
       currentX: 0, currentY: 0,
       isAttracted: false, attractionSpeed: 40,
       // Paramètres d'animation JS : Circulaire
@@ -705,7 +738,7 @@ export function createFrame(): HTMLElement {
       baseX: 0.7 * window.innerWidth, baseY: 0.3 * window.innerHeight
     },
     {
-      id: "blob-bg-3", element: null as HTMLDivElement,
+      id: "blob-bg-3", element: null as HTMLDivElement| null,
       currentX: 0, currentY: 0,
       isAttracted: false, attractionSpeed: 35,
       // Paramètres d'animation JS : Circulaire (lent)
@@ -713,7 +746,7 @@ export function createFrame(): HTMLElement {
       baseX: 0.3 * window.innerWidth, baseY: 0.7 * window.innerHeight
     },
     {
-      id: "blob-bg-4", element: null as HTMLDivElement,
+      id: "blob-bg-4", element: null as HTMLDivElement | null,
       currentX: 0, currentY: 0,
       isAttracted: false, attractionSpeed: 50,
       // Paramètres d'animation JS : Horizontal
@@ -721,7 +754,7 @@ export function createFrame(): HTMLElement {
       baseX: 0.6 * window.innerWidth, baseY: 0.8 * window.innerHeight
     },
     {
-      id: "blob-bg-5", element: null as HTMLDivElement,
+      id: "blob-bg-5", element: null as HTMLDivElement | null,
       currentX: 0, currentY: 0,
       isAttracted: false, attractionSpeed: 60,
       // Paramètres d'animation JS : Circulaire (très grand)
@@ -793,24 +826,47 @@ export function createFrame(): HTMLElement {
 
       const timeFactor = time * blob.animSpeed; // Utilise le temps pour faire avancer l'animation
 
+      // switch (blob.animType) {
+      //   case 'vertical':
+      //     programmedX = blob.baseX - frameRect.left;
+      //     programmedY = blob.baseY + Math.sin(timeFactor + blob.animPhase) * blob.animAmplitude - frameRect.top;
+      //     break;
+      //   case 'horizontal':
+      //     programmedX = blob.baseX + Math.sin(timeFactor + blob.animPhase) * blob.animAmplitude - frameRect.left;
+      //     programmedY = blob.baseY - frameRect.top;
+      //     break;
+      //   case 'circle':
+      //     programmedX = blob.baseX + Math.cos(timeFactor + blob.animPhase) * blob.animRadius - frameRect.left;
+      //     programmedY = blob.baseY + Math.sin(timeFactor + blob.animPhase) * blob.animRadius - frameRect.top;
+      //     break;
+      //   default:
+      //     programmedX = blob.baseX - frameRect.left;
+      //     programmedY = blob.baseY - frameRect.top;
+      // }
       switch (blob.animType) {
-        case 'vertical':
-          programmedX = blob.baseX - frameRect.left;
-          programmedY = blob.baseY + Math.sin(timeFactor + blob.animPhase) * blob.animAmplitude - frameRect.top;
+        case 'vertical': {
+          const b = blob as VerticalBlob;
+          programmedX = b.baseX - frameRect.left;
+          programmedY = b.baseY + Math.sin(timeFactor + b.animPhase) * b.animAmplitude - frameRect.top;
           break;
-        case 'horizontal':
-          programmedX = blob.baseX + Math.sin(timeFactor + blob.animPhase) * blob.animAmplitude - frameRect.left;
-          programmedY = blob.baseY - frameRect.top;
+        }
+        case 'horizontal': {
+          const b = blob as HorizontalBlob;
+          programmedX = b.baseX + Math.sin(timeFactor + b.animPhase) * b.animAmplitude - frameRect.left;
+          programmedY = b.baseY - frameRect.top;
           break;
-        case 'circle':
-          programmedX = blob.baseX + Math.cos(timeFactor + blob.animPhase) * blob.animRadius - frameRect.left;
-          programmedY = blob.baseY + Math.sin(timeFactor + blob.animPhase) * blob.animRadius - frameRect.top;
+        }
+        case 'circle': {
+          const b = blob as CircularBlob;
+          programmedX = b.baseX + Math.cos(timeFactor + b.animPhase) * b.animRadius - frameRect.left;
+          programmedY = b.baseY + Math.sin(timeFactor + b.animPhase) * b.animRadius - frameRect.top;
           break;
+        }
         default:
           programmedX = blob.baseX - frameRect.left;
           programmedY = blob.baseY - frameRect.top;
       }
-
+      
       // 2. Vérifier la distance au curseur
       const blobCenterX = (blob.element.getBoundingClientRect().left + blob.element.getBoundingClientRect().width / 2) - frameRect.left;
       const blobCenterY = (blob.element.getBoundingClientRect().top + blob.element.getBoundingClientRect().height / 2) - frameRect.top;
