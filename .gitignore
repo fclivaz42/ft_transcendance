@@ -2,6 +2,7 @@
 data/
 artifacts/
 cache/
+addscore.json
 .env
 package-lock.json
 
