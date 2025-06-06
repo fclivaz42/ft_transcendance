@@ -2,6 +2,7 @@ import type { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import UsersSdk from '../modules/users/usersSdk.ts'
 import type { UsersSdkLoginProps, UsersSdkRegisterProps } from '../modules/users/usersSdk.ts'
 import { usersEnforceAuthorize } from '../modules/users/usersAuthorization.ts';
+import UsersFilter from '../modules/users/usersFilter.ts';
 
 const usersSdk = new UsersSdk();
 
@@ -31,7 +32,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const authorization = await usersEnforceAuthorize(reply, request, usersSdk);
 
 		const currentUser = await usersSdk.getUser(authorization.data.sub);
-		return reply.code(currentUser.status).send(currentUser.data);
+		return reply.code(currentUser.status).send(UsersFilter.filterUserData(currentUser.data));
 	});
 
 	// Returns a JWT token that can be used to authenticate further requests.
@@ -82,14 +83,10 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			console.debug("ALL /users/:uuid called");
 		if (request.method !== 'GET')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user data retrieval.' });
-
-		const authorization = await usersSdk.getAuthorize(request.headers.authorization as string);
-
 		const params = request.params as { uuid: string };
 		const userData = await usersSdk.getUser(params.uuid);
 		if (userData.status !== 200)
 			return reply.code(userData.status).send(userData.data);
-		// TODO: Filter user data to only return public information, or more if the user is authorized (admin)
-		return reply.code(userData.status).send(userData.data);
+		return reply.code(userData.status).send(UsersFilter.filterPublicUserData(userData.data));
 	});
 }

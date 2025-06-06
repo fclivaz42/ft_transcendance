@@ -7,6 +7,22 @@ export interface UsersSdkConfig {
   serverUrl: string;
 }
 
+export interface UsersSdkUser {
+    PlayerID: string,
+    DisplayName: string,
+    EmailAddress: string,
+    PassHash: string,
+    OAuthID: string | null,
+    ActiveToken: string | null,
+    SessionID: string | null,
+    FriendsList: string | null,
+    PhoneNumber: string | null,
+    FirstName: string | null,
+    FamilyName: string | null,
+    Bappy: number | null,
+    Admin: number | null,
+}
+
 export interface UsersSdkAuthorizeResponse {
   /**
    * User ID
@@ -130,7 +146,7 @@ class UsersSdk {
    * @param uuid User uuid to retrieve information for.
    * @returns a promise with the user information response from axios
    */
-  public async getUser(uuid: string): Promise<AxiosResponse<any>> {
+  public async getUser(uuid: string): Promise<AxiosResponse<UsersSdkUser>> {
     return this.apiRequest<any>("get", uuid);
   }
 
