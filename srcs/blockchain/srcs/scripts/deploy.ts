@@ -26,7 +26,7 @@ export async function deploy() {
 		const wallet = new ethers.Wallet(privateKey, provider);
 		const factory: ContractFactory = new ethers.ContractFactory(contractData.abi, contractData.bytecode, wallet);
 
-		console.log("Try to deploy contract...");
+		console.log("Trying to deploy contract...");
 		const contract: eth.BaseContract = await factory.deploy();
 		await contract.waitForDeployment();
 
@@ -38,7 +38,7 @@ export async function deploy() {
 		contract.deploymentTransaction()?.wait;
 		const address = await contract.getAddress();
 		console.log("\n╔════════════════════════════════════");
-		console.log("║ Deployment.");
+		console.log("║ Deployed.");
 		console.log("║");
 		console.log("╠═    Contract deployed at:[", address, "]");
 		console.log("║");
