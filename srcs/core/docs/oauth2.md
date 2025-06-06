@@ -21,11 +21,15 @@ This module lets users log in using their provider account. It does that by redi
 
 Gets the URL to redirect the user to the provider's OAuth authorization server and it's state identifier to use with `GET /sessions/:state` endpoint (from internal module).
 
-### HTTP Headers
+### HTTP Queries
 
-| Key             | Required  | Expected value    | Description                               |
-| --------------- | --------- | ------------------| ----------------------------------------- |
-| `authorization` | yes       | Bearer `jwtToken` | JWT User token used to authorize the user |
+| Query        | Required | Example  | Description                                                                      |
+| ------------ | -------- | -------- | -------------------------------------------------------------------------------- |
+| `?client_id` | yes      | (string) | Identify the client, so newer states will force older ones to close.             |
+| `?user_id`   | no       | (string) | The user id to use for the session, if not provided a new one will be generated. |
+
+The `client_id` can be any unique id value as long as the client (browser) can be identified by it.
+The `user_id` is optional, if not provided a new user id will be generated for the session. It is not implemented yet.
 
 ### Response:
 
@@ -58,13 +62,6 @@ Token can also be fetched using `GET /sessions/:state` endpoint for a more simpl
 | -------- | -------- | -------- | --------------------------------------------- |
 | `?code`  | yes      | (string) | The code provided by the user login callback  |
 | `?state` | yes      | (string) | The state provided by the user login callback |
-
-### HTTP Headers
-
-| Key             | Required  | Expected value    | Description                               |
-| --------------- | --------- | ------------------| ----------------------------------------- |
-| `authorization` | yes       | Bearer `jwtToken` | JWT User token used to authorize the user |
-
 
 ### Required Query Parameters:
 

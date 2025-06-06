@@ -27,8 +27,8 @@ Gets the URL to redirect the user to the provider's OAuth authorization server a
 
 ### HTTP Queries
 
-| Query       | Required | Example  | Description                                                          |
-| ----------- | -------- | -------- | -------------------------------------------------------------------- |
+| Query        | Required | Example  | Description                                                          |
+| ------------ | -------- | -------- | -------------------------------------------------------------------- |
 | `?client_id` | yes      | (string) | Identify the client, so newer states will force older ones to close. |
 
 The `client_id` can be any unique id value as long as the client (browser) can be identified by it.

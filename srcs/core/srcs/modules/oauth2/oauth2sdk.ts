@@ -7,6 +7,18 @@ export interface Oauth2sdkConfig {
   serverUrl: string;
 }
 
+export interface Oauth2sdkDbEntry {
+  SubjectID: string,
+  IssuerName: string,
+  EmailAddress: string,
+  FullName: string,
+  FirstName: string,
+  FamilyName: string,
+  TokenHash: string,
+  IssueTime: number,
+  ExpirationTime: number,
+}
+
 export interface Oauth2sdkLoginResponse {
   url: string;
   state: string;
