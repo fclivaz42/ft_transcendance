@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/05/27 19:42:03 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/05/31 20:07:25 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -23,7 +23,7 @@ const OauthTable =
 		"TokenHash",
 		"IssueTime",
 		"ExpirationTime",
-		"PRIMARY KEY"
+		""
 	],
 	"Arguments": [
 		"TEXT NOT NULL",
@@ -35,7 +35,7 @@ const OauthTable =
 		"TEXT NOT NULL",
 		"INTEGER NOT NULL",
 		"INTEGER DEFAULT 0",
-		"(SubjectID, IssuerName)"
+		"PRIMARY KEY (SubjectID, IssuerName)"
 	],
 	"Methods": [
 		"GET",
@@ -53,7 +53,7 @@ const PlayersTable =
 		"DisplayName",
 		"EmailAddress",
 		"PassHash",
-		"GoogleID",
+		"OAuthID",
 		"ActiveToken",
 		"SessionID",
 		"FriendsList",
@@ -127,7 +127,7 @@ const UIDTable =
 		"TEXT NOT NULL PRIMARY KEY"
 	],
 	"Methods": [
-		"GET"
+		"POST"
 	]
 }
 
@@ -159,7 +159,7 @@ const CurrentContract =
 		"TEXT NOT NULL PRIMARY KEY"
 	],
 	"Methods": [
-		"GET"
+		"POST"
 	]
 }
 

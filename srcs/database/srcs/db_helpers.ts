@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/21 21:57:13 by fclivaz           #+#    #+#             //
-//   Updated: 2025/05/26 19:05:13 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/05/31 19:57:17 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -54,12 +54,15 @@ function create_new_uid(request: fft.FastifyRequest, reply: fft.FastifyReply, ta
 	return reply.code(200).send(generated_uid)
 }
 
+function check_contract(request: fft.FastifyRequest, reply: fft.FastifyReply, table: string, table_fields: Array<string>) {
+	// Handle creating and checking contract here
+	return reply.code(200).send("not handled yet so imagine i returned a valid contract hash")
+}
+
 export default class RequestHandler {
 	private constructor() { }
 
 	static get(request: fft.FastifyRequest, reply: fft.FastifyReply, table: string, table_fields: Array<string>) {
-		if (table === "UIDTable")
-			return create_new_uid(request, reply, table, table_fields)
 		return get_del_db(request, reply, table, table_fields)
 	}
 
@@ -68,8 +71,12 @@ export default class RequestHandler {
 	}
 
 	static post(request: fft.FastifyRequest, reply: fft.FastifyReply, table: string, table_fields: Array<string>) {
-		let response: string;
+		if (table === "UIDTable")
+			return create_new_uid(request, reply, table, table_fields)
+		if (table === "CurrentContract")
+			return check_contract(request, reply, table, table_fields)
 		const body = request.body as object;
+		let response: string;
 		try {
 			check_request_format(request.headers, request.method)
 			response = DatabaseWorker.post(table, table_fields, body)

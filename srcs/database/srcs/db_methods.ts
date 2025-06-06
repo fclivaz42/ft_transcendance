@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/05/26 21:41:16 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/05/31 19:47:02 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -148,7 +148,7 @@ function check_db_columns(db: sqlt.Database, table: string) {
 		}
 	}
 	for (const item of tables[table]["Fields"]) {
-		if (dbrows.indexOf(item) === -1) {
+		if (dbrows.indexOf(item) === -1 && item.length > 0) {
 			db.prepare(`ALTER TABLE ${table} ADD ${item} ${tables[table]["Arguments"][tables[table]["Fields"].indexOf(item)]}`).run()
 			console.log(`DB INIT: added ${item}.`)
 		}
