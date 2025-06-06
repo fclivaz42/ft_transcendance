@@ -1,5 +1,6 @@
 
 ////////////////////mode 2 en 1 frluide
+// if (data.displayName === 'test@example.com' && data.password === 'password123') {
 //chef orchestre (fond flou et fonce) + animation entree + croix
 //inject dans le DOM le Dialog,overlay soomber et blurredBackground
 // LoginDialogManager.ts
