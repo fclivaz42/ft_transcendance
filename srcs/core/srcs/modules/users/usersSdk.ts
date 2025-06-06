@@ -140,14 +140,13 @@ class UsersSdk {
     });
   }
 
-  // TODO: Create an interface for the response to replace `any`
   /**
    * Get current user information.
    * @param uuid User uuid to retrieve information for.
    * @returns a promise with the user information response from axios
    */
   public async getUser(uuid: string): Promise<AxiosResponse<UsersSdkUser>> {
-    return this.apiRequest<any>("get", uuid);
+    return this.apiRequest<UsersSdkUser>("get", uuid);
   }
 
   /**
