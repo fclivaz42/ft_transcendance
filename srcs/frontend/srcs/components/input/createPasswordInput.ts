@@ -181,7 +181,161 @@
 // components/input/createPasswordInput.ts
 
 // Interface pour le résultat de la vérification de la force du mot de passe
-export interface PasswordStrengthResult { // <-- AJOUTER EXPORT ICI AUSSI
+
+
+
+
+// ///////////////////////////////////en cours
+// // Définit la structure des résultats de la vérification.//////fenetre dialogue + true false en cours
+// export interface PasswordStrengthResult {
+//     minLength: boolean;
+//     hasUppercase: boolean;
+//     hasLowercase: boolean;
+//     hasNumber: boolean;
+//     hasSpecialChar: boolean;
+// }
+
+// /**
+//  * Vérifie la force d'un mot de passe en fonction de critères prédéfinis.
+//  * @param password Le mot de passe à vérifier.
+//  * @returns Un objet contenant le résultat de chaque critère.
+//  */
+// // calcule la force du mot de passe et renvoie un objet PasswordStrengthResult
+// export function checkPasswordStrength(password: string): PasswordStrengthResult { // <-- AJOUTER 'export' ICI
+//     const minLength = 8; // Longueur minimale requise
+//     const hasUppercase = /[A-Z]/.test(password);
+//     const hasLowercase = /[a-z]/.test(password);
+//     const hasNumber = /[0-9]/.test(password);
+//     const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`€]/.test(password); // Ajoutez ou retirez des caractères spéciaux au besoin
+
+//     return {
+//         minLength: password.length >= minLength,
+//         hasUppercase: hasUppercase,
+//         hasLowercase: hasLowercase,
+//         hasNumber: hasNumber,
+//         hasSpecialChar: hasSpecialChar,
+//     };
+// }
+// //crée <input type="password">
+// //gere + bouton pour afficher/masquer le mot de passe
+// //appelle checkPasswordStrength 
+// export function createPasswordInput(placeholder: string, name: string, enableStrengthCheck: boolean = true): HTMLDivElement {
+//     // ... (le reste de votre code de createPasswordInput.ts, inchangé)
+//     const container = document.createElement("div");
+//     container.className = "relative w-full"; 
+
+//     const input = document.createElement("input");
+//     input.type = "password";
+//     input.name = name;
+//     input.placeholder = placeholder;
+
+//     input.className = `
+//       w-full
+//       px-4
+//       py-2
+//       mt-2
+//       text-white
+//       bg-gray-800
+//       border
+//       border-gray-700
+//       rounded-lg
+//       focus:outline-none
+//       focus:ring-2
+//       focus:ring-blue-500
+//       dark:bg-white
+//       dark:text-black
+//       pr-10
+//     `.replace(/\s+/g, " ");
+
+//     const toggleButton = document.createElement("button");
+//     toggleButton.type = "button";
+//     toggleButton.className = `
+//       absolute
+//       right-3
+//       top-1/2
+//       -translate-y-1/2
+//       text-gray-400
+//       hover:text-gray-200
+//       focus:outline-none
+//       dark:text-gray-600
+//       dark:hover:text-gray-800
+//     `.replace(/\s+/g, " ");
+
+//     const eyeIcon = document.createElement("span");
+//     eyeIcon.className = "icon";
+//     eyeIcon.textContent = "👁️";
+
+//     const eyeSlashIcon = document.createElement("span");
+//     eyeSlashIcon.className = "icon hidden";
+//     eyeSlashIcon.textContent = "🙈";
+
+//     toggleButton.appendChild(eyeIcon);
+//     toggleButton.appendChild(eyeSlashIcon);
+
+//     toggleButton.addEventListener("click", () => {
+//         if (input.type === "password") {
+//             input.type = "text";
+//             eyeIcon.classList.add("hidden");
+//             eyeSlashIcon.classList.remove("hidden");
+//         } else {
+//             input.type = "password";
+//             eyeIcon.classList.remove("hidden");
+//             eyeSlashIcon.classList.add("hidden");
+//         }
+//     });
+
+//     input.addEventListener("input", () => {
+//         const strengthResult = checkPasswordStrength(input.value);
+//         const event = new CustomEvent('passwordStrengthChange', {
+//             detail: { strengthResult: strengthResult }
+//         });
+//         input.dispatchEvent(event);
+//     });
+
+//     input.addEventListener("focus", () => {
+//         const event = new CustomEvent('passwordInputFocus', {
+//             detail: { inputName: name }
+//         });
+//         input.dispatchEvent(event);
+//     });
+
+//     input.addEventListener("blur", () => {
+//         const event = new CustomEvent('passwordInputBlur', {
+//             detail: { inputName: name }
+//         });
+//         input.dispatchEvent(event);
+//     });
+
+//     container.appendChild(input);
+//     container.appendChild(toggleButton);
+
+//     Object.defineProperty(container, 'value', {
+//         get: () => input.value,
+//         set: (val) => { 
+//             input.value = val;
+//             input.dispatchEvent(new Event('input')); 
+//         },
+//         enumerable: true,
+//         configurable: true
+//     });
+
+//     (container as any).inputElement = input;
+
+//     return container;
+// }
+
+// // Pour le typage des événements personnalisés
+// declare global {
+//     interface HTMLElementEventMap {
+//         'passwordStrengthChange': CustomEvent<{ strengthResult: PasswordStrengthResult }>;
+//         'passwordInputFocus': CustomEvent<{ inputName: string }>;
+//         'passwordInputBlur': CustomEvent<{ inputName: string }>;
+//     }
+// }
+
+// srcs/components/input/createPasswordInput.ts
+
+export interface PasswordStrengthResult { 
     minLength: boolean;
     hasUppercase: boolean;
     hasLowercase: boolean;
@@ -189,17 +343,12 @@ export interface PasswordStrengthResult { // <-- AJOUTER EXPORT ICI AUSSI
     hasSpecialChar: boolean;
 }
 
-/**
- * Vérifie la force d'un mot de passe en fonction de critères prédéfinis.
- * @param password Le mot de passe à vérifier.
- * @returns Un objet contenant le résultat de chaque critère.
- */
-export function checkPasswordStrength(password: string): PasswordStrengthResult { // <-- AJOUTER 'export' ICI
-    const minLength = 8; // Longueur minimale requise
+export function checkPasswordStrength(password: string): PasswordStrengthResult { 
+    const minLength = 8;
     const hasUppercase = /[A-Z]/.test(password);
     const hasLowercase = /[a-z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
-    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`€]/.test(password); // Ajoutez ou retirez des caractères spéciaux au besoin
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`€]/.test(password);
 
     return {
         minLength: password.length >= minLength,
@@ -210,8 +359,11 @@ export function checkPasswordStrength(password: string): PasswordStrengthResult 
     };
 }
 
-export function createPasswordInput(placeholder: string, name: string): HTMLDivElement {
-    // ... (le reste de votre code de createPasswordInput.ts, inchangé)
+export function createPasswordInput(
+    placeholder: string, 
+    name: string, 
+    enableStrengthCheck: boolean = true // Ce paramètre sera stocké
+): HTMLDivElement & { value: string, inputElement: HTMLInputElement, _enableStrengthCheck: boolean } { // <-- Ajout de la propriété au type retourné
     const container = document.createElement("div");
     container.className = "relative w-full"; 
 
@@ -275,6 +427,7 @@ export function createPasswordInput(placeholder: string, name: string): HTMLDivE
         }
     });
 
+    // Ces événements sont toujours dispatchés, c'est au parent de décider d'y réagir.
     input.addEventListener("input", () => {
         const strengthResult = checkPasswordStrength(input.value);
         const event = new CustomEvent('passwordStrengthChange', {
@@ -311,8 +464,10 @@ export function createPasswordInput(placeholder: string, name: string): HTMLDivE
     });
 
     (container as any).inputElement = input;
+    // <-- NOUVEAU : Stocke le booléen enableStrengthCheck sur l'élément retourné
+    (container as any)._enableStrengthCheck = enableStrengthCheck; 
 
-    return container;
+    return container as HTMLDivElement & { value: string, inputElement: HTMLInputElement, _enableStrengthCheck: boolean };
 }
 
 // Pour le typage des événements personnalisés

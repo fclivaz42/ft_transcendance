@@ -9,13 +9,18 @@ import { createLoginDialog } from "../components/dialog/loginDialog.js"; // Impo
 class LoginDialogManager {
   private dialog: HTMLDialogElement | null = null;
   private closeAllCallback: (() => void) | null = null;
-  private currentDialogMode: 'login' | 'register' = 'register'; // Suivre le mode actuel
+  private currentDialogMode: 'login' | 'register'  | 'forgotPassword' = 'register';; // Suivre le mode actuel
 
   public initialize() {
+    const handleSwitchMode = (newMode: 'login' | 'register' | 'forgotPassword') => { // <-- UPDATE THIS LINE
+      this.currentDialogMode = newMode;
+      console.log(`LoginDialogManager: Mode de dialogue changé en ${newMode}`);
+    };
     const main = document.getElementById("main");
     if (!main) {
       console.error("Main element not found");
       return;
+    
     }
 
     const blurredBackground = main.cloneNode(true) as HTMLElement;
@@ -74,16 +79,24 @@ class LoginDialogManager {
     };
 
     // --- Fonction de gestion du changement de mode ---
-    const handleSwitchMode = (newMode: 'login' | 'register') => {
-      this.currentDialogMode = newMode;
-      console.log(`LoginDialogManager: Mode de dialogue changé en ${newMode}`);
+    // const handleSwitchMode = (newMode: 'login' | 'register'| 'forgotPassword') => {
+    //   this.currentDialogMode = newMode;
+    //   console.log(`LoginDialogManager: Mode de dialogue changé en ${newMode}`);
+    // };
+    const handleForgotPasswordSubmit = (email: string, code: string) => {
+        console.log(`Mot de passe oublié soumis: Email=${email}, Code=${code}`);
+        // Ici, vous gérerez la logique d'appel au backend pour la réinitialisation du mot de passe
+        alert("Réinitialisation du mot de passe (simulée) pour : " + email);
+        // Vous pourriez vouloir fermer le dialogue ou passer à un autre mode après la soumission
+        // this.closeAllCallback?.(); 
     };
 
     // 3. Création du <dialog> principal
     const dialog = createLoginDialog({
       initialMode: 'register',
       onSubmit: handleAuthSubmit,
-      onSwitchMode: handleSwitchMode
+      onSwitchMode: handleSwitchMode,
+      onForgotPasswordSubmit: handleForgotPasswordSubmit // <-- ADD THIS LINE
     });
 
     this.dialog = dialog;
@@ -127,12 +140,23 @@ class LoginDialogManager {
     `.replace(/\s+/g, " ");
     dialog.appendChild(closeBtn);
 
+        //////new
+        // Ferme le dialogue uniquement si l'utilisateur clique en dehors du <dialog>
+
+    //////
+
+
     document.body.appendChild(blurredBackground);
     document.body.appendChild(overlay);
     document.body.appendChild(dialog);
     document.body.style.overflow = "hidden";
 
     // --- Logique de fermeture complète ---
+    overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      this.closeAllCallback?.();
+    }
+  });
     this.closeAllCallback = () => {
       this.dialog!.classList.remove("opacity-100", "scale-100");
       this.dialog!.classList.add("opacity-0", "scale-95");
@@ -152,11 +176,11 @@ class LoginDialogManager {
 
     closeBtn.addEventListener("click", this.closeAllCallback);
 
-    dialog.addEventListener('click', (event) => {
-      if (event.target === dialog) {
-        this.closeAllCallback?.();
-      }
-    });
+    // dialog.addEventListener('click', (event) => {
+    //   if (event.target === dialog) {
+    //     this.closeAllCallback?.();
+    //   }
+    // });
 
     // --- Logique d'affichage ---
     dialog.showModal();
