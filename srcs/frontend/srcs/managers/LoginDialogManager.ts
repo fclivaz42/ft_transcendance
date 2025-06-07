@@ -110,7 +110,7 @@ class LoginDialogManager {
       maxWidth: "400px",
       position: "relative",
       height: "auto", //s'adapte à la taille du contenu
-      maxHeight: "60vh",       // <-- heeeeeeeere :limite haute raisonnable
+      maxHeight: "70vh",       // <-- heeeeeeeere :limite haute raisonnable
       overflow: "visible",     // <-- permet au contenu de dépasser si besoin
       padding: "1.5rem",       
     });

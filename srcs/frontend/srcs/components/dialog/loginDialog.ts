@@ -1,5 +1,4 @@
 
-
 // // srcs/components/dialog/loginDialog.ts
 // import { createDialog } from "./index.js";
 // import { createInfoInput } from "../input/infoInput.js";
@@ -8,10 +7,9 @@
 
 // interface LoginDialogOptions 
 // {
-//   initialMode: 'login' | 'register' | 'forgotPassword'; // <-- AJOUT DU NOUVEAU MODE
+//   initialMode: 'login' | 'register' | 'forgotPassword';
 //   onSubmit: (mode: 'login' | 'register', data: { displayName: string; password?: string; confirmPassword?: string }) => void;
-//   onSwitchMode: (newMode: 'login' | 'register' | 'forgotPassword') => void; // <-- AJOUT DU NOUVEAU MODE
-//   // AJOUT D'UN NOUVEL ÉVÉNEMENT DE SOUMISSION POUR LE MOT DE PASSE OUBLIÉ
+//   onSwitchMode: (newMode: 'login' | 'register' | 'forgotPassword') => void;
 //   onForgotPasswordSubmit: (email: string, code: string) => void; 
 // }
 
@@ -127,6 +125,10 @@
 //   const registerPasswordInput = createPasswordInput("Mot de passe", "password", true) as CustomPasswordInput;
 //   const registerConfirmPasswordInput = createPasswordInput("Confirmer mot de passe", "confirmPassword", false) as CustomPasswordInput;
   
+//   const passwordMatchFeedback = document.createElement("div");
+//   passwordMatchFeedback.className = "text-sm text-red-400 ml-2 hidden items-center justify-end gap-1 font-semibold";
+//   registerConfirmPasswordInput.appendChild(passwordMatchFeedback);
+
 //   const registerButton = document.createElement("button");
 //   registerButton.textContent = "S'inscrire";
 //   registerButton.type = "submit";
@@ -168,12 +170,11 @@
 //   loginForm.appendChild(loginButton);
 //   loginPanel.appendChild(loginForm);
 
-//   // --- NOUVEAU : Lien "Mot de passe oublié ?" ---
 //   const switchToForgotPasswordLink = document.createElement("a");
 //   switchToForgotPasswordLink.href = "#";
 //   switchToForgotPasswordLink.textContent = "Mot de passe oublié ?";
 //   switchToForgotPasswordLink.className = "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer";
-//   loginPanel.appendChild(switchToForgotPasswordLink); // Ajouté au panneau de connexion
+//   loginPanel.appendChild(switchToForgotPasswordLink);
 
 //   const switchToRegisterLink = document.createElement("a");
 //   switchToRegisterLink.href = "#";
@@ -182,7 +183,6 @@
 //   loginPanel.appendChild(switchToRegisterLink);
 
 
-//   // --- NOUVEAU : Panneau "Mot de passe oublié" ---
 //   const forgotPasswordPanel = document.createElement("div");
 //   forgotPasswordPanel.className = `
 //     absolute inset-0
@@ -216,7 +216,7 @@
 //   dialog.appendChild(dialogTitle);
 //   panelsContainer.appendChild(registerPanel);
 //   panelsContainer.appendChild(loginPanel);
-//   panelsContainer.appendChild(forgotPasswordPanel); // <-- AJOUT DU NOUVEAU PANNEAU AU CONTENEUR
+//   panelsContainer.appendChild(forgotPasswordPanel);
 //   dialog.appendChild(panelsContainer);
 //   dialog.appendChild(dialogBody);
   
@@ -264,11 +264,73 @@
 //     });
 //   });
 
+//   // --- MODIFIÉ : Fonction de validation de la correspondance des mots de passe ---
+//   const checkPasswordMatch = () => {
+//     const password = registerPasswordInput.value;
+//     const confirmPassword = registerConfirmPasswordInput.value;
+//     const isRegisterPanelActive = currentMode === 'register';
+
+//     // Vérifier si le champ de confirmation est en focus
+//     const isConfirmPasswordInputFocused = document.activeElement === registerConfirmPasswordInput.inputElement;
+
+//     // Nouvelle condition pour détecter une différence de manière subtile :
+//     // Le mot de passe de confirmation doit avoir au moins un caractère, ET
+//     // (soit il ne correspond pas au début du mot de passe original,
+//     // soit il est plus long que le mot de passe original)
+//     const hasMismatch = confirmPassword.length > 0 && 
+//                         (password.substring(0, confirmPassword.length) !== confirmPassword || 
+//                          confirmPassword.length > password.length);
+
+
+//     // Afficher le feedback si :
+//     // 1. Nous sommes en mode inscription
+//     // 2. Le champ de confirmation est en focus
+//     // 3. Une différence est détectée (selon 'hasMismatch')
+//     if (isRegisterPanelActive && isConfirmPasswordInputFocused && hasMismatch) {
+//         passwordMatchFeedback.classList.remove('hidden');
+//         passwordMatchFeedback.classList.add('flex');
+//         passwordMatchFeedback.innerHTML = '<svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg><span class="text-red-500">Mots de passe différents</span>';
+//     } else {
+//         // Cacher le feedback si les conditions ne sont pas remplies
+//         passwordMatchFeedback.classList.add('hidden');
+//         passwordMatchFeedback.classList.remove('flex');
+//     }
+//   };
+
+//   // Les écouteurs 'input' restent sur les deux champs pour que la vérification se déclenche
+//   registerPasswordInput.inputElement.addEventListener('input', checkPasswordMatch);
+//   registerConfirmPasswordInput.inputElement.addEventListener('input', checkPasswordMatch);
+  
+//   // Seulement sur le FOCUS du champ de confirmation
+//   registerConfirmPasswordInput.inputElement.addEventListener('focus', checkPasswordMatch);
+
+//   // Sur le BLUR des DEUX champs, on veut relancer checkPasswordMatch
+//   // pour qu'il masque le feedback si le champ de confirmation n'est plus focus.
+//   registerPasswordInput.inputElement.addEventListener('blur', () => {
+//     setTimeout(checkPasswordMatch, 50); 
+//   });
+//   registerConfirmPasswordInput.inputElement.addEventListener('blur', () => {
+//     setTimeout(checkPasswordMatch, 50); 
+//   });
+
+
 //   registerForm.addEventListener("submit", (event) => {
 //     event.preventDefault();
 //     const displayName = registerDisplayName.value;
 //     const password = registerPasswordInput.value;
 //     const confirmPassword = registerConfirmPasswordInput.value;
+
+//     if (currentMode === 'register' && password !== confirmPassword) {
+//         alert("Les mots de passe ne correspondent pas !");
+//         // Force l'affichage du message d'erreur lors de la soumission si mismatch,
+//         // même si le champ n'est pas en focus.
+//         passwordMatchFeedback.classList.remove('hidden');
+//         passwordMatchFeedback.classList.add('flex');
+//         passwordMatchFeedback.innerHTML = '<svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg><span class="text-red-500">Mots de passe différents</span>';
+        
+//         return; 
+//     }
+
 //     options.onSubmit('register', { displayName, password, confirmPassword });
 //   });
 
@@ -279,21 +341,19 @@
 //     options.onSubmit('login', { displayName, password });
 //   });
 
-//   // --- NOUVEAU : Gestion de la soumission du formulaire de mot de passe oublié ---
 //   forgotPasswordForm.addEventListener("submit", (event) => {
 //     event.preventDefault();
 //     const email = forgotPasswordEmailInput.value;
 //     const code = forgotPasswordCodeInput.value;
-//     options.onForgotPasswordSubmit(email, code); // Appelle la nouvelle fonction de rappel
+//     options.onForgotPasswordSubmit(email, code);
 //   });
 
 
-//   let currentMode: 'login' | 'register' | 'forgotPassword'; // <-- METTRE À JOUR LE TYPE
+//   let currentMode: 'login' | 'register' | 'forgotPassword';
 
-//   const switchMode = (mode: 'login' | 'register' | 'forgotPassword', animate = true) => { // <-- METTRE À JOUR LE TYPE
+//   const switchMode = (mode: 'login' | 'register' | 'forgotPassword', animate = true) => {
 //     if (mode === currentMode) return;
 
-//     // --- METTRE À JOUR LE TITRE DU DIALOGUE SELON LE NOUVEAU MODE ---
 //     if (mode === 'login') {
 //         dialogTitle.textContent = "Se connecter";
 //     } else if (mode === 'register') {
@@ -304,19 +364,19 @@
 
 //     const hiddenClass = 'opacity-0';
 //     const visibleClass = 'opacity-100';
-//     const slideLeft = '-translate-x-full'; // Utilisation de translate-x pour un effet latéral
+//     const slideLeft = '-translate-x-full';
 //     const slideRight = 'translate-x-full';
 //     const slideIn = 'translate-x-0';
 
 //     const addTransitions = () => {
 //         registerPanel.classList.add('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out');
 //         loginPanel.classList.add('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out');
-//         forgotPasswordPanel.classList.add('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out'); // <-- AJOUT
+//         forgotPasswordPanel.classList.add('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out');
 //     };
 //     const removeTransitions = () => {
 //         registerPanel.classList.remove('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out');
 //         loginPanel.classList.remove('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out');
-//         forgotPasswordPanel.classList.remove('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out'); // <-- AJOUT
+//         forgotPasswordPanel.classList.remove('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out');
 //     };
 
 //     if (animate) {
@@ -325,10 +385,9 @@
 //         removeTransitions();
 //     }
 
-//     // Réinitialiser toutes les classes de position pour les panneaux
 //     [registerPanel, loginPanel, forgotPasswordPanel].forEach(panel => {
 //         panel.classList.remove(slideIn, slideLeft, slideRight, visibleClass, hiddenClass);
-//         panel.classList.add(hiddenClass); // Cacher par défaut avant de positionner
+//         panel.classList.add(hiddenClass);
 //     });
 
 
@@ -336,43 +395,45 @@
 //       loginPanel.classList.remove(hiddenClass);
 //       loginPanel.classList.add(slideIn, visibleClass);
 
-//       registerPanel.classList.add(slideLeft); // S'assure que l'autre panneau est bien positionné
-//       forgotPasswordPanel.classList.add(slideRight); // S'assure que l'autre panneau est bien positionné
+//       registerPanel.classList.add(slideLeft);
+//       forgotPasswordPanel.classList.add(slideRight);
 
 //     } else if (mode === 'register') { 
 //       registerPanel.classList.remove(hiddenClass);
 //       registerPanel.classList.add(slideIn, visibleClass);
 
 //       loginPanel.classList.add(slideRight);
-//       forgotPasswordPanel.classList.add(slideLeft); // S'assure que l'autre panneau est bien positionné
+//       forgotPasswordPanel.classList.add(slideLeft);
 
 //     } else { // mode === 'forgotPassword'
 //       forgotPasswordPanel.classList.remove(hiddenClass);
 //       forgotPasswordPanel.classList.add(slideIn, visibleClass);
 
-//       loginPanel.classList.add(slideLeft); // Le panneau de connexion se déplace à gauche
-//       registerPanel.classList.add(slideRight); // Le panneau d'inscription se déplace à droite
+//       loginPanel.classList.add(slideLeft);
+//       registerPanel.classList.add(slideRight);
 //     }
     
 //     currentMode = mode;
 //     options.onSwitchMode(mode);
 
-//     // Cacher la bulle de force du mot de passe lors du changement de mode
-//     strengthListElement.classList.add('hidden'); // <-- AJOUT POUR CACHER LA BULLE
+//     strengthListElement.classList.add('hidden');
+//     passwordMatchFeedback.classList.add('hidden'); // S'assure que le feedback est caché lors du changement de mode
 
 //     setTimeout(() => {
 //         let activePanel;
 //         if (mode === 'login') activePanel = loginPanel;
 //         else if (mode === 'register') activePanel = registerPanel;
-//         else activePanel = forgotPasswordPanel; // <-- AJOUT
+//         else activePanel = forgotPasswordPanel;
 
-//         if (activePanel) { // Assurez-vous que le panneau actif existe
+//         if (activePanel) {
 //             panelsContainer.style.height = `${activePanel.scrollHeight}px`;
+//         }
+//         if (mode === 'register') {
+//             checkPasswordMatch(); 
 //         }
 //     }, animate ? 500 : 0);
 //   };
 
-//   // --- NOUVEL ÉCOUTEUR POUR LE LIEN "Mot de passe oublié ?" ---
 //   switchToForgotPasswordLink.addEventListener("click", (e) => {
 //     e.preventDefault();
 //     switchMode('forgotPassword');
@@ -381,10 +442,8 @@
 //   switchToLoginLink.addEventListener("click", (e) => {
 //     e.preventDefault();
 //     switchMode('login');
-//     // strengthListElement.classList.add('hidden'); // Déjà fait dans switchMode
 //   });
 
-//   // Nouveau lien de retour vers le login depuis le panneau forgotPassword
 //   switchToLoginFromForgotLink.addEventListener("click", (e) => {
 //     e.preventDefault();
 //     switchMode('login');
@@ -393,14 +452,12 @@
 //   switchToRegisterLink.addEventListener("click", (e) => {
 //     e.preventDefault();
 //     switchMode('register');
-//     // strengthListElement.classList.add('hidden'); // Déjà fait dans switchMode
 //   });
 
 //   switchMode(options.initialMode, false);
 
 //   return dialog;
 // }
-
 // srcs/components/dialog/loginDialog.ts
 import { createDialog } from "./index.js";
 import { createInfoInput } from "../input/infoInput.js";
@@ -410,7 +467,8 @@ import { createPasswordInput, checkPasswordStrength, PasswordStrengthResult } fr
 interface LoginDialogOptions 
 {
   initialMode: 'login' | 'register' | 'forgotPassword';
-  onSubmit: (mode: 'login' | 'register', data: { displayName: string; password?: string; confirmPassword?: string }) => void;
+  // MODIFIÉ : Ajout de rememberMe pour le mode 'login'
+  onSubmit: (mode: 'login' | 'register', data: { displayName: string; password?: string; confirmPassword?: string; rememberMe?: boolean }) => void;
   onSwitchMode: (newMode: 'login' | 'register' | 'forgotPassword') => void;
   onForgotPasswordSubmit: (email: string, code: string) => void; 
 }
@@ -562,6 +620,28 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   const loginDisplayName = createInfoInput("Nom d'utilisateur", "displayName");
   const loginPasswordInput = createPasswordInput("Mot de passe", "password", false) as CustomPasswordInput;
 
+  // NOUVEAU : Conteneur pour la case à cocher "Se souvenir de moi"
+  const rememberMeContainer = document.createElement("div");
+  rememberMeContainer.className = "flex items-center mt-2"; // Ajout de marge supérieure pour espacement
+  
+  const rememberMeCheckbox = document.createElement("input");
+  rememberMeCheckbox.type = "checkbox";
+  rememberMeCheckbox.id = "rememberMe";
+  rememberMeCheckbox.className = `
+    mr-2 h-4 w-4 text-blue-600 bg-gray-800 border-gray-600 
+    rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 
+    focus:ring-2 dark:bg-gray-600 dark:border-gray-500 cursor-pointer
+  `.replace(/\s+/g, " ");
+
+  const rememberMeLabel = document.createElement("label");
+  rememberMeLabel.htmlFor = "rememberMe";
+  rememberMeLabel.textContent = "Se souvenir de moi";
+  rememberMeLabel.className = "text-gray-300 text-sm cursor-pointer";
+
+  rememberMeContainer.appendChild(rememberMeCheckbox);
+  rememberMeContainer.appendChild(rememberMeLabel);
+
+
   const loginButton = document.createElement("button");
   loginButton.textContent = "Connexion";
   loginButton.type = "submit";
@@ -569,6 +649,8 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   
   loginForm.appendChild(loginDisplayName);
   loginForm.appendChild(loginPasswordInput);
+  // NOUVEAU : Ajout de la case à cocher avant le bouton de connexion
+  loginForm.appendChild(rememberMeContainer); 
   loginForm.appendChild(loginButton);
   loginPanel.appendChild(loginForm);
 
@@ -740,7 +822,9 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
     event.preventDefault();
     const displayName = loginDisplayName.value;
     const password = loginPasswordInput.value;
-    options.onSubmit('login', { displayName, password });
+    // NOUVEAU : Récupération de l'état de la case à cocher "remember me"
+    const rememberMe = rememberMeCheckbox.checked; 
+    options.onSubmit('login', { displayName, password, rememberMe }); // Passage de rememberMe
   });
 
   forgotPasswordForm.addEventListener("submit", (event) => {
