@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/05/26 20:30:05 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/06 20:21:49 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -15,6 +15,11 @@ import { tables } from "./db_vars.ts"
 import RequestHandler from "./db_helpers.ts"
 import Fastify from 'fastify'
 import type * as fft from 'fastify'
+
+//
+// Check if the necessary environment variables are set.
+// Exit if any is missing.
+//
 
 if (process.env.API_KEY === undefined ||
 	process.env.DBLOCATION === undefined ||
@@ -29,6 +34,10 @@ if (process.env.API_KEY === undefined ||
 	process.exit(1)
 }
 
+//
+// Asynchronously start the database creation/checks.
+//
+
 let status = init_db()
 
 if (process.env.RUNMODE === "debug")
@@ -38,6 +47,16 @@ const fastify = Fastify({
 	logger: process.env.RUNMODE === "debug" ? true : false
 })
 
+//
+// Okay, here we go.
+// For each available method, procedurally construct a route with such method named after the table.
+// The methods supported by the table are defined in db_vars.ts. If the method is defined, register the Fastifty plugin creating the route.
+// Example: if Players supports a GET and DELETE request, this will create both "POST /Players" and "DELETE /Players" automatically.
+// The function executed is then defined through RequestHandler which will then take the Fastify request as well as
+// the table's name and available columns as arguments.
+// Any actual work and differentiation should be made in RequestHandler.
+//
+
 const methods = ["GET", "POST", "DELETE", "PUT"]
 
 for (const method of methods) {
@@ -45,12 +64,16 @@ for (const method of methods) {
 		if (tables[item].Methods.indexOf(method) > -1) {
 			fastify.register(async function tophandler(fastify: fft.FastifyInstance) {
 				fastify[method.toLowerCase()](`/${tables[item].Name}`, async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
-					RequestHandler[method.toLowerCase()](request, reply, tables[item].Name, tables[item].Fields)
+					await RequestHandler[method.toLowerCase()](request, reply, tables[item].Name, tables[item].Fields)
 				})
 			})
 		}
 	}
 }
+
+//
+// Now that the funky freestyle procedural route generation is over, check the status of the database creation/checks.
+//
 
 status.then(
 	function(value) {
@@ -61,6 +84,10 @@ status.then(
 		process.exit(1);
 	}
 )
+
+//
+// Aaaand start!
+//
 
 fastify.listen({ port: 3000, host: '::' }, (err) => {
 	if (err) {
