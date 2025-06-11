@@ -47,6 +47,19 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
     return reply.code(resp.status).send(resp.data);
   });
 
+  app.post("/", async (request, reply) => {
+    if (process.env.RUNMODE?.toLowerCase() === "debug")
+      console.debug("POST /users called");
+    const authorization = checkRequestAuthorization(request, reply);
+    if (authorization)
+      return authorization;
+    const body = request.body as { username: string, email?: string, password: string };
+    if (!body.username || !body.password) {
+      return reply.code(400).send({ error: "Username and password are required." });
+    }
+    // TODO: Create user in the database
+  });
+
   app.put("/:uuid", async (request, reply) => {
     if (process.env.RUNMODE?.toLowerCase() === "debug")
       console.debug("PUT /users/:uuid called");

@@ -8,6 +8,10 @@ This document provides information about the internal Usermanager module's API u
 # Table of Contents
 - [`GET /users/authorize`](#get-users-authorize)
 - [`POST /users/login`](#get-users-login)
+- [`GET /users/:uuid`](#get-users-uuid)
+- [`POST /users`](#post-users)
+- [`PUT /users/:uuid`](#put-users-uuid)
+
 - [Environment Variables](#environment-variables)
 
 # 🔐 Overview
