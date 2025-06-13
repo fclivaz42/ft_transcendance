@@ -110,7 +110,8 @@ class LoginDialogManager {
       maxWidth: "400px",
       position: "relative",
       height: "auto", //s'adapte à la taille du contenu
-      maxHeight: "60vh",       // <-- heeeeeeeere :limite haute raisonnable
+      maxHeight: "70vh",    // <-- heeeeeeeere :limite haute raisonnable dialog
+      minHeight: "50vh"   ,
       overflow: "visible",     // <-- permet au contenu de dépasser si besoin
       padding: "1.5rem",       
     });
@@ -140,11 +141,6 @@ class LoginDialogManager {
       focus:outline-none
     `.replace(/\s+/g, " ");
     dialog.appendChild(closeBtn);
-
-        //////new
-        // Ferme le dialogue uniquement si l'utilisateur clique en dehors du <dialog>
-
-    //////
 
 
     document.body.appendChild(blurredBackground);
