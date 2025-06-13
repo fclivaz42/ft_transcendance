@@ -17,6 +17,7 @@ services:
       - sarifntw
     volumes:
       - data:/data
+      - sarif-libs:/libs
     ports:
       - "443:443"
     build:
