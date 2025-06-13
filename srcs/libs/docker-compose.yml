@@ -1,0 +1,15 @@
+services:
+  sarif_libs:
+    build: ./
+    container_name: sarif_libs
+    environment:
+      - TZ=Europe/Zurich
+    networks:
+      - sarifntw
+    volumes:
+      - sarif-libs:/libs/
+
+volumes:
+  sarif-libs:
+    name: sarif-libs
+    driver: local
