@@ -3,7 +3,6 @@ data/
 artifacts/
 cache/
 addscore.json
-*.env
 .env
 
 # Logs
