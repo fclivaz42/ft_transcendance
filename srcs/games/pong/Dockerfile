@@ -10,4 +10,6 @@ COPY package.json /sarif
 RUN npm i
 COPY srcs/ ./srcs
 
+EXPOSE 1337
+
 ENTRYPOINT ["npm", "run", "start"]
