@@ -1,32 +1,12 @@
-// createRegisterPanel(), createLoginPanel(), createForgotPasswordPanel()
-// //retourneraient le panneau HTML ccomplet avec ses champs et boutons
-// import { createInfoInput } from "../input/infoInput.js";
-// import { createPasswordInput } from "../input/createPasswordInput.js"; 
-
-// export interface LoginDialogOptions {
-//   initialMode: 'login' | 'register' | 'forgotPassword';
-//   onSwitchMode: (mode: 'login' | 'register' | 'forgotPassword') => void;
-
-//   // Surcharge pour le mode 'login'
-//   onSubmit(mode: 'login', data: { displayName: string; password: string; rememberMe: boolean; }): void;
-//   // Surcharge pour le mode 'register' - AJOUTÉ L'EMAIL ICI
-//   onSubmit(mode: 'register', data: { displayName: string; email: string; password: string; confirmPassword: string; }): void;
-//   // Vous pouvez ajouter d'autres surcharges si d'autres modes appellent onSubmit avec des données différentes
-
-//   onForgotPasswordSubmit: (email: string, code: string) => void; // Ceci est pour le bouton spécifique de Forgot Password
-// }
-
-// // Exportez ce type pour qu'il puisse être utilisé ailleurs..kezako
-// export type CustomPasswordInput = HTMLDivElement & { value: string, inputElement: HTMLInputElement, _enableStrengthCheck: boolean };
-
-
-
-// Fonction pour créer le panneau d'inscription heeere adapter gestion hauteur des panneaux et du container panelscontainer
-
-
-
 // // displayNameContainer et emailContainer. Chacun est un div avec des classes flex flex-col gap-1 pour empiler l'input et son message d'erreur.
 // //
+// import { createInfoInput, CustomInputContainer } from '../input/infoInput.js';
+// // If createPasswordInput returns a specific type (e.g., CustomPasswordInput), import it here.
+// // Otherwise, createInfoInput is used for password fields.
+// // import { createPasswordInput } from '../input/createPasswordInput.js';
+
+// import { LoginDialogOptions } from './index.js'; // Import from your new index.ts
+
 // export function createRegisterPanel(options: LoginDialogOptions) {
 //   const registerPanel = document.createElement("div");
 //   registerPanel.className = `
@@ -289,133 +269,291 @@
 //     emailErrorFeedback: emailErrorFeedback
 //   };
 // }
+// srcs/components/dialog/registerPanel.ts
 
-// // Fonction pour créer le panneau de connexion
-// export function createLoginPanel(options: LoginDialogOptions) {
-//   const loginPanel = document.createElement("div");
-//   loginPanel.className = `
-//     absolute inset-0
-//     flex flex-col gap-3 
-//     transition-transform duration-500 ease-in-out transform opacity-0
-//     w-full
-//     justify-center items-center pb-6
-//   `.replace(/\s+/g, " ");
+import { createInfoInput, CustomInputContainer } from '../input/infoInput.js';
+// Assurez-vous que cette ligne est correcte et importe le nouveau type
+import { createPasswordInput, CustomPasswordInputContainer, checkPasswordStrength, PasswordStrengthResult } from '../input/createPasswordInput.js'; 
+import { LoginDialogOptions } from './index.js'; 
 
-//   const loginForm = document.createElement("form");
-//   loginForm.className = "flex flex-col gap-3 w-full max-w-xs px-2";
 
-//   const loginDisplayName = createInfoInput("Nom d'utilisateur", "displayName");
-//   const loginPasswordInput = createPasswordInput("Mot de passe", "password", false) as CustomPasswordInput;
+export function createRegisterPanel(options: LoginDialogOptions) {
+  const registerPanel = document.createElement("div");
+  registerPanel.className = `
+    absolute inset-0
+    flex flex-col gap-3
+    transition-transform duration-500 ease-in-out transform opacity-0
+    w-full
+    items-center
+    pb-6
+  `.replace(/\s+/g, " ");
 
-//   const rememberMeContainer = document.createElement("div");
-//   rememberMeContainer.className = "flex items-center mt-2"; 
-  
-//   const rememberMeCheckbox = document.createElement("input");
-//   rememberMeCheckbox.type = "checkbox";
-//   rememberMeCheckbox.id = "rememberMe";
-//   rememberMeCheckbox.className = `
-//     mr-2 h-4 w-4 text-blue-600 bg-gray-800 border-gray-600 
-//     rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 
-//     focus:ring-2 dark:bg-gray-600 dark:border-gray-500 cursor-pointer
-//   `.replace(/\s+/g, " ");
+  const registerForm = document.createElement("form");
+  registerForm.className = `
+    flex flex-col gap-3 w-full max-w-xs px-2
+    max-h-[60vh] overflow-y-auto
+  `.replace(/\s+/g, " ");
 
-//   const rememberMeLabel = document.createElement("label");
-//   rememberMeLabel.htmlFor = "rememberMe";
-//   rememberMeLabel.textContent = "Se souvenir de moi";
-//   rememberMeLabel.className = "text-gray-300 text-sm cursor-pointer";
+  // --- CONTAINER FOR DISPLAY NAME ---
+  const registerDisplayNameContainer = createInfoInput("Nom d'utilisateur", "displayName");
+  const registerDisplayNameErrorFeedback = document.createElement("div");
+  registerDisplayNameErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
+  registerDisplayNameContainer.appendChild(registerDisplayNameErrorFeedback);
+  // --- END DISPLAY NAME CONTAINER ---
 
-//   rememberMeContainer.appendChild(rememberMeCheckbox);
-//   rememberMeContainer.appendChild(rememberMeLabel);
+  // --- CONTAINER FOR EMAIL ---
+  const registerEmailContainer = createInfoInput("Adresse e-mail", "email");
+  const registerEmailErrorFeedback = document.createElement("div");
+  registerEmailErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
+  registerEmailContainer.appendChild(registerEmailErrorFeedback);
+  // --- END EMAIL CONTAINER ---
 
-//   const loginButton = document.createElement("button");
-//   loginButton.textContent = "Connexion";
-//   loginButton.type = "submit";
-//   loginButton.className = "bg-blue-600 hover:bg-blue-700 font-semibold py-2 px-4 rounded ";
-  
-//   loginForm.appendChild(loginDisplayName);
-//   loginForm.appendChild(loginPasswordInput);
-//   loginForm.appendChild(rememberMeContainer); 
-//   loginForm.appendChild(loginButton);
-//   loginPanel.appendChild(loginForm);
+  // --- CONTAINER FOR PASSWORD ---
+  // CORRECTION ICI : Utilisez CustomPasswordInputContainer
+  const registerPasswordContainer: CustomPasswordInputContainer = createPasswordInput("Mot de passe", "password", true); 
+  const registerPasswordErrorFeedback = document.createElement("div");
+  registerPasswordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
+  registerPasswordContainer.appendChild(registerPasswordErrorFeedback);
+  // --- END PASSWORD CONTAINER ---
 
-//   const switchToForgotPasswordLink = document.createElement("a");
-//   switchToForgotPasswordLink.href = "#";
-//   switchToForgotPasswordLink.textContent = "Mot de passe oublié ?";
-//   switchToForgotPasswordLink.className = "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer";
-//   loginPanel.appendChild(switchToForgotPasswordLink);
+  // --- CONTAINER FOR CONFIRM PASSWORD ---
+  // CORRECTION ICI : Utilisez CustomPasswordInputContainer
+  const registerConfirmPasswordContainer: CustomPasswordInputContainer = createPasswordInput("Confirmer le mot de passe", "confirmPassword", false);
+  const registerConfirmPasswordErrorFeedback = document.createElement("div");
+  registerConfirmPasswordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
+  registerConfirmPasswordContainer.appendChild(registerConfirmPasswordErrorFeedback);
+  // --- END CONFIRM PASSWORD CONTAINER ---
 
-//   const switchToRegisterLink = document.createElement("a");
-//   switchToRegisterLink.href = "#";
-//   switchToRegisterLink.textContent = "Pas encore de compte ? S'inscrire";
-//   switchToRegisterLink.className = "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer";
-//   loginPanel.appendChild(switchToRegisterLink);
+  const registerButton = document.createElement("button");
+  registerButton.textContent = "S'inscrire";
+  registerButton.type = "submit";
+  registerButton.className = `
+    bg-green-600 font-semibold py-2 px-4 rounded
+    cursor-not-allowed
+    opacity-50
+    transition-all duration-300
+  `.replace(/\s+/g, " ");
+  registerButton.disabled = true;
 
-//   // Le gestionnaire de soumission est défini ici pour rester avec le formulaire
-//   loginForm.addEventListener("submit", (event) => {
-//     event.preventDefault();
-//     const displayName = loginDisplayName.value;
-//     const password = loginPasswordInput.value;
-//     const rememberMe = rememberMeCheckbox.checked; 
-//     options.onSubmit('login', { displayName, password, rememberMe });
-//   });
 
-//   return {
-//     panel: loginPanel,
-//     form: loginForm,
-//     displayNameInput: loginDisplayName,
-//     passwordInput: loginPasswordInput,
-//     rememberMeCheckbox: rememberMeCheckbox, // Retourne la checkbox
-//     switchToForgotPasswordLink: switchToForgotPasswordLink,
-//     switchToRegisterLink: switchToRegisterLink,
-//   };
-// }
+  registerForm.appendChild(registerDisplayNameContainer);
+  registerForm.appendChild(registerEmailContainer);
+  registerForm.appendChild(registerPasswordContainer);
+  registerForm.appendChild(registerConfirmPasswordContainer);
+  registerForm.appendChild(registerButton);
+  registerPanel.appendChild(registerForm);
 
-// // Fonction pour créer le panneau de mot de passe oublié
-// export function createForgotPasswordPanel(options: LoginDialogOptions) {
-//   const forgotPasswordPanel = document.createElement("div");
-//   forgotPasswordPanel.className = `
-//     absolute inset-0
-//     flex flex-col gap-3 
-//     transition-transform duration-500 ease-in-out transform opacity-0
-//     w-full
-//     justify-center items-center pb-6
-//   `.replace(/\s+/g, " ");
+  const switchToLoginLink = document.createElement("a");
+  switchToLoginLink.href = "#";
+  switchToLoginLink.textContent = "Déjà un compte ? Se connecter";
+  switchToLoginLink.className = "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer";
+  registerPanel.appendChild(switchToLoginLink);
 
-//   const forgotPasswordForm = document.createElement("form");
-//   forgotPasswordForm.className = "flex flex-col gap-3 w-full max-w-xs px-2";
+  // --- GENERIC VALIDATION FUNCTION FOR APPEARANCE ---
+  const updateFieldAppearance = (
+    inputContainer: CustomInputContainer | CustomPasswordInputContainer,
+    errorFeedbackElement: HTMLDivElement,
+    validationFunction: (value: string) => { isValid: boolean; errorMessage: string | null },
+    showFullMessage: boolean
+  ) => {
+    const value = inputContainer.inputElement.value.trim();
+    const { isValid, errorMessage } = validationFunction(value);
 
-//   const forgotPasswordEmailInput = createInfoInput("Votre adresse e-mail", "forgotEmail");
-//   const forgotPasswordCodeInput = createInfoInput("Code reçu par e-mail", "forgotCode");
-  
-//   const forgotPasswordButton = document.createElement("button");
-//   forgotPasswordButton.textContent = "Réinitialiser le mot de passe";
-//   forgotPasswordButton.type = "submit";
-//   forgotPasswordButton.className = "bg-purple-600 hover:bg-purple-700 font-semibold py-2 px-4 rounded ";
+    if (isValid) {
+      inputContainer.inputElement.classList.remove('border-red-500');
+      inputContainer.inputElement.classList.add('border-gray-600');
+      if ('errorIconElement' in inputContainer) {
+          (inputContainer as CustomInputContainer).errorIconElement.classList.add('hidden');
+      }
+    } else {
+      inputContainer.inputElement.classList.add('border-red-500');
+      inputContainer.inputElement.classList.remove('border-gray-600');
+      if ('errorIconElement' in inputContainer) {
+          (inputContainer as CustomInputContainer).errorIconElement.classList.remove('hidden');
+      }
+    }
 
-//   forgotPasswordForm.appendChild(forgotPasswordEmailInput);
-//   forgotPasswordForm.appendChild(forgotPasswordCodeInput);
-//   forgotPasswordForm.appendChild(forgotPasswordButton);
-//   forgotPasswordPanel.appendChild(forgotPasswordForm);
+    if (showFullMessage && errorMessage) {
+      errorFeedbackElement.textContent = errorMessage;
+      errorFeedbackElement.classList.remove('hidden');
+    } else {
+      errorFeedbackElement.classList.add('hidden');
+    }
 
-//   const switchToLoginFromForgotLink = document.createElement("a");
-//   switchToLoginFromForgotLink.href = "#";
-//   switchToLoginFromForgotLink.textContent = "Retour à la connexion";
-//   switchToLoginFromForgotLink.className = "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer";
-//   forgotPasswordPanel.appendChild(switchToLoginFromForgotLink);
+    return isValid;
+  };
 
-//   // Le gestionnaire de soumission est défini ici pour rester avec le formulaire
-//   forgotPasswordForm.addEventListener("submit", (event) => {
-//     event.preventDefault();
-//     const email = forgotPasswordEmailInput.value;
-//     const code = forgotPasswordCodeInput.value;
-//     options.onForgotPasswordSubmit(email, code);
-//   });
+  // --- Specific Register Validation Functions ---
+  const validateRegisterDisplayName = (value: string) => {
+    let isValid = true;
+    let errorMessage: string | null = null;
+    if (value === '') {
+      isValid = false;
+      errorMessage = "Le nom d'utilisateur est requis.";
+    } else if (value.length < 3) {
+      isValid = false;
+      errorMessage = "Le nom d'utilisateur doit contenir au moins 3 caractères.";
+    } else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+      isValid = false;
+      errorMessage = "Le nom d'utilisateur ne peut contenir que des lettres, chiffres et underscores.";
+    }
+    return { isValid, errorMessage };
+  };
 
-//   return {
-//     panel: forgotPasswordPanel,
-//     form: forgotPasswordForm,
-//     emailInput: forgotPasswordEmailInput,
-//     codeInput: forgotPasswordCodeInput,
-//     switchToLoginFromForgotLink: switchToLoginFromForgotLink,
-//   };
-// }
+  const validateRegisterEmail = (value: string) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    let isValid = true;
+    let errorMessage: string | null = null;
+    if (value === '') {
+      isValid = false;
+      errorMessage = "L'adresse e-mail est requise.";
+    } else if (!emailRegex.test(value)) {
+      isValid = false;
+      errorMessage = "Format d'adresse e-mail invalide.";
+    }
+    return { isValid, errorMessage };
+  };
+
+  const validateRegisterPassword = (value: string) => {
+    let isValid = true;
+    let errorMessage: string | null = null;
+    const strength = checkPasswordStrength(value); // Utilisez votre fonction de vérification de force
+
+    if (value === '') {
+        isValid = false;
+        errorMessage = "Le mot de passe est requis.";
+    } else if (!strength.minLength) {
+        isValid = false;
+        errorMessage = "Le mot de passe doit contenir au moins 8 caractères.";
+    } else if (!strength.hasUppercase) {
+        isValid = false;
+        errorMessage = "Le mot de passe doit contenir au moins une majuscule.";
+    } else if (!strength.hasLowercase) {
+        isValid = false;
+        errorMessage = "Le mot de passe doit contenir au moins une minuscule.";
+    } else if (!strength.hasNumber) {
+        isValid = false;
+        errorMessage = "Le mot de passe doit contenir au moins un chiffre.";
+    } else if (!strength.hasSpecialChar) {
+        isValid = false;
+        errorMessage = "Le mot de passe doit contenir au moins un caractère spécial.";
+    }
+    return { isValid, errorMessage };
+  };
+
+  const validateRegisterConfirmPassword = (value: string) => {
+    let isValid = true;
+    let errorMessage: string | null = null;
+    if (value === '') {
+      isValid = false;
+      errorMessage = "La confirmation du mot de passe est requise.";
+    } else if (value !== registerPasswordContainer.value) { // Compare to actual password input value
+      isValid = false;
+      errorMessage = "Les mots de passe ne correspondent pas.";
+    }
+    return { isValid, errorMessage };
+  };
+
+  // --- Overall Form Validation Function for the Button ---
+  const validateRegisterForm = () => {
+    const isDisplayNameValid = validateRegisterDisplayName(registerDisplayNameContainer.inputElement.value.trim()).isValid;
+    const isEmailValid = validateRegisterEmail(registerEmailContainer.inputElement.value.trim()).isValid;
+    const isPasswordValid = validateRegisterPassword(registerPasswordContainer.inputElement.value.trim()).isValid;
+    const isConfirmPasswordValid = validateRegisterConfirmPassword(registerConfirmPasswordContainer.inputElement.value.trim()).isValid;
+
+    const isFormValid = isDisplayNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid;
+
+    registerButton.disabled = !isFormValid;
+
+    if (isFormValid) {
+      registerButton.classList.remove('cursor-not-allowed', 'opacity-50');
+      registerButton.classList.add('hover:bg-green-700', 'cursor-pointer', 'opacity-100');
+    } else {
+      registerButton.classList.add('cursor-not-allowed', 'opacity-50');
+      registerButton.classList.remove('hover:bg-green-700', 'cursor-pointer', 'opacity-100');
+    }
+    return isFormValid;
+  };
+
+  // --- Event Listeners ---
+  registerDisplayNameContainer.inputElement.addEventListener('input', () => {
+    updateFieldAppearance(registerDisplayNameContainer, registerDisplayNameErrorFeedback, validateRegisterDisplayName, true);
+    validateRegisterForm();
+  });
+  registerDisplayNameContainer.inputElement.addEventListener('blur', () => {
+    updateFieldAppearance(registerDisplayNameContainer, registerDisplayNameErrorFeedback, validateRegisterDisplayName, false);
+    validateRegisterForm();
+  });
+
+  registerEmailContainer.inputElement.addEventListener('input', () => {
+    updateFieldAppearance(registerEmailContainer, registerEmailErrorFeedback, validateRegisterEmail, true);
+    validateRegisterForm();
+  });
+  registerEmailContainer.inputElement.addEventListener('blur', () => {
+    updateFieldAppearance(registerEmailContainer, registerEmailErrorFeedback, validateRegisterEmail, false);
+    validateRegisterForm();
+  });
+
+  registerPasswordContainer.inputElement.addEventListener('input', () => {
+    updateFieldAppearance(registerPasswordContainer, registerPasswordErrorFeedback, validateRegisterPassword, true);
+    validateRegisterForm();
+    // Also re-validate confirm password if password changes
+    updateFieldAppearance(registerConfirmPasswordContainer, registerConfirmPasswordErrorFeedback, validateRegisterConfirmPassword, true);
+  });
+  registerPasswordContainer.inputElement.addEventListener('blur', () => {
+    updateFieldAppearance(registerPasswordContainer, registerPasswordErrorFeedback, validateRegisterPassword, false);
+    validateRegisterForm();
+  });
+
+  registerConfirmPasswordContainer.inputElement.addEventListener('input', () => {
+    updateFieldAppearance(registerConfirmPasswordContainer, registerConfirmPasswordErrorFeedback, validateRegisterConfirmPassword, true);
+    validateRegisterForm();
+  });
+  registerConfirmPasswordContainer.inputElement.addEventListener('blur', () => {
+    updateFieldAppearance(registerConfirmPasswordContainer, registerConfirmPasswordErrorFeedback, validateRegisterConfirmPassword, false);
+    validateRegisterForm();
+  });
+
+
+  registerForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const isFormValid = validateRegisterForm();
+
+    if (!isFormValid) {
+      updateFieldAppearance(registerDisplayNameContainer, registerDisplayNameErrorFeedback, validateRegisterDisplayName, true);
+      updateFieldAppearance(registerEmailContainer, registerEmailErrorFeedback, validateRegisterEmail, true);
+      updateFieldAppearance(registerPasswordContainer, registerPasswordErrorFeedback, validateRegisterPassword, true);
+      updateFieldAppearance(registerConfirmPasswordContainer, registerConfirmPasswordErrorFeedback, validateRegisterConfirmPassword, true);
+      return;
+    }
+
+    const displayName = registerDisplayNameContainer.value;
+    const email = registerEmailContainer.value;
+    const password = registerPasswordContainer.value;
+    const confirmPassword = registerConfirmPasswordContainer.value;
+
+    options.onSubmit('register', { displayName, email, password, confirmPassword });
+  });
+
+  // Initial setup
+  validateRegisterForm();
+  updateFieldAppearance(registerDisplayNameContainer, registerDisplayNameErrorFeedback, validateRegisterDisplayName, false);
+  updateFieldAppearance(registerEmailContainer, registerEmailErrorFeedback, validateRegisterEmail, false);
+  updateFieldAppearance(registerPasswordContainer, registerPasswordErrorFeedback, validateRegisterPassword, false);
+  updateFieldAppearance(registerConfirmPasswordContainer, registerConfirmPasswordErrorFeedback, validateRegisterConfirmPassword, false);
+
+
+  return {
+    panel: registerPanel,
+    form: registerForm,
+    displayNameInput: registerDisplayNameContainer,
+    emailInput: registerEmailContainer,
+    passwordInput: registerPasswordContainer,
+    confirmPasswordInput: registerConfirmPasswordContainer,
+    switchToLoginLink: switchToLoginLink,
+    displayNameErrorFeedback: registerDisplayNameErrorFeedback,
+    emailErrorFeedback: registerEmailErrorFeedback,
+    passwordErrorFeedback: registerPasswordErrorFeedback,
+    confirmPasswordErrorFeedback: registerConfirmPasswordErrorFeedback,
+  };
+}

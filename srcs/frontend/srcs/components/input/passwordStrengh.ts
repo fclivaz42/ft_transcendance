@@ -9,6 +9,7 @@ import { PasswordStrengthResult } from "./createPasswordInput.js";
 //   onForgotPasswordSubmit: (email: string, code: string) => void; 
 // }
 // Helper pour créer la liste de vérification de la force du mot de passe
+// c'est le bon !!!
 export function createPasswordStrengthList(): { element: HTMLUListElement, update: (result: PasswordStrengthResult) => void } {
   const strengthList = document.createElement("ul");
   strengthList.className = `
@@ -23,7 +24,7 @@ export function createPasswordStrengthList(): { element: HTMLUListElement, updat
   `.replace(/\s+/g, " ");
 
   const criteria = [
-    { key: 'minLength', text: 'Au moins 8 caractères' },
+    { key: 'minLength', text: 'Au moins 8 cacaractères' },
     { key: 'hasUppercase', text: 'Au moins une majuscule' },
     { key: 'hasLowercase', text: 'Au moins une minuscule' },
     { key: 'hasNumber', text: 'Au moins un chiffre' },
