@@ -5,9 +5,9 @@ RUN apk upgrade
 
 WORKDIR /sarif
 
-COPY srcs/ ./srcs
 COPY package.json /sarif
 
 RUN npm i
+COPY srcs/ ./srcs
 
-ENTRYPOINT ["sh", "-c", "npm run ${RUNMODE}"]
+ENTRYPOINT ["npm", "run", "start"]
