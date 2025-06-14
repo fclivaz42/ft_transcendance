@@ -5,7 +5,7 @@ export function createFrame(): HTMLElement {
   frame.id = "frame";
   frame.innerHTML = `
     <main class="h-full w-full p-8">
-        <div class="bg-red-200 h-full w-full">
+        <canvas id="game" class="bg-red-200 h-full w-full"></canvas>
         </div>
       </main>
   `;
