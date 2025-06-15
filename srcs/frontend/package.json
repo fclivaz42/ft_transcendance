@@ -21,7 +21,7 @@
     "dev": "run-p tsc:watch tailwind:watch serve",
     "build": "npx tsc && tailwindcss -i ./public/assets/input.css -o ./public/assets/tailwind.css",
     "devite": "vite",
-    "vitebuild": "vite build",
+    "vitebuild": "vite build && tailwindcss -i ./public/assets/input.css -o ./public/assets/tailwind.css",
     "vitepreview": "vite preview"
   },
   "devDependencies": {

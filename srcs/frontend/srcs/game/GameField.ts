@@ -30,8 +30,9 @@ export class GameField {
 	public init(payload: InitPayload["payload"]) {
 		this.setupCameraAndLight(payload.camera, payload.light);
 
-		const testBox = MeshBuilder.CreateBox("testBox", {size: 1}, this.scene);
-		testBox.position = new Vector3(0, 30, 0);
+		// const testBox = MeshBuilder.CreateBox("testBox", {size: 1}, this.scene);
+		// testBox.position = new Vector3(0, 30, 0); wtf...
+
 		this.ball = new Ball(this.scene, payload.ball);
 		this.p1 = new Paddle(this.scene, "p1", payload.p1);
 		this.p2 = new Paddle(this.scene, "p2", payload.p2);
