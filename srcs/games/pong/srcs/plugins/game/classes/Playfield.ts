@@ -100,7 +100,7 @@ export default class PlayField {
 		return initInfo;
 	}
 
-	getLight() {
+	public getLight() {
 		return this._light;
 	}
 

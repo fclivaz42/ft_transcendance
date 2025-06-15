@@ -11,6 +11,7 @@ import {Wall} from "./game_components/Wall.js";
 import { InitPayload, UpdatePayload, CameraInitInfo, LightInitInfo} from "./types.js";
 import { MeshBuilder } from "@babylonjs/core";
 
+// Temp values, overriding WebSocket info
 const ALPHA: number = Math.PI / 2;
 const BETA: number = Math.PI / 2;
 const RADIUS: number = -20;
