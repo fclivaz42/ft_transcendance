@@ -1,5 +1,8 @@
 
-import { Scene, Mesh, MeshBuilder} from "@babylonjs/core";
+import { Scene } from "@babylonjs/core/scene.js";
+import { Mesh } from "@babylonjs/core/Meshes/mesh.js";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder.js";
+
 import { PaddleInit, PaddleUpdate} from "../types.js";
 
 
@@ -7,7 +10,7 @@ export class Paddle {
 	private mesh: Mesh;
 
 	constructor(scene: Scene, name: string, init: PaddleInit) {
-		this.mesh = MeshBuilder.CreateBox(name, {
+		this.mesh = CreateBox(name, {
 			width: init.size[0],
 			height: init.size[1],
 			depth: init.size[2],

@@ -1,5 +1,6 @@
 
-import { Engine } from "@babylonjs/core";
+import { Engine } from "@babylonjs/core/Engines/engine.js";
+
 import { WebSocketManager } from "./WebSocketManager.js";
 import { GameField } from "./GameField.js";
 

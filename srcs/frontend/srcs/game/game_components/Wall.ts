@@ -1,5 +1,8 @@
 
-import { Scene, Mesh, MeshBuilder} from "@babylonjs/core";
+import { Scene } from "@babylonjs/core/scene.js";
+import { Mesh } from "@babylonjs/core/Meshes/mesh.js";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder.js";
+
 import { WallsInit } from "../types.js";
 
 type SingleWallInit = WallsInit[string];
@@ -8,7 +11,7 @@ export class Wall {
 	private mesh: Mesh;
 
 	constructor(scene: Scene, name: string, init: SingleWallInit) {
-		this.mesh = MeshBuilder.CreateBox(name, {
+		this.mesh = CreateBox(name, {
 			width: init.size[0],
 			height: init.size[1],
 			depth: init.size[2],

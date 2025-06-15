@@ -1,14 +1,13 @@
-import {
-	Scene,
-	Vector3,
-	ArcRotateCamera,
-	HemisphericLight,
-	Engine,
-} from "@babylonjs/core";
+import { Scene } from "@babylonjs/core/scene.js";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
+import { Engine } from "@babylonjs/core/Engines/engine.js";
 
 import {Ball} from "./game_components/Ball.js";
 import {Paddle} from "./game_components/Paddle.js";
 import {Wall} from "./game_components/Wall.js";
+
 import { InitPayload, UpdatePayload, CameraInitInfo, LightInitInfo} from "./types.js";
 
 export class GameField {

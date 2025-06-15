@@ -1,5 +1,8 @@
 
-import { Scene, Mesh, MeshBuilder} from "@babylonjs/core";
+import { Scene } from "@babylonjs/core/scene.js";
+import { Mesh } from "@babylonjs/core/Meshes/mesh.js";
+import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder.js";
+
 import { BallInit, BallUpdate} from "../types.js";
 
 
@@ -7,7 +10,7 @@ export class Ball {
 	private mesh: Mesh;
 
 	constructor(scene: Scene, init: BallInit) {
-		this.mesh = MeshBuilder.CreateSphere(
+		this.mesh = CreateSphere(
 			"ball",
 			{
 				diameter: init.size[0],
