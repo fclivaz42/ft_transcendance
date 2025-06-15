@@ -20,7 +20,9 @@
     "serve": "python3 -m http.server 8080",
     "dev": "run-p tsc:watch tailwind:watch serve",
     "build": "npx tsc && tailwindcss -i ./public/assets/input.css -o ./public/assets/tailwind.css",
-    "devite": "vite"
+    "devite": "vite",
+    "vitebuild": "vite build",
+    "vitepreview": "vite preview"
   },
   "devDependencies": {
     "npm-run-all": "^4.1.5",

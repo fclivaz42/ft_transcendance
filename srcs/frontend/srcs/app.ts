@@ -5,6 +5,7 @@ import NavbarManager from "./managers/NavbarManager.js";
 import UserMenuManager from "./managers/UserMenuManager.js";
 import DarkmodeManager from "./handlers/DarkmodeHandler.js";
 import BackgroundManager from "./managers/BackgroundManager.js";
+import { startGame } from "./game/GameLaunch.js";
 
 
 // some rework is needed to make the code more readable and maintainable
@@ -37,6 +38,7 @@ await i18nHandler.initialize().finally(() => {
   frameManager.initialize();
   const userMenuManager = new UserMenuManager();
   userMenuManager.initialize();
+  startGame();
 
   // const backgroundManager = new BackgroundManager();
   // backgroundManager.initialize();
