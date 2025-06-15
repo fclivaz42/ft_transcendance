@@ -16,6 +16,7 @@ export class Paddle {
 			depth: init.size[2],
 		}, scene);
 		this.mesh.position.set(init.position[0], init.position[1], 0);
+		console.log(`Paddle position ${name}, ${this.mesh.position.asArray()}`);
 	}
 
 	update(update: PaddleUpdate) {

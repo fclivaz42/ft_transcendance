@@ -97,8 +97,8 @@ export default class GameRoom {
 			this.broadcast(this.buildUpdatePayload());
 		});
 
-		this.game.gameStart(FPS_OVERRIDE);
 		this.broadcast(this.buildInitPayload());
+		this.game.gameStart(FPS_OVERRIDE);
 	}
 
 	public broadcast(message: GameMessage): void {
