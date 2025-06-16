@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/06 21:04:13 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/13 21:30:41 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -31,11 +31,18 @@ interface table_id {
 	IDPrefix: string;
 }
 
+interface methods {
+	GET?: Array<string>,
+	POST?: Array<string>,
+	PUT?: Array<string>,
+	DELETE?: Array<string>
+}
+
 interface db_table {
 	Name: string;
 	Fields: Array<string>;
 	Arguments: Array<string>;
-	Methods: Array<string>;
+	Methods: methods;
 	Identification: table_id;
 }
 
@@ -74,12 +81,20 @@ const OauthTable: db_table =
 		"INTEGER DEFAULT 0",
 		"PRIMARY KEY (SubjectID, IssuerName)"
 	],
-	"Methods": [
-		"GET",
-		"POST",
-		"DELETE",
-		"PUT"
-	],
+	"Methods": {
+		"GET": [
+			"/id/:SubjectID"
+		],
+		"POST": [
+			""
+		],
+		"DELETE": [
+			"/id/:SubjectID"
+		],
+		"PUT": [
+			"/id/:SubjectID"
+		]
+	},
 	"Identification": {
 		"HasID": false,
 		"IDPrefix": "O-"
@@ -115,12 +130,24 @@ const PlayersTable: db_table =
 		"INTEGER DEFAULT 0",
 		"INTEGER DEFAULT 0"
 	],
-	"Methods": [
-		"GET",
-		"POST",
-		"PUT",
-		"DELETE"
-	],
+	"Methods": {
+		"GET": [
+			"/id/:PlayerID",
+			"/username/:DisplayName",
+			"/email/:EmailAddress"
+		],
+		"POST": [
+			""
+		],
+		"DELETE": [
+			"/id/:PlayerID",
+			"/username/:DisplayName",
+			"/email/:EmailAddress"
+		],
+		"PUT": [
+			"/id/:PlayerID",
+		]
+	},
 	"Identification": {
 		"HasID": true,
 		"IDPrefix": "P-"
@@ -152,10 +179,14 @@ const MatchesTable: db_table =
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL"
 	],
-	"Methods": [
-		"GET",
-		"POST"
-	],
+	"Methods": {
+		"GET": [
+			"/id/:MatchID",
+		],
+		"POST": [
+			""
+		],
+	},
 	"Identification": {
 		"HasID": true,
 		"IDPrefix": "M-"
@@ -171,7 +202,7 @@ const UIDTable: db_table =
 	"Arguments": [
 		"TEXT NOT NULL PRIMARY KEY"
 	],
-	"Methods": [],
+	"Methods": {},
 	"Identification": {
 		"HasID": false,
 		"IDPrefix": "U-"
@@ -187,9 +218,11 @@ const CurrentContract: db_table =
 	"Arguments": [
 		"TEXT NOT NULL PRIMARY KEY"
 	],
-	"Methods": [
-		"POST"
-	],
+	"Methods": {
+		"POST": [
+			""
+		],
+	},
 	"Identification": {
 		"HasID": false,
 		"IDPrefix": "C-"

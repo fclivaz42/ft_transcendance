@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/06 20:21:49 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/13 21:23:11 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -61,12 +61,15 @@ const methods = ["GET", "POST", "DELETE", "PUT"]
 
 for (const method of methods) {
 	for (const item in tables) {
-		if (tables[item].Methods.indexOf(method) > -1) {
-			fastify.register(async function tophandler(fastify: fft.FastifyInstance) {
-				fastify[method.toLowerCase()](`/${tables[item].Name}`, async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
-					await RequestHandler[method.toLowerCase()](request, reply, tables[item].Name, tables[item].Fields)
+		if (tables[item].Methods[method] !== undefined) {
+			for (const route of tables[item].Methods[method]) {
+				fastify.register(async function tophandler(fastify: fft.FastifyInstance) {
+					fastify[method.toLowerCase()]<{ Params: object }>(`/${tables[item].Name}${route}`, async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
+						await RequestHandler[method.toLowerCase()](request, reply, tables[item].Name, tables[item].Fields)
+					})
 				})
-			})
+				console.log(`registered ${method} /${tables[item].Name}${route}`)
+			}
 		}
 	}
 }

@@ -6,30 +6,71 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/05/31 20:07:43 by fclivaz           #+#    #+#             //
-//   Updated: 2025/05/31 20:07:45 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/16 18:56:18 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import Database from "better-sqlite3"
 import { tables } from "./db_vars.ts"
-console.log(process.argv[2])
+const print = console.log
+const printobj = console.dir
 
-const db = new Database(process.argv[2]);
+const methods = ["GET", "POST", "DELETE", "PUT"]
 
-console.log(db.pragma("table_info(Players)"))
-console.log(db.pragma("table_info(Matches)"))
-console.log(db.pragma("table_info(UIDTable)"))
-console.log(db.pragma("table_info(CurrentContract)"))
-
-const swag = db.pragma("table_info(Players)") as Array<object>
-const tempthing: Array<string> = [];
-
-for (const item of swag) {
-	tempthing.push(item["name"]);
-	if (tables["Players"]["Fields"].indexOf(item["name"]) === -1)
-		console.log(`OBJECT ${item["name"]} DOES NOT EXIST IN DEFINITION! (use DROP)`)
+for (const method of methods) {
+	for (const item in tables) {
+		if (tables[item].Methods[method] !== undefined) {
+			for (const route of tables[item].Methods[method])
+				print(`Registered ${method} ${route} for ${item}`)
+		}
+	}
 }
 
-for (const item of tables["Players"]["Fields"])
-	if (tempthing.indexOf(item) === -1)
-		console.log(`OBJECT ${item} DOES NOT EXIST IN DATABASE! (use ALTER)`)
+
+import Fastify from 'fastify'
+import type * as fft from 'fastify'
+
+const fastify = Fastify({
+	logger: true
+})
+
+type Params = {
+	query: string;
+}
+
+function params_printer(params: Params) {
+	if (JSON.stringify(params) === "{}")
+		return false
+	if (params[Object.keys(params)[0]] === "") {
+		console.log("empty params xd")
+		return true
+	}
+	return false
+}
+
+fastify.get<{ Params: Params }>("/route/test/:test", async function handler(request, reply) {
+	if (params_printer(request.params) === true)
+		return reply.code(500).send("ponng")
+	console.log(`Query ${request.params[Object.keys(request.params)[0]]} for field ${Object.keys(request.params)[0]}`)
+	return reply.code(200).send({ man: "man" })
+})
+
+fastify.get<{ Params: Params }>("/route/2test/:2test", async function handler(request, reply) {
+	if (params_printer(request.params) === true)
+		return reply.code(500).send("ping")
+	console.dir(request.params)
+	return reply.code(200).send({ man: "man" })
+})
+
+fastify.get<{ Params: Params }>("/", async function handler(request, reply) {
+	if (params_printer(request.params) === true)
+		return reply.code(500).send("ffffff")
+	return reply.code(200).send({ man: "man" })
+})
+
+fastify.listen({ port: 3000, host: '::' }, (err) => {
+	if (err) {
+		fastify.log.error(err)
+		process.exit(1)
+	}
+})

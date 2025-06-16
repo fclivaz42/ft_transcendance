@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/21 21:57:13 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/06 20:34:05 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/13 21:15:40 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -20,13 +20,17 @@ import { randomUUID } from "node:crypto"
 // Basic checks (eg. API-KEY, Content-Type, etc)
 //
 
-function check_request_format(headers: object, method: string) {
+function check_request_format(headers: object, method: string, params: object) {
 	if (!headers["authorization"])
 		throw { code: 401, string: "error.missing.authorization" }
 	if (headers["authorization"] !== process.env.API_KEY)
 		throw { code: 401, string: "error.invalid.authorization" }
 	if ((method === "POST" || method === "PUT") && headers["content-type"] !== "application/json")
 		throw { code: 400, string: "error.invalid.content-type" }
+	if (JSON.stringify(params) === "{}")
+		return;
+	if (params[Object.keys(params)[0]] === "")
+		throw { code: 400, string: "error.empty.params" }
 }
 
 //
@@ -35,15 +39,10 @@ function check_request_format(headers: object, method: string) {
 
 function get_del_db(request: fft.FastifyRequest, reply: fft.FastifyReply, table: string, table_fields: Array<string>) {
 	let response: object;
+	const params: object = request.params as object
 	try {
-		check_request_format(request.headers, request.method)
-		if (!request.headers["field"])
-			throw { code: 400, string: "error.missing.field" }
-		if (table_fields.indexOf(request.headers["field"] as string) == -1)
-			throw { code: 400, string: "error.invalid.field" }
-		if (!request.headers["query"])
-			throw { code: 400, string: "error.missing.query" }
-		response = DatabaseWorker[request.method.toLowerCase()](table, request.headers["field"], request.headers["query"]);
+		check_request_format(request.headers, request.method, params)
+		response = DatabaseWorker[request.method.toLowerCase()](table, Object.keys(params)[0], params[Object.keys(params)[0]]);
 	} catch (exception) {
 		if (typeof exception.code === "string")
 			return reply.code(500).send(exception.code)
@@ -106,9 +105,10 @@ export default class RequestHandler {
 		if (table === "CurrentContract")
 			return await check_contract(request, reply, table, table_fields)
 		const body = request.body as object;
+		const params: object = request.params as object
 		let response: string;
 		try {
-			check_request_format(request.headers, request.method)
+			check_request_format(request.headers, request.method, params)
 			response = DatabaseWorker.post(table, table_fields, body)
 		} catch (exception) {
 			return reply.code(exception.code).send(exception.string)
@@ -118,11 +118,10 @@ export default class RequestHandler {
 	static async put(request: fft.FastifyRequest, reply: fft.FastifyReply, table: string, table_fields: Array<string>) {
 		let response: object;
 		const body = request.body as object;
+		const params: object = request.params as object
 		try {
-			check_request_format(request.headers, request.method)
-			if (body[table_fields[0]] === undefined)
-				throw { code: 400, string: "error.missing.uuid" }
-			response = DatabaseWorker.put(table, table_fields, body);
+			check_request_format(request.headers, request.method, params)
+			response = DatabaseWorker.put(table, table_fields, body, Object.keys(params)[0], params[Object.keys(params)[0]]);
 		} catch (exception) {
 			return reply.code(exception.code).send(exception.string)
 		}

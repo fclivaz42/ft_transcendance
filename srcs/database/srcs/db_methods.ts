@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/06 20:35:33 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/13 21:28:19 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -31,12 +31,15 @@ export default class DatabaseWorker {
 
 	static get(table: string, field: string, query: string) {
 		const db = new Database(process.env.DBLOCATION, { readonly: true });
+		console.log(`${field} ${query}`)
 		let response: object;
 		try {
 			response = db.prepare(`SELECT * FROM ${table} WHERE ${field} = ?`).get(query) as object
 			if (response === undefined)
 				throw { code: 404, string: "error.value.notfound" }
 		} catch (exception) {
+			if (process.env.RUNMODE === "debug")
+				console.dir(exception)
 			if (typeof exception.code === "string")
 				throw { code: 500, string: exception.code }
 			throw { code: exception.code, string: exception.string }
@@ -58,6 +61,8 @@ export default class DatabaseWorker {
 			if (response === undefined)
 				throw { code: 404, string: "error.value.notfound" }
 		} catch (exception) {
+			if (process.env.RUNMODE === "debug")
+				console.dir(exception)
 			if (typeof exception.code === "string")
 				throw { code: 500, string: exception.code }
 			throw { code: exception.code, string: exception.string }
@@ -94,12 +99,15 @@ export default class DatabaseWorker {
 					throw { code: 409, string: "error.email.exists" }
 			}
 			for (const key of table_fields) {
-				sql += ` @${key},`
+				if (key !== "")
+					sql += ` @${key},`
 				if (body[key] === undefined)
 					body[key] = null
 			}
 			db.prepare(sql.replace(/.$/, ")")).run(body)
 		} catch (exception) {
+			if (process.env.RUNMODE === "debug")
+				console.dir(exception)
 			if (exception instanceof RangeError)
 				throw { code: 400, string: "error.missing.entries" }
 			if (typeof exception.code === "string")
@@ -117,11 +125,11 @@ export default class DatabaseWorker {
 	// as long as it is equal to or smaller than the size of the row it is trying to affect.
 	//
 
-	static put(table: string, table_fields: Array<string>, body: object) {
+	static put(table: string, table_fields: Array<string>, body: object, field: string, query: string) {
 		const db = new Database(process.env.DBLOCATION);
 		let response: sqlt.RunResult;
 		try {
-			if (db.prepare(`SELECT * FROM ${table} WHERE ${table_fields[0]} = ?`).get(body[table_fields[0]]) === undefined)
+			if (db.prepare(`SELECT * FROM ${table} WHERE ${field} = ?`).get(query) === undefined)
 				throw { code: 404, string: "error.invalid.uuid" }
 			let sql = `UPDATE ${table}\nSET`;
 			let count = 0;
@@ -138,9 +146,11 @@ export default class DatabaseWorker {
 			if (count === 0)
 				throw { code: 400, string: "error.missing.fields" }
 			sql = sql.slice(0, -1)
-			sql += `\nWHERE ${table_fields[0]} = @${table_fields[0]}`
-			response = db.prepare(sql).run(body)
+			sql += `\nWHERE ${field} = ?`
+			response = db.prepare(sql).run(body, query)
 		} catch (exception) {
+			if (process.env.RUNMODE === "debug")
+				console.dir(exception)
 			if (typeof exception.code === "string")
 				throw { code: 500, string: exception.code }
 			throw { code: exception.code, string: exception.string }
@@ -162,6 +172,8 @@ export default class DatabaseWorker {
 			if (response === undefined)
 				return undefined;
 		} catch (exception) {
+			if (process.env.RUNMODE === "debug")
+				console.dir(exception)
 			throw { code: 500, string: exception.code }
 		} finally {
 			db.close()
