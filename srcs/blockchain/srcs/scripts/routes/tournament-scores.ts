@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
+import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { getTournamentScore } from "../interact.ts"
 import { currentContract } from "./deploy.ts";
 

@@ -13,6 +13,27 @@ contract TournamentScores {
     }
 
     mapping(string => Score[]) private scores;
+    mapping(string => Score) private singleMatch;
+
+    function getMatchScore(string memory id)
+        public
+        view
+        returns (Score memory)
+    {
+        return singleMatch[id];
+    }
+
+    function addMatchScore(
+        string memory matchId,
+        string memory winnerName,
+        uint256 wins,
+        string memory loserName,
+        uint256 losses
+    ) public {
+        Player memory winner = Player(winnerName, wins);
+        Player memory loser = Player(loserName, losses);
+        singleMatch[matchId] = Score(winner, loser);
+    }
 
     function addScore(
         string memory tournamentId,

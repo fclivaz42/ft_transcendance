@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
+import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { deploy } from "../deploy.ts"
 import dotenv from "dotenv";
 dotenv.config();
