@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/13 21:30:41 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/17 20:25:30 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -28,7 +28,7 @@
 
 interface table_id {
 	HasID: boolean;
-	IDPrefix: string;
+	IDPrefix?: string;
 }
 
 interface methods {
@@ -50,6 +50,7 @@ export interface db_definition {
 	OAuth: db_table;
 	Players: db_table;
 	Matches: db_table;
+	Tournaments: db_table;
 	UIDTable: db_table;
 	CurrentContract: db_table;
 }
@@ -96,8 +97,7 @@ const OauthTable: db_table =
 		]
 	},
 	"Identification": {
-		"HasID": false,
-		"IDPrefix": "O-"
+		"HasID": false
 	}
 }
 
@@ -159,18 +159,16 @@ const MatchesTable: db_table =
 	"Name": "Matches",
 	"Fields": [
 		"MatchID",
-		"PlayerOneID",
-		"PlayerTwoID",
-		"WinnerPlayerID",
-		"ScoreOne",
-		"ScoreTwo",
+		"WPlayerID",
+		"LPlayerID",
+		"WScore",
+		"LScore",
 		"StartTime",
 		"EndTime",
 		"MatchIndex"
 	],
 	"Arguments": [
 		"TEXT NOT NULL PRIMARY KEY",
-		`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET NULL`,
 		`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET NULL`,
 		`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET NULL`,
 		"INTEGER NOT NULL",
@@ -193,6 +191,31 @@ const MatchesTable: db_table =
 	}
 }
 
+const TournamentsTable: db_table =
+{
+	"Name": "Tournaments",
+	"Fields": [
+		"TournamentID",
+		"TournamentData"
+	],
+	"Arguments": [
+		"TEXT NOT NULL",
+		"TEXT NOT NULL"
+	],
+	"Methods": {
+		"GET": [
+			"/id/:TournamentID",
+		],
+		"POST": [
+			""
+		],
+	},
+	"Identification": {
+		"HasID": true,
+		"IDPrefix": "T-"
+	}
+}
+
 const UIDTable: db_table =
 {
 	"Name": "UIDTable",
@@ -204,8 +227,7 @@ const UIDTable: db_table =
 	],
 	"Methods": {},
 	"Identification": {
-		"HasID": false,
-		"IDPrefix": "U-"
+		"HasID": false
 	}
 }
 
@@ -224,8 +246,7 @@ const CurrentContract: db_table =
 		],
 	},
 	"Identification": {
-		"HasID": false,
-		"IDPrefix": "C-"
+		"HasID": false
 	}
 }
 
@@ -234,6 +255,7 @@ export const tables: db_definition =
 	"OAuth": OauthTable,
 	"Players": PlayersTable,
 	"Matches": MatchesTable,
+	"Tournaments": TournamentsTable,
 	"UIDTable": UIDTable,
 	"CurrentContract": CurrentContract
 }

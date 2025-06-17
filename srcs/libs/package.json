@@ -1,0 +1,17 @@
+{
+  "name": "libs",
+  "version": "1.0.0",
+  "description": "A module containing shared libraries for the project",
+  "license": "ISC",
+  "author": "RPDJF",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@types/node": "^24.0.1",
+    "axios": "^1.10.0",
+    "fastify": "^5.4.0"
+  }
+}

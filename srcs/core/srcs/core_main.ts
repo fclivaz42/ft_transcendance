@@ -6,6 +6,8 @@ import Fastify from 'fastify'
 import type * as fft from 'fastify'
 import fs from 'node:fs'
 import path from 'node:path'
+import { fastifyLogger } from '../../libs/helpers/fastifyHelper.ts'
+import Logger from '../../libs/helpers/loggers.ts'
 
 if (process.env.KEYPATH === undefined || process.env.CERTPATH === undefined) {
 	console.error("Keypath and/or Certpath are not defined. Exiting.")
@@ -43,3 +45,12 @@ fastify.listen({ port: 443, host: '::' }, (err) => {
 		process.exit(1)
 	}
 })
+
+fastify.addHook("onResponse", async (req, res) => {
+	fastifyLogger(req, res);
+});
+
+fastify.addHook("onError", async (req, res, error) => {
+	Logger.error(`Error occurred: ${error.message}`);
+	fastifyLogger(req, res);
+});
