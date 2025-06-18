@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/17 20:25:30 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/18 21:30:51 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -108,8 +108,8 @@ const PlayersTable: db_table =
 		"PlayerID",
 		"DisplayName",
 		"EmailAddress",
-		"PassHash",
-		"OAuthID",
+		"Password",
+		// "OAuthID",
 		"FriendsList",
 		"PhoneNumber",
 		"FirstName",
@@ -122,7 +122,7 @@ const PlayersTable: db_table =
 		"TEXT UNIQUE NOT NULL",
 		"TEXT UNIQUE NOT NULL",
 		"TEXT NOT NULL",
-		`TEXT DEFAULT NULL REFERENCES ${OauthTable.Name}(${OauthTable.Fields[0]}) ON DELETE SET NULL`,
+		// `TEXT DEFAULT NULL REFERENCES ${OauthTable.Name}(${OauthTable.Fields[0]}) ON DELETE SET NULL`,
 		"TEXT DEFAULT NULL",
 		"TEXT DEFAULT NULL",
 		"TEXT DEFAULT NULL",

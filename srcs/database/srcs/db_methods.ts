@@ -6,15 +6,16 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/13 21:28:19 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/18 23:39:24 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import Database from "better-sqlite3"
 import { tables } from "./db_vars.ts"
-import { randomUUID } from "node:crypto"
+import { randomUUID, randomBytes, scrypt } from "node:crypto"
 import type * as sqlt from "better-sqlite3"
 import type { db_definition } from "./db_vars.ts"
+import { hash_password } from "./db_helpers.ts"
 
 //
 // Export as a non-instantiable class in order to directly call the static members.
@@ -31,7 +32,6 @@ export default class DatabaseWorker {
 
 	static get(table: string, field: string, query: string) {
 		const db = new Database(process.env.DBLOCATION, { readonly: true });
-		console.log(`${field} ${query}`)
 		let response: object;
 		try {
 			response = db.prepare(`SELECT * FROM ${table} WHERE ${field} = ?`).get(query) as object
@@ -78,8 +78,6 @@ export default class DatabaseWorker {
 	// If the row requires an unique identifier, generate it and add it to "body".
 	// After that, check if duplicate entries for Players exist.
 	// The SQL is procedurally generated so it will attempt to create the row with the data provided.
-	// TODO: Alter db_vars.ts and add a "no_dupe" list consisting of the fields that should not be duplicate,
-	// and procedurally check for every database.
 	//
 
 	static post(table: string, table_fields: Array<string>, body: object) {
@@ -88,16 +86,17 @@ export default class DatabaseWorker {
 			let sql = `INSERT INTO ${table} VALUES (`;
 			if (tables[table].Identification.HasID) {
 				let generated_uid: string = tables[table].Identification.IDPrefix + randomUUID();
-				while (check_uid(db, "UIDTable", "UID", generated_uid))
+				while (check_uid(db, tables.UIDTable.Name, tables.UIDTable.Fields[0], generated_uid))
 					generated_uid = tables[table].Identification.IDPrefix + randomUUID()
 				body[table_fields[0]] = generated_uid
 			}
-			if (table === "Players") {
-				if (db.prepare(`SELECT * FROM Players WHERE ${table_fields[1]} = ?`).get(body[table_fields[1]]) !== undefined)
-					throw { code: 409, string: "error.nameid.exists" }
-				if (db.prepare(`SELECT * FROM Players WHERE ${table_fields[6]} = ?`).get(body[table_fields[6]]) !== undefined)
-					throw { code: 409, string: "error.email.exists" }
-			}
+			// TODO: Insert function to check for dupes here! and do it for POST too while we're at it :)
+			// if (table === "Players") {
+			// 	if (db.prepare(`SELECT * FROM Players WHERE ${table_fields[1]} = ?`).get(body[table_fields[1]]) !== undefined)
+			// 		throw { code: 409, string: "error.nameid.exists" }
+			// 	if (db.prepare(`SELECT * FROM Players WHERE ${table_fields[6]} = ?`).get(body[table_fields[6]]) !== undefined)
+			// 		throw { code: 409, string: "error.email.exists" }
+			// }
 			for (const key of table_fields) {
 				if (key !== "")
 					sql += ` @${key},`
@@ -257,5 +256,35 @@ export async function init_db() {
 			db.close()
 		}
 		resolve(true);
+	})
+}
+
+//
+// Adds a default user with Admin privileges.
+//
+
+export async function add_default_user() {
+	return new Promise((resolve, reject) => {
+		(async () => {
+			try {
+				const test = DatabaseWorker.get(tables.Players.Name, tables.Players.Fields[1], process.env.ADMIN_NAME as string)
+				if (test[tables.Players.Fields[1]] === process.env.ADMIN_NAME as string)
+					resolve(true);
+			} catch (e) {
+				if (e.code !== 404) {
+					console.dir(e);
+					reject(false);
+				}
+			}
+			const default_user: object = { DisplayName: process.env.ADMIN_NAME, EmailAddress: "DEFAULTEMAIL", Admin: 1 };
+			try {
+				default_user["Password"] = await hash_password(process.env.ADMIN_PASSWORD as string)
+				DatabaseWorker.post(tables.Players.Name, tables.Players.Fields, default_user)
+			} catch (e) {
+				console.dir(e);
+				reject(false);
+			}
+			resolve(true);
+		})()
 	})
 }

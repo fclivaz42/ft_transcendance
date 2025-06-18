@@ -1,24 +1,23 @@
 export interface Users {
-  PlayerID: string,
-  DisplayName: string,
-  EmailAddress: string,
-  PassHash: string,
-  OAuthID: string | null,
-  ActiveToken: string | null,
-  SessionID: string | null,
-  FriendsList: string | null,
-  PhoneNumber: string | null,
-  FirstName: string | null,
-  FamilyName: string | null,
-  Bappy: number | null,
-  Admin: number | null,
+	PlayerID?: string,
+	DisplayName: string,
+	EmailAddress: string,
+	Password: string,
+	OAuthID?: string,
+	FriendsList?: string,
+	PhoneNumber?: string,
+	FirstName?: string,
+	FamilyName?: string,
+	Bappy?: number,
 };
 
 export interface UserLoginProps {
-    username: string;
-    password: string;
+	username?: string;
+	email?: string;
+	password: string;
 }
 
 export interface UserRegisterProps extends UserLoginProps {
-  email: string;
+	username: string;
+	email: string;
 }

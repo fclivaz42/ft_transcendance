@@ -6,11 +6,11 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/13 21:23:11 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/18 23:59:11 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
-import { init_db } from "./db_methods.ts"
+import { add_default_user, init_db } from "./db_methods.ts"
 import { tables } from "./db_vars.ts"
 import RequestHandler from "./db_helpers.ts"
 import Fastify from 'fastify'
@@ -74,6 +74,10 @@ for (const method of methods) {
 	}
 }
 
+import { passck_route } from "./db_extras.ts"
+
+fastify.register(passck_route)
+
 //
 // Now that the funky freestyle procedural route generation is over, check the status of the database creation/checks.
 //
@@ -87,6 +91,11 @@ status.then(
 		process.exit(1);
 	}
 )
+
+if (await add_default_user())
+	console.log("Default user added/updated.")
+else
+	console.error("Could not create user!")
 
 //
 // Aaaand start!

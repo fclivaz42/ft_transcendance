@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/21 21:57:13 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/13 21:15:40 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/18 23:47:52 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -14,7 +14,7 @@ import DatabaseWorker from "./db_methods.ts"
 import Axios from "axios"
 import type * as at from "axios"
 import type * as fft from 'fastify'
-import { randomUUID } from "node:crypto"
+import { randomBytes, scrypt } from "crypto"
 
 //
 // Basic checks (eg. API-KEY, Content-Type, etc)
@@ -83,6 +83,23 @@ async function check_contract(request: fft.FastifyRequest, reply: fft.FastifyRep
 		})
 }
 
+export async function hash_password(password: string) {
+	return new Promise((resolve, reject) => {
+		randomBytes(66, (err, buf) => {
+			if (err) reject(err);
+			const salt = buf.toString('base64').substring(0, 64)
+			if (process.env.RUNMODE === "debug")
+				console.log(`Generated salt: ${salt}`)
+			scrypt(password, salt, 66, (err, derivedKey) => {
+				if (err) reject(err);
+				if (process.env.RUNMODE === "debug")
+					console.log(`Generated hash: ${salt + derivedKey.toString('base64')}`)
+				resolve(salt + derivedKey.toString('base64'));
+			})
+		})
+	})
+}
+
 //
 // This static, non-instantiable class allows for the procedural route generation.
 // Its functions are lower-cased methods, each one doing basic checks or some parsing before
@@ -105,6 +122,10 @@ export default class RequestHandler {
 		if (table === "CurrentContract")
 			return await check_contract(request, reply, table, table_fields)
 		const body = request.body as object;
+		if (table === "Players") {
+			body["Password"] = await hash_password(body["Password"])
+			body["Admin"] = 0;
+		}
 		const params: object = request.params as object
 		let response: string;
 		try {
