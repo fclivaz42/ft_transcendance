@@ -18,3 +18,4 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		return reply.code(200).send(currentContract);
 	})
 }
+

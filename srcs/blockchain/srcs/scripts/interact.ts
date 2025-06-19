@@ -7,11 +7,6 @@ import { fileURLToPath } from 'node:url';
 
 dotenv.config();
 
-interface Score {
-	tournamentId: string;
-	wins: number;
-	losses: number;
-}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,7 +69,7 @@ export async function addTournamentScore(contractAddress: string, id: string, wi
 
 	try {
 		console.log("Add tournament score to contract...");
-		const tx: eth.ContractTransactionResponse = await contract.addScore(id, winnerName, wins, loserName, losses);
+		const tx: eth.ContractTransactionResponse = await contract.addTournamentScore(id, winnerName, wins, loserName, losses);
 
 		if (!tx)
 			throw ("tx null");
@@ -115,6 +110,19 @@ export async function getTournamentScore(contractAddress: string, id: string) {
 	}
 	catch (error) {
 		console.log("Error to get Tournament score, bad tournament id");
+	}
+}
+
+export async function getTournamentMatchScore(contractAddress: string, id: string, index: number) {
+
+	const provider: eth.JsonRpcProvider = new ethers.JsonRpcProvider(process.env.PROVIDER);
+	const contract: eth.Contract = new ethers.Contract(contractAddress, abi.abi, provider);
+
+	try {
+		return (await contract.getTournamentMatchScore(id, index));
+	}
+	catch (error) {
+		console.log("Error to get Match score, bad match id");
 	}
 }
 

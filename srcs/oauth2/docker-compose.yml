@@ -7,6 +7,6 @@ services:
       - API_KEY
     env_file:
       - .env
-    restart: on-failure
+    # restart: on-failure
     networks:
       - sarifntw

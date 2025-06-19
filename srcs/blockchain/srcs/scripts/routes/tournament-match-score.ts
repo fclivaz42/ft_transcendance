@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { getMatchScore } from "../interact.ts"
+import { getTournamentMatchScore } from "../interact.ts";
 import { currentContract } from "./deploy.ts";
 
 interface MatchObj {
@@ -33,7 +33,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const { id, index } = request.params;
 		try {
 			console.log(id, index);
-			const [winner, winnerScoreBig, loser, loserScoreBig]: MatchScore = await getMatchScore(currentContract, id, index);
+			const [winner, winnerScoreBig, loser, loserScoreBig]: MatchScore = await getTournamentMatchScore(currentContract, id, index);
 			const winnerScore = Number(winnerScoreBig);
 			const loserScore = Number(loserScoreBig);
 			const match: MatchObj = { winner, winnerScore, loser, loserScore };

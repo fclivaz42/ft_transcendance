@@ -1,0 +1,38 @@
+{
+  "name": "sarif-frontend",
+  "version": "1.0.0",
+  "description": "Sarif's transcendance frontend",
+  "homepage": "https://github.com/fclivaz42/ft_transcendance#readme",
+  "bugs": {
+    "url": "https://github.com/fclivaz42/ft_transcendance/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fclivaz42/ft_transcendance.git"
+  },
+  "license": "ISC",
+  "author": "RPDJF",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "tsc:watch": "tsc --watch",
+    "tailwind:watch": "tailwindcss -i ./public/assets/input.css -o ./public/assets/tailwind.css --watch",
+    "serve": "python3 -m http.server 8080",
+    "dev": "run-p tsc:watch tailwind:watch serve",
+    "build": "npx tsc && tailwindcss -i ./public/assets/input.css -o ./public/assets/tailwind.css",
+    "devite": "vite",
+    "vitebuild": "vite build && tailwindcss -i ./public/assets/input.css -o ./public/assets/tailwind.css",
+    "vitepreview": "vite preview"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "@babylonjs/core": "^8.12.1",
+    "@midudev/tailwind-animations": "^0.2.0",
+    "tailwind-scrollbar": "^3.1.0",
+    "tailwindcss": "^3.4.17"
+  }
+}

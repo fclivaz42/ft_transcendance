@@ -15,14 +15,6 @@ contract TournamentScores {
     mapping(string => Score[]) private scores;
     mapping(string => Score) private singleMatch;
 
-    function getMatchScore(string memory id)
-        public
-        view
-        returns (Score memory)
-    {
-        return singleMatch[id];
-    }
-
     function addMatchScore(
         string memory matchId,
         string memory winnerName,
@@ -35,7 +27,7 @@ contract TournamentScores {
         singleMatch[matchId] = Score(winner, loser);
     }
 
-    function addScore(
+    function addTournamentScore(
         string memory tournamentId,
         string memory winnerName,
         uint256 wins,
@@ -48,6 +40,14 @@ contract TournamentScores {
         scores[tournamentId].push(newScore);
     }
 
+	function getMatchScore(string memory id)
+        public
+        view
+        returns (Score memory)
+    {
+        return singleMatch[id];
+    }
+
     function getTournamentScore(string memory id)
         public
         view
@@ -56,7 +56,7 @@ contract TournamentScores {
         return scores[id];
     }
 
-    function getMatchScore(string memory id, uint256 index)
+    function getTournamentMatchScore(string memory id, uint256 index)
         public
         view
         returns (

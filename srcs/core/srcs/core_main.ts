@@ -8,6 +8,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fastifyLogger } from '../../libs/helpers/fastifyHelper.ts'
 import Logger from '../../libs/helpers/loggers.ts'
+import frontendRoutes from './modules/frontend/routes.ts'
 
 if (process.env.KEYPATH === undefined || process.env.CERTPATH === undefined) {
 	console.error("Keypath and/or Certpath are not defined. Exiting.")
@@ -38,6 +39,8 @@ async function load_modules() {
 	}
 }
 await load_modules()
+
+fastify.register(frontendRoutes);
 
 fastify.listen({ port: 443, host: '::' }, (err) => {
 	if (err) {

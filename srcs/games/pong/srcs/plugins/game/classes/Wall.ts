@@ -35,7 +35,7 @@ export default class Wall extends Paddle {
         if (!this._passThrough) {
             if (ball.getLastHit() === this._name) return ;
             ball.setLastHit(this._mesh.name)
-            ball.direction.z *= -1;
+            ball.direction.y *= -1;
             ball.direction.normalize();
         } else {
             ball.getMesh().position.set(0, 0, 0);

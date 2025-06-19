@@ -5,8 +5,6 @@ RUN apk upgrade
 
 RUN apk add openssl
 
-EXPOSE 3000
-
 WORKDIR /sarif
 
 COPY srcs ./srcs

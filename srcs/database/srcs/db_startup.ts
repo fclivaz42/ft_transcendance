@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/19 19:16:40 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/20 01:54:31 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -71,20 +71,22 @@ export async function init_db() {
 				else
 					check_db_columns(db, tables[item].Name);
 			}
-			let sql = `INSERT INTO ${tables.Players.Name} VALUES (`;
-			const body = {
-				PlayerID: "P-0",
-				DisplayName: "Guest",
-				EmailAddress: "null",
-				Password: "0"
+			if (db.prepare(`SELECT * FROM ${tables.Players.Name} WHERE ${tables.Players.Fields[0]} = ?`).get("P-0") === undefined) {
+				let sql = `INSERT INTO ${tables.Players.Name} VALUES (`;
+				const body = {
+					PlayerID: "P-0",
+					DisplayName: "Guest",
+					EmailAddress: "null",
+					Password: "0"
+				}
+				for (const key of tables.Players.Fields) {
+					if (key !== "")
+						sql += ` @${key},`
+					if (body[key] === undefined)
+						body[key] = null
+				}
+				db.prepare(sql.replace(/.$/, ")")).run(body)
 			}
-			for (const key of tables.Players.Fields) {
-				if (key !== "")
-					sql += ` @${key},`
-				if (body[key] === undefined)
-					body[key] = null
-			}
-			db.prepare(sql.replace(/.$/, ")")).run(body)
 		} catch (error) {
 			console.error(error);
 			reject(false);

@@ -24,20 +24,20 @@ all: start
 
 build:
 	mkdir -p ${DATADIR}
-	docker-compose -p ${NAME} -f ./srcs/docker-compose.yml build
+	docker compose -p ${NAME} -f ./srcs/docker-compose.yml build
 
 up: build
-	API_KEY="$$($(GENERATOR))" docker-compose -p ${NAME} -f ./srcs/docker-compose.yml up -d
+	API_KEY="$$($(GENERATOR))" docker compose -p ${NAME} -f ./srcs/docker-compose.yml up -d
 
 down:
-	docker-compose -p ${NAME} -f ./srcs/docker-compose.yml down -v
+	docker compose -p ${NAME} -f ./srcs/docker-compose.yml down -v
 
 start: up
 	mkdir -p ${DATADIR}
-	docker-compose -p ${NAME} -f ./srcs/docker-compose.yml start
+	docker compose -p ${NAME} -f ./srcs/docker-compose.yml start
 
 stop:
-	docker-compose -p ${NAME} -f ./srcs/docker-compose.yml stop
+	docker compose -p ${NAME} -f ./srcs/docker-compose.yml stop
 
 status:
 	docker ps -a

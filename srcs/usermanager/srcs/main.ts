@@ -13,7 +13,7 @@ const server = fastify({
 	}
 });
 
-server.register(initializeRoute, {prefix: "/users"});
+server.register(initializeRoute, { prefix: "/users" });
 
 server.listen({ port: config.ServerConfig.port, host: "0.0.0.0" }, (err, address) => {
 	if (err) {

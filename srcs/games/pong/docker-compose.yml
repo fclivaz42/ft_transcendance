@@ -7,6 +7,6 @@ services:
     env_file: ../../.env
     environment:
       - API_KEY
-    depends_on:
-      - sarif_db
+    # ports:
+    #   - "1337:1337"
     restart: on-failure

@@ -1,14 +1,21 @@
-# services:
-  # sarif_{MODULE}:
-  #   container_name: sarif_{MODULE}
-  #   networks:
-  #     - sarifntw
-  #   volumes:
-  #     - data:/data
-  #   build: ./
-  #   env_file: .env
-  #   environment:
-  #     - API_KEY
-  #   depends_on:
-  #     - sarif_{DEPENDMODULE}
-  #   restart: on-failure
+services:
+  frontend-builder:
+    build: ./
+    container_name: sarif_frontend
+    environment:
+      - TZ=Europe/Zurich
+    volumes:
+      - sarif-frontend:/var/www/sarif-frontend
+    networks:
+      - sarifntw
+    restart: on-failure
+
+volumes:
+  sarif-frontend:
+    name: "sarif-frontend"
+    driver: local
+
+# networks:
+#   sarifntw:
+#     name: "SARIF Bridge"
+#     driver: bridge

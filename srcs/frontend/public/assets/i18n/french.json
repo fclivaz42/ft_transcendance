@@ -1,0 +1,59 @@
+{
+  "home": {
+  "guestButton": {
+    "label": "Jouer en Guest"
+  },
+  "accountButton": {
+    "label": "Utiliser un compte"
+  }
+},
+  "header": {
+    "usermenu": {
+      "login": "Se connecter",
+      "register": "S'inscrire",
+      "logout": "Se déconnecter"
+    }
+  },
+  "navbar": {
+    "pong": {
+      "label": "Pong",
+      "title": "Jeu de Pong",
+      "submenu": {
+        "play": "Jouer maintenant",
+        "solo": "Mode solo",
+        "join": "Rejoindre une partie privée",
+        "create": "Créer une partie privée"
+      }
+    },
+    "tetris": {
+      "label": "Tetris",
+      "title": "Jeu de Tetris",
+      "submenu": {
+        "play": "Jouer maintenant"
+      }
+    },
+    "leaderboard": {
+      "label": "Classement",
+      "title": "Classement",
+      "submenu": {
+      }
+    },
+    "history": {
+      "label": "Historique",
+      "title": "Historique"
+    },
+    "settings": {
+      "label": "Paramètres",
+      "title": "Paramètres",
+      "submenu": {
+        "appearance": {
+          "title": "Apparence",
+          "submenu": {
+            "dark_mode": "Mode sombre",
+            "language": "Langue"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,8 @@
 import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh } from "@babylonjs/core";
 
+const DIAMETER: number = 0.05;
+const SEGMENTS: number = 32;
+
 interface BallOptions {
 	color: Color3;
 	diameter: number;
@@ -24,6 +27,8 @@ export default class Ball {
 	private _lastHit: string | null;
 	private _bounceCooldown: number;
 	private _playerBounces: number;
+	private _diameter: number;
+	private _segments: number;
 
 	public direction: Vector3;
 	
@@ -35,8 +40,8 @@ export default class Ball {
 	) {
 		const {
 			color = Color3.White(),
-			diameter = 0.05,
-			segments = 32
+			diameter = DIAMETER,
+			segments = SEGMENTS,
 		} = options;
 
 		this._scene = scene;
@@ -45,6 +50,8 @@ export default class Ball {
 		this._currSpeed = 0.0;
 		this._baseSpeed = 0.15;
 		this._playerBounces = 0;
+		this._diameter = diameter;
+		this._segments = segments;
 		this.direction = new Vector3(0, 0, 0);
 		
 		this._mesh = MeshBuilder.CreateSphere(name, { diameter, segments }, scene);
@@ -71,7 +78,8 @@ export default class Ball {
 		return {
 			curr_speed: this.getCurrSpeed(),
 			curr_position: this.getPosition().asArray(),
-			size: this.getCollisionBox().extendSize.scale(2).asArray()
+			// size: this.getCollisionBox().extendSize.scale(2).asArray(),
+			size: [this._diameter, this._segments]
 		};
 	}
 
