@@ -20,31 +20,30 @@ app?.appendChild(main);
 
 // Initialize i18nHandler (language handler)
 await i18nHandler.initialize().finally(() => {
-  // Initialize dark mode
-  const darkmodeManager = new DarkmodeManager();
-  darkmodeManager.initialize();
+	// Initialize dark mode
+	const darkmodeManager = new DarkmodeManager();
+	darkmodeManager.initialize();
 
-  // Initialize header
-  const headerManager = new HeaderManager();
-  headerManager.initialize();
+	// Initialize header
+	const headerManager = new HeaderManager();
+	headerManager.initialize();
 
-  // Initialize the managers
-  const navbarManager = new NavbarManager();
-  navbarManager.initialize();
+	// Initialize the managers
+	const navbarManager = new NavbarManager();
+	navbarManager.initialize();
 
-  // const backgroundManager = new BackgroundManager();
-  // backgroundManager.initialize();
+	// const backgroundManager = new BackgroundManager();
+	// backgroundManager.initialize();
 
-   const homeManager = new HomeManager(); // NOUVEAU: Instanciez le HomeManager
-  homeManager.initialize(main); // Passez 'main' comme parent pour la page d'accueil
+	// WARN: freeze le site
+	// const homeManager = new HomeManager(); // NOUVEAU: Instanciez le HomeManager
+	// homeManager.initialize(main); // Passez 'main' comme parent pour la page d'accueil
 
-  const frameManager = new FrameManager();
-  frameManager.initialize();
-  const userMenuManager = new UserMenuManager();
-  userMenuManager.initialize();
+	const frameManager = new FrameManager();
+	frameManager.initialize();
+	const userMenuManager = new UserMenuManager();
+	userMenuManager.initialize();
 
-
-
-  // note that the loginDialogManager is not initialized here, it is initialized on its own when needed (e.g., when the login button is clicked)
-  // this should be the case for all dialog managers, as they are only needed when the user interacts with the UI
+	// note that the loginDialogManager is not initialized here, it is initialized on its own when needed (e.g., when the login button is clicked)
+	// this should be the case for all dialog managers, as they are only needed when the user interacts with the UI
 });

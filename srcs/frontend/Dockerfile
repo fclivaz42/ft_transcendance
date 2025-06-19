@@ -1,6 +1,7 @@
 FROM node:23.10.0-alpine
 
-WORKDIR /app
+WORKDIR /app-srcs
+RUN apk add bash
 
 COPY srcs ./srcs
 COPY public ./public
@@ -15,7 +16,6 @@ RUN npm run vitebuild
 RUN rm -rf ./public/index.html ./public/assets/*.css
 RUN cp -rf ./public/* dist/
 RUN rm -rf ./public
-RUN mkdir -p /var/www/sarif-frontend
-RUN mv ./dist/* /var/www/sarif-frontend/
+RUN mv ./dist /app
 
-ENTRYPOINT ["/bin/sh", "./docker-entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "./docker-entrypoint.sh"]
