@@ -13,14 +13,14 @@ This document provides information about the database's API.
 
 A few fields are required for the database to accept ANY request (GET, POST, DELETE and PUT).
 
-| Key            | Expected value                      | Description                                             |
-| -------------- | ----------------------------------- | ------------------------------------------------------- |
-| `api_key`      | whatever `node.env.API_KEY` returns | The global, build-time defined API key used internally. |
-| `Content-Type` | `application/json`                  | `POST` and `PUT` only. Any other type will be rejected. |
+| Key             | Expected value                      | Description                                             |
+| --------------- | ----------------------------------- | ------------------------------------------------------- |
+| `Authorization` | whatever `node.env.API_KEY` returns | The global, build-time defined API key used internally. |
+| `Content-Type`  | `application/json`                  | `POST` and `PUT` only. Any other type will be rejected. |
 
 # `GET`
 
-**Valid table(s): `Players` and `Matches`.**
+**Valid table(s): `Players`, `Matches` and `OAuth`**
 
 `GET` is used to retrieve a row from any of the tables of the database.
 
@@ -46,39 +46,16 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 
 # `POST`
 
-**Valid table(s): `Players` and `Matches`.**
+**Valid table(s): `Players`, `Matches`, `OAuth` and `CurrentContract`**
 
-`POST` is used to create a new entry in one of the tables. For updating already existing entries, please use `PUT` instead.
+`POST` is used to create a new entry in one of the tables. For updating already existing entries, please use `PUT` instead. **`POST` requires a valid `application/json` body. Every absent field will automatically be set to NULL.**
 
-## `POST` requires a valid `application/json` body. Every field must be present.
+In order to use POST, please refer to the table list below to know which information must be present during a request.
 
-### If the table is `Players`:
-
-| Field          | Type           | Example                                    | Description                                                                   |
-| -------------- | -------------- | ------------------------------------------ | ----------------------------------------------------------------------------- |
-| `PlayerID`     | UUIDv4 String  | `f4d122ff-c1b1-4f69-a04d-e63044a3b052`     | The player's Unique Identifier (created with uuidv4();).                      |
-| `DisplayName`  | String         | `Broller`                                  | The player's display name.                                                    |
-| `PassHash`     | Hashed String  | `d1aa1db20f1ec7ec04c12e1bc5b5f01c653543b4` | The player's hashed password.                                                 |
-| `ActiveTokens` | String         | `f5242535f238ecfeff5df5938e26d2a3257c1676` | The player's active tokens. Set to the string `NULL` if empty.                |
-| `EmailAddress` | String         | `fclivaz@email.com`                        | The player's email address.                                                   |
-| `PhoneNumber`  | String         | `00411234567890`                           | The player's phone number.                                                    |
-| `RealName`     | String         | `Rui`                                      | The player's real name.                                                       |
-| `Surname`      | String         | `De Jesus Ferreira`                        | The player's surname.                                                         |
-| `Bappy`        | Integer        | `1745023412`                               | The player's birth date, in UNIX timestamp.                                   |
-| `Admin`        | Integer        | `0` or `1`                                 | Whether or not the player is an admin. You **MIGHT** want to set this to 0 :) |
-
-### If the table is `Matches`:
-
-| Field            | Type          | Example                                | Description                                             |
-| ---------------- | ------------- | -------------------------------------- | ------------------------------------------------------- |
-| `MatchID`        | UUIDv4 String | `1f45a30c-8818-4584-87f1-9192e08fbb2a` | The match's Unique Identifier (created with uuidv4();). |
-| `PlayerOneID`    | UUIDv4 String | `83157b37-f452-46b6-8aea-65df4d03683a` | The 1st player's UUIDv4, cross-referenced from Players. |
-| `PlayerTwoID`    | UUIDv4 String | `114cb650-b711-4c01-8f98-e2f7b44f6d8d` | The 2nd player's UUIDv4, cross-referenced from Players. |
-| `WinnerPlayerID` | UUIDv4 String | `83157b37-f452-46b6-8aea-65df4d03683a` | The winner's UUIDv4, cross-referenced from Players.     |
-| `ScoreOne`       | Integer       | 12                                     | The 1st player's score.                                 |
-| `ScoreTwo`       | Integer       | 1                                      | The 2nd player's score.                                 |
-| `StartTime`      | Integer       | 1745023412                             | The start time of the game, in UNIX timestamp.          |
-| `EndTime`        | Integer       | 1745023511                             | The end time of the game, in UNIX timestamp.            |
+- [Players](#players)
+- [Matches](#matches)
+- [OAuth](#oauth)
+- [CurrentContract](#currentcontract)
 
 ## `POST` can return one of the following:
 
@@ -97,7 +74,7 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 
 # `DELETE`
 
-**Valid table(s): `Players`**
+**Valid table(s): `Players` and `OAuth`**
 
 `DELETE` is used to, well, delete a row from a table.
 
@@ -123,10 +100,10 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 
 # `PUT`
 
-**Valid table(s): `Players`**
+**Valid table(s): `Players` and `OAuth`**
 
-`PUT` is used to update a row It can contain multiple fields to update in one go.
-`PUT` requires a valid `PlayerID` to update, as well as any additional fields which need to be changed. Refer to [Tables and values](#tables-and-values) to know which fields are applicable.
+`PUT` is used to update a row. It can contain multiple fields to update in one go.
+`PUT` requires a valid `<table>ID` to update, as well as any additional fields which need to be changed. Refer to [Tables and values](#tables-and-values) to know which fields are applicable.
 
 ## `PUT` can return the following codes:
 
@@ -143,34 +120,66 @@ A few fields are required for the database to accept ANY request (GET, POST, DEL
 
 # Tables and values
 
-The database contains two tables. In order to perform an operation on a table, you must perform your HTTP request using the table's name as route (case-sensitive.)
+In order to perform an operation on a table, you must perform your HTTP request using the table's name as route (case-sensitive.)
 eg. `PUT /Players` will perform an update on the Players table.
 **If you attempt a request on an unsupported table, you will get a Fastify 404 error.**
 
 ## Players:
 
-| Field          | Type            | Example                                    | Description                                                                     |
-| -------------- | --------------- | ------------------------------------------ | ------------------------------------------------------------------------------- |
-| `PlayerID`     | UUIDv4 String   | `f4d122ff-c1b1-4f69-a04d-e63044a3b052`     | The player's Unique Identifier (created with uuidv4();).                        |
-| `DisplayName`  | String          | `Broller`                                  | The player's display name.                                                      |
-| `PassHash`     | String          | `d1aa1db20f1ec7ec04c12e1bc5b5f01c653543b4` | The player's hashed password.                                                   |
-| `ActiveTokens` | String or NULL  | `f5242535f238ecfeff5df5938e26d2a3257c1676` | The player's active tokens. This field can be NULL if the player has no tokens. |
-| `EmailAddress` | String          | `fclivaz@email.com`                        | The player's email address.                                                     |
-| `PhoneNumber`  | String          | `00411234567890`                           | The player's phone number.                                                      |
-| `RealName`     | String          | `Rui`                                      | The player's real name.                                                         |
-| `Surname`      | String          | `De Jesus Ferreira`                        | The player's surname.                                                           |
-| `Bappy`        | Integer         | `1745023412`                               | The player's birth date, in UNIX timestamp.                                     |
-| `Admin`        | Integer or NULL | `0` or `1`                                 | Whether or not the player is an admin.                                          |
+| Field          | Type             | Required | Example                                    | Description                                                           |
+| -------------- | ---------------- | -------- | ------------------------------------------ | --------------------------------------------------------------------- |
+| `PlayerID`     | UUIDv4 String    | Ignored  | `P-f4d122ff-c1b1-4f69-a04d-e63044a3b052`   | The player's Unique Identifier (created with uuidv4();).              |
+| `DisplayName`  | String           | Yes      | `Broller`                                  | The player's display name.                                            |
+| `EmailAddress` | String           | Yes      | `fclivaz@email.com`                        | The player's email address.                                           |
+| `PassHash`     | String           | Yes      | `d1aa1db20f1ec7ec04c12e1bc5b5f01c653543b4` | The player's hashed password.                                         |
+| `OAuthID`      | String or NULL   | No       | `f5242535f238ecfeff5df5938e26d2a3257c1676` | The player's OAuth2 SubjectID, cross-referenced from the OAuth table. |
+| `FriendsList`  | Array of Strings | No       |`["98123nd", "asdd928ansdko", "chjdfud2"]` | The player's friends list (mine is empty)                             |
+| `PhoneNumber`  | String or NULL   | No       |`00411234567890`                           | The player's phone number.                                            |
+| `FirstName`    | String or NULL   | No       |`Rui`                                      | The player's real name.                                               |
+| `FamilyName`   | String or NULL   | No       |`De Jesus Ferreira`                        | The player's family name.                                             |
+| `Bappy`        | Integer or NULL  | No       | `1745023412`                               | The player's birth date, in UNIX timestamp.                           |
+| `Admin`        | Integer or NULL  | No       | `0` or `1`                                 | Whether or not the player is an admin.                                |
 
 ## Matches:
 
-| Field            | Type          | Example                                | Description                                                                                                               |
-| ---------------- | ------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `MatchID`        | UUIDv4 String | `1f45a30c-8818-4584-87f1-9192e08fbb2a` | The match's Unique Identifier (created with uuidv4();).                                                                   |
-| `PlayerOneID`    | UUIDv4 String | `83157b37-f452-46b6-8aea-65df4d03683a` | The 1st player's UUIDv4, cross-referenced from Players. If the Player is deleted, this will be automatically set to NULL. |
-| `PlayerTwoID`    | UUIDv4 String | `114cb650-b711-4c01-8f98-e2f7b44f6d8d` | The 2nd player's UUIDv4, cross-referenced from Players. If the Player is deleted, this will be automatically set to NULL. |
-| `WinnerPlayerID` | UUIDv4 String | `83157b37-f452-46b6-8aea-65df4d03683a` | The winner's UUIDv4, cross-referenced from Players. If the Player is deleted, this will be automatically set to NULL.     |
-| `ScoreOne`       | Integer       | 12                                     | The 1st player's score.                                                                                                   |
-| `ScoreTwo`       | Integer       | 1                                      | The 2nd player's score.                                                                                                   |
-| `StartTime`      | Integer       | 1745023412                             | The start time of the game, in UNIX timestamp.                                                                            |
-| `EndTime`        | Integer       | 1745023511                             | The end time of the game, in UNIX timestamp.                                                                              |
+| Field            | Type          | Required | Example                                  | Description                                                                                                               |
+| ---------------- | ------------- | -------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `MatchID`        | UUIDv4 String | Ignored  | `M-1f45a30c-8818-4584-87f1-9192e08fbb2a` | The match's Unique Identifier (created with uuidv4();).                                                                   |
+| `PlayerOneID`    | UUIDv4 String | Yes      | `P-83157b37-f452-46b6-8aea-65df4d03683a` | The 1st player's UUIDv4, cross-referenced from Players. If the Player is deleted, this will be automatically set to NULL. |
+| `PlayerTwoID`    | UUIDv4 String | Yes      | `P-114cb650-b711-4c01-8f98-e2f7b44f6d8d` | The 2nd player's UUIDv4, cross-referenced from Players. If the Player is deleted, this will be automatically set to NULL. |
+| `WinnerPlayerID` | UUIDv4 String | Yes      | `P-83157b37-f452-46b6-8aea-65df4d03683a` | The winner's UUIDv4, cross-referenced from Players. If the Player is deleted, this will be automatically set to NULL.     |
+| `ScoreOne`       | Integer       | Yes      | 12                                       | The 1st player's score.                                                                                                   |
+| `ScoreTwo`       | Integer       | Yes      | 1                                        | The 2nd player's score.                                                                                                   |
+| `StartTime`      | Integer       | Yes      | 1745023412                               | The start time of the game, in UNIX timestamp.                                                                            |
+| `EndTime`        | Integer       | Yes      | 1745023511                               | The end time of the game, in UNIX timestamp.                                                                              |
+| `MatchIndex`     | Integer       | TBD      | 4                                        | The Blockchain index of the match.                                                                                        |
+
+## Oauth:
+
+| Field            | Type    | Required | Example                                | Description                                      |
+| ---------------- | ------- | -------- | -------------------------------------- | ------------------------------------------------ |
+| `SubjectID`      | String  | Yes      | `jas089du2jmdp-a9s8daje3uhdc-a0sidja5` | The Subject ID provided by the Issuer.           |
+| `IssuerName`     | String  | Yes      | `Google`                               | The name of the issuer.                          |
+| `EmailAddress`   | String  | Yes      | `Rude-jes@email.com`                   | The email address of the user.                   |
+| `FullName`       | String  | No       | `Jean-Richard Bergmann`                | The full legal name of the user.                 |
+| `FirstName`      | String  | No       | `Jean-Richard`                         | The first name of the user.                      |
+| `FamilyName`     | String  | No       | `Bergmann`                             | The last name of the user.                       |
+| `TokenHash`      | String  | Yes      | `87q09we8aysgbdipoauwhe98q280qujeasoi` | The hashed token.                                |
+| `IssueTime`      | Integer | Yes      | 1745023412                             | The UNIX time when the OAuth session was issued. |
+| `ExpirationTime` | Integer | No       | 1745023511                             | The UNIX time at which the session expires.      |
+
+## UIDTable
+
+NOTE: UIDTable is internal. There are no available routes to modify it.
+
+| Field            | Type          | Example                                  | Description                            |
+| ---------------- | ------------- | ---------------------------------------- | -------------------------------------- |
+| `UID`            | UUIDv4 String | `M-1f45a30c-8818-4584-87f1-9192e08fbb2a` | Any UUIDv4 generated during insertion. |
+
+## CurrentContract
+
+NOTE: the `POST` request on CurrentContract does not need any information. You can send an empty body.
+
+| Field             | Type          | Example                                  | Description                                           |
+| ----------------- | ------------- | ---------------------------------------- | ----------------------------------------------------- |
+| `ContractAddress` | Hashed String | `0x98sdy9hqn32ieahsodiajosd8u0pq3ioj9oa` | The SmartContract generated by the Blockchain module. |

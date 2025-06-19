@@ -1,0 +1,14 @@
+services:
+  usermanager:
+    build: ./
+    container_name: sarif_usermanager
+    environment:
+      - TZ=Europe/Zurich
+      - API_KEY
+    env_file:
+      - .env
+    restart: on-failure
+    networks:
+      - sarifntw
+    volumes:
+      - sarif-libs:/libs/

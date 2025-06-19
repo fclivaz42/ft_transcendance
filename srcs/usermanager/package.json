@@ -1,0 +1,28 @@
+{
+  "name": "usermanager",
+  "version": "1.0.0",
+  "description": "A user management module",
+  "main": "main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node srcs/main.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fclivaz42/ft_transcendance.git#main"
+  },
+  "author": "RPDJF",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fclivaz42/ft_transcendance/issues"
+  },
+  "homepage": "https://github.com/fclivaz42/ft_transcendance/tree/main#readme",
+  "dependencies": {
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "fastify": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29"
+  }
+}

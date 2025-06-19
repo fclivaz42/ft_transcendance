@@ -1,7 +1,4 @@
-import { ethers } from 'ethers';
 import Fastify from 'fastify'
-import type { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { throws } from 'node:assert';
 import fs from 'node:fs'
 import path from 'node:path'
 

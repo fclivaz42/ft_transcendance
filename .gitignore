@@ -2,8 +2,6 @@
 data/
 artifacts/
 cache/
-addscore.json
-*.env
 .env
 
 # Logs
@@ -40,6 +38,7 @@ jspm_packages
 
 # Optional npm cache directory
 .npm
+package-lock.json
 
 # Optional REPL history
 .node_repl_history
@@ -64,3 +63,6 @@ profile-*
 profile*
 *clinic*
 *flamegraph*
+
+# Blockchain
+add*.json

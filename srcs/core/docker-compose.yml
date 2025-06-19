@@ -6,7 +6,7 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/04 22:27:45 by fclivaz           #+#    #+#              #
-#    Updated: 2025/05/04 22:33:42 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/06/19 18:12:11 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,13 +17,17 @@ services:
       - sarifntw
     volumes:
       - data:/data
+      - sarif-libs:/libs
     ports:
       - "443:443"
-    build: ./
-    env_file: ../.env
+    build:
+      context: .
+      args:
+        CERTPATH: ${CERTPATH}
+        KEYPATH: ${KEYPATH}
+    env_file:
+      - ../.env
+      - .env
     environment:
       - API_KEY
       - TZ=Europe/Zurich
-    depends_on:
-      - sarif_db
-    # restart: on-failure

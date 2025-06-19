@@ -1,14 +1,12 @@
-# services:
-  # sarif_{MODULE}:
-  #   container_name: sarif_{MODULE}
-  #   networks:
-  #     - sarifntw
-  #   volumes:
-  #     - data:/data
-  #   build: ./
-  #   env_file: .env
-  #   environment:
-  #     - API_KEY
-  #   depends_on:
-  #     - sarif_{DEPENDMODULE}
-  #   restart: on-failure
+services:
+  oauth2:
+    build: ./
+    container_name: sarif_oauth2
+    environment:
+      - TZ=Europe/Zurich
+      - API_KEY
+    env_file:
+      - .env
+    restart: on-failure
+    networks:
+      - sarifntw
