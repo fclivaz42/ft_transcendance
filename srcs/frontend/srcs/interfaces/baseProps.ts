@@ -9,4 +9,8 @@ export interface TitleProps extends BaseProps {
 
 export interface ButtonProps extends TitleProps {
   logo?: string;
+	f?: () => void;
+	color?: string;
+  darkColor?: string;
+	href?: string;
 }

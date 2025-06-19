@@ -22,12 +22,9 @@ export function createSidePanel(props: TitleProps): HTMLElement {
 
 export function createSidePanelButton(props: ButtonProps): HTMLElement {
 	const button = createButton({
-		title: props.title,
-		logo: props.logo,
+		...props,
 		color: "bg-background",
 		darkColor: "dark:bg-background_dark",
-		href: "#",
-		i18n: props.i18n,
 	});
 	button.classList.add("my-4");
 	return button;

@@ -1,6 +1,7 @@
 import { createSidePanel, createSidePanelButton } from "./index.js";
 
 import { i18nHandler } from "../../handlers/i18nHandler.js";
+import { startGame } from "../../game/GameLaunch.js";
 
 export function createPongSidePanel() {
 	const sidePanel = createSidePanel({
@@ -13,32 +14,28 @@ export function createPongSidePanel() {
 	sidePanel.appendChild(createSidePanelButton({
 		title: i18nHandler.getValue("navbar.pong.submenu.play"),
 		i18n: "navbar.pong.submenu.play",
-		logo: buttonLogo
-	}))
-
-	sidePanel.appendChild(createSidePanelButton({
-		title: i18nHandler.getValue("navbar.pong.submenu.play2"),
-		i18n: "navbar.pong.submenu.play2",
-		logo: buttonLogo
-	}))
+		logo: buttonLogo,
+		f: () =>  startGame("ws://localhost:1337/game/remote?userId=123"), // TODO: Is the parameter needed? If so, maybe add env variable
+		// TODO: To add a function to a button, simply map your function to the f property of the props
+	}));
 
 	sidePanel.appendChild(createSidePanelButton({
 		title: i18nHandler.getValue("navbar.pong.submenu.solo"),
 		i18n: "navbar.pong.submenu.solo",
 		logo: buttonLogo
-	}))
+	}));
 
 	sidePanel.appendChild(createSidePanelButton({
 		title: i18nHandler.getValue("navbar.pong.submenu.join"),
 		i18n: "navbar.pong.submenu.join",
 		logo: buttonLogo
-	}))
+	}));
 
 	sidePanel.appendChild(createSidePanelButton({
 		title: i18nHandler.getValue("navbar.pong.submenu.create"),
 		i18n: "navbar.pong.submenu.create",
 		logo: buttonLogo
-	}))
+	}));
 
 	return sidePanel;
 }

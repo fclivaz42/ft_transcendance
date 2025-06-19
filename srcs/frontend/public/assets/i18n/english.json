@@ -12,7 +12,6 @@
       "title": "Pong Game",
       "submenu": {
         "play": "Play now",
-        "play2": "Play now2",
         "solo": "Solo mode",
         "join": "Join a Private Game",
         "create": "Create a Private Game"

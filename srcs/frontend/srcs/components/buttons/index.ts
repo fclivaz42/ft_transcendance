@@ -1,12 +1,4 @@
-import { BaseProps } from "../../interfaces/baseProps.js";
-
-interface ButtonProps extends BaseProps {
-  title: string;
-  logo?: string;
-  color?: string;
-  darkColor?: string;
-  href?: string;
-}
+import { ButtonProps } from "../../interfaces/baseProps.js";
 
 export function createButton(props: ButtonProps): HTMLAnchorElement {
   const button = document.createElement("a") as HTMLAnchorElement;
@@ -21,6 +13,11 @@ export function createButton(props: ButtonProps): HTMLAnchorElement {
     button.id = props.id;
   if (props.href)
     button.href = props.href;
+	button.onclick = () => {
+		if (props.f) {
+			props.f();
+		}
+	}
   return button;
 }
 
