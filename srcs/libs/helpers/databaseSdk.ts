@@ -31,7 +31,7 @@ export default class databaseSdk {
 
 	}
 
-	public async check_password(query: string, plaintext: string) {
+	public async check_password(query: string, type: "PlayerID" | "DisplayName" | "EmailAddress", plaintext: string) {
 
 	}
 

@@ -6,15 +6,19 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/18 23:59:11 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/19 21:35:42 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
-import { add_default_user, init_db } from "./db_methods.ts"
+import { add_default_user, init_db } from "./db_startup.ts"
 import { tables } from "./db_vars.ts"
 import RequestHandler from "./db_helpers.ts"
+import fs from "node:fs"
 import Fastify from 'fastify'
+import fastifyStatic from '@fastify/static'
+import multipart from '@fastify/multipart'
 import type * as fft from 'fastify'
+import { extra_routes } from "./db_extras.ts"
 
 //
 // Check if the necessary environment variables are set.
@@ -40,12 +44,24 @@ if (process.env.API_KEY === undefined ||
 
 let status = init_db()
 
+fs.mkdir(process.env.FILELOCATION, { recursive: true, mode: 0o700 }, (err) => {
+	if (err) {
+		console.dir(err)
+		process.exit(1)
+	}
+})
+
 if (process.env.RUNMODE === "debug")
 	console.log(process.env.API_KEY)
 
 const fastify = Fastify({
 	logger: process.env.RUNMODE === "debug" ? true : false
 })
+
+fastify.register(multipart)
+fastify.register(fastifyStatic, {
+	root: process.env.FILELOCATION
+});
 
 //
 // Okay, here we go.
@@ -68,15 +84,14 @@ for (const method of methods) {
 						await RequestHandler[method.toLowerCase()](request, reply, tables[item].Name, tables[item].Fields)
 					})
 				})
-				console.log(`registered ${method} /${tables[item].Name}${route}`)
+				if (process.env.RUNMODE === "debug")
+					console.log(`registered ${method} /${tables[item].Name}${route}`)
 			}
 		}
 	}
 }
 
-import { passck_route } from "./db_extras.ts"
-
-fastify.register(passck_route)
+fastify.register(extra_routes)
 
 //
 // Now that the funky freestyle procedural route generation is over, check the status of the database creation/checks.

@@ -6,7 +6,7 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/04 22:27:50 by fclivaz           #+#    #+#              #
-#    Updated: 2025/06/13 21:25:18 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/06/19 18:12:21 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,6 +26,4 @@ services:
     environment:
       - API_KEY=aaa
       - TZ=Europe/Zurich
-    depends_on:
-      - sarif_blockchain
     restart: on-failure
