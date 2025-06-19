@@ -3,6 +3,7 @@ data/
 artifacts/
 cache/
 addscore.json
+package-lock.json
 *.env
 .env
 
