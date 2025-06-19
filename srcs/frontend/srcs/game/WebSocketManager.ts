@@ -10,8 +10,9 @@ export class WebSocketManager {
 	constructor(
 		private onInit: InitHandler,
 		private onUpdate: UpdateHanlder,
+		private addr: string
 	) {
-		this.socket = new WebSocket(HOST);
+		this.socket = new WebSocket(this.addr);
 		console.log("I am being called!");
 		console.log(this.socket);
 
@@ -30,4 +31,5 @@ export class WebSocketManager {
 		
 		this.socket.onerror = (e) => console.error("[WS] Error", e);
 	}
+
 }

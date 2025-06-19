@@ -9,7 +9,7 @@ export class BabylonGame {
 	private field: GameField;
 	private started: boolean = false;
 
-	constructor(canvas: HTMLCanvasElement) {
+	constructor(canvas: HTMLCanvasElement, addr: string) {
 		this.engine = new Engine(canvas, true);
 		this.field = new GameField(this.engine);
 
@@ -23,7 +23,7 @@ export class BabylonGame {
 					});
 				}
 			},
-			(payload) => this.field.update(payload)
+			(payload) => this.field.update(payload), addr
 		);
 
 		// this.engine.runRenderLoop(() => {

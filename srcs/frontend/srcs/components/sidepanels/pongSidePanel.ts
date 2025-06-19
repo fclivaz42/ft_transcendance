@@ -17,6 +17,12 @@ export function createPongSidePanel() {
 	}))
 
 	sidePanel.appendChild(createSidePanelButton({
+		title: i18nHandler.getValue("navbar.pong.submenu.play2"),
+		i18n: "navbar.pong.submenu.play2",
+		logo: buttonLogo
+	}))
+
+	sidePanel.appendChild(createSidePanelButton({
 		title: i18nHandler.getValue("navbar.pong.submenu.solo"),
 		i18n: "navbar.pong.submenu.solo",
 		logo: buttonLogo
