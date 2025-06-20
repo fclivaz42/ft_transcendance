@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/20 01:45:28 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/20 02:11:57 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -28,11 +28,15 @@ import { extra_routes } from "./db_extras.ts"
 if (process.env.API_KEY === undefined ||
 	process.env.DBLOCATION === undefined ||
 	process.env.FILELOCATION === undefined ||
+	process.env.ADMIN_NAME === undefined ||
+	process.env.ADMIN_PASSWORD === undefined ||
 	process.env.RUNMODE === undefined) {
 	console.error("At least one of the necessary variables to run this program isn't set:",
 		process.env.API_KEY === undefined ? "API_KEY" : "",
 		process.env.DBLOCATION === undefined ? "DBLOCATION" : "",
 		process.env.FILELOCATION === undefined ? "FILELOCATION" : "",
+		process.env.ADMIN_NAME === undefined ? "ADMIN_NAME" : "",
+		process.env.ADMIN_PASSWORD === undefined ? "ADMIN_PASSWORD" : "",
 		process.env.RUNMODE === undefined ? "RUNMODE" : ""
 	)
 	process.exit(1)
