@@ -1,5 +1,4 @@
+mkdir -p /var/www/sarif-frontend
 rm -rf /var/www/sarif-frontend/*
-for file in /app/*; do
-	mv $file /var/www/sarif-frontend
-done
+cp -rf /app/* /var/www/sarif-frontend
 exit 0

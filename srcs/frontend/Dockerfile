@@ -1,7 +1,6 @@
 FROM node:23.10.0-alpine
 
 WORKDIR /app-srcs
-RUN apk add bash
 
 COPY srcs ./srcs
 COPY public ./public
@@ -18,4 +17,4 @@ RUN cp -rf ./public/* dist/
 RUN rm -rf ./public
 RUN mv ./dist /app
 
-ENTRYPOINT ["/bin/bash", "./docker-entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "./docker-entrypoint.sh"]
