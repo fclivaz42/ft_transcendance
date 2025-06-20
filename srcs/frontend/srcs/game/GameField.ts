@@ -14,7 +14,7 @@ import { MeshBuilder } from "@babylonjs/core";
 // Temp values, overriding WebSocket info
 const ALPHA: number = Math.PI / 2;
 const BETA: number = Math.PI / 2;
-const RADIUS: number = -20;
+const RADIUS: number = -26;
 
 export class GameField {
 	public scene: Scene;
