@@ -6,6 +6,7 @@ const COLORS = {
 	red: "\x1b[31m",
 	magenta: "\x1b[35m",
 	white: "\x1b[37m",
+	cyan: "\x1b[36m",
 };
 
 
@@ -22,7 +23,7 @@ export class Logger {
 	) {
 		const timestamp = new Date().toISOString();
 		console[level](
-			`${COLORS.blue}[${timestamp}]${COLORS.reset} ${this._colors[level.toLowerCase()]}[${level.toUpperCase()}]${COLORS.reset} ${message}`
+			`${COLORS.cyan}[${timestamp}]${COLORS.reset} ${this._colors[level.toLowerCase()]}[${level.toUpperCase()}]${COLORS.reset} ${message}`
 		);
 	}
 
