@@ -6,11 +6,11 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/20 02:11:57 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/20 22:08:05 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
-import { add_default_user, init_db } from "./db_startup.ts"
+import { add_default_user, check_contract, init_db } from "./db_startup.ts"
 import { tables } from "./db_vars.ts"
 import RequestHandler from "./db_helpers.ts"
 import fs from "node:fs"
@@ -115,6 +115,9 @@ if (await add_default_user())
 	console.log("Default user added/updated.")
 else
 	console.error("Could not create user!")
+
+// WARN: UNCOMMENT ONCE WORKING WITH BLOCKCHAIN
+// check_contract()
 
 //
 // Aaaand start!
