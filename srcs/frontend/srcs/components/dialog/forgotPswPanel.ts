@@ -2,6 +2,7 @@
 
 import { createInfoInput, CustomInputContainer } from '../input/infoInput.js';
 import { LoginDialogOptions } from './index.js'; // Import from your new index.ts
+import { i18nHandler } from "../../handlers/i18nHandler.js";
 
 export function createForgotPasswordPanel(options: LoginDialogOptions) {
   const forgotPasswordPanel = document.createElement("div");
@@ -16,11 +17,11 @@ export function createForgotPasswordPanel(options: LoginDialogOptions) {
   const forgotPasswordForm = document.createElement("form");
   forgotPasswordForm.className = "flex flex-col gap-3 w-full max-w-xs px-2";
 
-  const forgotPasswordEmailInput = createInfoInput("Votre adresse e-mail", "forgotEmail");
-  const forgotPasswordCodeInput = createInfoInput("Code reçu par e-mail", "forgotCode");
+  const forgotPasswordEmailInput = createInfoInput(i18nHandler.getValue("panel.emailLabel"), "forgotEmail");
+  const forgotPasswordCodeInput = createInfoInput(i18nHandler.getValue("panel.forgotPasswordPanel.validation.code"), "forgotCode");
   
   const forgotPasswordButton = document.createElement("button");
-  forgotPasswordButton.textContent = "Réinitialiser le mot de passe";
+  forgotPasswordButton.textContent = i18nHandler.getValue("panel.forgotPasswordPanel.sendButton");
   forgotPasswordButton.type = "submit";
   forgotPasswordButton.className = "bg-purple-600 hover:bg-purple-700 font-semibold py-2 px-4 rounded ";
 
@@ -31,7 +32,7 @@ export function createForgotPasswordPanel(options: LoginDialogOptions) {
 
   const switchToLoginFromForgotLink = document.createElement("a");
   switchToLoginFromForgotLink.href = "#";
-  switchToLoginFromForgotLink.textContent = "Retour à la connexion";
+  switchToLoginFromForgotLink.textContent = i18nHandler.getValue("panel.forgotPasswordPanel.link.loginPanel");
   switchToLoginFromForgotLink.className = "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer";
   forgotPasswordPanel.appendChild(switchToLoginFromForgotLink);
 

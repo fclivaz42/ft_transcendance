@@ -7,7 +7,7 @@ import { createDialog } from "./index.js";
 import { checkPasswordStrength, PasswordStrengthResult } from "../input/createPasswordInput.js";
 import { createPasswordStrengthList } from "../input/passwordStrengh.js";
 import { createLoginPanel, createRegisterPanel, createForgotPasswordPanel, LoginDialogOptions } from './index.js';
-
+import { i18nHandler } from "../../handlers/i18nHandler.js";
 
 // --- Main Login Dialog Function ---
 export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElement
@@ -184,11 +184,11 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
 
     // Définir le titre du dialogue
     if (mode === 'login') {
-        dialogTitle.textContent = "Se connecter";
+        dialogTitle.textContent = i18nHandler.getValue("panel.loginPanel.panelTitle");
     } else if (mode === 'register') {
-        dialogTitle.textContent = "S'inscrire";
+        dialogTitle.textContent = i18nHandler.getValue("panel.registerPanel.panelTitle");
     } else { // mode === 'forgotPassword'
-        dialogTitle.textContent = "Mot de passe oublié";
+        dialogTitle.textContent = i18nHandler.getValue("panel.forgotPasswordPanel.panelTitle");
     }
 
     const hiddenClass = 'opacity-0';

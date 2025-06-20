@@ -89,24 +89,49 @@ absolute inset-y-1 right-2
     focus:outline-none 
     z-10 cursor-pointer
     `.replace(/\s+/g, " ");
-    const eyeIcon = document.createElement("span");
-    eyeIcon.className = "icon";
-    eyeIcon.textContent = "👁️";
-    const eyeSlashIcon = document.createElement("span");
-    eyeSlashIcon.className = "icon hidden";
-    eyeSlashIcon.textContent = "🙈";
+    // const eyeIcon = document.createElement("span");
+    // eyeIcon.className = "icon";
+    // eyeIcon.textContent = "👁️";
+    // const eyeSlashIcon = document.createElement("span");
+    // eyeSlashIcon.className = "icon hidden";
+    // eyeSlashIcon.textContent = "🙈";
+    // toggleButton.appendChild(eyeIcon);
+    // toggleButton.appendChild(eyeSlashIcon);
+    // Icône "œil ouvert"
+    const eyeIcon = document.createElement("img");
+    eyeIcon.src = "./assets/ui/eye-open.svg"; // <--- Chemin vers votre SVG pour l'œil ouvert
+    eyeIcon.alt = "Afficher le mot de passe"; // Texte alternatif pour l'accessibilité
+    eyeIcon.className = "w-5 h-5"; // Taille de l'icône, ajustez si besoin
+
+    // Icône "œil barré" (cachée par défaut)
+    const eyeSlashIcon = document.createElement("img");
+    eyeSlashIcon.src = "./assets/ui/eye-closed.svg"; // <--- Chemin vers votre SVG pour l'œil fermé
+    eyeSlashIcon.alt = "Cacher le mot de passe"; // Texte alternatif pour l'accessibilité
+    eyeSlashIcon.className = "w-5 h-5 hidden"; // Taille et 'hidden' pour qu'elle soit cachée au départ
+
     toggleButton.appendChild(eyeIcon);
     toggleButton.appendChild(eyeSlashIcon);
 
+    // toggleButton.addEventListener("click", () => {
+    //     if (input.type === "password") {
+    //         input.type = "text";
+    //         eyeIcon.classList.add("hidden");
+    //         eyeSlashIcon.classList.remove("hidden");
+    //     } else {
+    //         input.type = "password";
+    //         eyeIcon.classList.remove("hidden");
+    //         eyeSlashIcon.classList.add("hidden");
+    //     }
+    // });
     toggleButton.addEventListener("click", () => {
         if (input.type === "password") {
             input.type = "text";
-            eyeIcon.classList.add("hidden");
-            eyeSlashIcon.classList.remove("hidden");
+            eyeIcon.classList.add("hidden");        // Cache l'œil ouvert
+            eyeSlashIcon.classList.remove("hidden"); // Affiche l'œil barré
         } else {
             input.type = "password";
-            eyeIcon.classList.remove("hidden");
-            eyeSlashIcon.classList.add("hidden");
+            eyeIcon.classList.remove("hidden");     // Affiche l'œil ouvert
+            eyeSlashIcon.classList.add("hidden");   // Cache l'œil barré
         }
     });
 
