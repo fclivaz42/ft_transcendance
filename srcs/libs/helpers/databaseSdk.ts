@@ -6,8 +6,8 @@ export type UUIDv4 = string
 
 export default class databaseSdk {
 
-	private _api_key = process.env.API_KEY
-	private serverUrl = "https://sarif_usermanager:3000"
+	private api_key = process.env.API_KEY
+	private server_url = "http://sarif_database:3000"
 
 	constructor() { }
 
