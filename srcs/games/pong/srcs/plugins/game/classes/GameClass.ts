@@ -34,14 +34,14 @@ interface BroadcastFunction {
 }
 
 interface WallMap {
-	[key : string]: Wall;
+	[key: string]: Wall;
 }
 
 export default class Game {
 	private _field: PlayField;
 	private _scene: Scene;
 	private _broadcastUpdate: BroadcastFunction | null = null;
-	
+
 	private _p1: Paddle;
 	private _p2: Paddle;
 	private _ball: Ball;
@@ -57,51 +57,51 @@ export default class Game {
 				this._scene,
 				"northWall",
 				new Vector3(0, 8.05, 0), {
-					color: Color3.White(),
-					width: WALL_WIDTH,
-					height: WALL_HEIGHT,
-					depth: WALL_DEPTH
+				color: Color3.White(),
+				width: WALL_WIDTH,
+				height: WALL_HEIGHT,
+				depth: WALL_DEPTH
 			}),
 			"southWall": new Wall(
 				this._scene,
 				"southWall",
 				new Vector3(0, -8.05, 0), {
-					color: Color3.White(),
-					width: WALL_WIDTH,
-					height: WALL_HEIGHT,
-					depth: WALL_DEPTH
+				color: Color3.White(),
+				width: WALL_WIDTH,
+				height: WALL_HEIGHT,
+				depth: WALL_DEPTH
 			}),
 			"eastWall": new Wall(
 				this._scene,
 				"eastWall",
 				new Vector3(15.2, 0, 0), {
-					color: Color3.White(),
-					width: GOAL_WIDTH,
-					height: GOAL_HEIGHT,
-					depth: GOAL_DEPTH
+				color: Color3.White(),
+				width: GOAL_WIDTH,
+				height: GOAL_HEIGHT,
+				depth: GOAL_DEPTH
 			}),
 			"westWall": new Wall(
 				this._scene,
 				"westWall",
 				new Vector3(-15.2, 0, 0), {
-					color: Color3.White(),
-					width: GOAL_WIDTH,
-					height: GOAL_HEIGHT,
-					depth: GOAL_DEPTH
+				color: Color3.White(),
+				width: GOAL_WIDTH,
+				height: GOAL_HEIGHT,
+				depth: GOAL_DEPTH
 			}),
 		}
-		const bounds: {minY: number, maxY: number} = this.getVerticalBounds();
+		const bounds: { minY: number, maxY: number } = this.getVerticalBounds();
 
 		/* Creating Player 1 Paddle */
 		this._p1 = new Paddle(
 			this._scene,
 			"player1",
 			new Vector3(-14.5, 0, 0), {
-				color: Color3.White(),
-				speed: PADDLE_SPEED,
-				height: PLAYER_HEIGHT,
-				width: PLAYER_WIDTH
-			});
+			color: Color3.White(),
+			speed: PADDLE_SPEED,
+			height: PLAYER_HEIGHT,
+			width: PLAYER_WIDTH
+		});
 		this._p1.getMesh().showBoundingBox = SHOW_BOXES;
 		this._p1.setVerticalBounds(bounds);
 
@@ -110,11 +110,11 @@ export default class Game {
 			this._scene,
 			"player2",
 			new Vector3(14.5, 0, 0), {
-				color: Color3.White(),
-				speed: PADDLE_SPEED,
-				height: PLAYER_HEIGHT,
-				width: PLAYER_WIDTH
-			});
+			color: Color3.White(),
+			speed: PADDLE_SPEED,
+			height: PLAYER_HEIGHT,
+			width: PLAYER_WIDTH
+		});
 		this._p2.getMesh().showBoundingBox = SHOW_BOXES;
 		this._p2.setVerticalBounds(bounds);
 
@@ -123,11 +123,11 @@ export default class Game {
 			this._scene,
 			"ball",
 			new Vector3(0, 0, 0), {
-				color: Color3.White(),
-				diameter: BALL_DIAMETER
-			});
-			this._ball.setBaseSpeed(BALL_SPEED);
-			this._ball.getMesh().showBoundingBox = SHOW_BOXES;
+			color: Color3.White(),
+			diameter: BALL_DIAMETER
+		});
+		this._ball.setBaseSpeed(BALL_SPEED);
+		this._ball.getMesh().showBoundingBox = SHOW_BOXES;
 
 		for (let [key, value] of Object.entries(this._walls)) {
 			value.getMesh().showBoundingBox = SHOW_BOXES;
@@ -165,12 +165,12 @@ export default class Game {
 		return this._walls;
 	}
 
-	public getVerticalBounds(): {minY: number; maxY: number} {
+	public getVerticalBounds(): { minY: number; maxY: number } {
 		const north = this._walls.northWall.getMesh();
 		const south = this._walls.southWall.getMesh();
 
 		if (!north || !south) {
-			return {minY: -7.5, maxY: 7.5}; // un-hardcode later // these are defaults in case something goes wrong
+			return { minY: -7.5, maxY: 7.5 }; // un-hardcode later // these are defaults in case something goes wrong
 		}
 
 		const northHalf = (north.scaling.y || 1) * (north.getBoundingInfo()?.boundingBox.extendSize.y ?? 0.25);
@@ -178,8 +178,8 @@ export default class Game {
 
 		const southHalf = (south.scaling.y || 1) * (south.getBoundingInfo()?.boundingBox.extendSize.y ?? 0.25);
 		const minY = (south.position.y - southHalf);
-		
-		return {minY, maxY};
+
+		return { minY, maxY };
 	}
 
 	public getWallsForWs(): Record<string, ReturnType<Wall["getInitInfo"]>> {

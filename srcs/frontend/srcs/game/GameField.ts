@@ -4,11 +4,11 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
 import { Engine } from "@babylonjs/core/Engines/engine.js";
 
-import {Ball} from "./game_components/Ball.js";
-import {Paddle} from "./game_components/Paddle.js";
-import {Wall} from "./game_components/Wall.js";
+import { Ball } from "./game_components/Ball.js";
+import { Paddle } from "./game_components/Paddle.js";
+import { Wall } from "./game_components/Wall.js";
 
-import { InitPayload, UpdatePayload, CameraInitInfo, LightInitInfo} from "./types.js";
+import { InitPayload, UpdatePayload, CameraInitInfo, LightInitInfo } from "./types.js";
 import { MeshBuilder } from "@babylonjs/core";
 
 // Temp values, overriding WebSocket info
@@ -36,7 +36,7 @@ export class GameField {
 		this.ball = new Ball(this.scene, payload.ball);
 		this.p1 = new Paddle(this.scene, "p1", payload.p1);
 		this.p2 = new Paddle(this.scene, "p2", payload.p2);
-		
+
 		for (const [name, wall] of Object.entries(payload.walls)) {
 			this.walls.push(new Wall(this.scene, name, wall));
 		}
@@ -61,7 +61,7 @@ export class GameField {
 			Vector3.Zero(),
 			this.scene
 		);
-		// camera.attachControl(this.engine.getRenderingCanvas(), false);
+		// camera.attachContro(this.engine.getRenderingCanvas(), false);
 		this.scene.activeCamera = camera;
 		console.log("Camera position: ", camera.position.asArray());
 

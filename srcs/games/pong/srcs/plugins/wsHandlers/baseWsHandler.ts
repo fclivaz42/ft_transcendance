@@ -1,17 +1,24 @@
 
 import fastify, { type FastifyRequest } from "fastify";
-import fastifyWebsocket, {type WebSocket} from "@fastify/websocket";
+import fastifyWebsocket, { type WebSocket } from "@fastify/websocket";
 import RoomManager from "../game/classes/RoomManager.ts";
 import PlayerSession from "../game/classes/PlayerSession.ts";
+import Ball from "../game/classes/Ball.ts";
+import Game from "../game/classes/GameClass.ts";
+import GameRoom from "../game/classes/GameRoom.ts";
 
 interface GameWsQuery {
 	userId: string;
 	roomId?: string;
 }
 
+interface payload {
+	direction?: string
+}
+
 interface ClientMessage {
 	type: string;
-	payload?: any;
+	payload?: payload;
 }
 
 interface CreateWsHandlerParams {
@@ -26,21 +33,21 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 		const query = req.query;
 
 		if (!query.userId) {
-            socket.send(JSON.stringify({ type: '403', message: 'Unauthorized user'}));
-            socket.close();
-            return;
-        }
+			socket.send(JSON.stringify({ type: '403', message: 'Unauthorized user' }));
+			socket.close();
+			return;
+		}
 
 		let session: PlayerSession;
 
 		if (mode === 'friend_join') {
 			if (!query.roomId) {
-				socket.send(JSON.stringify({ type: '400', message: 'Missing roomId'}));
-            	socket.close();
-            	return;
+				socket.send(JSON.stringify({ type: '400', message: 'Missing roomId' }));
+				socket.close();
+				return;
 			}
 
-			session = manager.assignPlayer( socket, {
+			session = manager.assignPlayer(socket, {
 				userId: query.userId,
 				mode,
 				roomId: query.roomId
@@ -57,7 +64,14 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 		socket.on('message', (msg) => {
 			try {
 				const { type, payload }: ClientMessage = JSON.parse(msg.toString());
-				if (type === 'move' && payload?.direction) {
+				if (type === 'ball' && payload?.direction && payload.direction == "launch") {
+					console.log(`Launch command from ${session.getPaddleId()} | user: ${session.getUserId()}`);
+					console.log("OON EST ICIIII");
+					let ball = session.getRoom()?.getGame().getBall();
+					ball?.launch();
+					ball?.setCurrSpeed(0.25);
+				}
+				else if (type === 'move' && payload?.direction) {
 					console.log(`Move command from ${session.getPaddleId()} | user: ${session.getUserId()}`);
 					const paddle = session.getPaddle();
 

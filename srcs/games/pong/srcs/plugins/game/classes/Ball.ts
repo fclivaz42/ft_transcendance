@@ -31,7 +31,7 @@ export default class Ball {
 	private _segments: number;
 
 	public direction: Vector3;
-	
+
 	constructor(
 		scene: Scene,
 		name: string,
@@ -47,13 +47,13 @@ export default class Ball {
 		this._scene = scene;
 		this._name = name;
 		this._position = position;
-		this._currSpeed = 0.0;
-		this._baseSpeed = 0.15;
+		this._currSpeed = 0;
+		this._baseSpeed = 0.25;
 		this._playerBounces = 0;
 		this._diameter = diameter;
 		this._segments = segments;
 		this.direction = new Vector3(0, 0, 0);
-		
+
 		this._mesh = MeshBuilder.CreateSphere(name, { diameter, segments }, scene);
 		this._mesh.position = position.clone();
 
@@ -66,15 +66,15 @@ export default class Ball {
 		this._bounceCooldown = 0;
 	}
 
-	public getMesh(): Mesh								{ return this._mesh; }
-	public getCollisionBox(): BoundingBox				{ return this._mesh.getBoundingInfo().boundingBox; }
-	public getLastHit(): string | null					{ return this._lastHit; }
-	public getPlayerBounces(): number					{ return this._playerBounces; }
-	public getBaseSpeed(): number						{ return this._baseSpeed; }
-	public getCurrSpeed(): number						{ return this._currSpeed; }
-	public getPosition(): Vector3						{ return this._mesh.position; }
-	public getColliders(): any[]						{ return this._colliders; }
-	public getBallInitInfo(): BallInfo		{
+	public getMesh(): Mesh { return this._mesh; }
+	public getCollisionBox(): BoundingBox { return this._mesh.getBoundingInfo().boundingBox; }
+	public getLastHit(): string | null { return this._lastHit; }
+	public getPlayerBounces(): number { return this._playerBounces; }
+	public getBaseSpeed(): number { return this._baseSpeed; }
+	public getCurrSpeed(): number { return this._currSpeed; }
+	public getPosition(): Vector3 { return this._mesh.position; }
+	public getColliders(): any[] { return this._colliders; }
+	public getBallInitInfo(): BallInfo {
 		return {
 			curr_speed: this.getCurrSpeed(),
 			curr_position: this.getPosition().asArray(),
@@ -83,22 +83,19 @@ export default class Ball {
 		};
 	}
 
-	public setLastHit(lastHit: string | null): void		{ this._lastHit = lastHit; }
-	public setBaseSpeed(baseSpeed: number): void		{ this._baseSpeed = baseSpeed; }
-	public setCurrSpeed(currSpeed: number): void		{ this._currSpeed = currSpeed; }
-	public incrCurrSpeed(increment: number): void		{ this._currSpeed += increment; }
-	public setStartDir(dir: Vector3): void				{ this.direction = dir.normalize(); }
-	public setDirection(vector: Vector3): void			{ this.direction = vector.normalize(); }
-	public setColliders(colliders: any[]): void			{ this._colliders = colliders; }
-	public incrPlayerBounce(): void						{ this._playerBounces++; }
-	
+	public setLastHit(lastHit: string | null): void { this._lastHit = lastHit; }
+	public setBaseSpeed(baseSpeed: number): void { this._baseSpeed = baseSpeed; }
+	public setCurrSpeed(currSpeed: number): void { this._currSpeed = currSpeed; }
+	public incrCurrSpeed(increment: number): void { this._currSpeed += increment; }
+	public setStartDir(dir: Vector3): void { this.direction = dir.normalize(); }
+	public setDirection(vector: Vector3): void { this.direction = vector.normalize(); }
+	public setColliders(colliders: any[]): void { this._colliders = colliders; }
+	public incrPlayerBounce(): void { this._playerBounces++; }
+
 	public launch(): void {
 		this._currSpeed = this._baseSpeed;
 		this.direction = new Vector3(
-			Math.random() < 0.5 ? 1 : -1,
-			0,
-			0
-		).normalize();
+			Math.random() < 0.5 ? 1 : -1, 0, 0).normalize();
 		this._mesh.position.addInPlace(this.direction.scale(this._currSpeed));
 	}
 

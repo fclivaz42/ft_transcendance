@@ -15,7 +15,7 @@ export function createPongSidePanel() {
 		title: i18nHandler.getValue("navbar.pong.submenu.play"),
 		i18n: "navbar.pong.submenu.play",
 		logo: buttonLogo,
-		f: () =>  startGame("ws://localhost:1337/game/remote?userId=123"), // TODO: Is the parameter needed? If so, maybe add env variable
+		f: () => startGame("ws://localhost:1337/game/remote?userId=123"), // TODO: Is the parameter needed? If so, maybe add env variable
 		// TODO: To add a function to a button, simply map your function to the f property of the props
 	}));
 
