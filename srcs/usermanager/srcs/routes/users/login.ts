@@ -2,6 +2,9 @@ import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { jwt } from '../../managers/JwtManager.ts';
 import { randomBytes } from 'crypto';
 import checkRequestAuthorization from '../../managers/AuthorizationManager.ts';
+import type { UserLoginProps, Users } from '../../../../libs/interfaces/Users.ts';
+import databaseSdk from "../../../../libs/helpers/databaseSdk.ts"
+import { httpReply } from "../../../../libs/helpers/httpResponse.ts";
 
 export default async function usersLoginEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.post("/login", async (request, reply) => {
@@ -10,20 +13,30 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
 			return authorization;
-		// TODO: Implement user authentication logic here
-		// For now, we will simulate a successful login by generating a fake user ID and JWT token.
-		// sub property in JWT payload should be the user ID.
-		// you can add more properties to the payload as needed in data object.
 
-		// Keep in mind that you can either recieve username, password (and 2fa in the future) **OR** Oauth2 token
-		// @RPDJF will implement the Oauth2 token validation in the future once the usermanager will be mature enough.
-		const fakeUserId = randomBytes(32).toString("hex");
+		const userLogin = request.body as UserLoginProps;
+		const dbSdk = new databaseSdk();
+
+		// TODO: Polish the code once the databaseSdk is fully implemented.
+		/*let loggedUser: Users | undefined;
+		if (userLogin.username)
+			loggedUser = await dbSdk.check_password(userLogin.username, "DisplayName", userLogin.password);
+		else if (userLogin.email)
+			loggedUser = await dbSdk.check_password(userLogin.email, "EmailAddress", userLogin.password);
+		else
+			return httpReply({
+				module: "usermanager",
+				detail: "Invalid login request, username or email is required.",
+				status: 400
+			}, request, reply);		
 		const jwtToken = jwt.createJwtToken({
-			sub: fakeUserId,
+			sub: loggedUser.PlayerID,
 			data: {
-				somestring: "Not necessary but you can pass non-critical-sensitive data here if needed, or encrypt it yourself",
-			}
+				DisplayName: user.DisplayName,
+				EmailAddress: user.EmailAddress,
+				//AvatarURL: user.AvatarURL,
+			},
 		});
-		return reply.status(200).send({ token: jwtToken.token });
+		return reply.status(200).send({ token: jwtToken.token });*/
 	});
 }

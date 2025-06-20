@@ -25,12 +25,17 @@ server.listen({ port: config.ServerConfig.port, host: "0.0.0.0" }, (err, address
 
 
 server.addHook("onResponse", async (req, res) => {
-	// @ts-expect-error
 	fastifyLogger(req, res);
 });
 
 server.addHook("onError", async (req, res, error) => {
 	Logger.error(`Error occurred: ${error.message}`);
-	// @ts-expect-error
 	fastifyLogger(req, res);
+});
+
+server.addHook("onListen", () => {
+	if (!config.ServerConfig.cert._keypath || !config.ServerConfig.cert._certpath)
+		Logger.info(`Listening on http://127.0.1:${config.ServerConfig.port}/`);
+	else
+		Logger.info(`Listening on https://127.0.0.1:${config.ServerConfig.port}/`);
 });

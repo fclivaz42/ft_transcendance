@@ -19,7 +19,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 		const resp = await axios.get(`http://sarif_db:3000/Players`, {
 			headers: {
-				"api_key": process.env.API_KEY || "",
+				"Authorization": process.env.API_KEY || "",
 				"field": "PlayerID",
 				"query": params.uuid
 			},
@@ -38,7 +38,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		// TODO: Remove axios request, use sdk instead
 		const resp = await axios.delete(`http://sarif_db:3000/Players`, {
 			headers: {
-				"api_key": process.env.API_KEY || "",
+				"Authorization": process.env.API_KEY || "",
 				"field": "PlayerID",
 				"query": params.uuid,
 			},
@@ -64,7 +64,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 
 		const db = await axios.post(`http://sarif_db:3000/Players`, body, {
 			headers: {
-				"api_key": process.env.API_KEY || "",
+				"Authorization": process.env.API_KEY || "",
 				"Content-Type": "application/json",
 			},
 			httpsAgent: new https.Agent({ rejectUnauthorized: false }),
@@ -84,7 +84,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 
 		const db = await axios.put(`http://sarif_db:3000/Players`, body, {
 			headers: {
-				"api_key": process.env.API_KEY || "",
+				"Authorization": process.env.API_KEY || "",
 				"Content-Type": "application/json",
 			},
 			httpsAgent: new https.Agent({ rejectUnauthorized: false }),
