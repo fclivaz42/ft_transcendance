@@ -96,12 +96,12 @@
       "panelTitle": "Petit oubli?",
       "sendButton": "Réinitialiser le mot de passe",
       "validation": {
-        "code" : "Veuillez saisir le code envoyé à votre adresse e-mail.",
+        "code" : "Rentrez le code reçu par mail.",
         "emailRequired": "Veuillez saisir votre adresse e-mail.",
         "emailFormatError": "Veuillez saisir une adresse e-mail valide."
       },
       "link": {
-        "loginPanel": "Vous vous souvenez de votre mot de passe ? Se connecter"
+        "loginPanel": "La mémoire revient? Se connecter"
       }
     }
   }
