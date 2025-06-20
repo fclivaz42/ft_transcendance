@@ -1,38 +1,53 @@
 import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import crypto from 'node:crypto';
-import Oauth2sdk from "../modules/oauth2/oauth2sdk.ts";
-import type { Oauth2sdkDbEntry } from "../modules/oauth2/oauth2sdk.ts";
-import { httpReply } from "../modules/oauth2/HttpResponse.ts";
+import Oauth2sdk from "../../../libs/helpers/oauthSdk.ts";
+import type { Oauth2sdkDbEntry } from "../../../libs/helpers/oauthSdk.ts";
+import { httpReply } from "../../../libs/helpers/httpResponse.ts";
 import axios from "axios";
 import type { AxiosResponse } from "axios";
-import type { UsersSdkUser } from "../modules/users/usersSdk.ts";
+import type { Users } from "../../../libs/interfaces/Users.ts";
+import { Logger } from "../../../libs/helpers/loggers.ts";
 
 
 const oauth2sdk = new Oauth2sdk();
 
 async function oauth_routes(app: FastifyInstance, opts: FastifyPluginOptions) {
   app.get('/login', async (req, rep) => {
-    console.error("Using random client_id for debug purposes");
-    const client_id = crypto.randomBytes(16).toString('hex');
     const query = req.query as { client_id?: string ; user_id?: string };
 
     if (!query.client_id) {
-      return httpReply(rep, req, 400, "Missing client_id query from request. Please provide a client_id to identify the browser session.");
+      return httpReply({
+				detail: "Missing client_id query parameter. Please provide a client_id to identify the browser session.",
+				status: 400,
+				module: "oauth2",
+			}, rep, req);
     }
 
     if (query.user_id) {
       // TODO: Update current user session with oauth2sdk
-      return httpReply(rep, req, 501, "User session management is not implemented yet. Please provide a user_id to associate with the client_id.");
+      return httpReply({
+				detail: "User session management is not implemented yet. Please provide a user_id to associate with the client_id.",
+				status: 501,
+				module: "oauth2",
+			}, rep, req);
     }
 
     await oauth2sdk.getLogin(query.client_id)
       .catch(err => {
-        console.error("Error fetching login URL:", err);
-        httpReply(rep, req, 500, "Failed to fetch login URL");;
+        Logger.error(err);
+        httpReply({
+					detail: "Failed to fetch login URL",
+					status: 500,
+					module: "oauth2",
+				}, rep, req);
       })
       .then(response => {
         if (!response)
-          return httpReply(rep, req, 500, "No response from OAuth2 SDK");
+          return httpReply({
+						detail: "No response from Oauth2",
+						status: 500,
+						module: "oauth2",
+					}, rep, req);
         rep.status(200).send(response.data);
       });
   });
@@ -42,11 +57,19 @@ async function oauth_routes(app: FastifyInstance, opts: FastifyPluginOptions) {
     const { code, state } = req.query as { code?: string; state?: string };
 
     if (!code || !state)
-      return httpReply(rep, req, 400, "Missing code or state in query parameters");
+      return httpReply({
+				detail: "Missing code or state in query parameters.",
+				status: 400,
+				module: "oauth2",
+			}, rep, req);
 
     const response = await oauth2sdk.getCallback(code, state);
     if (!response)
-      return httpReply(rep, req, 500, "No response from OAuth2 SDK");
+      return httpReply({
+				detail: "No response from OAuth2 module",
+				status: 500,
+				module: "oauth2",
+			}, rep, req);
     const jwtDec = response.data.token.jwt_decode;
 
     const oauth2Content: Oauth2sdkDbEntry = {
@@ -71,16 +94,16 @@ async function oauth_routes(app: FastifyInstance, opts: FastifyPluginOptions) {
       },          
     });
   
-    const userContent: Partial<UsersSdkUser> = {
+    const userContent: Users = {
       DisplayName: jwtDec.name || "Unknown User",
       EmailAddress: jwtDec.email_verified ? jwtDec.email : "",
       FamilyName: jwtDec.family_name || "",
       FirstName: jwtDec.given_name || "",
       OAuthID: oauth2Content.SubjectID || "",
-      PassHash: "oauth2",
+      Password: "oauth2",
     }
 
-    let userResponse: AxiosResponse<UsersSdkUser> | null = null;
+    let userResponse: AxiosResponse<Users>;
     try {
       // TODO: Use db SDK when available
       userResponse = await axios.post("http://sarif_users:3000/Players", {
@@ -92,7 +115,7 @@ async function oauth_routes(app: FastifyInstance, opts: FastifyPluginOptions) {
         },
       });
     } catch (err) {
-      console.error("Error creating user:", err);
+      Logger.error(err);
       axios.delete("http://sarif_db:3000/OauthTable", {
         headers: {
           "field": "SubjectID",
@@ -100,7 +123,11 @@ async function oauth_routes(app: FastifyInstance, opts: FastifyPluginOptions) {
           "api_key": process.env.API_KEY || "",
         }
       });
-      return httpReply(rep, req, 500, "Failed to create user in database");
+      return httpReply({
+				detail: "Failed to create user in database",
+				status: 500,
+				module: "oauth2",
+			}, rep, req);
     }
     rep.status(200).send(response.data);
   });
