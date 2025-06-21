@@ -9,8 +9,6 @@ import https from 'https';
 
 export default async function usersRegisterEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.post("/register", async (request, reply) => {
-		if (process.env.RUNMODE?.toLowerCase() === "debug")
-			console.debug("POST /users/register called");
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
 			return authorization;
@@ -37,6 +35,6 @@ export default async function usersRegisterEndpoint(app: FastifyInstance, opts: 
 				//AvatarURL: user.AvatarURL,
 			}
 		});
-		return reply.status(201).send({token: jwtToken.token});
+		return reply.status(201).send({token: jwtToken.token, ...jwtToken.payload});
 	});
 }
