@@ -6,13 +6,15 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/20 01:54:31 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/20 20:39:55 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import Database from "better-sqlite3"
-import { tables } from "./db_vars.ts"
 import type * as sqlt from "better-sqlite3"
+import Axios from "axios"
+import type * as at from "axios"
+import { tables } from "./db_vars.ts"
 import { hash_password } from "./db_helpers.ts"
 import DatabaseWorker from "./db_methods.ts"
 
@@ -89,11 +91,11 @@ export async function init_db() {
 			}
 		} catch (error) {
 			console.error(error);
-			reject(false);
+			return reject(false);
 		} finally {
 			db.close()
 		}
-		resolve(true);
+		return resolve(true);
 	})
 }
 
@@ -107,11 +109,11 @@ export async function add_default_user() {
 			try {
 				const test = DatabaseWorker.get(tables.Players.Name, tables.Players.Fields[1], process.env.ADMIN_NAME as string)
 				if (test[tables.Players.Fields[1]] === process.env.ADMIN_NAME as string)
-					resolve(true);
+					return resolve(true);
 			} catch (e) {
 				if (e.code !== 404) {
 					console.dir(e);
-					reject(false);
+					return reject(false);
 				}
 			}
 			const default_user: object = { DisplayName: process.env.ADMIN_NAME, EmailAddress: "DEFAULTEMAIL", Admin: 1 };
@@ -120,9 +122,43 @@ export async function add_default_user() {
 				DatabaseWorker.post(tables.Players.Name, tables.Players.Fields, default_user)
 			} catch (e) {
 				console.dir(e);
-				reject(false);
+				return reject(false);
 			}
-			resolve(true);
+			return resolve(true);
 		})()
 	})
+}
+
+//
+// Check if the SmartContract already exists in the database.
+// If it isnt, it can only mean that it was not generated!
+// So we kindly ask the blockchain module to do it and we then store it inside of the CurrentContract table :)
+//
+
+export async function check_contract() {
+	const resp: object | undefined = DatabaseWorker.get_contract(tables.CurrentContract.Name);
+	if (resp !== undefined) {
+		console.log(`Blockchain already there: ${resp[tables.CurrentContract.Fields[0]]}`)
+		return;
+	}
+	const ask_blockchain: at.AxiosInstance = Axios.create({
+		method: "post",
+		timeout: 15000,
+		baseURL: "http://sarif_blockchain:8080",
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': process.env.API_KEY,
+		}
+	});
+	await ask_blockchain.post("/deploy", "")
+		.then(function(response: at.AxiosResponse) {
+			const obj = {};
+			obj[tables.CurrentContract.Fields[0]] = response.data;
+			DatabaseWorker.post(tables.CurrentContract.Name, tables.CurrentContract.Fields, obj)
+			console.log(`Blockchain initialized: ${response.data}`)
+		})
+		.catch(function(error: at.AxiosError) {
+			console.error("WARN: BLOCKCHAIN NOT INITIALIZED!")
+			console.log(error.name, error.code)
+		})
 }
