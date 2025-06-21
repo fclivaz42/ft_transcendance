@@ -1,12 +1,18 @@
 
 import fastify, { type FastifyInstance } from "fastify";
 import websocket from "@fastify/websocket";
-
+import fs from "node:fs";
 import gamePlugin from "./plugins/game/gamePlugin.ts";
 import websocketRoutes from "./plugins/websocketRoutes.ts";
+import { betterFastify } from "../../../libs/helpers/fastifyHelper.ts";
+import Logger from "../../../libs/helpers/loggers.ts";
 
 const app: FastifyInstance = fastify({
 	logger: true,
+	https: {
+		key: fs.readFileSync("/etc/ssl/private/sarif.key"),
+		cert: fs.readFileSync("/etc/ssl/certs/sarif.crt")
+	}
 });
 
 if (process.env.API_KEY === undefined ||
@@ -37,11 +43,11 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 	const start = async () => {
 		try {
 			await app.listen({ port: 1337, host: "::" });
-			app.log.info(`Server listening at http://0.0.0.0:1337`);
 		} catch (err) {
-			app.log.error(err);
+			Logger.error(`Error starting the server:\n${err}`);
 			process.exit(1);
 		}
 	};
+	betterFastify(app);
 	start();
 }

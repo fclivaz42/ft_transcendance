@@ -28,13 +28,17 @@ export default async function usersAuthorizeEndpoint(app: FastifyInstance, opts:
 		if (!jwtToken.payload)
 			return httpReply(reply, request, 401, "JWT token payload is missing");
 		// Check if the user exists in the database
-		await axios.get(`http://sarif_db:3000/Players/id/${jwtToken.payload.sub}`, {
-			headers: {
-				"Authorization": process.env.API_KEY || "",
-				"Content-Type": "application/json",
-			},
-			httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-		});
+		try {
+			await axios.get(`http://sarif_db:3000/Players/id/${jwtToken.payload.sub}`, {
+				headers: {
+					"Authorization": process.env.API_KEY || "",
+					"Content-Type": "application/json",
+				},
+				httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+			});
+		} catch (err) {
+			return httpReply(reply, request, 401, "Invalid JWT token: User not found");
+		}
 		return reply.send({ ...jwtToken.payload });
 	});
 }

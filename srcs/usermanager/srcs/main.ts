@@ -13,6 +13,8 @@ const server = fastify({
 
 server.register(initializeRoute, { prefix: "/users" });
 
+betterFastify(server);
+
 server.listen({ port: config.ServerConfig.port, host: "0.0.0.0" }, (err, address) => {
 	if (err) {
 		server.log.error(err);
@@ -20,5 +22,3 @@ server.listen({ port: config.ServerConfig.port, host: "0.0.0.0" }, (err, address
 	}
 	server.log.info(`Server listening at ${address}`);
 });
-
-betterFastify(server);
