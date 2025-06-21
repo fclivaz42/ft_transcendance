@@ -51,7 +51,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 	});
 
 	// The route that DELETES current user.
-	fastify.all('/delete', async (request, reply) => {
+	/*fastify.all('/delete', async (request, reply) => {
 		if (request.method !== 'DELETE')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only DELETE method is allowed for user deletion.' });
 
@@ -59,12 +59,15 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 
 		const deleteUser = await usersSdk.deleteUser(authorization.data.sub);
 		return reply.code(deleteUser.status).send(deleteUser.data);
-	});
+	});*/
 
 	// The route that allows a user to update their data (eg. password, address, etc).
 	fastify.all('/update', async (request, reply) => {
 		if (!(request.method === 'PUT' || request.method === 'PATCH'))
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only PUT or PATCH method is allowed for user update.' });
+
+		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		// TODO: Implement user data update logic
 	});
 
 	// Get public user data by UUID

@@ -40,20 +40,16 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		return reply.code(resp.status).send(resp.data);
 	});
 
-	app.post("/", async (request, reply) => {
+	app.put("/:uuid", async (request, reply) => {
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
 			return authorization;
-
-		// body validation
+		const params = request.params as { uuid: string };
 		const body = request.body as Partial<Users>;
-		if (!body.DisplayName)
-			return reply.code(400).send({ error: "DisplayName is required" });
 		if (body.PlayerID)
 			return reply.code(400).send({ error: "PlayerID is not allowed to be set manually" });
-		delete body.PlayerID;
 
-		const db = await axios.post(`http://sarif_db:3000/Players`, body, {
+		const db = await axios.put(`http://sarif_db:3000/Players/id/${params.uuid}`, body, {
 			headers: {
 				"Authorization": process.env.API_KEY || "",
 				"Content-Type": "application/json",
@@ -63,15 +59,21 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		return reply.code(db.status).send(db.data);
 	});
 
-	app.put("/", async (request, reply) => {
+	app.post("/", async (request, reply) => {
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
 			return authorization;
-		const body = request.body as Partial<Users>;
-		if (!body || !body.DisplayName || !body.PlayerID)
-			return reply.code(400).send({ error: "DisplayName and PlayerID are required" });
 
-		const db = await axios.put(`http://sarif_db:3000/Players`, body, {
+		// body validation
+		const body = request.body as Partial<Users>;
+		if (!body.DisplayName)
+			return reply.code(400).send({ error: "DisplayName is required" });
+		if (!body.EmailAddress)
+			return reply.code(400).send({ error: "EmailAddress is required" });
+		if (body.PlayerID)
+			return reply.code(400).send({ error: "PlayerID is not allowed to be set manually" });
+
+		const db = await axios.post(`http://sarif_db:3000/Players`, body, {
 			headers: {
 				"Authorization": process.env.API_KEY || "",
 				"Content-Type": "application/json",

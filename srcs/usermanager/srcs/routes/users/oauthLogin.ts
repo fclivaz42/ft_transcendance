@@ -2,7 +2,7 @@ import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { jwt } from '../../managers/JwtManager.ts';
 import { randomBytes } from 'crypto';
 import checkRequestAuthorization from '../../managers/AuthorizationManager.ts';
-import type { UserLoginProps, UserRegisterOauthProps, Users } from '../../../../libs/interfaces/Users.ts';
+import type { UserLoginOauthProps, Users } from '../../../../libs/interfaces/Users.ts';
 import databaseSdk from "../../../../libs/helpers/databaseSdk.ts"
 import { httpReply } from "../../../../libs/helpers/httpResponse.ts";
 import axios from 'axios';
@@ -14,7 +14,7 @@ export default async function usersOauthLoginEndpoint(app: FastifyInstance, opts
 		if (authorization)
 			return authorization;
 
-		const userLogin = request.body as UserRegisterOauthProps;
+		const userLogin = request.body as UserLoginOauthProps;
 		const dbSdk = new databaseSdk();
 
 		// TODO: Polish the code once the databaseSdk is fully implemented.
