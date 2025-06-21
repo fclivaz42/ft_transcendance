@@ -6,7 +6,7 @@ It is only intended to be executed once during the build process to generate the
 
 ## Features
 - `Logger` from `libs/helpers/loggers.ts`: A logger utility that can be used in any module.
-- `fastifyLogger` from `libs/helpers/fastifyHelper.ts`: A Fastify logger utility for request - response logging using `Logger`.
+- `betterFastify` from `libs/helpers/fastifyHelper.ts`: A Fastify utility that provides better logging and error handling.
 - `httpResponse` from `libs/helpers/httpResponse.ts`: A utility to create HTTP responses with standardized structure.
 
 ## How to use libs module

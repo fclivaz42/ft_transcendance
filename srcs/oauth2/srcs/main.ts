@@ -1,10 +1,10 @@
 import fastify from "fastify";
-import oauthRoutes from "./routes/oauth.ts";
+import oauthRoutes from "./routes/index.ts";
 import { config } from "./managers/ConfigManager.ts";
 import fs from "node:fs";
+import { betterFastify } from "../../libs/helpers/fastifyHelper.ts";
 
 const server = fastify({
-	logger: config.ServerConfig.logger,
 	https: {
 		key: fs.readFileSync(config.ServerConfig.cert._keypath),
 		cert: fs.readFileSync(config.ServerConfig.cert._certpath)
@@ -20,3 +20,5 @@ server.listen({ port: config.ServerConfig.port, host: "0.0.0.0" }, (err, address
 	}
 	server.log.info(`Server listening at ${address}`);
 });
+
+betterFastify(server);

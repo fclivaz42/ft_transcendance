@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { AxiosResponse } from "axios";
 import https from "https";
+import type { UsersSdkToken  } from "./usersSdk.ts";
 
 export interface Oauth2sdkConfig {
   apiKey: string;
@@ -24,7 +25,9 @@ export interface Oauth2sdkLoginResponse {
   state: string;
 }
 
-export interface Oauth2sdkCallbackResponse {
+export interface Oauth2sdkCallbackResponse extends UsersSdkToken  {}
+
+export interface Oauth2sdkSessionResponse {
   state: string;
   client_id: string;
   logged: boolean;
@@ -115,10 +118,10 @@ class Oauth2sdk {
   /**
    * 
    * @param state the state parameter to get the session information
-   * @returns a promise of type `Oauth2sdkCallbackResponse` containing the session information
+   * @returns a promise of type `Oauth2sdkSessionResponse` containing the session information
    */
-  public async getSession(state: string): Promise<AxiosResponse<Oauth2sdkCallbackResponse>> {
-    return this.apiRequest<Oauth2sdkCallbackResponse>(
+  public async getSession(state: string): Promise<AxiosResponse<Oauth2sdkSessionResponse>> {
+    return this.apiRequest<Oauth2sdkSessionResponse>(
       "get",
       `session/${state}`
     );
