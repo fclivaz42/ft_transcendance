@@ -105,7 +105,7 @@ class JwtManager {
 		const currentTime = Math.floor(Date.now() / 1000);
 		const fullPayload: JwtFullPayload = {
 			...payload,
-			iss: 'sarif.usermanager',
+			iss: config.UsermanagerConfig.issuer,
 			iat: currentTime,
 			exp: currentTime + this.props.expire
 		};
