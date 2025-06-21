@@ -5,11 +5,12 @@ import checkRequestAuthorization from '../../managers/AuthorizationManager.ts';
 import type { UserLoginProps, Users } from '../../../../libs/interfaces/Users.ts';
 import databaseSdk from "../../../../libs/helpers/databaseSdk.ts"
 import { httpReply } from "../../../../libs/helpers/httpResponse.ts";
+import axios from 'axios';
+import https from 'https';
+import Logger from '../../../../libs/helpers/loggers.ts';
 
 export default async function usersLoginEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.post("/login", async (request, reply) => {
-		if (process.env.RUNMODE?.toLowerCase() === "debug")
-			console.debug("POST /users/login called");
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
 			return authorization;
@@ -18,25 +19,63 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 		const dbSdk = new databaseSdk();
 
 		// TODO: Polish the code once the databaseSdk is fully implemented.
-		/*let loggedUser: Users | undefined;
-		if (userLogin.username)
-			loggedUser = await dbSdk.check_password(userLogin.username, "DisplayName", userLogin.password);
-		else if (userLogin.email)
-			loggedUser = await dbSdk.check_password(userLogin.email, "EmailAddress", userLogin.password);
+		let loggedUser: Users | undefined;
+		if (userLogin.DisplayName) {
+			loggedUser = await axios.get<Users>(`http://sarif_db:3000/pass_name/${userLogin.DisplayName}`, {
+				headers: {
+					Authorization: process.env.API_KEY || '',
+					"Content-Type": "application/json",
+					"Password": userLogin.Password || '',
+				},
+				httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+			})
+			.then(response => response.data)
+			.catch(error => {
+				Logger.error("Error fetching user by DisplayName: " + error);
+				return undefined;
+			});
+			//loggedUser = await dbSdk.check_password(userLogin.DisplayName, "DisplayName", userLogin.Password);
+		}
+		else if (userLogin.EmailAddress) {
+			loggedUser = await axios.get<Users>(`http://sarif_db:3000/pass_mail/${userLogin.EmailAddress}`, {
+				headers: {
+					Authorization: process.env.API_KEY || '',
+					"Content-Type": "application/json",
+					"Password": userLogin.Password || '',
+				},
+				httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+			})
+			.then(response => response.data)
+			.catch(error => {
+				Logger.error("Error fetching user by EmailAddress:" + error);
+				return undefined;
+			});
+			//loggedUser = await dbSdk.check_password(userLogin.EmailAddress, "EmailAddress", userLogin.Password);
+		}
 		else
 			return httpReply({
 				module: "usermanager",
 				detail: "Invalid login request, username or email is required.",
 				status: 400
-			}, request, reply);		
+			}, reply, request);
+
+		if (!loggedUser) {
+			return httpReply({
+				module: "usermanager",
+				detail: "Login credentials are incorrect.",
+				status: 401
+			}, reply, request);
+		}
+		if (!loggedUser.PlayerID)
+			throw new Error("Missing PlayerID in user data");
 		const jwtToken = jwt.createJwtToken({
 			sub: loggedUser.PlayerID,
 			data: {
-				DisplayName: user.DisplayName,
-				EmailAddress: user.EmailAddress,
-				//AvatarURL: user.AvatarURL,
+				DisplayName: loggedUser.DisplayName,
+				EmailAddress: loggedUser.EmailAddress,
+				//AvatarURL: loggedUser.AvatarURL,
 			},
 		});
-		return reply.status(200).send({ token: jwtToken.token });*/
+		return reply.status(200).send({ token: jwtToken.token, ...jwtToken.payload });
 	});
 }
