@@ -1,5 +1,13 @@
 {
   
+  "home": {
+    "guestButton": {
+      "label": "Jogar como convidado"
+    },
+    "accountButton": {
+      "label": "Usar uma conta"
+    }
+},
   "header": {
     "usermenu": {
       "login": "Iniciar sessão",
@@ -46,6 +54,54 @@
             "language": "Idioma"
           }
         }
+      }
+    }
+  },
+"panel": {
+    "usernameLabel": "Nome de Utilizador",
+    "passwordLabel": "Palavra-passe",
+    "emailLabel": "Endereço de e-mail",
+    "loginPanel": {
+      "panelTitle": "Iniciar sessão",
+      "rememberMe": "Lembrar-me",
+      "connexionButton": "Iniciar sessão",
+      "validation": {
+        "usernameRequired": "Por favor, insira o seu nome de utilizador.",
+        "passwordRequired": "A palavra-passe é obrigatória."
+      },
+      "link": {
+        "subscribePanel": "Ainda não tem conta? Crie uma!",
+        "forgotPasswordPanel": "Esqueceu-se da palavra-passe?"
+      }
+    },
+    "registerPanel": {
+      "panelTitle": "Criar a tua conta",
+      "confirmPasswordLabel": "Confirmar palavra-passe",
+      "registerButton": "Continuar",
+      "validation": {
+        "usernameRequired": "Por favor, insira o seu nome de utilizador.",
+        "emailRequired": "Por favor, insira o seu endereço de e-mail.",
+        "passwordRequired": "A palavra-passe é obrigatória.",
+        "confirmPasswordRequired": "Por favor, confirme a sua palavra-passe.",
+        "passwordMismatch": "As palavras-passe não correspondem.",
+        "lengthError": "O nome de utilizador deve ter entre 3 e 20 caracteres.",
+        "charactersError": "O nome de utilizador pode conter apenas letras [a-z], números [0-9] e hífens [-].",
+        "emailFormatError": "Por favor, insira um endereço de e-mail válido."
+      },
+      "link": {
+        "loginPanel": "Já tem conta? Iniciar sessão"
+      }
+    },
+    "forgotPasswordPanel": {
+      "panelTitle": "Pequeno esquecimento?",
+      "sendButton": "Redefinir palavra-passe",
+      "validation": {
+        "code" : "Por favor, insira o código enviado para o seu endereço de e-mail.",
+        "emailRequired": "Por favor, insira o seu endereço de e-mail.",
+        "emailFormatError": "Por favor, insira um endereço de e-mail válido."
+      },
+      "link": {
+        "loginPanel": "Lembrou-se da sua palavra-passe? Iniciar sessão"
       }
     }
   }

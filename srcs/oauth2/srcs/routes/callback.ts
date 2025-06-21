@@ -62,7 +62,7 @@ export async function getCallback(req: FastifyRequest, rep: FastifyReply) {
 	// update session state
 	stateManager.initSession(query.state, token);
 	// create or update the user in the database
-	updateUser(token, await getMatchingOauthUser(token));
+	await updateUser(token, await getMatchingOauthUser(token));
 	// log the user in using the OAuth ID
 	const userSdk = new UsersSdk();
 	// TODO: Fix db to respond when user is created or updated
@@ -86,7 +86,7 @@ async function getMatchingOauthUser(token: OauthToken) {
 		Logger.debug(error);
 		Logger.debug("No user found with OAuth ID, checking by email.");
 		try {
-			const matchingUser = (await axios.get<Users>(`https://sarif_db:3000/Players/email/${token.jwt_decode.email}`, {
+			const matchingUser = (await axios.get<Users>(`http://sarif_db:3000/Players/email/${token.jwt_decode.email}`, {
 				headers: {
 					"Authorization": process.env.API_KEY || "",
 					"Content-Type": "application/json",
@@ -129,7 +129,7 @@ async function updateUser(token: OauthToken, matchingUser: Users | undefined) {
 		const updateUser: Partial<Users> = {
 			OAuthID: token.jwt_decode.subject,
 		}
-		await axios.put<Users>(`https://sarif_db:3000/Players/id/${matchingUser.PlayerID}`, updateUser, {
+		await axios.put<Users>(`http://sarif_db:3000/Players/id/${matchingUser.PlayerID}`, updateUser, {
 			headers: {
 				"Authorization": process.env.API_KEY || "",
 				"Content-Type": "application/json",

@@ -70,22 +70,18 @@ Token can also be fetched using `GET /sessions/:state` endpoint for a more simpl
 | `code`| (string)        | The code returned by the OAuth server.  |
 
 ### Response:
-
-| Return Code                 | Condition                                              |
-| --------------------------- | ------------------------------------------------------ |
-| `200 OK`                    | Successfully retrieved the access token.               |
-| `400 Bad Request`           | Missing some headers, queries or parameters.           |
-| `401 Unauthorized`          | Authorization header does not comply with API_KEY      |
-| `404 Not Found`             | Requested state id was not found, probably timed out.  |
-| `500 Internal Server error` | Something went wrong during the token request process. |
+             
+| Return Code                 | Condition                                                           |
+| --------------------------- | ------------------------------------------------------------------- |
+| `303 See Other`             | Successfully retrieved the access token. Redirects to the frontend. |
+| `400 Bad Request`           | Missing some headers, queries or parameters.                        |
+| `401 Unauthorized`          | Authorization header does not comply with API_KEY                   |
+| `404 Not Found`             | Requested state id was not found, probably timed out.               |
+| `500 Internal Server error` | Something went wrong during the token request process.              |
 
 #### Example Response:
 
-```json
-{
-   "token": "p-f43th43ui...",
-}
-```
+Simply redirects to the frontend with token added to cookies.
 
 ## OAUTH configuration
 
