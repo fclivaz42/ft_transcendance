@@ -27,14 +27,18 @@ export function betterFastify(serverRef: FastifyInstance | any) {
 	});
 	
 	server.addHook("onError", async (req, res, error) => {
-		Logger.error(`Error occurred: ${error.message}`);
-		fastifyLogger(req, res);
+		Logger.error(`Error occurred:\n${error}`);
 	});
 	
 	server.addHook("onListen", () => {
+		if (process.env.API_KEY)
+			Logger.debug(`API Key: ${process.env.API_KEY}`);
+		const config = server.server.address() as AddressInfo;
+		if (config.address === '::' || config.address === "0.0.0.0")
+			config.address = "127.0.0.1";
 		if (server.server instanceof Server)
-			Logger.info(`Listening on https://127.0.1:${(server.server.address() as AddressInfo).port}/`);
+			Logger.info(`Listening on https://${config.address}:${config.port}/`);
 		else
-			Logger.info(`Listening on http://127.0.0.1:${(server.server.address() as AddressInfo).port}/`);
+			Logger.info(`Listening on http://${config.address}:${config.port}/`);
 	});
 }

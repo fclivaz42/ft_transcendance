@@ -8,7 +8,7 @@ import { createPasswordInput, CustomPasswordInputContainer, checkPasswordStrengt
 import { LoginDialogOptions } from './index.js';
 import { updateFieldAppearance } from '../input/utils.js'; // Chemin vers la fonction générique
 import { createPasswordStrengthList} from '../input/passwordStrengh.js';
-
+import { i18nHandler } from "../../handlers/i18nHandler.js";
 // ==============================
 // 2. EXPORT FUNCTION: createRegisterPanel
 // ==============================
@@ -42,13 +42,13 @@ export function createRegisterPanel(options: LoginDialogOptions) {
     let errorMessage: string | null = null;
     if (value === '') {
       isValid = false;
-      errorMessage = "Veuillez entrer un nom d'utilisateur.";
+      errorMessage = i18nHandler.getValue("panel.registerPanel.validation.usernameRequired");
     } else if (value.length < 3) {
       isValid = false;
-      errorMessage = "Essayez avec au moins 3 caractères.";
+      errorMessage = i18nHandler.getValue("panel.registerPanel.validation.lenghtError");
     } else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
       isValid = false;
-      errorMessage = "Uniquement compose avec ces caractères: [a-z], [0-9], [-].";
+      errorMessage = i18nHandler.getValue("panel.registerPanel.validation.charactersError");
     }
     return { isValid, errorMessage };
   };
@@ -60,10 +60,10 @@ export function createRegisterPanel(options: LoginDialogOptions) {
     let errorMessage: string | null = null;
     if (value === '') {
       isValid = false;
-      errorMessage = "L'adresse e-mail est requise.";
+      errorMessage = i18nHandler.getValue("panel.registerPanel.validation.emailRequired");
     } else if (!emailRegex.test(value)) {
       isValid = false;
-      errorMessage = "Format d'adresse e-mail invalide.";
+      errorMessage = i18nHandler.getValue("panel.registerPanel.validation.emailFormatError");
     }
     return { isValid, errorMessage };
   };
@@ -101,12 +101,12 @@ const validateRegisterConfirmPassword = (value: string) => {
         // Cas 1: Le champ de confirmation est vide.
         // Il est invalide et le message s'affiche immédiatement.
         isValid = false;
-        errorMessage = "Veuillez confirmer le mot de passe.";
+        errorMessage = i18nHandler.getValue("panel.registerPanel.validation.confirmPasswordRequired");
     } else if (passwordValue.length === 0) {
         // Cas 2: Le mot de passe principal est vide, mais on tape dans la confirmation.
         // C'est invalide.
         isValid = false;
-        errorMessage = "Veuillez d'abord saisir le mot de passe."; // Nouveau message si le premier champ est vide
+        errorMessage = i18nHandler.getValue("panel.registerPanel.validation.passwordRequired"); // Nouveau message si le premier champ est vide
     } else {
         // Cas 3: Comparaison caractère par caractère
         // Parcourir la chaîne de confirmation (ou le mot de passe original si plus court)
@@ -116,7 +116,7 @@ const validateRegisterConfirmPassword = (value: string) => {
             if (value[i] !== passwordValue[i]) {
                 // Si un caractère ne correspond pas, c'est une erreur immédiate.
                 isValid = false;
-                errorMessage = "Les mots de passe ne correspondent pas.";
+                errorMessage = i18nHandler.getValue("panel.registerPanel.validation.passwordMismatch");
                 break; // Arrêter la boucle dès la première différence
             }
         }
@@ -133,7 +133,7 @@ const validateRegisterConfirmPassword = (value: string) => {
             // et que tous les caractères comparés correspondent (jusqu'à la longueur de passwordValue).
             // Alors, c'est une non-concordance (car la fin dépasse).
             isValid = false;
-            errorMessage = "Les mots de passe ne correspondent pas.";
+            errorMessage = i18nHandler.getValue("panel.registerPanel.validation.passwordMismatch");
         } else if (isValid && value.length === passwordValue.length) {
             // Si tous les caractères comparés correspondent et les longueurs sont identiques.
             // C'est valide.
@@ -193,32 +193,32 @@ const validateRegisterConfirmPassword = (value: string) => {
   // ==============================
 
   // Champ Nom d'utilisateur
-  const registerDisplayNameContainer = createInfoInput("Nom d'utilisateur", "displayName");
+  const registerDisplayNameContainer = createInfoInput(i18nHandler.getValue("panel.usernameLabel"), "displayName");
   const registerDisplayNameErrorFeedback = document.createElement("div");
   registerDisplayNameErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
   registerDisplayNameContainer.appendChild(registerDisplayNameErrorFeedback);
 
   // Champ Email
-  const registerEmailContainer = createInfoInput("Adresse e-mail", "email");
+  const registerEmailContainer = createInfoInput(i18nHandler.getValue("panel.emailLabel"), "email");
   const registerEmailErrorFeedback = document.createElement("div");
   registerEmailErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
   registerEmailContainer.appendChild(registerEmailErrorFeedback);
 
   // Champ Mot de passe
-  const registerPasswordContainer: CustomPasswordInputContainer = createPasswordInput("Mot de passe", "password", true);
+  const registerPasswordContainer: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.passwordLabel"), "password", true);
   const registerPasswordErrorFeedback = document.createElement("div");
   registerPasswordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
   registerPasswordContainer.appendChild(registerPasswordErrorFeedback);
 
   // Champ Confirmer mot de passe
-  const registerConfirmPasswordContainer: CustomPasswordInputContainer = createPasswordInput("Confirmer le mot de passe", "confirmPassword", false);
+  const registerConfirmPasswordContainer: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.registerPanel.confirmPasswordLabel"), "confirmPassword", false);
   const registerConfirmPasswordErrorFeedback = document.createElement("div");
   registerConfirmPasswordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
   registerConfirmPasswordContainer.appendChild(registerConfirmPasswordErrorFeedback);
 
   // Bouton d'inscription
   const registerButton = document.createElement("button");
-  registerButton.textContent = "S'inscrire";
+  registerButton.textContent = i18nHandler.getValue("panel.registerPanel.registerButton");
   registerButton.type = "submit";
   registerButton.className = `
     font-semibold py-2 px-4 rounded
@@ -232,7 +232,7 @@ const validateRegisterConfirmPassword = (value: string) => {
   // Lien "Déjà un compte ?"
   const switchToLoginLink = document.createElement("a");
   switchToLoginLink.href = "#";
-  switchToLoginLink.textContent = "Déjà un compte ? Se connecter";
+  switchToLoginLink.textContent = i18nHandler.getValue("panel.registerPanel.link.loginPanel");
   switchToLoginLink.className = "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer";
 
   // ==============================

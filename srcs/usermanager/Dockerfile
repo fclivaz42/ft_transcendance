@@ -16,4 +16,5 @@ RUN openssl req -x509 -newkey rsa:2048 -nodes -keyout /etc/ssl/private/sarif.key
 
 COPY ./docker-entrypoint.sh ./docker-entrypoint.sh
 
-ENTRYPOINT ["/bin/sh", "./docker-entrypoint.sh"]
+RUN chmod +x ./docker-entrypoint.sh
+ENTRYPOINT ["./docker-entrypoint.sh"]

@@ -12,12 +12,20 @@ export interface Users {
 };
 
 export interface UserLoginProps {
-	username?: string;
-	email?: string;
-	password: string;
+	DisplayName?: string;
+	EmailAddress?: string;
+	Password: string;
 }
 
 export interface UserRegisterProps extends UserLoginProps {
-	username: string;
-	email: string;
+	DisplayName: string;
+	EmailAddress: string;
 }
+
+export interface UserLoginOauthProps {
+	OAuthID: string;
+}
+
+export interface UserRegisterOauthProps extends
+	Partial<UserRegisterProps>,
+	UserLoginOauthProps { }

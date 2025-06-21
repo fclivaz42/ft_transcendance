@@ -8,7 +8,11 @@ This document provides information about the internal Usermanager module's API u
 # Table of Contents
 - [`GET /users/authorize`](#get-users-authorize)
 - [`POST /users/login`](#get-users-login)
+- [`POST /users/register`](#get-users-login)
+- [`POST /users/oauthLogin`](#get-users-login)
 - [`GET /users/:uuid`](#get-users-uuid)
+- [`PUT /users/:uuid`](#put-users-uuid)
+- [`DELETE /users/:uuid`](#delete-users-uuid)
 - [`POST /users`](#post-users)
 - [`PUT /users/:uuid`](#put-users-uuid)
 
@@ -19,12 +23,6 @@ This document provides information about the internal Usermanager module's API u
 This module is responsible for handling user management for the SARIF project, including user authentication and authorization using JWT tokens.
 
 # Endpoints
-
-## `POST /users`
-Creates a new user in the system.
-
-`Yet to be defined.`
-
 
 ## `GET /users/authorize`
 Validates the user's JWT token and returns the user information if valid.
@@ -67,6 +65,65 @@ Validates the user's JWT token and returns the user information if valid.
 | `iat`  | number | The timestamp when the JWT was issued, in seconds since the epoch.                     |
 | `exp`  | number | The expiration timestamp of the JWT, in seconds since the epoch.                       |
 
+## `GET /users/:uuid`
+Gets a user by their UUID.
+
+### HTTP Headers
+| Key             | Required | Expected value           | Description                                        |
+| --------------- | -------- | ------------------------ | -------------------------------------------------- |
+| `authorization` | yes			 | `Bearer process.API_KEY` | Project API key to authorize the internal request. |
+
+### URL Parameters
+| Key    | Required | Example         | Description                       |
+| ------ | -------- | --------------- | --------------------------------- |
+| `uuid` | yes      | (string)        | The UUID of the user to retrieve. |
+
+### Response example:
+
+```json
+{
+  "PlayerID": "P-e643426b-8a3f-43b9-85ab-7a3816874efa",
+  "DisplayName": "ruipaulo@outlook.fr",
+  "EmailAddress": "ruipaulo@outlook.fr",
+  "FriendsList": null,
+  "PhoneNumber": null,
+  "FirstName": null,
+  "FamilyName": null,
+  "Bappy": null,
+  "Admin": 0
+}
+```
+
+## `PUT /users/:uuid`
+Updates a user by their UUID.
+
+### HTTP Headers
+| Key             | Required | Expected value           | Description                                        |
+| --------------- | -------- | ------------------------ | -------------------------------------------------- |
+| `authorization` | yes			 | `Bearer process.API_KEY` | Project API key to authorize the internal request. |
+
+### URL Parameters
+| Key    | Required | Example         | Description                       |
+| ------ | -------- | --------------- | --------------------------------- |
+| `uuid` | yes      | (string)        | The UUID of the user to update.   |
+
+### Body Parameters:
+same as `GET /users/:uuid` response, except `PlayerID`.
+can include `Password` to update the user's password.
+
+## `DELETE /users/:uuid`
+Deletes a user by their UUID.
+
+### HTTP Headers
+
+| Key             | Required | Expected value           | Description                                        |
+| --------------- | -------- | ------------------------ | -------------------------------------------------- |
+| `authorization` | yes			 | `Bearer process.API_KEY` | Project API key to authorize the internal request. |
+
+### URL Parameters
+| Key    | Required | Example         | Description                     |
+| ------ | -------- | --------------- | ------------------------------- |
+| `uuid` | yes      | (string)        | The UUID of the user to delete. |
 
 ## `POST /users/login`
 
@@ -77,17 +134,97 @@ Validates the user's JWT token and returns the user information if valid.
 | `authorization` | yes       | `Bearer process.API_KEY` | Project API key to authorize the internal request. |
 
 ### Body Parameters:
-`Yet to be defined`
+*Note*: The EmailAddress and DisplayName are both exclusive, only one is required.
 
-### Response:
-
-`Yet to be defined`
+```json
+{
+	"DisplayName": "username",
+	"EmailAddress": "email@test.com",
+	"Password": "password",
+}
+```
 
 ### Example Response:
 
 ```json
 {
-	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMDZmNWEzMDY2NDAxYmMyM2M3Mzk2YmYzNzc3NTYwNzQzOWZkZTU1OGIxYzg0YmJmMzhiOWM1ZWY5NmE5Njk1IiwiZGF0YSI6eyJzb21lc3RyaW5nIjoiTm90IG5lY2Vzc2FyeSBidXQgeW91IGNhbiBwYXNzIG5vbi1jcml0aWNhbC1zZW5zaXRpdmUgZGF0YSBoZXJlIGlmIG5lZWRlZCwgb3IgZW5jcnlwdCBpdCB5b3Vyc2VsZiJ9LCJpc3MiOiJzYXJpZi51c2VybWFuYWdlciIsImlhdCI6MTc0ODYzODA5MCwiZXhwIjoxNzQ4NjQxNjkwfQ.x-TuwPkHt3aWFPRZ9omUjlU0qgebNA7QDtqER-fuPD8"
+	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMDZmNWEzMDY2NDAxYmMyM2M3Mzk2YmYzNzc3NTYwNzQzOWZkZTU1OGIxYzg0YmJmMzhiOWM1ZWY5NmE5Njk1IiwiZGF0YSI6eyJzb21lc3RyaW5nIjoiTm90IG5lY2Vzc2FyeSBidXQgeW91IGNhbiBwYXNzIG5vbi1jcml0aWNhbC1zZW5zaXRpdmUgZGF0YSBoZXJlIGlmIG5lZWRlZCwgb3IgZW5jcnlwdCBpdCB5b3Vyc2VsZiJ9LCJpc3MiOiJzYXJpZi51c2VybWFuYWdlciIsImlhdCI6MTc0ODYzODA5MCwiZXhwIjoxNzQ4NjQxNjkwfQ.x-TuwPkHt3aWFPRZ9omUjlU0qgebNA7QDtqER-fuPD8",
+	"sub": "p-c0f6a53066401bc23c7396bf37775607439fde5581b8c4bbf38b9c5ef96a9695",
+	"data": {},
+	"iss": "sarif.usermanager",
+	"iat": 1748638090,
+	"exp": 1748641690
+}
+```
+
+##### Description of the response fields:
+
+| Field   | Type   | Description                                                                |
+| ------- | ------ | -------------------------------------------------------------------------- |
+| `token` | string | The JWT token that the user can use for subsequent authenticated requests. |
+
+## `POST /users/register`
+
+### HTTP Headers
+
+| Key             | Required  | Expected value           | Description                                        |
+| --------------- | --------- | ------------------------ | -------------------------------------------------- |
+| `authorization` | yes       | `Bearer process.API_KEY` | Project API key to authorize the internal request. |
+
+### Body Parameters:
+
+```json
+{
+	"DisplayName": "username",
+	"EmailAddress": "email@test.com",
+	"Password": "password",
+}
+```
+
+### Example Response:
+
+```json
+{
+	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMDZmNWEzMDY2NDAxYmMyM2M3Mzk2YmYzNzc3NTYwNzQzOWZkZTU1OGIxYzg0YmJmMzhiOWM1ZWY5NmE5Njk1IiwiZGF0YSI6eyJzb21lc3RyaW5nIjoiTm90IG5lY2Vzc2FyeSBidXQgeW91IGNhbiBwYXNzIG5vbi1jcml0aWNhbC1zZW5zaXRpdmUgZGF0YSBoZXJlIGlmIG5lZWRlZCwgb3IgZW5jcnlwdCBpdCB5b3Vyc2VsZiJ9LCJpc3MiOiJzYXJpZi51c2VybWFuYWdlciIsImlhdCI6MTc0ODYzODA5MCwiZXhwIjoxNzQ4NjQxNjkwfQ.x-TuwPkHt3aWFPRZ9omUjlU0qgebNA7QDtqER-fuPD8",
+	"sub": "p-c0f6a53066401bc23c7396bf37775607439fde5581b8c4bbf38b9c5ef96a9695",
+	"data": {},
+	"iss": "sarif.usermanager",
+	"iat": 1748638090,
+	"exp": 1748641690
+}
+```
+
+##### Description of the response fields:
+
+| Field   | Type   | Description                                                                |
+| ------- | ------ | -------------------------------------------------------------------------- |
+| `token` | string | The JWT token that the user can use for subsequent authenticated requests. |
+
+## `POST /users/oathLogin`
+
+### HTTP Headers
+
+| Key             | Required  | Expected value           | Description                                        |
+| --------------- | --------- | ------------------------ | -------------------------------------------------- |
+| `authorization` | yes       | `Bearer process.API_KEY` | Project API key to authorize the internal request. |
+
+### Body Parameters:
+```json
+{
+	"OAuthID": "5453jdskd343552...",
+}
+```
+
+### Example Response:
+
+```json
+{
+	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMDZmNWEzMDY2NDAxYmMyM2M3Mzk2YmYzNzc3NTYwNzQzOWZkZTU1OGIxYzg0YmJmMzhiOWM1ZWY5NmE5Njk1IiwiZGF0YSI6eyJzb21lc3RyaW5nIjoiTm90IG5lY2Vzc2FyeSBidXQgeW91IGNhbiBwYXNzIG5vbi1jcml0aWNhbC1zZW5zaXRpdmUgZGF0YSBoZXJlIGlmIG5lZWRlZCwgb3IgZW5jcnlwdCBpdCB5b3Vyc2VsZiJ9LCJpc3MiOiJzYXJpZi51c2VybWFuYWdlciIsImlhdCI6MTc0ODYzODA5MCwiZXhwIjoxNzQ4NjQxNjkwfQ.x-TuwPkHt3aWFPRZ9omUjlU0qgebNA7QDtqER-fuPD8",
+	"sub": "p-c0f6a53066401bc23c7396bf37775607439fde5581b8c4bbf38b9c5ef96a9695",
+	"data": {},
+	"iss": "sarif.usermanager",
+	"iat": 1748638090,
+	"exp": 1748641690
 }
 ```
 

@@ -22,7 +22,14 @@ export default class UserMenuManager {
     const userMenu = document.getElementById("userMenu");
 		if (!getCookie("session")) {
       // userMenu?.appendChild(createRegisterButton());
-      userMenu?.appendChild(createLoginButton());
+			fetch("/users/authorize", {
+				method: "GET",
+			}).then((response) => {
+				if (response.ok)
+					userMenu?.appendChild(createLogoutButton());
+				else // TODO: Create a "user" button with username
+					userMenu?.appendChild(createLoginButton());
+			});
     }
     else {
       userMenu?.appendChild(createLogoutButton());

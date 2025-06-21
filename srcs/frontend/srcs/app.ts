@@ -35,7 +35,7 @@ await i18nHandler.initialize().finally(() => {
 	// const backgroundManager = new BackgroundManager();
 	// backgroundManager.initialize();
 
-	// WARN: freeze le site
+	// // WARN: freeze le site
 	// const homeManager = new HomeManager(); // NOUVEAU: Instanciez le HomeManager
 	// homeManager.initialize(main); // Passez 'main' comme parent pour la page d'accueil
 

@@ -10,3 +10,5 @@ services:
     # restart: on-failure
     networks:
       - sarifntw
+    volumes:
+      - sarif-libs:/libs

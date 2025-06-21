@@ -6,11 +6,11 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/20 01:45:28 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/20 22:08:05 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
-import { add_default_user, init_db } from "./db_startup.ts"
+import { add_default_user, check_contract, init_db } from "./db_startup.ts"
 import { tables } from "./db_vars.ts"
 import RequestHandler from "./db_helpers.ts"
 import fs from "node:fs"
@@ -28,11 +28,15 @@ import { extra_routes } from "./db_extras.ts"
 if (process.env.API_KEY === undefined ||
 	process.env.DBLOCATION === undefined ||
 	process.env.FILELOCATION === undefined ||
+	process.env.ADMIN_NAME === undefined ||
+	process.env.ADMIN_PASSWORD === undefined ||
 	process.env.RUNMODE === undefined) {
 	console.error("At least one of the necessary variables to run this program isn't set:",
 		process.env.API_KEY === undefined ? "API_KEY" : "",
 		process.env.DBLOCATION === undefined ? "DBLOCATION" : "",
 		process.env.FILELOCATION === undefined ? "FILELOCATION" : "",
+		process.env.ADMIN_NAME === undefined ? "ADMIN_NAME" : "",
+		process.env.ADMIN_PASSWORD === undefined ? "ADMIN_PASSWORD" : "",
 		process.env.RUNMODE === undefined ? "RUNMODE" : ""
 	)
 	process.exit(1)
@@ -111,6 +115,9 @@ if (await add_default_user())
 	console.log("Default user added/updated.")
 else
 	console.error("Could not create user!")
+
+// WARN: UNCOMMENT ONCE WORKING WITH BLOCKCHAIN
+// check_contract()
 
 //
 // Aaaand start!

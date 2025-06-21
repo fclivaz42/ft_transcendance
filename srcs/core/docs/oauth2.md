@@ -26,10 +26,8 @@ Gets the URL to redirect the user to the provider's OAuth authorization server a
 | Query        | Required | Example  | Description                                                                      |
 | ------------ | -------- | -------- | -------------------------------------------------------------------------------- |
 | `?client_id` | yes      | (string) | Identify the client, so newer states will force older ones to close.             |
-| `?user_id`   | no       | (string) | The user id to use for the session, if not provided a new one will be generated. |
 
 The `client_id` can be any unique id value as long as the client (browser) can be identified by it.
-The `user_id` is optional, if not provided a new user id will be generated for the session. It is not implemented yet.
 
 ### Response:
 
@@ -50,7 +48,9 @@ The `user_id` is optional, if not provided a new user id will be generated for t
 
 ## `GET /callback`
 
-Fetch and return the access token from user.
+On the `core` module, this endpoint will catch the provider's OAuth callback after the user has logged in and updates/creates the user.
+
+It will then return the JWT access token for the user to authenticate with our APIs.
 
 This endpoint handles the callback from provider's OAuth server. It expects a `code` in the query string and will return an access token.
 
@@ -70,46 +70,18 @@ Token can also be fetched using `GET /sessions/:state` endpoint for a more simpl
 | `code`| (string)        | The code returned by the OAuth server.  |
 
 ### Response:
-
-| Return Code                 | Condition                                              |
-| --------------------------- | ------------------------------------------------------ |
-| `200 OK`                    | Successfully retrieved the access token.               |
-| `400 Bad Request`           | Missing some headers, queries or parameters.           |
-| `401 Unauthorized`          | Authorization header does not comply with API_KEY      |
-| `404 Not Found`             | Requested state id was not found, probably timed out.  |
-| `500 Internal Server error` | Something went wrong during the token request process. |
+             
+| Return Code                 | Condition                                                           |
+| --------------------------- | ------------------------------------------------------------------- |
+| `303 See Other`             | Successfully retrieved the access token. Redirects to the frontend. |
+| `400 Bad Request`           | Missing some headers, queries or parameters.                        |
+| `401 Unauthorized`          | Authorization header does not comply with API_KEY                   |
+| `404 Not Found`             | Requested state id was not found, probably timed out.               |
+| `500 Internal Server error` | Something went wrong during the token request process.              |
 
 #### Example Response:
 
-> jwt_decode will only be present if the used OAuth service is google
-
-> Note that jwt_decode.subject can be used as a google account identifier
-
-
-```json
-{
-   "access_token": "f43th43ui...",
-   "expires_in": 3572,
-   "scope": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
-   "token_type": "Bearer",
-   "id_token": "fjoi3jji2ee3...",
-   "jwt_decode": {
-      "issuer": "https://accounts.google.com",
-      "authorized_party": "someapp.apps.googleusercontent.com",
-      "audience": "someaudience.apps.googleusercontent.com",
-      "subject": "user uid",
-      "email": "user email",
-      "email_verified": true,
-      "accesstoken_hash": "KdS0gvi0Jw8...",
-      "name": "user fullname",
-      "picture": "user picture url",
-      "given_name": "first name",
-      "family_name": "last name",
-      "issued_at": 1746304625,
-      "expiration": 1746308225
-   }
-}
-```
+Simply redirects to the frontend with token added to cookies.
 
 ## OAUTH configuration
 

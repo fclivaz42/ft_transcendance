@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/20 01:44:55 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/20 19:51:31 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -90,13 +90,7 @@ export default class DatabaseWorker {
 					generated_uid = tables[table].Identification.IDPrefix + randomUUID()
 				body[table_fields[0]] = generated_uid
 			}
-			// TODO: Insert function to check for dupes here! and do it for POST too while we're at it :)
-			// if (table === "Players") {
-			// 	if (db.prepare(`SELECT * FROM Players WHERE ${table_fields[1]} = ?`).get(body[table_fields[1]]) !== undefined)
-			// 		throw { code: 409, string: "error.nameid.exists" }
-			// 	if (db.prepare(`SELECT * FROM Players WHERE ${table_fields[6]} = ?`).get(body[table_fields[6]]) !== undefined)
-			// 		throw { code: 409, string: "error.email.exists" }
-			// }
+			check_duplicate(db, table, body, null, null)
 			for (const key of table_fields) {
 				if (key !== "")
 					sql += ` @${key},`
@@ -132,6 +126,7 @@ export default class DatabaseWorker {
 				throw { code: 404, string: "error.invalid.uuid" }
 			let sql = `UPDATE ${table}\nSET`;
 			let count = 0;
+			check_duplicate(db, table, body, field, query)
 			for (const key in body) {
 				if (table_fields.indexOf(key) === 0)
 					continue;
@@ -192,4 +187,37 @@ function check_uid(db: sqlt.Database, table: string, field: string, uid: string)
 		return false
 	}
 	return true
+}
+
+//
+// Check for duplicate entries dynamically so we gracefully throw an error rather than
+// make SQlite yell at you.
+//
+
+interface idlist {
+	seq: number,
+	name: string,
+	unique: number,
+	origin: string,
+	partial: number
+}
+
+interface idinfo {
+	seqno: number,
+	cid: number,
+	name: string
+}
+
+function check_duplicate(db: sqlt.Database, table: string, body: object, field: string | null, query: string | null) {
+	for (const item of db.pragma(`index_list(${table})`) as Array<idlist>) {
+		const truc = db.pragma(`index_info(${item.name})`) as Array<idinfo>
+		if (body[truc[0].name] !== undefined) {
+			const test = db.prepare(`SELECT * FROM ${table} WHERE ${truc[0].name} = ?`).get(body[truc[0].name]) as object
+			if (test !== undefined && ((field === null && query === null) || (test[field as string] !== query))) {
+				console.log(`duplicate found!`)
+				console.dir(test)
+				throw { code: 409, string: `error.duplicate.${truc[0].name}` }
+			}
+		}
+	}
 }

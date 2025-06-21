@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/20 01:43:49 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/20 22:03:55 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -47,7 +47,7 @@ interface db_table {
 }
 
 export interface db_definition {
-	OAuth: db_table;
+	// OAuth: db_table;
 	Players: db_table;
 	Matches: db_table;
 	Tournaments: db_table;
@@ -55,51 +55,51 @@ export interface db_definition {
 	CurrentContract: db_table;
 }
 
-const OauthTable: db_table =
-{
-	"Name": "OAuth",
-	"Fields": [
-		"SubjectID",
-		"IssuerName",
-		"EmailAddress",
-		"FullName",
-		"FirstName",
-		"FamilyName",
-		"TokenHash",
-		"IssueTime",
-		"ExpirationTime",
-		""
-	],
-	"Arguments": [
-		"TEXT NOT NULL",
-		"TEXT NOT NULL",
-		"TEXT NOT NULL",
-		"TEXT DEFAULT NULL",
-		"TEXT DEFAULT NULL",
-		"TEXT DEFAULT NULL",
-		"TEXT NOT NULL",
-		"INTEGER NOT NULL",
-		"INTEGER DEFAULT 0",
-		"PRIMARY KEY (SubjectID, IssuerName)"
-	],
-	"Methods": {
-		"GET": [
-			"/id/:SubjectID"
-		],
-		"POST": [
-			""
-		],
-		"DELETE": [
-			"/id/:SubjectID"
-		],
-		"PUT": [
-			"/id/:SubjectID"
-		]
-	},
-	"Identification": {
-		"HasID": false
-	}
-}
+// const OauthTable: db_table =
+// {
+// 	"Name": "OAuth",
+// 	"Fields": [
+// 		"SubjectID",
+// 		"IssuerName",
+// 		"EmailAddress",
+// 		"FullName",
+// 		"FirstName",
+// 		"FamilyName",
+// 		"TokenHash",
+// 		"IssueTime",
+// 		"ExpirationTime",
+// 		""
+// 	],
+// 	"Arguments": [
+// 		"TEXT NOT NULL",
+// 		"TEXT NOT NULL",
+// 		"TEXT NOT NULL",
+// 		"TEXT DEFAULT NULL",
+// 		"TEXT DEFAULT NULL",
+// 		"TEXT DEFAULT NULL",
+// 		"TEXT NOT NULL",
+// 		"INTEGER NOT NULL",
+// 		"INTEGER DEFAULT 0",
+// 		"PRIMARY KEY (SubjectID, IssuerName)"
+// 	],
+// 	"Methods": {
+// 		"GET": [
+// 			"/id/:SubjectID"
+// 		],
+// 		"POST": [
+// 			""
+// 		],
+// 		"DELETE": [
+// 			"/id/:SubjectID"
+// 		],
+// 		"PUT": [
+// 			"/id/:SubjectID"
+// 		]
+// 	},
+// 	"Identification": {
+// 		"HasID": false
+// 	}
+// }
 
 const PlayersTable: db_table =
 {
@@ -133,6 +133,7 @@ const PlayersTable: db_table =
 	"Methods": {
 		"GET": [
 			"/id/:PlayerID",
+			"/oauth/:OAuthID",
 			"/username/:DisplayName",
 			"/email/:EmailAddress"
 		],
@@ -241,7 +242,7 @@ const CurrentContract: db_table =
 		"TEXT NOT NULL PRIMARY KEY"
 	],
 	"Methods": {
-		"POST": [
+		"GET": [
 			""
 		],
 	},
@@ -252,7 +253,7 @@ const CurrentContract: db_table =
 
 export const tables: db_definition =
 {
-	"OAuth": OauthTable,
+	// "OAuth": OauthTable,
 	"Players": PlayersTable,
 	"Matches": MatchesTable,
 	"Tournaments": TournamentsTable,

@@ -6,25 +6,22 @@ import Fastify from 'fastify'
 import type * as fft from 'fastify'
 import fs from 'node:fs'
 import path from 'node:path'
-import { fastifyLogger } from '../../libs/helpers/fastifyHelper.ts'
+import { betterFastify } from '../../libs/helpers/fastifyHelper.ts'
 import Logger from '../../libs/helpers/loggers.ts'
 import frontendRoutes from './modules/frontend/routes.ts'
+import websocketPlugin from '@fastify/websocket'
 
 if (process.env.KEYPATH === undefined || process.env.CERTPATH === undefined) {
-	console.error("Keypath and/or Certpath are not defined. Exiting.")
+	Logger.error("Keypath and/or Certpath are not defined. Exiting.")
 	process.exit(1)
 }
 
 const fastify: fft.FastifyInstance = Fastify({
-	logger: true,
 	https: {
 		key: fs.readFileSync(process.env.KEYPATH),
 		cert: fs.readFileSync(process.env.CERTPATH)
 	}
 })
-
-if (process.env.RUNMODE === "debug")
-	console.log(process.env.API_KEY)
 
 const subfolder: string = path.join(import.meta.dirname, "routes")
 const folder: string[] = fs.readdirSync(subfolder)
@@ -35,12 +32,15 @@ async function load_modules() {
 	for (const file of ts_files) {
 		const file_path: string = path.join(subfolder, file)
 		const module_routes = (await import(`file://${file_path}`))
-		fastify.register(module_routes, { prefix: `/${file.split(".")[0]}`.toLowerCase() })
+		await fastify.register(module_routes, { prefix: `/${file.split(".")[0]}`.toLowerCase() })
 	}
 }
-await load_modules()
 
-fastify.register(frontendRoutes);
+await fastify.register(websocketPlugin);
+await load_modules()
+await fastify.register(frontendRoutes);
+
+betterFastify(fastify);
 
 fastify.listen({ port: 443, host: '::' }, (err) => {
 	if (err) {
@@ -48,12 +48,3 @@ fastify.listen({ port: 443, host: '::' }, (err) => {
 		process.exit(1)
 	}
 })
-
-fastify.addHook("onResponse", async (req, res) => {
-	fastifyLogger(req, res);
-});
-
-fastify.addHook("onError", async (req, res, error) => {
-	Logger.error(`Error occurred: ${error.message}`);
-	fastifyLogger(req, res);
-});

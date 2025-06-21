@@ -15,17 +15,17 @@ export interface GoogleJwtDecoded {
 }
 
 export interface OauthCallbackRequest {
-	code: number | undefined;
-	state: string | undefined;
+	code: number;
+	state: string;
 }
 
 export interface OauthLoginRequest {
-	client_id: string | undefined;
-	state: string | undefined;
+	client_id: string;
+	state: string;
 }
 
 export interface OauthSessionRequest {
-	state: string | undefined;
+	state: string;
 }
 
 export interface OauthToken {

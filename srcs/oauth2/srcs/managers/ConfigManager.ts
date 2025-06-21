@@ -1,9 +1,9 @@
 import dotenv from "dotenv";
 import crypto from "crypto";
+import { Logger } from "../../../libs/helpers/loggers.ts";
 
 class ServerConfig {
 	private _port: number;
-	private _logger: boolean;
 	private _api_key: string;
 	private _cert: {
 		_keypath: string;
@@ -12,28 +12,19 @@ class ServerConfig {
 
 	constructor() {
 		if (!process.env.OAUTH_PORT) {
-			console.warn("Missing OAUTH_PORT env, using default port 3000");
+			Logger.warn("Missing OAUTH_PORT env, using default port 3000");
 			process.env.OAUTH_PORT = "3000";
 		}
 		this._port = parseInt(process.env.OAUTH_PORT);
 		if (isNaN(this._port)) throw new Error("OAUTH_PORT must be an integer");
-		if (!process.env.OAUTH_LOGGER) {
-			if (process.env.LOGGER)
-				process.env.OAUTH_LOGGER = process.env.LOGGER;
-			else {
-				console.warn("Missing OAUTH_LOGGER|LOGGER env, using default 'true'");
-				process.env.OAUTH_LOGGER = "true";
-			}
-		}
-		this._logger = process.env.OAUTH_LOGGER.toLowerCase() === "true";
 		if (!process.env.API_KEY) {
-			console.warn("Missing API_KEY env, setting a random key...");
+			Logger.warn("Missing API_KEY env, setting a random key...");
 			process.env.API_KEY = crypto.randomBytes(32).toString("hex");
-			console.info(`API_KEY for Authorization header: ${process.env.API_KEY}`)	
+			Logger.info(`API_KEY for Authorization header: ${process.env.API_KEY}`)	
 		}
 		this._api_key = process.env.API_KEY;
 		if (!process.env.KEYPATH || !process.env.CERTPATH) {
-			console.warn("Missing KEYPATH or CERTPATH env, using default paths.");
+			Logger.warn("Missing KEYPATH or CERTPATH env, using default paths.");
 			this._cert = {
 				_keypath: "/etc/ssl/private/sarif.key",
 				_certpath: "/etc/ssl/certs/sarif.crt",
@@ -44,11 +35,10 @@ class ServerConfig {
 				_certpath: process.env.CERTPATH,
 			};
 		}
-		console.warn(`Loading certificate and key from ${this._cert._certpath} and ${this._cert._keypath}`);
+		Logger.warn(`Loading certificate and key from ${this._cert._certpath} and ${this._cert._keypath}`);
 	}
 
 	public get port(): number { return this._port; }
-	public get logger(): boolean { return this._logger; }
 	public get api_key(): string { return this._api_key; }
 	public get cert(): { _keypath: string; _certpath: string } {
 		return {
@@ -84,7 +74,7 @@ class OauthConfig {
 		if (!process.env.OAUTH_SECRET) throw new Error("Missing OAUTH_SECRET env");
 		this._secret = process.env.OAUTH_SECRET;
 		if (!process.env.OAUTH_SESSION_TIMEOUT) {
-			console.warn("Missing OAUTH_SESSION_TIMEOUT env, setting 60000ms as default..");
+			Logger.warn("Missing OAUTH_SESSION_TIMEOUT env, setting 60000ms as default..");
 			process.env.OAUTH_SESSION_TIMEOUT = "60000";
 		}
 		this._session_timeout = parseInt(process.env.OAUTH_SESSION_TIMEOUT);
