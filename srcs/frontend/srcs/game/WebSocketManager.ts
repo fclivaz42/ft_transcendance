@@ -1,3 +1,4 @@
+import { GameField } from "./GameField.js";
 import { ServerMessage, InitPayload, UpdatePayload } from "./types.js";
 
 type InitHandler = (payload: InitPayload["payload"]) => void;
@@ -49,6 +50,8 @@ export class WebSocketManager {
 				}))
 			};
 		});
+
+
 		window.addEventListener('keyup', (event) => {
 			if (event.key === 's') {
 				this.socket.send(JSON.stringify({
