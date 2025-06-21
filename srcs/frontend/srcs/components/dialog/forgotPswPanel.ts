@@ -53,7 +53,7 @@
 //     switchToLoginFromForgotLink: switchToLoginFromForgotLink,
 //   };
 // }
-
+////////////////////////////////mail gauche->
 // Fonction pour créer le panneau de mot de passe oublié
 
 import { createInfoInput, CustomInputContainer } from '../input/infoInput.js';
@@ -90,23 +90,23 @@ export function createForgotPasswordPanel(options: LoginDialogOptions) {
     opacity-0 transition-opacity duration-500 ease-out
   `.replace(/\s+/g, " ");
 
-  // L'icône ouverte commence le plus à droite possible, hors du viewport
+  // L'icône ouverte commence le plus à GAUCHE possible, hors du viewport
   const mailOpenIcon = document.createElement("img");
   mailOpenIcon.src = "./assets/ui/mail-open.svg";
   mailOpenIcon.alt = "Mail envoyé";
   mailOpenIcon.className = `
     absolute w-10 h-10
-    left-1/2 -translate-x-1/2 translate-x-[500%] opacity-0 // Départ: Centré, puis décalé 500% à droite (très loin)
+    left-1/2 -translate-x-1/2 -translate-x-[500%] opacity-0 // Départ: Centré, puis décalé 500% à GAUCHE (très loin)
     transition-all duration-700 ease-in-out
   `.replace(/\s+/g, " ");
 
   // L'icône fermée est initialement à la même position de départ, mais cachée
   const mailClosedIcon = document.createElement("img");
-  mailClosedIcon.src = "./assets/ui/mail-closed.svg";
+  mailClosedIcon.src = "./assets/ui/mail-open.svg";
   mailClosedIcon.alt = "Mail envoyé";
   mailClosedIcon.className = `
     absolute w-10 h-10
-    left-1/2 -translate-x-1/2 translate-x-[500%] opacity-0 hidden // Départ: comme l'icône ouverte
+    left-1/2 -translate-x-1/2 -translate-x-[500%] opacity-0 hidden // Départ: comme l'icône ouverte
     transition-all duration-700 ease-in-out
   `.replace(/\s+/g, " ");
 
@@ -132,13 +132,13 @@ export function createForgotPasswordPanel(options: LoginDialogOptions) {
     const email = forgotPasswordEmailInput.value;
     const code = forgotPasswordCodeInput.value;
 
-    // --- LOGIQUE DE L'ANIMATION "VOYAGE" ---
+    // --- LOGIQUE DE L'ANIMATION "VOYAGE" (GAUCHE À DROITE) ---
 
     // 0. Pré-réinitialisation rapide pour s'assurer que tout est en place pour le départ
-    mailOpenIcon.classList.add('hidden', 'opacity-0', 'translate-x-[500%]'); // Recommence très à droite
-    mailClosedIcon.classList.add('hidden', 'opacity-0', 'translate-x-[500%]'); // Recommence très à droite
-    mailOpenIcon.classList.remove('translate-x-0', '-translate-x-[500%]');
-    mailClosedIcon.classList.remove('translate-x-0', '-translate-x-[500%]');
+    mailOpenIcon.classList.add('hidden', 'opacity-0', '-translate-x-[500%]'); // Recommence très à gauche
+    mailClosedIcon.classList.add('hidden', 'opacity-0', '-translate-x-[500%]'); // Recommence très à gauche
+    mailOpenIcon.classList.remove('translate-x-0', 'translate-x-[500%]');
+    mailClosedIcon.classList.remove('translate-x-0', 'translate-x-[500%]');
 
 
     // 1. Rendre le conteneur visible et préparer l'icône ouverte pour le départ
@@ -147,9 +147,9 @@ export function createForgotPasswordPanel(options: LoginDialogOptions) {
 
     mailOpenIcon.classList.remove('hidden'); // Rendre l'icône ouverte non-cachée
 
-    // 2. Faire venir l'enveloppe ouverte de la droite vers le centre
+    // 2. Faire venir l'enveloppe ouverte de la gauche vers le centre
     setTimeout(() => {
-        mailOpenIcon.classList.remove('translate-x-[500%]'); // Démarre le mouvement vers le centre
+        mailOpenIcon.classList.remove('-translate-x-[500%]'); // Démarre le mouvement vers le centre (enlève le négatif)
         mailOpenIcon.classList.add('opacity-100', 'translate-x-0'); // Rendre visible et au centre
     }, 100); // Petit délai pour s'assurer que les classes initiales sont bien appliquées
 
@@ -162,23 +162,23 @@ export function createForgotPasswordPanel(options: LoginDialogOptions) {
             mailOpenIcon.classList.add('hidden'); // Cache l'icône ouverte
         }, 300); // Durée du fondu (doit être < duration-700)
 
-        mailClosedIcon.classList.remove('hidden', 'translate-x-[500%]'); // Révèle l'enveloppe fermée
+        mailClosedIcon.classList.remove('hidden', '-translate-x-[500%]'); // Révèle l'enveloppe fermée
         mailClosedIcon.classList.add('opacity-100', 'translate-x-0'); // Apparaît au centre
     }, 800); // 100ms (délai initial) + 700ms (durée de transition) = 800ms pour l'arrivée au centre
 
-    // 4. L'enveloppe fermée part vers la gauche
+    // 4. L'enveloppe fermée part vers la droite
     setTimeout(() => {
         mailClosedIcon.classList.remove('opacity-100', 'translate-x-0');
-        mailClosedIcon.classList.add('opacity-0', '-translate-x-[500%]'); // Part vers la gauche et s'estompe (très loin)
+        mailClosedIcon.classList.add('opacity-0', 'translate-x-[500%]'); // Part vers la droite et s'estompe (très loin)
     }, 1600); // 800ms (changement d'icône) + 800ms (attente avant départ) = 1600ms. Ajustez 800ms selon votre souhait d'attente.
 
     // 5. Réinitialisation des icônes et masquage du conteneur après l'animation
     setTimeout(() => {
         mailAnimationContainer.classList.add('opacity-0'); // Cache le conteneur
         // Réinitialiser les classes des icônes pour la prochaine utilisation
-        mailOpenIcon.classList.add('hidden', 'opacity-0', 'translate-x-[500%]');
-        mailClosedIcon.classList.add('hidden', 'opacity-0', 'translate-x-[500%]');
-    }, 2400); // 1600ms (départ à gauche) + 800ms (durée de transition) = 2400ms. Ajusté pour correspondre à la fin du mouvement.
+        mailOpenIcon.classList.add('hidden', 'opacity-0', '-translate-x-[500%]');
+        mailClosedIcon.classList.add('hidden', 'opacity-0', '-translate-x-[500%]');
+    }, 2400); // 1600ms (départ à droite) + 800ms (durée de transition) = 2400ms. Ajusté pour correspondre à la fin du mouvement.
 
     // --- FIN DE LA LOGIQUE D'ANIMATION ---
 
