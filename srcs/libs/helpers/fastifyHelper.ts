@@ -4,7 +4,9 @@ import type { AddressInfo } from 'node:net';
 import { Server } from "https";
 
 export function fastifyLogger(request: FastifyRequest | any, response?: FastifyReply | any): void {
-	let message = `${request.method} ${request.url} - ${request.ip}`;
+	const forwarded = request.headers['x-forwarded-for'];
+	const ip = forwarded ? forwarded.split(',')[0] : request.ip;
+	let message = `${request.method} ${request.url} - ${ip}`;
 	if (response) {
 		message += ` - Response ${response.statusCode}`;
 		if (response.statusCode >= 400) {
