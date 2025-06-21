@@ -9,7 +9,6 @@ export function createLoginButton(): HTMLElement {
     color: "bg-white",
     darkColor: "dark:bg-background_dark",
     id: "loginButton",
-    href: "#",
     i18n: "header.usermenu.login",
   });
   button.onclick = () => {
