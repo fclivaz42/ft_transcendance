@@ -57,7 +57,7 @@ async function oauth_routes(app: FastifyInstance, opts: FastifyPluginOptions) {
 				module: "oauth2",
 			}, rep, req);
 		UsersSdk.showerCookie(rep, response.data.token, response.data.exp);
-    rep.status(response.status).send(response.data);
+		rep.status(303).header('Location', '/');
   });
 }
 

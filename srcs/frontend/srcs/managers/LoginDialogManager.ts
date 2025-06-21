@@ -55,27 +55,65 @@ class LoginDialogManager {
     });
 
     // --- Fonction de gestion de la soumission (Login ou Register) ---
-    const handleAuthSubmit = async (mode: 'login' | 'register', data: { displayName: string; password?: string; confirmPassword?: string }) => {
+    const handleAuthSubmit = async (mode: 'login' | 'register', data: { displayName: string; email: string, password?: string; confirmPassword?: string }) => {
       console.log(`Soumission en mode ${mode} pour l'e-mail: ${data.displayName}`);
 
       // *******************************************************************
       //APPELS AU BACKEND
       // *******************************************************************
 //test
+			// User object
+			let user = {
+				DisplayName: data.displayName,
+				EmailAddress: data.email,
+				Password: data.password
+			}
       if (mode === 'login') {
-        if (data.displayName === 'test@example.com' && data.password === 'password123') {
-          alert("Connexion réussie (simulée) !");
-          this.closeAllCallback?.();
-        } else {
-          alert("Connexion échouée : E-mail ou mot de passe incorrect.");
-        }
+				// le login peut se faire avec un displayName ou un email
+				if (data.displayName.search(/@/) > -1) {
+					user.EmailAddress = data.displayName;
+					user.DisplayName = "";
+				}
+				await fetch("/users/login", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(user),
+				}).then(response => {
+					if (response.status < 400) {
+						window.location.reload();
+						//this.closeAllCallback?.();
+					} else {
+						if (response.status === 401)
+							alert("Connexion échouée : E-mail ou mot de passe incorrect.");
+						else
+							alert("Connexion échouée : Veuillez vérifier les informations.");
+					}
+				});
       } else if (mode === 'register') {
-        if (data.displayName === 'newuser@example.com' && data.password === 'newpass' && data.password === data.confirmPassword) {
-          alert("Inscription réussie (simulée) !");
-          this.closeAllCallback?.();
-        } else {
-          alert("Inscription échouée : Veuillez vérifier les informations (et la confirmation du mot de passe).");
-        }
+				if (data.password !== data.confirmPassword) {
+					alert("Inscription échouée : Les mots de passe ne correspondent pas.");
+					return;
+				}
+				// fetch sur /users/register pour enregistrer l'utilisateur
+				await fetch("/users/register", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(user),
+				}).then(response => {
+					if (response.status < 400) {
+						window.location.reload();
+						//this.closeAllCallback?.();
+					} else {
+						if (response.status === 409)
+							alert("Inscription échouée : L'utilisateur existe déjà.");
+						else
+							alert("Inscription échouée : Veuillez vérifier les informations (et la confirmation du mot de passe).");
+					}
+				})
       }
     };
 
