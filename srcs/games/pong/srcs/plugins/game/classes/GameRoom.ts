@@ -1,8 +1,7 @@
 import Game from "./GameClass.ts"
 import PlayerSession from "./PlayerSession.ts";
 import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
-
-const FPS_OVERRIDE: number = 60;
+import { DEFAULT_FPS } from "./Playfield.ts";
 
 interface BallUpdate {
 	curr_speed: number;
@@ -98,7 +97,7 @@ export default class GameRoom {
 		});
 
 		this.broadcast(this.buildInitPayload());
-		this.game.gameStart(FPS_OVERRIDE);
+		this.game.gameStart(DEFAULT_FPS);
 	}
 
 	public broadcast(message: GameMessage): void {

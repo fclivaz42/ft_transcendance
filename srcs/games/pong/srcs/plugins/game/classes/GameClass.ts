@@ -14,7 +14,7 @@ const BALL_DIAMETER: number = 0.6;
 /* Paddle defines */
 const PLAYER_HEIGHT: number = 2.8;
 const PLAYER_WIDTH: number = 0.3;
-const PADDLE_SPEED: number = 0.4;
+export const PADDLE_SPEED: number = 0.4;
 
 /* Wall defines */
 const WALL_WIDTH: number = 30;
@@ -27,7 +27,6 @@ const GOAL_HEIGHT: number = 16.6;
 const GOAL_DEPTH: number = 0.5;
 
 /* Default FPS for serverside simulation */
-const FPS: number = 30;
 
 interface BroadcastFunction {
 	(): void;
@@ -175,7 +174,7 @@ export default class Game {
 		const south = this._walls.southWall.getMesh();
 
 		if (!north || !south) {
-			return { minY: -7.5, maxY: 7.5 }; // un-hardcode later // these are defaults in case something goes wrong
+			return { minY: -7, maxY: 7.5 }; // un-hardcode later // these are defaults in case something goes wrong
 		}
 
 		const northHalf = (north.scaling.y || 1) * (north.getBoundingInfo()?.boundingBox.extendSize.y ?? 0.25);
@@ -200,7 +199,7 @@ export default class Game {
 		this._broadcastUpdate = func;
 	}
 
-	public gameStart(fps: number = FPS): void {
+	public gameStart(fps: number): void {
 		this._field.addUpdatable(this._p1);
 		this._field.addUpdatable(this._p2);
 		this._field.addUpdatable(this._ball);
