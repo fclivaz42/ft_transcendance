@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 
-function httpStandard(code: number): string {
+export function httpStandard(code: number): string {
 	const httpStatusTitles: Record<number, string> = {
 		// Informational Responses
 		100: "Continue",
@@ -78,16 +78,24 @@ function httpStandard(code: number): string {
 	return httpStatusTitles[code] || "Unknown Status Code"
 }
 
-export function httpError(code: number, message: string, req: FastifyRequest) {
+export function httpError(props: {
+	module?: string,
+	status: number,
+	detail: string,
+}, req: FastifyRequest | any
+) {
 	return {
-		type: "https://raw.githubusercontent.com/fclivaz42/ft_transcendance/refs/heads/main/srcs/oauth2/README.md",
-		title: httpStandard(code),
-		status: code,
-		detail: message,
+		...props,
+		type: props.module ? `https://raw.githubusercontent.com/fclivaz42/ft_transcendance/refs/heads/main/srcs/${props.module}/README.md` : "https://raw.githubusercontent.com/fclivaz42/ft_transcendance/refs/heads/main/README.md",
+		title: httpStandard(props.status),
 		instance: req.url
 	}
 }
 
-export function httpReply(rep: FastifyReply, req: FastifyRequest, code: number, message: string) {
-	return rep.status(code).send(httpError(code, message, req));
+export function httpReply(props: {
+	module?: string,
+	status: number,
+	detail: string
+}, rep: FastifyReply | any, req: FastifyRequest | any) {
+	return rep.status(props.status).send(httpError(props, req));
 }

@@ -45,3 +45,4 @@ export function createNavbar(props: NavbarProps): HTMLElement {
   container.appendChild(navBar);
   return container;
 }
+

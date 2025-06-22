@@ -7,7 +7,8 @@ import { createDialog } from "./index.js";
 import { checkPasswordStrength, PasswordStrengthResult } from "../input/createPasswordInput.js";
 import { createPasswordStrengthList } from "../input/passwordStrengh.js";
 import { createLoginPanel, createRegisterPanel, createForgotPasswordPanel, LoginDialogOptions } from './index.js';
-
+import { i18nHandler } from "../../handlers/i18nHandler.js";
+import { createGoogleLoginButton } from "./googleLoginButton.js";
 
 // --- Main Login Dialog Function ---
 export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElement
@@ -34,7 +35,6 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
 
   const panelsContainer = document.createElement("div");
   panelsContainer.className = "relative w-full flex flex-col items-center justify-center overflow-hidden";
-
 
   // --- PANEL CREATION ---
   // Ensure all panel variables are destructured here, within the function's scope.
@@ -83,6 +83,12 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   panelsContainer.appendChild(loginPanel);
   panelsContainer.appendChild(forgotPasswordPanel);
   dialog.appendChild(panelsContainer);
+	dialog.appendChild((() => {
+		const hr = document.createElement("hr");
+		hr.className = "w-3/4 my-4";
+		return hr;
+	})());	
+	dialog.appendChild(createGoogleLoginButton());
 
 
 // --- PASSWORD STRENGTH LIST MANAGEMENT (EXTERNAL) ---
@@ -184,11 +190,11 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
 
     // Définir le titre du dialogue
     if (mode === 'login') {
-        dialogTitle.textContent = "Se connecter";
+        dialogTitle.textContent = i18nHandler.getValue("panel.loginPanel.panelTitle");
     } else if (mode === 'register') {
-        dialogTitle.textContent = "S'inscrire";
+        dialogTitle.textContent = i18nHandler.getValue("panel.registerPanel.panelTitle");
     } else { // mode === 'forgotPassword'
-        dialogTitle.textContent = "Mot de passe oublié";
+        dialogTitle.textContent = i18nHandler.getValue("panel.forgotPasswordPanel.panelTitle");
     }
 
     const hiddenClass = 'opacity-0';

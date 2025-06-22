@@ -45,10 +45,8 @@ const mimeTypes = {
 export default function getMimeType(filename: string): string {
   const ext = filename.split('.').pop();
   if (!ext) {
-    console.warn(`No extension found for file: ${filename}`);
     return 'application/octet-stream';
   }
-  console.log(`Getting MIME type for file: ${filename} with extension: ${ext}`);
   const mimeType = mimeTypes[ext];
   if (mimeType) {
     return mimeType;
