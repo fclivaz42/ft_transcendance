@@ -6,26 +6,23 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/18 20:58:12 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/22 22:25:47 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/23 01:18:55 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import DatabaseWorker from "./db_methods.ts"
-import Axios from "axios"
 import Logger from "../../libs/helpers/loggers.ts"
-import * as fs from "node:fs"
+import fs from "node:fs"
 import util from 'util';
+import path from "node:path";
 import { pipeline } from "node:stream"
-import { randomBytes, scrypt } from "crypto"
+import { scrypt } from "crypto"
 import { check_request_format } from "./db_helpers.ts"
 import { tables } from "./db_vars.ts"
-import type * as at from "axios"
 import type * as fft from 'fastify'
 import type { MultipartFile } from "@fastify/multipart"
 import type { db_params } from "./db_main.ts"
-
-
-const pump = util.promisify(pipeline);
+import { fileTypeFromFile } from "file-type";
 
 async function check_password(user: string, field: "PlayerID" | "DisplayName" | "EmailAddress", password: string) {
 	return new Promise((resolve, reject) => {
@@ -72,6 +69,57 @@ async function logger_preparser(request: fft.FastifyRequest, reply: fft.FastifyR
 	}
 }
 
+async function upload_picture(request: fft.FastifyRequest, reply: fft.FastifyReply, params: db_params, file: MultipartFile) {
+	try {
+		if (!request.headers["authorization"])
+			throw { code: 401, string: "error.missing.authorization" }
+		if (request.headers["authorization"] !== process.env.API_KEY)
+			throw { code: 401, string: "error.invalid.authorization" }
+		if (file === undefined)
+			throw { code: 400, string: "error.invalid.file" }
+		if (file.mimetype !== "image/png" && file.mimetype !== "image/jpeg" && file.mimetype !== "image/webp")
+			throw { code: 400, string: "error.invalid.content-type" }
+		if (JSON.stringify(params) === "{}")
+			return;
+		if (params[Object.keys(params)[0]] === "")
+			throw { code: 400, string: "error.empty.params" }
+		const filename = params.PlayerID + file.filename.slice(file.filename.lastIndexOf('.'))
+		const folder: Array<string> = fs.readdirSync(process.env.FILELOCATION as string)
+		for (const item of folder)
+			if (params.PlayerID === item.split('.')[0])
+				fs.rmSync(path.join(process.env.FILELOCATION as string, item))
+		const pump = util.promisify(pipeline);
+		await pump(file.file, fs.createWriteStream(path.join(process.env.FILELOCATION as string, filename)));
+		const ftype = await fileTypeFromFile(path.join(process.env.FILELOCATION as string, filename))
+		if (ftype && ftype.mime !== 'image/png' && ftype.mime !== 'image/jpeg' && ftype.mime !== 'image/webp') {
+			fs.rmSync(path.join(process.env.FILELOCATION as string, filename))
+			throw { code: 415, string: "error.not.image" }
+		}
+	} catch (exception) {
+		if (typeof exception.code === "number")
+			return reply.code(exception.code).send(exception.string)
+		console.dir(exception)
+		return reply.code(500).send("error.save.failed")
+	}
+	return reply.code(200).send({ skill: "solution" })
+}
+
+async function get_picture(request: fft.FastifyRequest, reply: fft.FastifyReply, params: db_params) {
+	try {
+		check_request_format(request.headers, request.method, params)
+		const folder: Array<string> = fs.readdirSync(process.env.FILELOCATION as string)
+		for (const item of folder)
+			if (params.PlayerID === item.split('.')[0])
+				return reply.code(200).sendFile(`${item}`)
+		throw { code: 404, string: "error.picture.notfound" }
+	} catch (exception) {
+		if (typeof exception.code === "number")
+			return reply.code(exception.code).send(exception.string)
+		console.dir(exception)
+		return reply.code(500).send("error.internal.fail")
+	}
+}
+
 export async function extra_routes(fastify: fft.FastifyInstance, options: fft.FastifyPluginOptions) {
 
 	fastify.get<{ Params: db_params }>(`/${tables.Players.Name}/id/:PlayerID/CheckPass`, async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
@@ -86,24 +134,11 @@ export async function extra_routes(fastify: fft.FastifyInstance, options: fft.Fa
 		return logger_preparser(request, reply, request.params as db_params, request.headers, "EmailAddress")
 	})
 
-	fastify.get<{ Params: db_params }>("/download/:DisplayName", async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
-		const parms: db_params = request.params as db_params;
-		if (fs.existsSync(`${process.env.FILELOCATION}/${parms.DisplayName}.png`))
-			return reply.code(200).sendFile(`${parms.DisplayName}.png`)
-		else
-			return reply.code(404).send({ skill: "issue" })
+	fastify.post<{ Params: db_params }>(`/${tables.Players.Name}/id/:PlayerID/picture`, async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
+		return upload_picture(request, reply, request.params as db_params, await request.file({ limits: { fileSize: 2 * 1024 * 1024 } }) as MultipartFile)
 	})
 
-	fastify.post<{ Params: db_params }>("/upload/:DisplayName", async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
-		const parms: db_params = request.params as db_params;
-		const part = await request.file({
-			limits: {
-				fileSize: 4 * 1024 * 1024
-			}
-		}) as MultipartFile
-
-		const filename = parms.DisplayName + part?.filename.slice(part?.filename.lastIndexOf('.'))
-		await pump(part.file, fs.createWriteStream(`${process.env.FILELOCATION}/${filename}`));
-		return reply.code(200).send({ skill: "solution" })
+	fastify.get<{ Params: db_params }>(`/${tables.Players.Name}/id/:PlayerID/picture`, async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
+		return get_picture(request, reply, request.params as db_params)
 	})
 }
