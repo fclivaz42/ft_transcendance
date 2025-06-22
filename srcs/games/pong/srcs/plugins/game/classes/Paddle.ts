@@ -1,6 +1,7 @@
 
 import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh } from "@babylonjs/core";
 import Ball from "./Ball.ts";
+import { Session } from "inspector/promises";
 
 interface PaddleOptions {
 	color: Color3;
@@ -30,6 +31,7 @@ export default class Paddle {
 
 	private _moveDirection: "up" | "down" | null = null;
 	private _bounds: { minY: number, maxY: number } = { minY: -Infinity, maxY: Infinity };
+	private _ball: Ball | null = null;
 
 	constructor(
 		scene: Scene,
@@ -72,6 +74,7 @@ export default class Paddle {
 		return false;
 	}
 
+	public getIsIA(): boolean { return this._isAi; }
 	public getMesh(): Mesh { return this._mesh; }
 	public getPosition(): Vector3 { return this.getMesh().position; }
 	public getSpeed(): number { return this._speed; }
@@ -86,6 +89,7 @@ export default class Paddle {
 		};
 	}
 
+	public setBall(ball: Ball): void { this._ball = ball; }
 	public setSpeed(speed: number): void { this._speed = speed; }
 	public setColliders(colliders: any): void { this._colliders = colliders; }
 	public setAI(io: boolean): void { this._isAi = io; }
@@ -119,35 +123,43 @@ export default class Paddle {
 		ball.direction.normalize();
 	}
 
-	public update(): void {
+	public update(fps: number): void {
 
 		// this._direction.set(0, 0, 0);
-		if (!this._moveDirection) return;
-		console.log("received command to move, attempting to move");
+		// this.getMesh().position.addInPlace(this._direction.scale(this._speed));
+		if (this._isAi && fps === 0)
+			this.manageIA();
+		else {
+			if (!this._moveDirection) return;
+			console.log("received command to move, attempting to move");
+			const deltaY = this._moveDirection === "up" ? this.getSpeed() : -this.getSpeed();
+			const currentY = this.getMesh().position.y;
+			const newY = currentY + deltaY;
 
-		/* TODO: just below this works, test both, see which is better // after tests this is better, gotta fix clamping */
-		/* if (this._moveDirection === "up") {
-			console.log("received command to move UP!");
-			this._direction.y += 1;
+			const boundingInfo = this.getMesh().getBoundingInfo();
+			const halfHeight = boundingInfo.boundingBox.extendSize.y;
+
+			const maxY = this._bounds.maxY - halfHeight;
+			const minY = this._bounds.minY + halfHeight;
+
+			this.getMesh().position.y = Math.max(minY, Math.min(maxY, newY));
 		}
+	}
 
-		if (this._moveDirection === "down") {
-			this._direction.y -= 1;
-		}
+	public async manageIA() {
 
-		this.getMesh().position.addInPlace(this._direction.scale(this._speed)); */
-
-		/* TODO: this here below doesn't work! Compare to other branches to see how to fix // works but clamping is messed up */
-		const deltaY = this._moveDirection === "up" ? this.getSpeed() : -this.getSpeed();
-		const currentY = this.getMesh().position.y;
-		const newY = currentY + deltaY;
-
-		const boundingInfo = this.getMesh().getBoundingInfo();
-		const halfHeight = boundingInfo.boundingBox.extendSize.y;
-
-		const maxY = this._bounds.maxY - halfHeight;
-		const minY = this._bounds.minY + halfHeight;
-
-		this.getMesh().position.y = Math.max(minY, Math.min(maxY, newY));
+		// console.log(`IA currently working, Ball: ${this._ball?.getPosition().asArray()}`);
+		// Math.random() < 0.5 ? this.getMesh().position.y += 0.1 : this.getMesh().position.y -= 0.1;
+		const y = this._ball?.getMesh().position.y;
+		if (y)
+			this.getMesh().position.y = y;
+		// const boundingInfo = this.getMesh().getBoundingInfo();
+		// const halfHeight = boundingInfo.boundingBox.extendSize.y;
+		//
+		// const maxY = this._bounds.maxY - halfHeight;
+		// const minY = this._bounds.minY + halfHeight;
+		// const currentY = this.getMesh().position.y;
+		// this.getMesh().position.y += 0.1;
+		// (Math.random() < 0.5) ?  : this.getMesh().position.y = Math.max(minY, Math.min(maxY, newY)) - 0.1;
 	}
 }
