@@ -43,7 +43,7 @@ export default async function game_routes(fastify: FastifyInstance, options: Fas
 		if (!token)
 			return;
 		const wildcardMatch = request.url.slice('/game/'.length);
-		const url = new URL(request.url, `wss://sarif_pong:1337/game/${wildcardMatch}`);
+		const url = new URL(request.url, `wss://pong:1337/game/${wildcardMatch}`);
 		url.searchParams.append('userId', token.sub);
 		console.log(url);
 		const proxySocket = new WebSocket(url, {

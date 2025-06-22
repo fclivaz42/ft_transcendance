@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/20 20:39:55 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/22 19:56:58 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -17,6 +17,7 @@ import type * as at from "axios"
 import { tables } from "./db_vars.ts"
 import { hash_password } from "./db_helpers.ts"
 import DatabaseWorker from "./db_methods.ts"
+import Logger from "../../libs/helpers/loggers.ts"
 
 //
 // Automatically check if any column has been changed in db_vars.ts
@@ -31,13 +32,13 @@ function check_db_columns(db: sqlt.Database, table: string) {
 		dbrows.push(item["name"]);
 		if (tables[table]["Fields"].indexOf(item["name"]) === -1) {
 			db.prepare(`ALTER TABLE ${table} DROP COLUMN ${item["name"]}`).run()
-			console.log(`DB INIT: dropped ${item["name"]}.`)
+			Logger.info(`DB INIT: dropped ${item["name"]}.`)
 		}
 	}
 	for (const item of tables[table]["Fields"]) {
 		if (dbrows.indexOf(item) === -1 && item.length > 0) {
 			db.prepare(`ALTER TABLE ${table} ADD ${item} ${tables[table]["Arguments"][tables[table]["Fields"].indexOf(item)]}`).run()
-			console.log(`DB INIT: added ${item}.`)
+			Logger.info(`DB INIT: added ${item}.`)
 		}
 	}
 }
@@ -68,7 +69,7 @@ export async function init_db() {
 							sql += `${tables[item].Fields[x]} ${tables[item].Arguments[x]},\n`
 					}
 					db.prepare(sql).run()
-					console.log(`DB INIT: Created table ${tables[item].Name}`);
+					Logger.info(`DB INIT: Created table ${tables[item].Name}`);
 				}
 				else
 					check_db_columns(db, tables[item].Name);
@@ -107,7 +108,7 @@ export async function add_default_user() {
 	return new Promise((resolve, reject) => {
 		(async () => {
 			try {
-				const test = DatabaseWorker.get(tables.Players.Name, tables.Players.Fields[1], process.env.ADMIN_NAME as string)
+				const test = DatabaseWorker.get_del(tables.Players.Name, tables.Players.Fields[1], process.env.ADMIN_NAME as string, "get")
 				if (test[tables.Players.Fields[1]] === process.env.ADMIN_NAME as string)
 					return resolve(true);
 			} catch (e) {
@@ -138,13 +139,13 @@ export async function add_default_user() {
 export async function check_contract() {
 	const resp: object | undefined = DatabaseWorker.get_contract(tables.CurrentContract.Name);
 	if (resp !== undefined) {
-		console.log(`Blockchain already there: ${resp[tables.CurrentContract.Fields[0]]}`)
+		Logger.info(`Blockchain already there: ${resp[tables.CurrentContract.Fields[0]]}`)
 		return;
 	}
 	const ask_blockchain: at.AxiosInstance = Axios.create({
 		method: "post",
 		timeout: 15000,
-		baseURL: "http://sarif_blockchain:8080",
+		baseURL: "http://blockchain:8080",
 		headers: {
 			'Content-Type': 'application/json',
 			'Authorization': process.env.API_KEY,
@@ -155,10 +156,10 @@ export async function check_contract() {
 			const obj = {};
 			obj[tables.CurrentContract.Fields[0]] = response.data;
 			DatabaseWorker.post(tables.CurrentContract.Name, tables.CurrentContract.Fields, obj)
-			console.log(`Blockchain initialized: ${response.data}`)
+			Logger.info(`Blockchain initialized: ${response.data}`)
 		})
 		.catch(function(error: at.AxiosError) {
 			console.error("WARN: BLOCKCHAIN NOT INITIALIZED!")
-			console.log(error.name, error.code)
+			Logger.info(`${error.name} ${error.code}`)
 		})
 }

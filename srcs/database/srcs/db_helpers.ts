@@ -6,13 +6,15 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/21 21:57:13 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/20 21:27:00 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/22 19:52:52 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import DatabaseWorker from "./db_methods.ts"
 import type * as fft from 'fastify'
 import { randomBytes, scrypt } from "crypto"
+import type { db_params } from "./db_main.ts"
+import Logger from "../../libs/helpers/loggers.ts"
 
 //
 // Basic checks (eg. API-KEY, Content-Type, etc)
@@ -37,17 +39,27 @@ export function check_request_format(headers: object, method: string, params: ob
 //
 
 function get_del_db(request: fft.FastifyRequest, reply: fft.FastifyReply, table: string, table_fields: Array<string>) {
-	let response: object;
-	const params: object = request.params as object
+	let response: object | Array<object>;
+	const params: db_params = request.params as db_params
+	const meth = request.method.toLowerCase()
 	try {
 		check_request_format(request.headers, request.method, params)
-		response = DatabaseWorker[request.method.toLowerCase()](table, Object.keys(params)[0], params[Object.keys(params)[0]]);
+		const regex = new RegExp(`^/${table}\\/multiget$`)
+		if (regex.test(request.url)) {
+			response = DatabaseWorker.multiget(table, request.headers["field"] as string | undefined, request.headers["array"] as string | undefined) as Array<object>;
+		}
+		else if (/^\/Matches\/search\//.test(request.url)) {
+			response = DatabaseWorker.get_del(table, table_fields[1], params.PlayerID as string, "all")
+			response = [...response as Array<object>, ...DatabaseWorker.get_del(table, table_fields[2], params.PlayerID as string, "all") as Array<object>];
+		}
+		else
+			response = DatabaseWorker.get_del(table, Object.keys(params)[0], params[Object.keys(params)[0]], meth === "get" ? "get" : "run") as object;
 	} catch (exception) {
 		if (typeof exception.code === "string")
 			return reply.code(500).send(exception.code)
 		return reply.code(exception.code).send(exception.string)
 	}
-	return reply.code(request.method.toLowerCase() === "get" ? 200 : 202).send(response)
+	return reply.code(meth === "get" ? 200 : 202).send(response)
 }
 
 //
@@ -61,11 +73,11 @@ export async function hash_password(password: string) {
 			if (err) return reject(err);
 			const salt = buf.toString('base64').substring(0, 64)
 			if (process.env.RUNMODE === "debug")
-				console.log(`Generated salt: ${salt}`)
+				Logger.info(`Generated salt: ${salt}`)
 			scrypt(password, salt, 66, (err, derivedKey) => {
 				if (err) return reject(err);
 				if (process.env.RUNMODE === "debug")
-					console.log(`Generated hash: ${salt + derivedKey.toString('base64')}`)
+					Logger.info(`Generated hash: ${salt + derivedKey.toString('base64')}`)
 				return resolve(salt + derivedKey.toString('base64'));
 			})
 		})
@@ -92,7 +104,7 @@ export default class RequestHandler {
 
 	static async post(request: fft.FastifyRequest, reply: fft.FastifyReply, table: string, table_fields: Array<string>) {
 		const body = request.body as object;
-		const params: object = request.params as object
+		const params: db_params = request.params as db_params
 		let response: string;
 		try {
 			if (table === "Players") {
@@ -111,7 +123,7 @@ export default class RequestHandler {
 	static async put(request: fft.FastifyRequest, reply: fft.FastifyReply, table: string, table_fields: Array<string>) {
 		let response: object;
 		const body = request.body as object;
-		const params: object = request.params as object
+		const params: db_params = request.params as db_params
 		try {
 			if (table === "Players" && body["Password"] !== undefined)
 				body["Password"] = await hash_password(body["Password"])
