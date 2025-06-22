@@ -6,10 +6,12 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/20 22:08:05 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/22 16:33:04 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
+import { fastifyLogger } from "../../libs/helpers/fastifyHelper.ts";
+import Logger from "../../libs/helpers/loggers.ts";
 import { add_default_user, check_contract, init_db } from "./db_startup.ts"
 import { tables } from "./db_vars.ts"
 import RequestHandler from "./db_helpers.ts"
@@ -56,10 +58,10 @@ fs.mkdir(process.env.FILELOCATION, { recursive: true, mode: 0o700 }, (err) => {
 })
 
 if (process.env.RUNMODE === "debug")
-	console.log(process.env.API_KEY)
+	Logger.info(process.env.API_KEY)
 
 const fastify = Fastify({
-	logger: process.env.RUNMODE === "debug" ? true : false
+	logger: false
 })
 
 fastify.register(multipart)
@@ -79,17 +81,26 @@ fastify.register(fastifyStatic, {
 
 const methods = ["GET", "POST", "DELETE", "PUT"]
 
+export interface db_params {
+	PlayerID?: string,
+	OAuthID?: string,
+	MatchID?: string,
+	TournamentID?: string,
+	DisplayName?: string,
+	EmailAddress?: string,
+}
+
 for (const method of methods) {
 	for (const item in tables) {
 		if (tables[item].Methods[method] !== undefined) {
 			for (const route of tables[item].Methods[method]) {
 				fastify.register(async function tophandler(fastify: fft.FastifyInstance) {
-					fastify[method.toLowerCase()]<{ Params: object }>(`/${tables[item].Name}${route}`, async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
+					fastify[method.toLowerCase()]<{ Params: Parameters }>(`/${tables[item].Name}${route}`, async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
 						await RequestHandler[method.toLowerCase()](request, reply, tables[item].Name, tables[item].Fields)
 					})
 				})
 				if (process.env.RUNMODE === "debug")
-					console.log(`registered ${method} /${tables[item].Name}${route}`)
+					Logger.info(`registered ${method} /${tables[item].Name}${route}`)
 			}
 		}
 	}
@@ -103,18 +114,18 @@ fastify.register(extra_routes)
 
 status.then(
 	function(value) {
-		console.log("Database successfully initialized: ", value)
+		Logger.info(`Database successfully initialized: ${value}`)
 	},
 	function(error) {
-		console.error("Could not initialize database!", error)
+		Logger.error(`Could not initialize database! ${error}`)
 		process.exit(1);
 	}
 )
 
 if (await add_default_user())
-	console.log("Default user added/updated.")
+	Logger.info("Default user added/updated.")
 else
-	console.error("Could not create user!")
+	Logger.error("Could not create user!")
 
 // WARN: UNCOMMENT ONCE WORKING WITH BLOCKCHAIN
 // check_contract()
@@ -129,3 +140,15 @@ fastify.listen({ port: 3000, host: '::' }, (err) => {
 		process.exit(1)
 	}
 })
+
+
+fastify.addHook("onResponse", async (req, res) => {
+	// @ts-expect-error
+	fastifyLogger(req, res);
+});
+
+fastify.addHook("onError", async (req, res, error) => {
+	Logger.error(`Error occurred: ${error.message}`);
+	// @ts-expect-error
+	fastifyLogger(req, res);
+});

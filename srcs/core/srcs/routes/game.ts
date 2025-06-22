@@ -37,17 +37,17 @@ async function handleToken(req: FastifyRequest, client: WebSocket) {
 
 export default async function game_routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
 	Logger.info("WebSocket routes loaded");
-	fastify.get('/*', { websocket: true}, async (client, request) => {
+	fastify.get('/*', { websocket: true }, async (client, request) => {
 		Logger.info(`WebSocket connection request received for ${request.url}`);
 		const token = await handleToken(request, client);
 		if (!token)
 			return;
 		const wildcardMatch = request.url.slice('/game/'.length);
-		const url = new URL(request.url, `wss://sarif_pong:1337/game/${wildcardMatch}`);
+		const url = new URL(request.url, `wss://pong:1337/game/${wildcardMatch}`);
 		url.searchParams.append('userId', token.sub);
 		console.log(url);
 		const proxySocket = new WebSocket(url, {
-			agent: new https.Agent({rejectUnauthorized: false}),
+			agent: new https.Agent({ rejectUnauthorized: false }),
 		});
 
 		proxySocket.on("open", () => {
@@ -80,16 +80,16 @@ export default async function game_routes(fastify: FastifyInstance, options: Fas
 		client.on("error", (error) => {
 			Logger.error(`Client WebSocket error\n${error}`);
 			proxySocket.close(1011, 'Client error');
-		});		
+		});
 
 		proxySocket.on("close", (code, reason) => {
 			client.close(code, reason.toString());
 		});
-		
+
 		client.on("close", (code, reason) => {
 			proxySocket.close(code, reason.toString());
 		});
-		
+
 		proxySocket.on("ping", () => client.ping());
 		proxySocket.on("pong", () => client.pong());
 

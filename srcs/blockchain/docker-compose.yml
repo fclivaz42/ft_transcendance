@@ -1,6 +1,6 @@
 services:
-  sarif_blockchain:
-    container_name: sarif_blockchain
+  blockchain:
+    container_name: blockchain
     image: sarif_blockchain
     networks:
       - sarifntw
@@ -13,3 +13,7 @@ services:
     environment:
       - API_KEY
     restart: on-failure
+    depends_on:
+      libs:
+        condition: service_completed_successfully
+        restart: true

@@ -29,7 +29,7 @@ export default async function usersAuthorizeEndpoint(app: FastifyInstance, opts:
 			return httpReply(reply, request, 401, "JWT token payload is missing");
 		// Check if the user exists in the database
 		try {
-			await axios.get(`http://sarif_db:3000/Players/id/${jwtToken.payload.sub}`, {
+			await axios.get(`http://db:3000/Players/id/${jwtToken.payload.sub}`, {
 				headers: {
 					"Authorization": process.env.API_KEY || "",
 					"Content-Type": "application/json",

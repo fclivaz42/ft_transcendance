@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/20 22:03:55 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/22 19:12:38 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -47,59 +47,12 @@ interface db_table {
 }
 
 export interface db_definition {
-	// OAuth: db_table;
 	Players: db_table;
 	Matches: db_table;
 	Tournaments: db_table;
 	UIDTable: db_table;
 	CurrentContract: db_table;
 }
-
-// const OauthTable: db_table =
-// {
-// 	"Name": "OAuth",
-// 	"Fields": [
-// 		"SubjectID",
-// 		"IssuerName",
-// 		"EmailAddress",
-// 		"FullName",
-// 		"FirstName",
-// 		"FamilyName",
-// 		"TokenHash",
-// 		"IssueTime",
-// 		"ExpirationTime",
-// 		""
-// 	],
-// 	"Arguments": [
-// 		"TEXT NOT NULL",
-// 		"TEXT NOT NULL",
-// 		"TEXT NOT NULL",
-// 		"TEXT DEFAULT NULL",
-// 		"TEXT DEFAULT NULL",
-// 		"TEXT DEFAULT NULL",
-// 		"TEXT NOT NULL",
-// 		"INTEGER NOT NULL",
-// 		"INTEGER DEFAULT 0",
-// 		"PRIMARY KEY (SubjectID, IssuerName)"
-// 	],
-// 	"Methods": {
-// 		"GET": [
-// 			"/id/:SubjectID"
-// 		],
-// 		"POST": [
-// 			""
-// 		],
-// 		"DELETE": [
-// 			"/id/:SubjectID"
-// 		],
-// 		"PUT": [
-// 			"/id/:SubjectID"
-// 		]
-// 	},
-// 	"Identification": {
-// 		"HasID": false
-// 	}
-// }
 
 const PlayersTable: db_table =
 {
@@ -115,6 +68,7 @@ const PlayersTable: db_table =
 		"FirstName",
 		"FamilyName",
 		"Bappy",
+		"Private",
 		"Admin"
 	],
 	"Arguments": [
@@ -128,10 +82,12 @@ const PlayersTable: db_table =
 		"TEXT DEFAULT NULL",
 		"TEXT DEFAULT NULL",
 		"INTEGER DEFAULT 0",
+		"INTEGER DEFAULT 0",
 		"INTEGER DEFAULT 0"
 	],
 	"Methods": {
 		"GET": [
+			"/multiget",
 			"/id/:PlayerID",
 			"/oauth/:OAuthID",
 			"/username/:DisplayName",
@@ -180,6 +136,8 @@ const MatchesTable: db_table =
 	],
 	"Methods": {
 		"GET": [
+			"/multiget",
+			"/search/:PlayerID",
 			"/id/:MatchID",
 		],
 		"POST": [
@@ -253,7 +211,6 @@ const CurrentContract: db_table =
 
 export const tables: db_definition =
 {
-	// "OAuth": OauthTable,
 	"Players": PlayersTable,
 	"Matches": MatchesTable,
 	"Tournaments": TournamentsTable,

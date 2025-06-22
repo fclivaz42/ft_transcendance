@@ -16,7 +16,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		const params = request.params as { uuid: string };
 		// TODO: Remove axios request, use sdk instead
 		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
-		const resp = await axios.get(`http://sarif_db:3000/Players/id/${params.uuid}`, {
+		const resp = await axios.get(`http://db:3000/Players/id/${params.uuid}`, {
 			headers: {
 				"Authorization": process.env.API_KEY || "",
 			},
@@ -31,7 +31,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 			return authorization;
 		const params = request.params as { uuid: string };
 		// TODO: Remove axios request, use sdk instead
-		const resp = await axios.delete(`http://sarif_db:3000/Players/id/${params.uuid}`, {
+		const resp = await axios.delete(`http://db:3000/Players/id/${params.uuid}`, {
 			headers: {
 				"Authorization": process.env.API_KEY || "",
 			},
@@ -49,7 +49,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		if (body.PlayerID)
 			return reply.code(400).send({ error: "PlayerID is not allowed to be set manually" });
 
-		const db = await axios.put(`http://sarif_db:3000/Players/id/${params.uuid}`, body, {
+		const db = await axios.put(`http://db:3000/Players/id/${params.uuid}`, body, {
 			headers: {
 				"Authorization": process.env.API_KEY || "",
 				"Content-Type": "application/json",
@@ -73,7 +73,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		if (body.PlayerID)
 			return reply.code(400).send({ error: "PlayerID is not allowed to be set manually" });
 
-		const db = await axios.post(`http://sarif_db:3000/Players`, body, {
+		const db = await axios.post(`http://db:3000/Players`, body, {
 			headers: {
 				"Authorization": process.env.API_KEY || "",
 				"Content-Type": "application/json",
