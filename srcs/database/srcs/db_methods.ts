@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/22 19:55:33 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/23 01:29:11 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -14,6 +14,8 @@ import Database from "better-sqlite3"
 import { tables } from "./db_vars.ts"
 import { randomUUID } from "node:crypto"
 import type * as sqlt from "better-sqlite3"
+import fs from "node:fs";
+import path from "node:path";
 
 //
 // Export as a non-instantiable class in order to directly call the static members.
@@ -35,6 +37,14 @@ export default class DatabaseWorker {
 		let response: object | Array<object> | sqlt.RunResult;
 		const sql = mode === "run" ? "DELETE" : "SELECT *"
 		try {
+			if (table === tables.Players.Name && mode === "run") {
+				response = db.prepare(`SELECT * FROM ${table} WHERE ${field} = ?`).get(query) as object
+				const filename = response[tables.Players.Fields[0]]
+				const folder: Array<string> = fs.readdirSync(process.env.FILELOCATION as string)
+				for (const item of folder)
+					if (filename === item.split('.')[0])
+						fs.rmSync(path.join(process.env.FILELOCATION as string, item))
+			}
 			response = db.prepare(`${sql} FROM ${table} WHERE ${field} = ?`)[mode](query) as object
 			if (response === undefined)
 				throw { code: 404, string: "error.value.notfound" }

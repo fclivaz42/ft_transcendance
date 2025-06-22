@@ -65,10 +65,8 @@ export async function getCallback(req: FastifyRequest, rep: FastifyReply) {
 	await updateUser(token, await getMatchingOauthUser(token));
 	// log the user in using the OAuth ID
 	const userSdk = new UsersSdk();
-	// TODO: Fix db to respond when user is created or updated
-	await new Promise(resolve => setTimeout(resolve, 500)); // wait for the user to be created or updated
-	const login = (await userSdk.postOauthLogin({OAuthID: token.jwt_decode.subject})).data;
-	return rep.status(200).send({...login});
+	const login = (await userSdk.postOauthLogin({ OAuthID: token.jwt_decode.subject })).data;
+	return rep.status(200).send({ ...login });
 }
 
 async function getMatchingOauthUser(token: OauthToken) {
@@ -79,7 +77,7 @@ async function getMatchingOauthUser(token: OauthToken) {
 			headers: {
 				"Authorization": process.env.API_KEY || "",
 				"Content-Type": "application/json",
-		},
+			},
 			httpsAgent: new https.Agent({ rejectUnauthorized: false }),
 		})).data;
 	} catch (error) {
