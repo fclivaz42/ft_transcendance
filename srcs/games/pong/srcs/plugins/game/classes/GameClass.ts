@@ -4,6 +4,7 @@ import Wall from "./Wall.ts";
 import Ball from "./Ball.ts";
 import PlayField from "./Playfield.ts";
 import { Scene, Vector3, Color3 } from "@babylonjs/core";
+import GameRoom from "./GameRoom.ts";
 
 const SHOW_BOXES: boolean = false;
 
@@ -45,6 +46,7 @@ export default class Game {
 	private _p2: Paddle;
 	private _ball: Ball;
 	private _walls: WallMap;
+	private _room: GameRoom | null = null;
 
 	constructor() {
 		this._field = new PlayField();
@@ -127,14 +129,15 @@ export default class Game {
 
 		for (let [key, value] of Object.entries(this._walls)) {
 			value.getMesh().showBoundingBox = SHOW_BOXES;
+			value.setGame(this);
 			if (key.startsWith("east") || key.startsWith("west"))
 				value.setPassThrough(true);
 		}
 
 		// set ia brut
-		this._p2.setAI(true);
+		/* this._p2.setAI(true);
 		if (this._p2.getIsIA())
-			this._p2.setBall(this._ball);
+			this._p2.setBall(this._ball); */
 
 		this._p2.getMesh().showBoundingBox = SHOW_BOXES;
 		this._p2.setVerticalBounds(bounds);
@@ -204,5 +207,15 @@ export default class Game {
 		this._field.addUpdatable(this._p2);
 		this._field.addUpdatable(this._ball);
 		this._field.start(fps, this._broadcastUpdate || undefined);
+	}
+
+	public score(player: number): void {
+		if (this._room) {
+			this._room.addScore(player); 
+		}
+	}
+
+	public setRoom(room: GameRoom) {
+		this._room = room;
 	}
 }

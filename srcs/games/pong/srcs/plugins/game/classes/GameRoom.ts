@@ -13,12 +13,18 @@ interface PaddleUpdate {
 	position: number[];
 }
 
+interface RoomScore {
+	p1: number,
+	p2: number
+}
+
 interface UpdatePayload {
 	type: "update";
 	payload: {
 		ball: BallUpdate;
 		p1: PaddleUpdate;
 		p2: PaddleUpdate;
+		score: RoomScore;
 	}
 }
 
@@ -55,13 +61,13 @@ export default class GameRoom {
 	public id: string;
 	public players: PlayerSession[] = [];
 	public game: Game;
-	public score: { p1: number | null; p2: number | null };
+	public score: { p1: number; p2: number};
 
 
 	constructor(id: string) {
 		this.id = id;
 		this.game = new Game();
-		this.score = { p1: null, p2: null };
+		this.score = { p1: 0, p2: 0 };
 	}
 
 	public isFull(): boolean {
@@ -71,6 +77,10 @@ export default class GameRoom {
 
 	public getGame(): Game {
 		return this.game;
+	}
+
+	public getScore(): {p1: number, p2: number} {
+		return this.score;
 	}
 
 	public addPlayer(playerSession: PlayerSession): void {
@@ -90,12 +100,17 @@ export default class GameRoom {
 		}
 	}
 
-	startGame() {
+	public addScore(player: number) {
+		player === 1 ? this.score.p1++ : this.score.p2++;
+	}
+
+	public startGame() {
 
 		this.game.setBroadcastFunction(() => {
 			this.broadcast(this.buildUpdatePayload());
 		});
 
+		this.game.setRoom(this);
 		this.broadcast(this.buildInitPayload());
 		this.game.gameStart(DEFAULT_FPS);
 	}
@@ -150,6 +165,10 @@ export default class GameRoom {
 				p2: {
 					max_speed: p2.getSpeed(),
 					position: p2.getPosition().asArray()
+				},
+				score: {
+					p1: this.score.p1,
+					p2: this.score.p2
 				}
 			}
 		}
