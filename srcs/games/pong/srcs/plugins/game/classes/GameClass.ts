@@ -226,18 +226,14 @@ export default class Game {
 
 // BACKEND:
 //       Fix the clipping at the bottom [DONE]
-// TODO: Make the field a little smaller?
+//       Make the field a little smaller? [DONE]
 // TODO: Speed up the ball after a few bounces
-// TODO: Problem with constant for ball speed
-// TODO: Collision increase size! very slightly
+//       Collision increase size! very slightly [DONE]
 // 	     Broadcast score with update [DONE]
 
-// SMOOTHNESS
-// TODO: Test if possible to implement interpolation on the front end to make it smoother
-
 // FRONTEND
-// TODO: Add skybox and tron like glow to the elements
-// TODO: See if paddles can only have glowing outline
-// TODO: Have ball glow
-// TODO: See if the ball can have a trail
+// TODO: Add skybox FUCK THE SKYBOX, PIECE OF FUCKING SHIT
+//       Tron-like glow to paddles [DONE]
+//       See if paddles can only have glowing outline [DONE]
+//       Have ball glow [ISH]
 // TODO: Introduce the scorebox
