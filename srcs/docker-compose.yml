@@ -5,11 +5,11 @@
 include:
   - ./libs/docker-compose.yml
   - ./core/docker-compose.yml
-  # - ./database/docker-compose.yml
-  # - ./oauth2/docker-compose.yml
-  # - ./usermanager/docker-compose.yml
+  - ./database/docker-compose.yml
+  - ./oauth2/docker-compose.yml
+  - ./usermanager/docker-compose.yml
   - ./frontend/docker-compose.yml
-  # - ./blockchain/docker-compose.yml
+  - ./blockchain/docker-compose.yml
   - ./games/pong/docker-compose.yml
 
 networks:

@@ -29,6 +29,7 @@ export default class Ball {
 	private _playerBounces: number;
 	private _diameter: number;
 	private _segments: number;
+	private _isLanched: boolean;
 
 	public direction: Vector3;
 
@@ -64,6 +65,7 @@ export default class Ball {
 		this._colliders = [];
 		this._lastHit = null;
 		this._bounceCooldown = 0;
+		this._isLanched = false;
 	}
 
 	public getMesh(): Mesh { return this._mesh; }
@@ -93,13 +95,16 @@ export default class Ball {
 	public incrPlayerBounce(): void { this._playerBounces++; }
 
 	public launch(): void {
-		this._currSpeed = this._baseSpeed;
-		this.direction = new Vector3(
-			Math.random() < 0.5 ? 1 : -1, 0, 0).normalize();
-		this._mesh.position.addInPlace(this.direction.scale(this._currSpeed));
+		if (!this._isLanched) {
+			this._currSpeed = this._baseSpeed;
+			this.direction = new Vector3(
+				Math.random() < 0.5 ? 1 : -1, 0, 0).normalize();
+			this._mesh.position.addInPlace(this.direction.scale(this._currSpeed));
+			this._isLanched = true;
+		}
 	}
 
-	public update(): void {
+	public update(fps: number): void {
 		this._mesh.position.addInPlace(this.direction.scale(this._currSpeed));
 
 		// add launch control option

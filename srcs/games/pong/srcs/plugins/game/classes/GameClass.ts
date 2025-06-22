@@ -115,9 +115,6 @@ export default class Game {
 			height: PLAYER_HEIGHT,
 			width: PLAYER_WIDTH
 		});
-		this._p2.getMesh().showBoundingBox = SHOW_BOXES;
-		this._p2.setVerticalBounds(bounds);
-
 		/* Creating Ball */
 		this._ball = new Ball(
 			this._scene,
@@ -134,6 +131,14 @@ export default class Game {
 			if (key.startsWith("east") || key.startsWith("west"))
 				value.setPassThrough(true);
 		}
+
+		// set ia brut
+		this._p2.setAI(true);
+		if (this._p2.getIsIA())
+			this._p2.setBall(this._ball);
+
+		this._p2.getMesh().showBoundingBox = SHOW_BOXES;
+		this._p2.setVerticalBounds(bounds);
 
 		/* Setting colliders for the paddles and the ball */
 		this._p1.setColliders([this._walls.northWall, this._walls.southWall]);
