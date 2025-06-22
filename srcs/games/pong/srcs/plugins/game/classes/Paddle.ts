@@ -148,18 +148,11 @@ export default class Paddle {
 
 	public async manageIA() {
 
-		// console.log(`IA currently working, Ball: ${this._ball?.getPosition().asArray()}`);
+		console.log(`IA currently working, Ball: ${this._ball?.getPosition().asArray()}`);
 		// Math.random() < 0.5 ? this.getMesh().position.y += 0.1 : this.getMesh().position.y -= 0.1;
+		console.log("\nis ia\n");
 		const y = this._ball?.getMesh().position.y;
 		if (y)
 			this.getMesh().position.y = y;
-		// const boundingInfo = this.getMesh().getBoundingInfo();
-		// const halfHeight = boundingInfo.boundingBox.extendSize.y;
-		//
-		// const maxY = this._bounds.maxY - halfHeight;
-		// const minY = this._bounds.minY + halfHeight;
-		// const currentY = this.getMesh().position.y;
-		// this.getMesh().position.y += 0.1;
-		// (Math.random() < 0.5) ?  : this.getMesh().position.y = Math.max(minY, Math.min(maxY, newY)) - 0.1;
 	}
 }

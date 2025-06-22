@@ -15,7 +15,7 @@ import {
 const WIDTH: number = 512;
 const HEIGHT: number = 256;
 
-const DEFAULT_FPS: number = 30;
+export const DEFAULT_FPS: number = 60;
 
 const ALPHA: number = Math.PI / 2;
 const BETA: number = Math.PI / 2;
@@ -125,10 +125,10 @@ export default class PlayField {
 		}
 		const frameTime = 1000 / fps;
 		this._intervalId = setInterval(() => {
-			PlayField._fps < 60 ? PlayField._fps++ : PlayField._fps = 0;
 			for (const obj of this._updatables) {
 				obj.update(PlayField._fps);
 			}
+			PlayField._fps < 60 ? PlayField._fps++ : PlayField._fps = 0;
 			if (broadCast) broadCast();
 			this._scene.render();
 		}, frameTime);
