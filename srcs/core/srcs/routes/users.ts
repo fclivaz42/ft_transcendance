@@ -86,6 +86,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for logout.' });
 		return reply
 			.header("Set-Cookie", `token=; Path=/; HttpOnly; SameSite=Strict; Secure; Max-Age=0`)
-			.code(200).send({ message: 'Logged out successfully' });
+			.header("location", "/")
+			.code(303).send({ message: 'Logged out successfully' });
 	});
 }

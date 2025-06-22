@@ -38,7 +38,7 @@ export function createDialog(props?: DialogProps): HTMLDialogElement {
     dialog.appendChild(props.child);
   }
 
-  dialog.className = "bg-white p-8 bg-background dark:bg-background_dark border-0 rounded-lg shadow-lg flex flex-col justify-center items-center gap-y-4 text-black dark:text-white";
+  dialog.className = "fixed left-0 right-0 top-0 bottom-0 p-8 bg-background dark:bg-background_dark border-0 rounded-lg shadow-lg flex flex-col justify-center items-center gap-y-4 text-black dark:text-white";
 
   return dialog;
 }
