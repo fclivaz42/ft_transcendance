@@ -37,7 +37,7 @@ async function handleToken(req: FastifyRequest, client: WebSocket) {
 
 export default async function game_routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
 	Logger.info("WebSocket routes loaded");
-	fastify.get('/*', { websocket: true}, async (client, request) => {
+	fastify.get('/*', { websocket: true }, async (client, request) => {
 		Logger.info(`WebSocket connection request received for ${request.url}`);
 		const token = await handleToken(request, client);
 		if (!token)
@@ -47,7 +47,7 @@ export default async function game_routes(fastify: FastifyInstance, options: Fas
 		url.searchParams.append('userId', token.sub);
 		console.log(url);
 		const proxySocket = new WebSocket(url, {
-			agent: new https.Agent({rejectUnauthorized: false}),
+			agent: new https.Agent({ rejectUnauthorized: false }),
 		});
 
 		proxySocket.on("open", () => {
@@ -80,16 +80,17 @@ export default async function game_routes(fastify: FastifyInstance, options: Fas
 		client.on("error", (error) => {
 			Logger.error(`Client WebSocket error\n${error}`);
 			proxySocket.close(1011, 'Client error');
-		});		
+		});
 
 		proxySocket.on("close", (code, reason) => {
 			client.close(code, reason.toString());
 		});
-		
+
 		client.on("close", (code, reason) => {
-			proxySocket.close(code, reason.toString());
+			const validCode = typeof code === "number" && code >= 1000 && code <= 4999 ? code : 1000;
+			proxySocket.close(validCode, reason?.toString() || "");
 		});
-		
+
 		proxySocket.on("ping", () => client.ping());
 		proxySocket.on("pong", () => client.pong());
 

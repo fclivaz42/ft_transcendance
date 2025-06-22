@@ -4,6 +4,7 @@ import Ball from "./Ball.ts";
 import { Session } from "inspector/promises";
 import { PADDLE_SPEED } from "./GameClass.ts";
 import { match } from "assert";
+import type { WallMap } from "./GameClass.ts";
 
 interface PaddleOptions {
 	color: Color3;
@@ -20,10 +21,6 @@ interface InitInfo {
 	size: number[];
 }
 
-// interface Walls {
-// 	upWall : ;
-//
-// }
 
 export default class Paddle {
 
@@ -39,7 +36,7 @@ export default class Paddle {
 	private _moveDirection: "up" | "down" | null = null;
 	private _bounds: { minY: number, maxY: number } = { minY: -Infinity, maxY: Infinity };
 	private _ball: Ball | null = null;
-	// private _ball: Walls | null = null;
+	private _walls: WallMap;
 	private _isRan: boolean;
 
 	static _ballPos: number | undefined = undefined;
@@ -103,6 +100,7 @@ export default class Paddle {
 	}
 
 	public setBall(ball: Ball): void { this._ball = ball; }
+	public setWalls(walls: WallMap): void { this._walls = walls; }
 	public setSpeed(speed: number): void { this._speed = speed; }
 	public setColliders(colliders: any): void { this._colliders = colliders; }
 	public setAI(io: boolean): void { this._isAi = io; }
@@ -159,6 +157,20 @@ export default class Paddle {
 		}
 	}
 
+	public iaAlgo(fps: number, diff: number): void {
+		console.log(`Wall: ${this._walls.upWall.getMesh().position.y.toString}`);
+		console.log(`Wall: ${this._walls.downWall.getMesh().position.y.toString}`);
+		if (diff < -0.20)
+			this.getMesh().position.y -= this.getSpeed();
+		else if (diff > 0.20)
+			this.getMesh().position.y += this.getSpeed();
+		else if (fps === 30)
+			if (Math.random() < 0.5) {
+				this._isRan = true;
+				this.randMoove();
+			}
+	}
+
 	public async manageIA(fps: number) {
 
 		let newBallPos: number | undefined;
@@ -172,15 +184,7 @@ export default class Paddle {
 			if (!this._isRan) {
 				const diff = Paddle._ballPos - this.getMesh().position.y;
 				console.log(`diff: ${diff}`);
-				if (diff < -0.20)
-					this.getMesh().position.y -= this.getSpeed();
-				else if (diff > 0.20)
-					this.getMesh().position.y += this.getSpeed();
-				else if (fps === 30)
-					if (Math.random() < 0.5) {
-						this._isRan = true;
-						this.randMoove();
-					}
+				this.iaAlgo(fps, diff);
 			}
 			else
 				this.randMoove();

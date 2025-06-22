@@ -32,7 +32,7 @@ interface BroadcastFunction {
 	(): void;
 }
 
-interface WallMap {
+export interface WallMap {
 	[key: string]: Wall;
 }
 
@@ -133,8 +133,10 @@ export default class Game {
 
 		// set ia brut
 		this._p2.setAI(true);
-		if (this._p2.getIsIA())
+		if (this._p2.getIsIA()) {
 			this._p2.setBall(this._ball);
+			this._p2.setWalls(this._walls);
+		}
 
 		this._p2.getMesh().showBoundingBox = SHOW_BOXES;
 		this._p2.setVerticalBounds(bounds);
