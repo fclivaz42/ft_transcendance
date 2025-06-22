@@ -45,7 +45,8 @@ export default class Wall extends Paddle {
             ball.direction.normalize();
         } else {
             this._name === "eastWall" ? this._game?.score(1) : this._game?.score(2);
-            ball.getMesh().position.set(0, 0, 0);
+            ball.getHitbox().position.set(0, 0, 0);
+            ball.setIsLaunched(false);
             ball.setCurrSpeed(0);
             ball.setLastHit("");
         }

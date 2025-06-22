@@ -1,7 +1,9 @@
-import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh } from "@babylonjs/core";
+import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh, FlowGraphBitwiseLeftShiftBlock } from "@babylonjs/core";
 
 const DIAMETER: number = 0.05;
 const SEGMENTS: number = 32;
+const HITBOX_MOD: number = 1.2;
+const MAX_SPEED: number = 0.8;
 
 interface BallOptions {
 	color: Color3;
@@ -18,18 +20,21 @@ interface BallInfo {
 export default class Ball {
 
 	private _scene: Scene;
+
 	private _mesh: Mesh;
+	private _hitbox: Mesh;
+
 	private _name: string;
 	private _position: Vector3;
 	private _currSpeed: number;
 	private _baseSpeed: number;
+	private _maxSpeed: number;
 	private _colliders: any[];
 	private _lastHit: string | null;
-	private _bounceCooldown: number;
 	private _playerBounces: number;
 	private _diameter: number;
 	private _segments: number;
-	private _isLanched: boolean;
+	private _isLaunched: boolean;
 
 	public direction: Vector3;
 
@@ -58,23 +63,33 @@ export default class Ball {
 		this._mesh = MeshBuilder.CreateSphere(name, { diameter, segments }, scene);
 		this._mesh.position = position.clone();
 
+		this._hitbox = MeshBuilder.CreateSphere(`${name}-hitbox`, {
+			diameter: diameter * HITBOX_MOD,
+			segments: segments
+		}, scene);
+		this._hitbox.isVisible = false;
+		this._hitbox.isPickable = false;
+		this._hitbox.checkCollisions = false;
+
+		this._hitbox.position = position.clone();
+		this._mesh.parent = this._hitbox;
+
 		const material: StandardMaterial = new StandardMaterial(`${name}-mat`, scene);
 		material.diffuseColor = color;
 		this._mesh.material = material;
 
 		this._colliders = [];
 		this._lastHit = null;
-		this._bounceCooldown = 0;
-		this._isLanched = false;
+		this._isLaunched = false;
 	}
 
 	public getMesh(): Mesh { return this._mesh; }
-	public getCollisionBox(): BoundingBox { return this._mesh.getBoundingInfo().boundingBox; }
+	public getCollisionBox(): BoundingBox { return this._hitbox.getBoundingInfo().boundingBox; }
 	public getLastHit(): string | null { return this._lastHit; }
 	public getPlayerBounces(): number { return this._playerBounces; }
 	public getBaseSpeed(): number { return this._baseSpeed; }
 	public getCurrSpeed(): number { return this._currSpeed; }
-	public getPosition(): Vector3 { return this._mesh.position; }
+	public getPosition(): Vector3 { return this._hitbox.position; }
 	public getColliders(): any[] { return this._colliders; }
 	public getBallInitInfo(): BallInfo {
 		return {
@@ -95,17 +110,26 @@ export default class Ball {
 	public incrPlayerBounce(): void { this._playerBounces++; }
 
 	public launch(): void {
-		if (!this._isLanched) {
+		if (!this._isLaunched) {
+			this.direction = Vector3.Zero();
 			this._currSpeed = this._baseSpeed;
 			this.direction = new Vector3(
 				Math.random() < 0.5 ? 1 : -1, 0, 0).normalize();
-			this._mesh.position.addInPlace(this.direction.scale(this._currSpeed));
-			this._isLanched = true;
+			// this._hitbox.position.addInPlace(this.direction.scale(this._currSpeed));
+			this._isLaunched = true;
 		}
 	}
 
+	public setIsLaunched(io: boolean) {
+		this._isLaunched = io;
+	}
+
+	public getHitbox(): Mesh {
+		return this._hitbox;
+	}
+
 	public update(fps: number): void {
-		this._mesh.position.addInPlace(this.direction.scale(this._currSpeed));
+		this._hitbox.position.addInPlace(this.direction.scale(this._currSpeed));
 
 		// add launch control option
 

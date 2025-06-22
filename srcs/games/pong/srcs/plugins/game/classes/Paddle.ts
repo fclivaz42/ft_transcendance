@@ -111,7 +111,7 @@ export default class Paddle {
 		const collisionBox = this.getCollisionBox();
 		const collisionCenter = collisionBox.centerWorld;
 		const collisionHeight = collisionBox.extendSizeWorld.y * 2;
-		let impact = (ball.getMesh().position.y - collisionCenter.y) / (collisionHeight / 2);
+		let impact = (ball.getHitbox().position.y - collisionCenter.y) / (collisionHeight / 2);
 		impact = Math.max(-1, Math.min(impact, 1));
 		ball.direction.x *= -1;
 		ball.direction.y = (impact * 0.8 + ball.direction.y * 0.2); //weighted average for bounce
