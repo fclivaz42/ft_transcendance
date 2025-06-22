@@ -2,8 +2,8 @@ import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mes
 
 const DIAMETER: number = 0.05;
 const SEGMENTS: number = 32;
-const HITBOX_MOD: number = 1.2;
-const MAX_SPEED: number = 0.8;
+const HITBOX_MOD: number = 1.5;
+const MAX_SPEED: number = 0.35;
 
 interface BallOptions {
 	color: Color3;
@@ -35,7 +35,7 @@ export default class Ball {
 	private _diameter: number;
 	private _segments: number;
 	private _isLaunched: boolean;
-
+	private _lastSpeedIncreaseBounce: number | undefined;
 	public direction: Vector3;
 
 	constructor(
@@ -55,6 +55,7 @@ export default class Ball {
 		this._position = position;
 		this._currSpeed = 0;
 		this._baseSpeed = 0.25;
+		this._maxSpeed = MAX_SPEED;
 		this._playerBounces = 0;
 		this._diameter = diameter;
 		this._segments = segments;
@@ -129,7 +130,17 @@ export default class Ball {
 	}
 
 	public update(fps: number): void {
+		console.log(`Player bounces: ${this._playerBounces}`);
+		if (this._playerBounces > 1 
+			&& this._playerBounces % 4 === 0 
+			&& this._playerBounces !== this._lastSpeedIncreaseBounce
+			&& this._currSpeed < this._maxSpeed) {
+			this._currSpeed += 0.025;
+			this._lastSpeedIncreaseBounce = this._playerBounces;
+			console.log("INCREASING SPEED MOD!");
+		}
 		this._hitbox.position.addInPlace(this.direction.scale(this._currSpeed));
+		console.log(`ball curr_speed: ${this._currSpeed}`);
 
 		// add launch control option
 
