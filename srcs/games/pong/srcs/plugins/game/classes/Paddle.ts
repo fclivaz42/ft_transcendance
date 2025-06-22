@@ -2,6 +2,8 @@
 import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh } from "@babylonjs/core";
 import Ball from "./Ball.ts";
 import { Session } from "inspector/promises";
+import { PADDLE_SPEED } from "./GameClass.ts";
+import { match } from "assert";
 
 interface PaddleOptions {
 	color: Color3;
@@ -18,6 +20,11 @@ interface InitInfo {
 	size: number[];
 }
 
+// interface Walls {
+// 	upWall : ;
+//
+// }
+
 export default class Paddle {
 
 	protected _scene: Scene;
@@ -32,6 +39,11 @@ export default class Paddle {
 	private _moveDirection: "up" | "down" | null = null;
 	private _bounds: { minY: number, maxY: number } = { minY: -Infinity, maxY: Infinity };
 	private _ball: Ball | null = null;
+	// private _ball: Walls | null = null;
+	private _isRan: boolean;
+
+	static _ballPos: number | undefined = undefined;
+	static _ran: number = 3;
 
 	constructor(
 		scene: Scene,
@@ -56,6 +68,7 @@ export default class Paddle {
 		this._direction = new Vector3(0, 0, 0);
 		this._mesh = MeshBuilder.CreateBox(name, { width, height, depth }, scene);
 		this._mesh.position = position.clone();
+		this._isRan = false;
 
 		const material = new StandardMaterial(`${name}-mat`, scene);
 		material.diffuseColor = color;
@@ -127,8 +140,8 @@ export default class Paddle {
 
 		// this._direction.set(0, 0, 0);
 		// this.getMesh().position.addInPlace(this._direction.scale(this._speed));
-		if (this._isAi && fps === 0)
-			this.manageIA();
+		if (this._isAi)
+			this.manageIA(fps);
 		else {
 			if (!this._moveDirection) return;
 			console.log("received command to move, attempting to move");
@@ -146,13 +159,49 @@ export default class Paddle {
 		}
 	}
 
-	public async manageIA() {
+	public async manageIA(fps: number) {
 
-		console.log(`IA currently working, Ball: ${this._ball?.getPosition().asArray()}`);
-		// Math.random() < 0.5 ? this.getMesh().position.y += 0.1 : this.getMesh().position.y -= 0.1;
-		console.log("\nis ia\n");
-		const y = this._ball?.getMesh().position.y;
-		if (y)
-			this.getMesh().position.y = y;
+		let newBallPos: number | undefined;
+		if (fps === 1) {
+			newBallPos = this._ball?.getMesh().position.y;
+			console.log(`reading ball: ${Paddle._ballPos}`);
+			console.log(`${this._ball?.direction.asArray()}`);
+		}
+		if (Paddle._ballPos) {
+			console.log(`ballpos: ${Paddle._ballPos}, paddle: ${this.getMesh().position.y}`);
+			if (!this._isRan) {
+				const diff = Paddle._ballPos - this.getMesh().position.y;
+				console.log(`diff: ${diff}`);
+				if (diff < -0.20)
+					this.getMesh().position.y -= this.getSpeed();
+				else if (diff > 0.20)
+					this.getMesh().position.y += this.getSpeed();
+				else if (fps === 30)
+					if (Math.random() < 0.5) {
+						this._isRan = true;
+						this.randMoove();
+					}
+			}
+			else
+				this.randMoove();
+		}
+		if (fps === 1)
+			Paddle._ballPos = newBallPos;
+	}
+
+	public randMoove(): void {
+		console.log(`Random noice: ${Paddle._ran}`);
+		if (Paddle._ran < 3) {
+			this.getMesh().position.y += this.getSpeed();
+			Paddle._ran++;
+		}
+		else if (Paddle._ran > 3) {
+			this.getMesh().position.y -= this.getSpeed();
+			Paddle._ran--;
+		}
+		else if (Paddle._ran === 3) {
+			Paddle._ran = Math.floor((Math.random() * 100) % 6);
+			this._isRan = false;
+		}
 	}
 }

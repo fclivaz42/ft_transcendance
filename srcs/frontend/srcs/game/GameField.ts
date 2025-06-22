@@ -61,7 +61,7 @@ export class GameField {
 			Vector3.Zero(),
 			this.scene
 		);
-		// camera.attachContro(this.engine.getRenderingCanvas(), false);
+		// camera.attachControl(this.engine.getRenderingCanvas(), false);
 		this.scene.activeCamera = camera;
 		console.log("Camera position: ", camera.position.asArray());
 

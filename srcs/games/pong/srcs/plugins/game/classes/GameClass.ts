@@ -174,7 +174,7 @@ export default class Game {
 		const south = this._walls.southWall.getMesh();
 
 		if (!north || !south) {
-			return { minY: -7, maxY: 7.5 }; // un-hardcode later // these are defaults in case something goes wrong
+			return { minY: -6.5, maxY: 7.5 }; // un-hardcode later // these are defaults in case something goes wrong
 		}
 
 		const northHalf = (north.scaling.y || 1) * (north.getBoundingInfo()?.boundingBox.extendSize.y ?? 0.25);
