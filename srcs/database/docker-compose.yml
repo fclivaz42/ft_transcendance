@@ -6,17 +6,18 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/04 22:27:50 by fclivaz           #+#    #+#              #
-#    Updated: 2025/06/20 01:42:17 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/06/22 22:43:58 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
 services:
-  sarif_db:
-    container_name: sarif_db
+  db:
+    container_name: db
     networks:
       - sarifntw
     volumes:
       - data:/data
+      - sarif-libs:/libs/
     build: ./
     env_file:
       - ../.env
@@ -25,3 +26,7 @@ services:
       - API_KEY
       - TZ=Europe/Zurich
     restart: on-failure
+    depends_on:
+      libs:
+        condition: service_completed_successfully
+        restart: true

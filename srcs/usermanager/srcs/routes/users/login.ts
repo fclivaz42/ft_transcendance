@@ -21,7 +21,7 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 		// TODO: Polish the code once the databaseSdk is fully implemented.
 		let loggedUser: Users | undefined;
 		if (userLogin.DisplayName) {
-			loggedUser = await axios.get<Users>(`http://sarif_db:3000/pass_name/${userLogin.DisplayName}`, {
+			loggedUser = await axios.get<Users>(`http://db:3000/Players/username/${userLogin.DisplayName}/CheckPass`, {
 				headers: {
 					Authorization: process.env.API_KEY || '',
 					"Content-Type": "application/json",
@@ -29,15 +29,15 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 				},
 				httpsAgent: new https.Agent({ rejectUnauthorized: false }),
 			})
-			.then(response => response.data)
-			.catch(error => {
-				Logger.error("Error fetching user by DisplayName: " + error);
-				return undefined;
-			});
+				.then(response => response.data)
+				.catch(error => {
+					Logger.error("Error fetching user by DisplayName: " + error);
+					return undefined;
+				});
 			//loggedUser = await dbSdk.check_password(userLogin.DisplayName, "DisplayName", userLogin.Password);
 		}
 		else if (userLogin.EmailAddress) {
-			loggedUser = await axios.get<Users>(`http://sarif_db:3000/pass_mail/${userLogin.EmailAddress}`, {
+			loggedUser = await axios.get<Users>(`http://db:3000/Players/email/${userLogin.EmailAddress}/CheckPass`, {
 				headers: {
 					Authorization: process.env.API_KEY || '',
 					"Content-Type": "application/json",
@@ -45,11 +45,11 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 				},
 				httpsAgent: new https.Agent({ rejectUnauthorized: false }),
 			})
-			.then(response => response.data)
-			.catch(error => {
-				Logger.error("Error fetching user by EmailAddress:" + error);
-				return undefined;
-			});
+				.then(response => response.data)
+				.catch(error => {
+					Logger.error("Error fetching user by EmailAddress:" + error);
+					return undefined;
+				});
 			//loggedUser = await dbSdk.check_password(userLogin.EmailAddress, "EmailAddress", userLogin.Password);
 		}
 		else
