@@ -17,7 +17,7 @@ export default async function usersRegisterEndpoint(app: FastifyInstance, opts: 
 		const dbSdk = new databaseSdk();
 
 		// TODO: Remove axios request, use sdk instead once the databaseSdk is fully implemented.
-		const user = (await axios.post<Users>("http://sarif_db:3000/Players", userRegister, {
+		const user = (await axios.post<Users>("http://db:3000/Players", userRegister, {
 			headers: {
 				"Authorization": process.env.API_KEY || "",
 				"Content-Type": "application/json",

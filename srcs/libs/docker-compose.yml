@@ -1,7 +1,7 @@
 services:
-  sarif_libs:
+  libs:
     build: ./
-    container_name: sarif_libs
+    container_name: libs
     environment:
       - TZ=Europe/Zurich
     networks:

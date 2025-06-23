@@ -58,7 +58,7 @@ export interface UsersSdkOptions {
 
 export const defaultConfig: UsersSdkConfig = {
 	apiKey: process.env.API_KEY || "",
-	serverUrl: "https://sarif_usermanager:3000",
+	serverUrl: "https://usermanager:3000",
 }
 
 class UsersSdk {
@@ -136,8 +136,8 @@ class UsersSdk {
 	 * @param oauthId User OAuth ID to log in with.
 	 * @returns a promise with the login response from axios
 	 */
-	public async postOauthLogin(credentials: UserLoginOauthProps): Promise<AxiosResponse<UsersSdkToken >> {
-		return this.apiRequest<UsersSdkToken >("post", "oauthLogin", {
+	public async postOauthLogin(credentials: UserLoginOauthProps): Promise<AxiosResponse<UsersSdkToken>> {
+		return this.apiRequest<UsersSdkToken>("post", "oauthLogin", {
 			data: credentials,
 		});
 	}
@@ -296,32 +296,32 @@ class UsersSdk {
 		const cookies = UsersSdk.unshowerCookie(req.headers.cookie);
 		if (!cookies || !cookies["token"]) {
 			const detail = "No `token` cookie found in request headers.";
-			throw{
+			throw {
 				status: 401,
 				statusText: "Unauthorized",
 				message: detail
 			}
 		}
 		const token = (await this.getAuthorize(cookies["token"])
-		.then(jwtToken => {
-			if (jwtToken.status < 200 || jwtToken.status >= 300) {
-				const message = `Authorization failed with status ${jwtToken.status}: ${jwtToken.statusText}`;
+			.then(jwtToken => {
+				if (jwtToken.status < 200 || jwtToken.status >= 300) {
+					const message = `Authorization failed with status ${jwtToken.status}: ${jwtToken.statusText}`;
+					throw {
+						status: jwtToken.status,
+						statusText: jwtToken.statusText,
+						message
+					}
+				}
+				output = jwtToken.data;
+			})
+			.catch(err => {
+				const message = `Authorization failed: ${err.message}`;
 				throw {
-					status: jwtToken.status,
-					statusText: jwtToken.statusText,
+					status: err.status || 500,
+					statusText: err.statusText || "Internal Server Error",
 					message
 				}
-			}
-			output = jwtToken.data;
-		})
-		.catch(err => {
-			const message = `Authorization failed: ${err.message}`;
-			throw {
-				status: err.status || 500,
-				statusText: err.statusText || "Internal Server Error",
-				message
-			}
-		}));
+			}));
 		if (!output) {
 			const detail = "Authorization failed: No user data returned.";
 			throw {

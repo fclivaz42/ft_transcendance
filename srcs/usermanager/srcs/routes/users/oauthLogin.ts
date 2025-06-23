@@ -18,7 +18,7 @@ export default async function usersOauthLoginEndpoint(app: FastifyInstance, opts
 		const dbSdk = new databaseSdk();
 
 		// TODO: Polish the code once the databaseSdk is fully implemented.
-		const loggedUser = (await axios.get<Users>(`http://sarif_db:3000/Players/oauth/${userLogin.OAuthID}`, {
+		const loggedUser = (await axios.get<Users>(`http://db:3000/Players/oauth/${userLogin.OAuthID}`, {
 			headers: {
 				Authorization: process.env.API_KEY || '',
 				"Content-Type": "application/json",
