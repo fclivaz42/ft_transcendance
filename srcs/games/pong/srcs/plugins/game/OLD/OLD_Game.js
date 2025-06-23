@@ -18,12 +18,12 @@ const scene = field.getScene();
 // const frames = 60;
 // const frameLimiter = frames / 100;
 
-const player1Color = Color3.White();
-const player2Color = Color3.White();
+const player1Color = Color3.Random();
+const player2Color = Color3.Random();
 const wallsColor = Color3.White();
 const ballColor = Color3.White();
-const playerSpeed = 0.4; 
-const ballBaseSpeed = 0.2; 
+const playerSpeed = 0.4;
+const ballBaseSpeed = 0.2;
 const boxes = false;
 
 
@@ -32,10 +32,10 @@ let player1Paddle = new Paddle(
 	scene,
 	"player1",
 	new Vector3(-14.5, 0, 0), {
-		color: player1Color,
-		speed: playerSpeed,
-		depth: 2.8,
-		width: 0.3
+	color: player1Color,
+	speed: playerSpeed,
+	depth: 2.8,
+	width: 0.3
 });
 player1Paddle.mesh.showBoundingBox = boxes;
 
@@ -44,60 +44,60 @@ let player2Paddle = new Paddle(
 	scene,
 	"player2",
 	new Vector3(14.5, 0, 0), {
-		color: player2Color,
-		speed: playerSpeed,
-		controls: {"up": "ArrowUp", "down": "ArrowDown"},
-		depth: 2.8,
-		width: 0.3
-	});
-	player2Paddle.mesh.showBoundingBox = boxes;
-	
+	color: player2Color,
+	speed: playerSpeed,
+	controls: { "up": "ArrowUp", "down": "ArrowDown" },
+	depth: 2.8,
+	width: 0.3
+});
+player2Paddle.mesh.showBoundingBox = boxes;
+
 /* CREATING BALL MESH ****************************************************** */
 let ball = new Ball(
 	scene,
 	"ball",
 	new Vector3(0, 0, 0), {
-		color: ballColor,
-		diameter: 0.6
-	});
-	ball.setBaseSpeed(ballBaseSpeed);
-	ball.mesh.showBoundingBox = boxes;
-	
+	color: ballColor,
+	diameter: 0.6
+});
+ball.setBaseSpeed(ballBaseSpeed);
+ball.mesh.showBoundingBox = boxes;
+
 /* CREATING WALL OBJECTS *************************************************** */
 let northWall = new Wall(
 	scene,
 	"wallNorth",
-	new Vector3(0,0,8.05), {
-		color: wallsColor,
-		width: 30
-	}
+	new Vector3(0, 0, 8.05), {
+	color: wallsColor,
+	width: 30
+}
 );
 northWall.mesh.showBoundingBox = boxes;
 let southWall = new Wall(
 	scene,
 	"wallSouth",
-	new Vector3(0,0,-8.05), {
-		color: wallsColor,
-		width: 30
-	}
+	new Vector3(0, 0, -8.05), {
+	color: wallsColor,
+	width: 30
+}
 );
 southWall.mesh.showBoundingBox = boxes;
 let eastWall = new Wall(
 	scene,
 	"wallEast",
 	new Vector3(15.2, 0, 0), {
-		color: wallsColor,
-		depth: 16.6,
-	}
+	color: wallsColor,
+	depth: 16.6,
+}
 );
 eastWall.setPassThrough(true);
 let westWall = new Wall(
 	scene,
 	"wallWest",
 	new Vector3(-15.2, 0, 0), {
-		color: wallsColor,
-		depth: 16.6,
-	}
+	color: wallsColor,
+	depth: 16.6,
+}
 );
 westWall.setPassThrough(true);
 
@@ -105,7 +105,7 @@ westWall.setPassThrough(true);
 player1Paddle.setColliders([northWall, southWall]);
 player2Paddle.setColliders([northWall, southWall]);
 ball.setColliders([
-	player1Paddle, 
+	player1Paddle,
 	player2Paddle,
 	northWall,
 	southWall,
