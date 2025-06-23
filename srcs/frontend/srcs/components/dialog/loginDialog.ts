@@ -6,9 +6,20 @@
 import { createDialog } from "./index.js";
 import { checkPasswordStrength, PasswordStrengthResult } from "../input/createPasswordInput.js";
 import { createPasswordStrengthList } from "../input/passwordStrengh.js";
-import { createLoginPanel, createRegisterPanel, createForgotPasswordPanel, LoginDialogOptions } from './index.js';
+import { createLoginPanel, createRegisterPanel, createForgotPasswordPanel } from './index.js';
 import { i18nHandler } from "../../handlers/i18nHandler.js";
 import { createGoogleLoginButton } from "./googleLoginButton.js";
+
+// Interfaces partagées pour la logique de dialogue
+export interface LoginDialogOptions {
+  initialMode: 'login' | 'register' | 'forgotPassword';
+  onSwitchMode: (mode: 'login' | 'register' | 'forgotPassword') => void;
+
+  onSubmit(mode: 'login', data: { displayName: string; password: string; rememberMe: boolean; }): void;
+  onSubmit(mode: 'register', data: { displayName: string; email: string; password: string; confirmPassword: string; }): void;
+
+  onForgotPasswordSubmit: (email: string, code: string) => void;
+}
 
 // --- Main Login Dialog Function ---
 export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElement

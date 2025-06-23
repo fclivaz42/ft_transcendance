@@ -5,17 +5,6 @@ export { createLoginPanel } from './loginPanel.js';
 export { createRegisterPanel } from './registerPanel.js';
 export { createForgotPasswordPanel } from './forgotPswPanel.js';
 
-// 1. Interfaces partagées pour la logique de dialogue
-export interface LoginDialogOptions {
-  initialMode: 'login' | 'register' | 'forgotPassword';
-  onSwitchMode: (mode: 'login' | 'register' | 'forgotPassword') => void;
-
-  onSubmit(mode: 'login', data: { displayName: string; password: string; rememberMe: boolean; }): void;
-  onSubmit(mode: 'register', data: { displayName: string; email: string; password: string; confirmPassword: string; }): void;
-
-  onForgotPasswordSubmit: (email: string, code: string) => void;
-}
-
 // Interface pour les propriétés de la boîte de dialogue générique
 export interface DialogProps {
   allowClose?: boolean;
@@ -24,14 +13,14 @@ export interface DialogProps {
 
 
 
-// 2. Export de la fonction générique createDialog (une seule fois !)
+// Export de la fonction générique createDialog (une seule fois !)
 export function createDialog(props?: DialogProps) {
 	const backdrop = createDialogBackdrop(props as dialogBackdropProps);
 	const dialog = document.createElement("dialog", { is: "sarif-dialog" }) as SarifDialog;
   
   if (props?.allowClose) {
     const closeButton = document.createElement("button");
-    closeButton.className = "dark:text-white absolute -top-6 -right-6 z-50 w-10 h-10 text-3xl font-bold bg-background dark:bg-black/70 rounded-md flex items-center justify-center cursor-pointer hover:text-red-500 hover:bg-blue-100 dark:hover:bg-black/90 shadow-lg select-none focus:outline-none";
+    closeButton.className = "dark:text-white absolute -top-6 -right-6 z-50 w-10 h-10 text-3xl font-bold bg-background dark:bg-black/70 rounded-md flex items-center justify-center cursor-pointer dark:hover:text-red-500 hover:text-red-500 hover:bg-blue-100 dark:hover:bg-black/90 shadow-lg select-none focus:outline-none";
     closeButton.innerHTML = "×";
     closeButton.onclick = () => dialog.remove();
     dialog.appendChild(closeButton);
