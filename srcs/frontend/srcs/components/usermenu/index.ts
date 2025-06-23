@@ -2,7 +2,7 @@ import UserHandler from "../../handlers/UserHandler";
 import { createLogoutButton } from "../buttons";
 import { createDialog } from "../dialog";
 import createTextbox from "../input/textbox";
-import createUserAvatar from "./userAvatat";
+import createUserAvatar from "./userAvatar";
 
 export function createUserDialog(): HTMLDialogElement {
 	const dialog = createDialog({allowClose: true});
