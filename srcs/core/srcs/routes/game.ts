@@ -83,12 +83,13 @@ export default async function game_routes(fastify: FastifyInstance, options: Fas
 		});
 
 		proxySocket.on("close", (code, reason) => {
-			client.close(code, reason.toString());
+			Logger.error(`proxyClient for ${token.sub} closed with ${code}: ${reason}`)
+			client.close();
 		});
 
 		client.on("close", (code, reason) => {
-			const validCode = typeof code === "number" && code >= 1000 && code <= 4999 ? code : 1000;
-			proxySocket.close(validCode, reason?.toString() || "");
+			Logger.error(`Client ${token.sub} closed with ${code}: ${reason}`)
+			proxySocket.close();
 		});
 
 		proxySocket.on("ping", () => client.ping());

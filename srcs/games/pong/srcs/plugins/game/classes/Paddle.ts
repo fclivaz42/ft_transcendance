@@ -1,5 +1,5 @@
 
-import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh } from "@babylonjs/core";
+import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh, PhysicsRaycastResult } from "@babylonjs/core";
 import Ball from "./Ball.ts";
 import { Session } from "inspector/promises";
 import { PADDLE_SPEED } from "./GameClass.ts";
@@ -37,7 +37,8 @@ export default class Paddle {
 	private _bounds: { minY: number, maxY: number } = { minY: -Infinity, maxY: Infinity };
 	private _ball: Ball | null = null;
 	private _walls: WallMap;
-	private _isRan: boolean;
+	private _upMoove: number;
+	private _downMoove: number;
 
 	static _ballPos: number | undefined = undefined;
 	static _ran: number = 3;
@@ -65,7 +66,8 @@ export default class Paddle {
 		this._direction = new Vector3(0, 0, 0);
 		this._mesh = MeshBuilder.CreateBox(name, { width, height, depth }, scene);
 		this._mesh.position = position.clone();
-		this._isRan = false;
+		this._upMoove = 0;
+		this._downMoove = 0;
 
 		const material = new StandardMaterial(`${name}-mat`, scene);
 		material.diffuseColor = color;
@@ -157,55 +159,65 @@ export default class Paddle {
 		}
 	}
 
-	public iaAlgo(fps: number, diff: number): void {
-		console.log(`Wall: ${this._walls.upWall.getMesh().position.y.toString}`);
-		console.log(`Wall: ${this._walls.downWall.getMesh().position.y.toString}`);
-		if (diff < -0.20)
-			this.getMesh().position.y -= this.getSpeed();
-		else if (diff > 0.20)
-			this.getMesh().position.y += this.getSpeed();
-		else if (fps === 30)
-			if (Math.random() < 0.5) {
-				this._isRan = true;
-				this.randMoove();
+	public iaAlgo(fps: number): void {
+		// console.log(`Wall: ${this._walls.upWall.getMesh().position.y.toString}`);
+		// console.log(`Wall: ${this._walls.downWall.getMesh().position.y.toString}`);
+		try {
+			const paddlSpeed = this.getSpeed();
+			const ballSpeed = this._ball?.getCurrSpeed();
+			const ballY = this._ball?.getMesh().position.y;
+			const currentPaddle = this.getMesh().position.y;
+			const nWallY = this._walls.northWall.getMesh().position.y;
+			const nWallX = this._walls.northWall.getMesh().position.x;
+			const sWallY = this._walls.southWall.getMesh().position.y;
+			const sWallX = this._walls.southWall.getMesh().position.x;
+			if (fps === 1) {
+				console.log(`paddleSpedd: ${paddlSpeed}`);
+				console.log(`ballSpeed: ${ballSpeed}`);
+				console.log(`ballY: ${ballY}`);
+				console.log(`currentPaddle: ${currentPaddle}`);
+				console.log(`nWallY: ${nWallY}`);
+				console.log(`nWallX: ${nWallX}`);
+				console.log(`sWallY: ${sWallY}`);
+				console.log(`sWallX: ${sWallX}\n`);
+				// console.log(`: ${}`);
 			}
+			if (this._upMoove) {
+				this.getMesh().position.y -= this.getSpeed();
+				this._upMoove--;
+			}
+			else if (this._downMoove) {
+				this.getMesh().position.y += this.getSpeed();
+				this._downMoove--;
+			}
+		}
+		catch (e) {
+			throw ("iaAlgo error");
+		}
 	}
 
 	public async manageIA(fps: number) {
 
-		let newBallPos: number | undefined;
-		if (fps === 1) {
-			newBallPos = this._ball?.getMesh().position.y;
-			console.log(`reading ball: ${Paddle._ballPos}`);
-			console.log(`${this._ball?.direction.asArray()}`);
-		}
-		if (Paddle._ballPos) {
-			console.log(`ballpos: ${Paddle._ballPos}, paddle: ${this.getMesh().position.y}`);
-			if (!this._isRan) {
-				const diff = Paddle._ballPos - this.getMesh().position.y;
-				console.log(`diff: ${diff}`);
-				this.iaAlgo(fps, diff);
-			}
-			else
-				this.randMoove();
-		}
 		if (fps === 1)
-			Paddle._ballPos = newBallPos;
+			Paddle._ballPos = this._ball.getMesh().position.y;
+		if (Paddle._ballPos) {
+			this.randMoove(fps);
+			this.iaAlgo(fps);
+		}
 	}
 
-	public randMoove(): void {
-		console.log(`Random noice: ${Paddle._ran}`);
-		if (Paddle._ran < 3) {
-			this.getMesh().position.y += this.getSpeed();
-			Paddle._ran++;
-		}
-		else if (Paddle._ran > 3) {
-			this.getMesh().position.y -= this.getSpeed();
-			Paddle._ran--;
-		}
-		else if (Paddle._ran === 3) {
-			Paddle._ran = Math.floor((Math.random() * 100) % 6);
-			this._isRan = false;
+	public randMoove(fps: number): void {
+		if (fps % 15 === 0) {
+			if (Paddle._ran < 3) {
+				this.getMesh().position.y += this.getSpeed();
+				Paddle._ran++;
+			}
+			else if (Paddle._ran > 3) {
+				this.getMesh().position.y -= this.getSpeed();
+				Paddle._ran--;
+			}
+			else if (Paddle._ran === 3)
+				Paddle._ran = Math.floor((Math.random() * 100) % 6);
 		}
 	}
 }
