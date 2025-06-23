@@ -5,10 +5,9 @@ class UserHandler {
 		EmailAddress: string;
 	} | undefined;
 
-	constructor() {
-		this.fetchUser();
+	public async initialize() {
+		await this.fetchUser();
 	}
-
 	public get user() {
 		return this.User;
 	}
@@ -26,8 +25,11 @@ class UserHandler {
 	}
 
 	public get avatarUrl() {
-		// TODO: Implement avatar URL retrieval logic
 		return `https://placehold.co/100x100?text=${this.displayName?.substring(0,2) || "?"}&font=roboto&bg=cccccc`;
+	}
+
+	public get isFetched() {
+		return this.User !== undefined;
 	}
 
 	public async fetchUser() {

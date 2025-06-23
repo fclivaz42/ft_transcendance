@@ -13,25 +13,22 @@ import { createGoogleLoginButton } from "./googleLoginButton.js";
 // --- Main Login Dialog Function ---
 export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElement
 {
-  const dialog = createDialog({ allowClose: false });
+  const dialog = createDialog({ allowClose: true });
 
   dialog.classList.add(
-    "overflow-visible",
     "w-[400px]",
     "max-w-full",
     "rounded-xl",
-    "bg-gray-900",
     "px-6",
     "pt-1",
     "pb-4",
-    "text-white",
     "shadow-2xl",
     "border",
     "relative"
   );
 
   const dialogTitle = document.createElement("h2");
-  dialogTitle.className = "text-2xl font-bold text-white mb-2 text-center";
+  dialogTitle.className = "text-2xl font-bold mb-2 text-center";
 
   const panelsContainer = document.createElement("div");
   panelsContainer.className = "relative w-full flex flex-col items-center justify-center overflow-hidden";

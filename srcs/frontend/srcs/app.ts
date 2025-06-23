@@ -5,8 +5,9 @@ import NavbarManager from "./managers/NavbarManager.js";
 import UserMenuManager from "./managers/UserMenuManager.js";
 import DarkmodeManager from "./handlers/DarkmodeHandler.js";
 import BackgroundManager from "./managers/BackgroundManager.js";
-import { startGame } from "./game/GameLaunch.js";
 import HomeManager from "./managers/HomeManager.js";
+import ElementsHandler from "./handlers/ElementsHandler.js";
+import UserHandler from "./handlers/UserHandler.js";
 
 
 // some rework is needed to make the code more readable and maintainable
@@ -18,32 +19,36 @@ main.className = "flex flex-grow h-full w-full";
 main.id = "main";
 app?.appendChild(main);
 
-// Initialize i18nHandler (language handler)
-await i18nHandler.initialize().finally(() => {
-	// Initialize dark mode
-	const darkmodeManager = new DarkmodeManager();
-	darkmodeManager.initialize();
+// Custom elements initialization
+ElementsHandler.initialize();
 
-	// Initialize header
-	const headerManager = new HeaderManager();
-	headerManager.initialize();
+// Initialize the user handler
+await UserHandler.initialize();
 
-	// Initialize the managers
-	const navbarManager = new NavbarManager();
-	navbarManager.initialize();
+// language initialization
+await i18nHandler.initialize();
 
-	// const backgroundManager = new BackgroundManager();
-	// backgroundManager.initialize();
+const darkmodeManager = new DarkmodeManager();
+darkmodeManager.initialize();
 
-	// // WARN: freeze le site
-	// const homeManager = new HomeManager(); // NOUVEAU: Instanciez le HomeManager
-	// homeManager.initialize(main); // Passez 'main' comme parent pour la page d'accueil
+// Initialize components
+const headerManager = new HeaderManager();
+headerManager.initialize();
 
-	const frameManager = new FrameManager();
-	frameManager.initialize();
-	const userMenuManager = new UserMenuManager();
-	userMenuManager.initialize();
+const navbarManager = new NavbarManager();
+navbarManager.initialize();
 
-	// note that the loginDialogManager is not initialized here, it is initialized on its own when needed (e.g., when the login button is clicked)
-	// this should be the case for all dialog managers, as they are only needed when the user interacts with the UI
-});
+// const backgroundManager = new BackgroundManager();
+// backgroundManager.initialize();
+
+// // WARN: freeze le site
+// const homeManager = new HomeManager(); // NOUVEAU: Instanciez le HomeManager
+// homeManager.initialize(main); // Passez 'main' comme parent pour la page d'accueil
+
+const frameManager = new FrameManager();
+frameManager.initialize();
+const userMenuManager = new UserMenuManager();
+userMenuManager.initialize();
+
+// note that the loginDialogManager is not initialized here, it is initialized on its own when needed (e.g., when the login button is clicked)
+// this should be the case for all dialog managers, as they are only needed when the user interacts with the UI

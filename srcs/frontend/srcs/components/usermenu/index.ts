@@ -1,15 +1,14 @@
 import UserHandler from "../../handlers/UserHandler";
 import { createLogoutButton } from "../buttons";
 import { createDialog } from "../dialog";
+import createTextbox from "../input/textbox";
+import createUserAvatar from "./userAvatat";
 
 export function createUserDialog(): HTMLDialogElement {
 	const dialog = createDialog({allowClose: true});
-	dialog.className += " w-[500px] max-w-[90vw] z-50";
+	dialog.className += " w-[500px] max-w-[90vw]";
 
-	const profilePicture = document.createElement("img");
-	profilePicture.src = `${UserHandler.avatarUrl}`;
-	profilePicture.alt = "Profile Picture";
-	profilePicture.className = "rounded-full object-cover w-32 h-32 mb-2";
+	const profilePicture = createUserAvatar({sizeClass: "w-32 h-32 mb-2"});
 
 	const userNameElement = document.createElement("span");
 	userNameElement.className = "text-xl font-semibold text-gray-800 dark:text-gray-200";
@@ -21,7 +20,11 @@ export function createUserDialog(): HTMLDialogElement {
 	logoutButton.onclick = () => {
 		// Handle logout logic here
 		console.log("User logged out");
-		window.location.href = "/users/logout";
+		fetch("/users/logout", {
+			method: "GET",
+		}).then(() => {
+			window.location.reload();
+		});
 	};
 
 	const hr = document.createElement("hr");
@@ -31,30 +34,30 @@ export function createUserDialog(): HTMLDialogElement {
 	editProfileTitle.className = "text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2";
 	editProfileTitle.textContent = "Edit Profile";
 
-	const displayNameTextbox = document.createElement("input");
-	displayNameTextbox.type = "text";
-	displayNameTextbox.placeholder = "Display Name";
-	displayNameTextbox.className = "w-full px-4 py-2 mt-2 text-gray-600 dark:text-white bg-white dark:bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 pr-10 transition-all duration-300 ease-in-out border-blue-500 focus:ring-blue-500 focus:border-blue-500";
+	const displayNameTextbox = createTextbox({
+		placeholder: "Display Name",
+		type: "text",
+	});
 
-	const emailTextbox = document.createElement("input");
-	emailTextbox.type = "email";
-	emailTextbox.placeholder = "Email";
-	emailTextbox.className = "w-full px-4 py-2 mt-2 text-gray-600 dark:text-white bg-white dark:bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 pr-10 transition-all duration-300 ease-in-out border-blue-500 focus:ring-blue-500 focus:border-blue-500";
+	const emailTextbox = createTextbox({
+		placeholder: "Email",
+		type: "email",
+	});
 
-	const passwordTextbox = document.createElement("input");
-	passwordTextbox.type = "password";
-	passwordTextbox.placeholder = "New Password";
-	passwordTextbox.className = "w-full px-4 py-2 mt-2 text-gray-600 dark:text-white bg-white dark:bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 pr-10 transition-all duration-300 ease-in-out border-blue-500 focus:ring-blue-500 focus:border-blue-500";
-	const confirmPasswordTextbox = document.createElement("input");
-	confirmPasswordTextbox.type = "password";
-	confirmPasswordTextbox.placeholder = "Confirm New Password";
-	confirmPasswordTextbox.className = "w-full px-4 py-2 mt-2 text-gray-600 dark:text-white bg-white dark:bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 pr-10 transition-all duration-300 ease-in-out border-blue-500 focus:ring-blue-500 focus:border-blue-500";
+	const passwordTextbox = createTextbox({
+		placeholder: "New Password",
+		type: "password",
+	});
+
+	const confirmPasswordTextbox = createTextbox({
+		placeholder: "Confirm New Password",
+		type: "password",
+	});
 
 	const cancelButton = document.createElement("button");
 	cancelButton.textContent = "Cancel";
 	cancelButton.className = "w-full p-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50";
 	cancelButton.onclick = () => {
-		console.log("Edit cancelled");
 		dialog.remove();
 	};
 
@@ -63,7 +66,6 @@ export function createUserDialog(): HTMLDialogElement {
 	saveButton.className = "w-full p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50";
 	saveButton.onclick = () => {
 		// Handle save logic here
-		console.log("Changes saved");
 		fetch("/users/update", {
 			method: "PUT",
 			headers: {
@@ -76,7 +78,6 @@ export function createUserDialog(): HTMLDialogElement {
 			})
 		}).then(response => {
 			if (response.ok) {
-				console.log("Profile updated successfully");
 				window.location.reload();
 			} else {
 				console.error("Failed to update profile");
@@ -109,10 +110,12 @@ export default function createUserContext(): HTMLDivElement {
 	userMenuContainer.className = "flex gap-x-2 items-center justify-center cursor-pointer";
 	userMenuContainer.innerHTML = `
 		<span class="text-lg font-semibold text-gray-800 dark:text-gray-200">${UserHandler.displayName || "User Name"}</span>
-		<img src=${UserHandler.avatarUrl} alt="Avatar" class="rounded-full object-cover w-10 h-10">
 	`;
+	userMenuContainer.appendChild(createUserAvatar());
 	userMenuContainer.onclick = () => {
-		document.body.appendChild(createUserDialog());
+		const dialog = createUserDialog();
+		dialog.showModal();
+
 	};
 	return userMenuContainer;
 }
