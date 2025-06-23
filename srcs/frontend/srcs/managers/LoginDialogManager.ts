@@ -44,7 +44,7 @@ class LoginDialogManager {
 					user.EmailAddress = data.displayName;
 					user.DisplayName = "";
 				}
-				await fetch("/users/login", {
+				await fetch("/api/users/login", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json"
@@ -66,7 +66,7 @@ class LoginDialogManager {
 					return;
 				}
 				// fetch sur /users/register pour enregistrer l'utilisateur
-				await fetch("/users/register", {
+				await fetch("/api/users/register", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json"

@@ -9,7 +9,7 @@ export function createLogoutButton(): HTMLElement {
     color: "bg-red-100",
 		darkColor: "dark:bg-red-400",
 		f: () => {
-			fetch("/users/logout", {
+			fetch("/api/users/logout", {
 				method: "GET",
 			}).then((response) => {
 				if (response.ok)

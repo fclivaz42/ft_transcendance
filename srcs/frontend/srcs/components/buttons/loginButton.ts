@@ -10,9 +10,8 @@ export function createLoginButton(): HTMLElement {
     darkColor: "dark:bg-background_dark",
     id: "loginButton",
     i18n: "header.usermenu.login",
+		f: () => loginDialogManager.initialize(),
+		addClasses: "h-[40px]",
   });
-  button.onclick = () => {
-    loginDialogManager.initialize();
-  }
   return button;
 }

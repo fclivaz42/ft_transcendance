@@ -8,7 +8,7 @@ export function createGoogleLoginButton(): HTMLButtonElement {
 		<span>Login with Google</span>
 	`;
 	button.onclick = async () => {
-		const fetchLogin = await fetch("/oauth2/login?client_id=1");
+		const fetchLogin = await fetch("/api/oauth2/login?client_id=1");
 		if (!fetchLogin.ok) {
 			console.error("Failed to initiate Google login:", fetchLogin.statusText);
 			return;

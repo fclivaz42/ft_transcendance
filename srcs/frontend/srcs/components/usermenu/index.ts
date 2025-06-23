@@ -20,7 +20,7 @@ export function createUserDialog(): HTMLDialogElement {
 	logoutButton.onclick = () => {
 		// Handle logout logic here
 		console.log("User logged out");
-		fetch("/users/logout", {
+		fetch("/api/users/logout", {
 			method: "GET",
 		}).then(() => {
 			window.location.reload();
@@ -66,7 +66,7 @@ export function createUserDialog(): HTMLDialogElement {
 	saveButton.className = "w-full p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50";
 	saveButton.onclick = () => {
 		// Handle save logic here
-		fetch("/users/update", {
+		fetch("/api/users/update", {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json"
@@ -106,17 +106,27 @@ export function createUserDialog(): HTMLDialogElement {
 	return dialog;
 }
 
-export default function createUserContext(): HTMLDivElement {
-	const userMenuContainer = document.createElement("div");
-	userMenuContainer.className = "flex gap-x-2 items-center justify-center cursor-pointer";
-	userMenuContainer.innerHTML = `
-		<span class="text-lg font-semibold text-gray-800 dark:text-gray-200">${UserHandler.displayName || "User Name"}</span>
+export function createUserMenuSettings(): HTMLDivElement {
+	const template = document.createElement("template");
+	template.innerHTML = `
+		<div id="userMenuSettings" class="flex gap-x-2 items-center justify-center cursor-pointer">
+			<span class="text-lg font-semibold text-gray-800 dark:text-gray-200">${UserHandler.displayName || "User Name"}</span>
+		</div>
 	`;
-	userMenuContainer.appendChild(createUserAvatar());
-	userMenuContainer.onclick = () => {
+	const userMenuSettings = template.content.firstElementChild as HTMLDivElement;
+	userMenuSettings.appendChild(createUserAvatar());
+	userMenuSettings.onclick = () => {
 		const dialog = createUserDialog();
 		dialog.showModal();
-
 	};
-	return userMenuContainer;
+	return userMenuSettings;
+}
+
+export default function createUserMenu(): HTMLDivElement {
+	const template = document.createElement("template");
+	template.innerHTML = `
+		<div id="userMenu" class="flex items-center justify-center">
+		</div>
+	`;
+	return template.content.firstElementChild as HTMLDivElement;
 }

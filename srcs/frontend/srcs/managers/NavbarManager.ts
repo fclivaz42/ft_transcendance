@@ -3,7 +3,7 @@ import { createNavbar } from "../components/navbar/index.js";
 import { i18nHandler } from "../handlers/i18nHandler.js";
 import SidePanelManager from "./SidePanelManager.js";
 
-export default class NavbarManager {
+class NavbarManager {
   private _sidePanelManager: SidePanelManager;
 
   constructor() {
@@ -46,7 +46,9 @@ export default class NavbarManager {
         }
       ]
     });
-    main?.appendChild(navBar);
+		main?.appendChild(navBar);
     this._sidePanelManager.initialize();
   }
 }
+
+export const navbarManager = new NavbarManager();

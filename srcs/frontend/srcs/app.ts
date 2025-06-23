@@ -1,9 +1,9 @@
 import { i18nHandler } from "./handlers/i18nHandler.js";
-import FrameManager from "./managers/FrameManager.js";
-import HeaderManager from "./managers/HeaderManager.js";
-import NavbarManager from "./managers/NavbarManager.js";
-import UserMenuManager from "./managers/UserMenuManager.js";
-import DarkmodeManager from "./handlers/DarkmodeHandler.js";
+import { frameManager } from "./managers/FrameManager.js";
+import { headerManager } from "./managers/HeaderManager.js";
+import { navbarManager } from "./managers/NavbarManager.js";
+import { userMenuManager } from "./managers/UserMenuManager.js";
+import { darkmodeManager } from "./handlers/DarkmodeHandler.js";
 import BackgroundManager from "./managers/BackgroundManager.js";
 import HomeManager from "./managers/HomeManager.js";
 import ElementsHandler from "./handlers/ElementsHandler.js";
@@ -28,14 +28,10 @@ await UserHandler.initialize();
 // language initialization
 await i18nHandler.initialize();
 
-const darkmodeManager = new DarkmodeManager();
 darkmodeManager.initialize();
 
 // Initialize components
-const headerManager = new HeaderManager();
 headerManager.initialize();
-
-const navbarManager = new NavbarManager();
 navbarManager.initialize();
 
 // const backgroundManager = new BackgroundManager();
@@ -45,9 +41,7 @@ navbarManager.initialize();
 // const homeManager = new HomeManager(); // NOUVEAU: Instanciez le HomeManager
 // homeManager.initialize(main); // Passez 'main' comme parent pour la page d'accueil
 
-const frameManager = new FrameManager();
 frameManager.initialize();
-const userMenuManager = new UserMenuManager();
 userMenuManager.initialize();
 
 // note that the loginDialogManager is not initialized here, it is initialized on its own when needed (e.g., when the login button is clicked)

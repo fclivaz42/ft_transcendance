@@ -33,7 +33,7 @@ class UserHandler {
 	}
 
 	public async fetchUser() {
-		const user = await fetch("/users/me");
+		const user = await fetch("/api/users/me");
 		if (!user.ok) {
 			console.warn("Failed to fetch user data:", user.statusText);
 			this.User = undefined;
