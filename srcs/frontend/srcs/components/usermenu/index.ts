@@ -72,12 +72,13 @@ export function createUserDialog(): HTMLDialogElement {
 				"Content-Type": "application/json"
 			},
 			body: JSON.stringify({
-				DisplayName: displayNameTextbox.value,
-				EmailAddress: emailTextbox.value,
-				Password: passwordTextbox.value,
+				DisplayName: displayNameTextbox.value || undefined,
+				EmailAddress: emailTextbox.value || undefined,
+				Password: passwordTextbox.value || undefined,
 			})
 		}).then(response => {
 			if (response.ok) {
+				// TODO: Make UserHandler update its user data without reloading the page
 				window.location.reload();
 			} else {
 				console.error("Failed to update profile");
