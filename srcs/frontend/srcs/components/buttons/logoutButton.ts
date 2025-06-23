@@ -1,4 +1,5 @@
 import { i18nHandler } from "../../handlers/i18nHandler.js";
+import UserHandler from "../../handlers/UserHandler.js";
 import { createButton } from "./index.js";
 
 export function createLogoutButton(): HTMLElement {
@@ -13,7 +14,7 @@ export function createLogoutButton(): HTMLElement {
 				method: "GET",
 			}).then((response) => {
 				if (response.ok)
-					window.location.reload();
+					UserHandler.fetchUser();
 			});
 		},
     id: "logoutButton",

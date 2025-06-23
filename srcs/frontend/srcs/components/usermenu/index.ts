@@ -1,4 +1,5 @@
 import UserHandler from "../../handlers/UserHandler";
+import { userMenuManager } from "../../managers/UserMenuManager";
 import { createLogoutButton } from "../buttons";
 import { createDialog } from "../dialog";
 import createTextbox from "../input/textbox";
@@ -8,11 +9,15 @@ export function createUserDialog(): HTMLDialogElement {
 	const dialog = createDialog({allowClose: true});
 	dialog.className += " w-[500px] max-w-[90vw]";
 
-	const profilePicture = createUserAvatar({sizeClass: "w-32 h-32 mb-2"});
+	const profilePicture = createUserAvatar({
+		sizeClass: "w-32 h-32 mb-2",
+		editable: true,
+	});
 
 	const userNameElement = document.createElement("span");
 	userNameElement.className = "text-xl font-semibold text-gray-800 dark:text-gray-200";
 	userNameElement.textContent = UserHandler.displayName || "User Name";
+	userNameElement.setAttribute("data-user", "username");
 
 	const logoutButton = document.createElement("button");
 	logoutButton.textContent = "Logout";
@@ -23,7 +28,8 @@ export function createUserDialog(): HTMLDialogElement {
 		fetch("/api/users/logout", {
 			method: "GET",
 		}).then(() => {
-			window.location.reload();
+			UserHandler.fetchUser();
+			dialog.remove();
 		});
 	};
 
@@ -65,7 +71,6 @@ export function createUserDialog(): HTMLDialogElement {
 	saveButton.textContent = "Save Changes";
 	saveButton.className = "w-full p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50";
 	saveButton.onclick = () => {
-		// Handle save logic here
 		fetch("/api/users/update", {
 			method: "PUT",
 			headers: {
@@ -75,11 +80,11 @@ export function createUserDialog(): HTMLDialogElement {
 				DisplayName: displayNameTextbox.value || undefined,
 				EmailAddress: emailTextbox.value || undefined,
 				Password: passwordTextbox.value || undefined,
+				Avatar: userMenuManager.uploadFile.files?.[0] ? userMenuManager.uploadFile.files[0] : undefined
 			})
 		}).then(response => {
 			if (response.ok) {
-				// TODO: Make UserHandler update its user data without reloading the page
-				window.location.reload();
+				UserHandler.fetchUser();
 			} else {
 				console.error("Failed to update profile");
 				alert("Failed to update profile. Please try again.");
@@ -110,7 +115,7 @@ export function createUserMenuSettings(): HTMLDivElement {
 	const template = document.createElement("template");
 	template.innerHTML = `
 		<div id="userMenuSettings" class="flex gap-x-2 items-center justify-center cursor-pointer">
-			<span class="text-lg font-semibold text-gray-800 dark:text-gray-200">${UserHandler.displayName || "User Name"}</span>
+			<span data-user="username" class="text-lg font-semibold text-gray-800 dark:text-gray-200">${UserHandler.displayName || "User Name"}</span>
 		</div>
 	`;
 	const userMenuSettings = template.content.firstElementChild as HTMLDivElement;

@@ -7,6 +7,7 @@
 // gere le contenu de la fenetre de connexion
 import SarifDialog from "../class/SarifDialog.js";
 import { createLoginDialog } from "../components/dialog/loginDialog.js"; // Importe la fonction modifiée
+import UserHandler from "../handlers/UserHandler.js";
 
 class LoginDialogManager {
   private dialog: SarifDialog | null = null;
@@ -17,12 +18,6 @@ class LoginDialogManager {
       this.currentDialogMode = newMode;
       console.log(`LoginDialogManager: Mode de dialogue changé en ${newMode}`);
     };
-    const main = document.getElementById("main");
-    if (!main) {
-      console.error("Main element not found");
-      return;
-    
-    }
 
     // --- Fonction de gestion de la soumission (Login ou Register) ---
     const handleAuthSubmit = async (mode: 'login' | 'register', data: { displayName: string; email: string, password?: string; confirmPassword?: string }) => {
@@ -51,8 +46,9 @@ class LoginDialogManager {
 					},
 					body: JSON.stringify(user),
 				}).then(response => {
-					if (response.status < 400) {
-						window.location.reload();
+					if (response.ok) {
+						UserHandler.fetchUser();
+						dialog.remove();
 					} else {
 						if (response.status === 401)
 							alert("Connexion échouée : E-mail ou mot de passe incorrect.");
@@ -73,8 +69,9 @@ class LoginDialogManager {
 					},
 					body: JSON.stringify(user),
 				}).then(response => {
-					if (response.status < 400) {
-						window.location.reload();
+					if (response.ok) {
+						UserHandler.fetchUser();
+						dialog.remove();
 					} else {
 						if (response.status === 409)
 							alert("Inscription échouée : L'utilisateur existe déjà.");

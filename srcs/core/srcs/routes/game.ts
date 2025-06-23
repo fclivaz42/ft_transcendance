@@ -38,12 +38,12 @@ async function handleToken(req: FastifyRequest, client: WebSocket) {
 export default async function game_routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
 	Logger.info("WebSocket routes loaded");
 	fastify.get('/*', { websocket: true }, async (client, request) => {
-		Logger.info(`WebSocket connection request received for ${request.url}`);
+		const wildcardMatch = request.url.split("/game/")[1] || request.url;
+		Logger.info(`WebSocket connection request received on ${request.url} for ${wildcardMatch}`);
 		const token = await handleToken(request, client);
 		if (!token)
 			return;
-		const wildcardMatch = request.url.slice('/game/'.length);
-		const url = new URL(request.url, `wss://pong:1337/game/${wildcardMatch}`);
+		const url = new URL(`wss://pong:1337/game/${wildcardMatch}`);
 		url.searchParams.append('userId', token.sub);
 		console.log(url);
 		const proxySocket = new WebSocket(url, {

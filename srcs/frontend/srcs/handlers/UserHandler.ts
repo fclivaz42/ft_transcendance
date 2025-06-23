@@ -1,3 +1,5 @@
+import { userMenuManager } from "../managers/UserMenuManager";
+
 class UserHandler {
 	private User: {
 		PlayerID: string;
@@ -28,7 +30,7 @@ class UserHandler {
 		return `https://placehold.co/100x100?text=${this.displayName?.substring(0,2) || "?"}&font=roboto&bg=cccccc`;
 	}
 
-	public get isFetched() {
+	public get isLogged() {
 		return this.User !== undefined;
 	}
 
@@ -37,17 +39,36 @@ class UserHandler {
 		if (!user.ok) {
 			console.warn("Failed to fetch user data:", user.statusText);
 			this.User = undefined;
-			return this.User;
 		}
-		const userData = await user.json();
-		if (!userData || !userData.PlayerID || !userData.DisplayName || !userData.EmailAddress) {
-			console.warn("User data is incomplete or missing.", userData);
-			return this.User;
+		else {
+			const userData = await user.json();
+			if (!userData || !userData.PlayerID || !userData.DisplayName || !userData.EmailAddress) {
+				console.warn("User data is incomplete or missing.", userData);
+				this.User = undefined;
+			} else {
+				this.User = {...userData};
+			}
 		}
-		this.User = {
-			...userData,
-		}
+		this.updateComponents();
 		return this.User;
+	}
+
+	private updateComponents() {
+		const userNameElements = document.querySelectorAll("[data-user='username']");
+		userNameElements.forEach(element => {
+			if (element instanceof HTMLElement) {
+				element.textContent = this.displayName || "User Name";
+			}
+		});
+
+		const userAvatarElements = document.querySelectorAll("[data-user='avatar']");
+		userAvatarElements.forEach(element => {
+			if (element instanceof HTMLImageElement) {
+				element.src = this.avatarUrl;
+			}
+		});
+
+		userMenuManager.initialize();
 	}
 }
 

@@ -8,16 +8,13 @@ import BackgroundManager from "./managers/BackgroundManager.js";
 import HomeManager from "./managers/HomeManager.js";
 import ElementsHandler from "./handlers/ElementsHandler.js";
 import UserHandler from "./handlers/UserHandler.js";
+import { mainManager } from "./managers/MainManager.js";
 
 
 // some rework is needed to make the code more readable and maintainable
 
 // Initialize main container
-const app = document.getElementById("app");
-const main = document.createElement("div");
-main.className = "flex flex-grow h-full w-full";
-main.id = "main";
-app?.appendChild(main);
+mainManager.initialize();
 
 // Custom elements initialization
 ElementsHandler.initialize();
