@@ -9,7 +9,11 @@ import { Paddle } from "./game_components/Paddle.js";
 import { Wall } from "./game_components/Wall.js";
 
 import { InitPayload, UpdatePayload, CameraInitInfo, LightInitInfo } from "./types.js";
+<<<<<<< HEAD
 import { MeshBuilder } from "@babylonjs/core";
+=======
+import { GlowLayer } from "@babylonjs/core";
+>>>>>>> origin
 
 // Temp values, overriding WebSocket info
 const ALPHA: number = Math.PI / 2;
@@ -25,13 +29,23 @@ export class GameField {
 
 	constructor(private engine: Engine) {
 		this.scene = new Scene(this.engine);
+		// const glow = new GlowLayer("glow", this.scene);
+		// glow.intensity = 0.8;
 	}
 
 	public init(payload: InitPayload["payload"]) {
 		this.setupCameraAndLight(payload.camera, payload.light);
 
-		// const testBox = MeshBuilder.CreateBox("testBox", {size: 1}, this.scene);
-		// testBox.position = new Vector3(0, 30, 0); wtf...
+		// FUCK YOU SKYBOX
+		// var skybox = MeshBuilder.CreateBox("skyBox", {size:1000.0}, this.scene);
+		// var skyboxMaterial = new StandardMaterial("skyBox", this.scene);
+		// skyboxMaterial.backFaceCulling = false;
+		// skyboxMaterial.reflectionTexture = new CubeTexture("assets/textures/corona.dds", this.scene);
+		// skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
+		// skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
+		// skyboxMaterial.specularColor = new Color3(0, 0, 0); 
+		// skybox.material = skyboxMaterial;
+
 
 		this.ball = new Ball(this.scene, payload.ball);
 		this.p1 = new Paddle(this.scene, "p1", payload.p1);
@@ -61,7 +75,7 @@ export class GameField {
 			Vector3.Zero(),
 			this.scene
 		);
-		// camera.attachControl(this.engine.getRenderingCanvas(), false);
+		camera.attachControl(this.engine.getRenderingCanvas(), false);
 		this.scene.activeCamera = camera;
 		console.log("Camera position: ", camera.position.asArray());
 
