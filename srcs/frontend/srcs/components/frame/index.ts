@@ -1,13 +1,11 @@
-export function createFrame(): HTMLElement {
-  const frame = document.createElement("div");
+export default function createFrame(): HTMLElement {
+	const template = document.createElement("template");
+	template.innerHTML = `
+		<main class="h-full w-full p-8 bg-background dark:bg-background_dark relative">
+		</main>
+	`;
 
-  frame.className = "h-full w-full bg-white p-8 bg-background dark:bg-background_dark";
-  frame.id = "frame";
-  frame.innerHTML = `
-    <main class="h-full w-full p-8">
-      <canvas id="game" class="h-full w-full m-0 p-0"></canvas>
-    </main>
-  `;
+	const frame = template.content.firstElementChild as HTMLElement;
 
   return frame;
 }

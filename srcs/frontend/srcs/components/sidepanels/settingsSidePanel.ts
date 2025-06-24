@@ -36,7 +36,6 @@ function appearanceSettings(sidePanel: HTMLElement) {
   });
   const languageSelect = languageSelector.querySelector("select") as HTMLSelectElement;
   languageSelect.value = localStorage.getItem("language") || "English";
-  console.log(languageSelect.value);
   languageSelect.addEventListener("change", () => {
     i18nHandler.setLanguage(languageSelect.value);
   });

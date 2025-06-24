@@ -2,6 +2,7 @@ import { createSidePanel, createSidePanelButton } from "./index.js";
 
 import { i18nHandler } from "../../handlers/i18nHandler.js";
 import { startGame } from "../../game/GameLaunch.js";
+import RoutingHandler from "../../handlers/RoutingHandler.js";
 
 export function createPongSidePanel() {
 	const sidePanel = createSidePanel({
@@ -15,7 +16,10 @@ export function createPongSidePanel() {
 		title: i18nHandler.getValue("navbar.pong.submenu.play"),
 		i18n: "navbar.pong.submenu.play",
 		logo: buttonLogo,
-		f: () =>  startGame(`wss://${location.host}/api/game/remote`),
+		f: () =>  {
+			RoutingHandler.setRoute("/pong");
+			startGame(`wss://${location.host}/api/game/remote`)
+		},
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({

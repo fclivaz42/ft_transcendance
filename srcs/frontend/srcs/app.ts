@@ -9,9 +9,16 @@ import HomeManager from "./managers/HomeManager.js";
 import ElementsHandler from "./handlers/ElementsHandler.js";
 import UserHandler from "./handlers/UserHandler.js";
 import { mainManager } from "./managers/MainManager.js";
+import RoutingHandler from "./handlers/RoutingHandler.js";
 
 
 // some rework is needed to make the code more readable and maintainable
+
+// language initialization
+await i18nHandler.initialize();
+
+// Initialize the routing handler
+RoutingHandler.initialize();
 
 // Initialize main container
 mainManager.initialize();
@@ -21,9 +28,6 @@ ElementsHandler.initialize();
 
 // Initialize the user handler
 await UserHandler.initialize();
-
-// language initialization
-await i18nHandler.initialize();
 
 darkmodeManager.initialize();
 

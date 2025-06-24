@@ -42,6 +42,12 @@ await fastify.register(frontendRoutes);
 
 betterFastify(fastify);
 
+fastify.addHook('onSend', async (request, reply, payload) => {
+  reply.header('Server', 'Sarifcore Webserver');
+  return payload;
+});
+
+
 fastify.listen({ port: 443, host: '::' }, (err) => {
 	if (err) {
 		fastify.log.error(err)

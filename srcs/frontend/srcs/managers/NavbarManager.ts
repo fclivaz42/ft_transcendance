@@ -1,6 +1,7 @@
 //barre laterale gauche [pong, history, leaderboard, settings]
 import { createNavbar } from "../components/navbar/index.js";
 import { i18nHandler } from "../handlers/i18nHandler.js";
+import RoutingHandler from "../handlers/RoutingHandler.js";
 import { mainManager } from "./MainManager.js";
 import SidePanelManager from "./SidePanelManager.js";
 
@@ -18,6 +19,15 @@ class NavbarManager {
 		this._navbar = createNavbar({
 			buttons: [
 				{
+					id: "btnHome",
+					title: i18nHandler.getValue("navbar.home.label"),
+					logo: "./assets/ui/home-svgrepo-com.svg",
+					i18n: "navbar.home.label",
+					f: () => {
+						RoutingHandler.setRoute("/");
+					}
+				},
+				{
 					id: "btnPong",
 					title: i18nHandler.getValue("navbar.pong.label"),
 					logo: "./assets/ui/ping-pong-svgrepo-com.svg",
@@ -28,15 +38,21 @@ class NavbarManager {
 					id: "btnLeaderboard",
 					title: i18nHandler.getValue("navbar.leaderboard.label"),
 					logo: "./assets/ui/leaderboard-svgrepo-com.svg",
-					panelId: "leaderboardSidePanel",
-					i18n: "navbar.leaderboard.label"
+					//panelId: "leaderboardSidePanel",
+					i18n: "navbar.leaderboard.label",
+					f: () => {
+						RoutingHandler.setRoute("/leaderboard");
+					}
 				},
 				{
 					id: "btnHistory",
 					title: i18nHandler.getValue("navbar.history.label"),
 					logo: "./assets/ui/history-svgrepo-com.svg",
-					panelId: "historySidePanel",
-					i18n: "navbar.history.label"
+					//panelId: "historySidePanel",
+					i18n: "navbar.history.label",
+					f: () => {
+						RoutingHandler.setRoute("/history");
+					}
 				},
 				{
 					id: "btnSettings",
