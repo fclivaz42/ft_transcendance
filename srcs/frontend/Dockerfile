@@ -11,7 +11,7 @@ COPY vite.config.js ./
 COPY docker-entrypoint.sh ./
 
 RUN npm i
-RUN npm run vitebuild
+RUN npm run build
 RUN rm -rf ./public/index.html ./public/assets/*.css
 RUN cp -rf ./public/* dist/
 RUN rm -rf ./public
