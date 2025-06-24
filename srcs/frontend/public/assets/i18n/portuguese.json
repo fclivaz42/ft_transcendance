@@ -81,6 +81,11 @@
       "link": {
         "subscribePanel": "Ainda não tem conta? Crie uma!",
         "forgotPasswordPanel": "Esqueceu-se da palavra-passe?"
+      },
+      "notification": {
+        "loginErrorTitle": "Erro ao iniciar sessão",
+        "loginErrorMessage": "Ocorreu um erro ao tentar iniciar sessão.",
+        "loginBadCredentials": "Nome de utilizador ou palavra-passe inválidos."
       }
     },
     "registerPanel": {
@@ -99,6 +104,12 @@
       },
       "link": {
         "loginPanel": "Já tem conta? Iniciar sessão"
+      },
+      "notification": {
+        "registerErrorTitle": "Erro ao registar",
+        "registerErrorMessage": "Ocorreu um erro ao tentar registar.",
+        "registerCredentialTaken": "O nome de utilizador ou o endereço de e-mail já está em uso.",
+        "registerPassMismatch": "As palavras-passe não correspondem."
       }
     },
     "forgotPasswordPanel": {
@@ -112,6 +123,18 @@
       "link": {
         "loginPanel": "Lembrou-se da sua palavra-passe? Iniciar sessão"
       }
+    },
+    "updateProfile": {
+      "notification": {
+        "updateErrorTitle": "Erro ao atualizar perfil",
+        "updateErrorMessage": "Ocorreu um erro ao atualizar o seu perfil."
+      }
+    }
+  },
+  "notification": {
+    "oauth2": {
+      "callbackError": "Erro ao iniciar sessão",
+      "noSession": "Nenhuma sessão encontrada.<br>Por favor, tente novamente."
     }
   }
 }

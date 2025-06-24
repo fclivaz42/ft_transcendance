@@ -1,29 +1,46 @@
 import { userMenuManager } from "../managers/UserMenuManager";
 
 class UserHandler {
-	private User: {
+	private _clientId: string = "";
+	private _user: {
 		PlayerID: string;
 		DisplayName: string;
 		EmailAddress: string;
 	} | undefined;
 
+	constructor() {
+		let clientId = localStorage.getItem("clientId");
+		if (clientId = localStorage.getItem("clientId")) {
+			this._clientId = clientId;
+			return;
+		}
+		clientId = crypto.randomUUID();
+		localStorage.setItem("clientId", clientId);
+		this._clientId = clientId;
+	}
+
 	public async initialize() {
 		await this.fetchUser();
 	}
+
+	public get clientId() {
+		return this._clientId;
+	}
+
 	public get user() {
-		return this.User;
+		return this._user;
 	}
 
 	public get userId() {
-		return this.User?.PlayerID;
+		return this._user?.PlayerID;
 	}
 
 	public get displayName() {
-		return this.User?.DisplayName;
+		return this._user?.DisplayName;
 	}
 
 	public get emailAddress() {
-		return this.User?.EmailAddress;
+		return this._user?.EmailAddress;
 	}
 
 	public get avatarUrl() {
@@ -31,26 +48,26 @@ class UserHandler {
 	}
 
 	public get isLogged() {
-		return this.User !== undefined;
+		return this._user !== undefined;
 	}
 
 	public async fetchUser() {
 		const user = await fetch("/api/users/me");
 		if (!user.ok) {
 			console.warn("Failed to fetch user data:", user.statusText);
-			this.User = undefined;
+			this._user = undefined;
 		}
 		else {
 			const userData = await user.json();
 			if (!userData || !userData.PlayerID || !userData.DisplayName || !userData.EmailAddress) {
 				console.warn("User data is incomplete or missing.", userData);
-				this.User = undefined;
+				this._user = undefined;
 			} else {
-				this.User = {...userData};
+				this._user = {...userData};
 			}
 		}
 		this.updateComponents();
-		return this.User;
+		return this._user;
 	}
 
 	private updateComponents() {

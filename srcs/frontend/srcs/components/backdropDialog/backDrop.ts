@@ -15,7 +15,7 @@ export default function createDialogBackdrop(props: dialogBackdropProps) {
 	if (props.allowClose) {
 		backdrop.onclick = (event) => {
 			if (event.target !== backdrop) return;
-			const dialogs = document.querySelectorAll('dialog');
+			const dialogs = document.querySelectorAll('#dialogBackdrop');
 			for (const dialog of dialogs)
 				dialog.remove();
 			backdrop.remove();

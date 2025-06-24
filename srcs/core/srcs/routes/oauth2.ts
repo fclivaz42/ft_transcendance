@@ -58,13 +58,13 @@ async function oauth_routes(app: FastifyInstance, opts: FastifyPluginOptions) {
 			.catch(err => {
 				if (!axios.isAxiosError(err)) {
 					Logger.error(`Unexpected error in /callback route:\n${err}`);
-					return rep.status(303).header('Location', '/?error=errors.oauth2.callbackError').send();
+					return rep.status(303).header('Location', '/?error=notification.oauth2.callbackError').send();
 				}
 				if (err.response?.status === 404) {
-					return rep.status(303).header('Location', '/?error=errors.oauth2.callbackError;errors.oauth2.noSession').send();
+					return rep.status(303).header('Location', '/?error=notification.oauth2.callbackError;notification.oauth2.noSession').send();
 				}
 				Logger.error(`Error in /callback route:\n${err}`);
-				return rep.status(303).header('Location', `/?error=errors.oauth2.callbackError${err.response? ";" + err.response.data.detail : ""}`).send();
+				return rep.status(303).header('Location', `/?error=notification.oauth2.callbackError${err.response? ";" + err.response.data.detail : ""}`).send();
 			});
   });
 }

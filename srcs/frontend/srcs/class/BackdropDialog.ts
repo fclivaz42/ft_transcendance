@@ -1,8 +1,7 @@
-export default class SarifDialog extends HTMLDialogElement {
+export default class BackdropDialog extends HTMLDialogElement {
 	public remove() {
-		if (this.parentElement?.id === "dialogBackdrop") {
+		if (this.parentElement?.id === "dialogBackdrop")
 			this.parentElement.remove();
-		}
 		super.remove();
 	}
 

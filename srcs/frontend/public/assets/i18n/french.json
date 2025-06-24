@@ -74,7 +74,6 @@
       "panelTitle": "Se connecter",
       "rememberMe": "Se souvenir de moi",
       "connexionButton": "Se connecter",
-
       "validation": {
         "usernameRequired": "Veuillez saisir votre nom d'utilisateur.",
         "passwordRequired": "Mot de passe requis."
@@ -82,6 +81,11 @@
       "link": {
         "subscribePanel": "Pas encore inscrit ? Créer un compte !",
         "forgotPasswordPanel": "Mot de passe oublié ?"
+      },
+      "notification": {
+        "loginErrorTitle": "Erreur de connexion",
+        "loginErrorMessage": "Une erreur s'est produite lors de la connexion.",
+        "loginBadCredentials": "Nom d'utilisateur ou mot de passe invalide."
       }
     },
     "registerPanel": {
@@ -100,6 +104,12 @@
       },
       "link": {
         "loginPanel": "Déjà un compte ? Se connecter"
+      },
+      "notification": {
+        "registerErrorTitle": "Erreur d'inscription",
+        "registerErrorMessage": "Une erreur s'est produite lors de l'inscription.",
+        "registerCredentialTaken": "Nom d'utilisateur ou adresse e-mail déjà existant.",
+        "registerPassMismatch": "Les mots de passe ne correspondent pas."
       }
     },
     "forgotPasswordPanel": {
@@ -113,6 +123,18 @@
       "link": {
         "loginPanel": "La mémoire revient? Se connecter"
       }
+    },
+    "updateProfile": {
+      "notification": {
+        "updateErrorTitle": "Erreur de mise à jour du profil",
+        "updateErrorMessage": "Une erreur s'est produite lors de la mise à jour de votre profil.<br>Veuillez vérifier vos informations et réessayer."
+      }
+    }
+  },
+  "notification": {
+    "oauth2": {
+      "callbackError": "Échec de la connexion",
+      "noSession": "Aucune session trouvée. Réessayez plus tard."
     }
   }
 }

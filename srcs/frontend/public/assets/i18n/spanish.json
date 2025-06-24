@@ -81,6 +81,11 @@
       "link": {
         "subscribePanel": "¡Crear una cuenta!",
         "forgotPasswordPanel": "¿Olvidaste tu contraseña?"
+      },
+      "notification": {
+        "loginErrorTitle": "Error de inicio de sesión",
+        "loginErrorMessage": "Ocurrió un error al iniciar sesión.",
+        "loginBadCredentials": "Nombre de usuario o contraseña incorrectos."
       }
     },
     "registerPanel": {
@@ -99,6 +104,12 @@
       },
       "link": {
         "loginPanel": "¿Ya tienes una cuenta? Iniciar sesión"
+      },
+      "notification": {
+        "registerErrorTitle": "Error al crear la cuenta",
+        "registerErrorMessage": "Ocurrió un error al crear tu cuenta.",
+        "registerCredentialTaken": "El nombre de usuario o correo electrónico ya está en uso.",
+        "registerPassMismatch": "The passwords do not match."
       }
     },
     "forgotPasswordPanel": {
@@ -112,6 +123,18 @@
       "link": {
         "loginPanel": "¿Recordaste tu contraseña? Iniciar sesión"
       }
+    },
+    "updateProfile": {
+      "notification": {
+        "updateErrorTitle": "Error al actualizar el perfil",
+        "updateErrorMessage": "Ocurrió un error al actualizar tu perfil."
+      }
+    }
+  },
+  "notification": {
+    "oauth2": {
+      "callbackError": "Inicio de sesión fallido",
+      "noSession": "No se encontró ninguna sesión.<br>Por favor, inténtalo de nuevo más tarde."
     }
   }
 }
