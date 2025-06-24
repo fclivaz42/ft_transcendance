@@ -112,7 +112,7 @@ async function updateUser(token: OauthToken, matchingUser: Users | undefined) {
 	if (!matchingUser) {
 		const maxTry = 10;
 		for (let i = 0; i < maxTry; i++) {
-			const uniqueSuffix = crypto.randomBytes(4).toString('hex').substring(0, 4);
+			const uniqueSuffix = crypto.randomBytes(4).toString('hex').substring(0, 13 - displayName.length);
 			// create a new user with OAuth ID
 			const userRegister: UserRegisterOauthProps = {
 				DisplayName: `${displayName}.${uniqueSuffix}`,
