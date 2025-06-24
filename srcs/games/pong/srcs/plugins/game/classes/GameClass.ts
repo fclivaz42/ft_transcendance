@@ -147,11 +147,11 @@ export default class Game {
 		// 	this._p1.setBall(this._ball);
 		// 	this._p1.setWalls(this._walls);
 		// }
-		this._p2.setAI(true);
-		if (this._p2.getIsIA()) {
-			this._p2.setBall(this._ball);
-			this._p2.setWalls(this._walls);
-		}
+		// this._p2.setAI(true);
+		// if (this._p2.getIsIA()) {
+		// 	this._p2.setBall(this._ball);
+		// 	this._p2.setWalls(this._walls);
+		// }
 
 		/* Setting colliders for the paddles and the ball */
 		this._p1.setColliders([this._walls.northWall, this._walls.southWall]);

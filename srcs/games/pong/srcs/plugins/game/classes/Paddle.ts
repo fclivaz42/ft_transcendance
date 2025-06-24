@@ -1,5 +1,5 @@
 
-import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh, PhysicsRaycastResult, Vector2 } from "@babylonjs/core";
+import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh, Vector2 } from "@babylonjs/core";
 import Ball from "./Ball.ts";
 import { Session } from "inspector/promises";
 import { PADDLE_SPEED } from "./GameClass.ts";

@@ -123,7 +123,6 @@ export default class PlayField {
 		if (this._intervalId !== null) {
 			this.stop();
 		}
-		this._scene.enablePhysics();
 		const frameTime = 1000 / fps;
 		this._intervalId = setInterval(() => {
 			for (const obj of this._updatables) {
