@@ -5,9 +5,11 @@
 //inject dans le DOM le Dialog,overlay soomber et blurredBackground
 // LoginDialogManager.ts
 // gere le contenu de la fenetre de connexion
-import SarifDialog from "../class/SarifDialog.js";
-import { createLoginDialog } from "../components/dialog/loginDialog.js"; // Importe la fonction modifiée
+import SarifDialog from "../class/BackdropDialog";
+import { createLoginDialog } from "../components/backdropDialog/loginDialog"; // Importe la fonction modifiée
+import { i18nHandler } from "../handlers/i18nHandler.js";
 import UserHandler from "../handlers/UserHandler.js";
+import NotificationManager from "./NotificationManager.js";
 
 class LoginDialogManager {
   private dialog: SarifDialog | null = null;
@@ -51,14 +53,26 @@ class LoginDialogManager {
 						dialog.remove();
 					} else {
 						if (response.status === 401)
-							alert("Connexion échouée : E-mail ou mot de passe incorrect.");
+							NotificationManager.notify({
+								level: "error",
+								title: i18nHandler.getValue("panel.loginPanel.notification.loginErrorTitle"),
+								message: i18nHandler.getValue("panel.loginPanel.notification.loginBadCredentials")
+							});
 						else
-							alert("Connexion échouée : Veuillez vérifier les informations.");
+							NotificationManager.notify({
+								level: "error",
+								title: i18nHandler.getValue("panel.loginPanel.notification.loginErrorTitle"),
+								message: i18nHandler.getValue("panel.loginPanel.notification.loginErrorMessage")
+							});
 					}
 				});
       } else if (mode === 'register') {
 				if (data.password !== data.confirmPassword) {
-					alert("Inscription échouée : Les mots de passe ne correspondent pas.");
+					NotificationManager.notify({
+						level: "error",
+						title: i18nHandler.getValue("panel.registerPanel.notification.registerErrorTitle"),
+						message: i18nHandler.getValue("panel.registerPanel.notification.registerPassMismatchMessage")
+					});
 					return;
 				}
 				// fetch sur /users/register pour enregistrer l'utilisateur
@@ -74,9 +88,17 @@ class LoginDialogManager {
 						dialog.remove();
 					} else {
 						if (response.status === 409)
-							alert("Inscription échouée : L'utilisateur existe déjà.");
+							NotificationManager.notify({
+								level: "error",
+								title: i18nHandler.getValue("panel.registerPanel.notification.registerErrorTitle"),
+								message: i18nHandler.getValue("panel.registerPanel.notification.registerCredentialTaken")
+							});
 						else
-							alert("Inscription échouée : Veuillez vérifier les informations (et la confirmation du mot de passe).");
+							NotificationManager.notify({
+								level: "error",
+								title: i18nHandler.getValue("panel.registerPanel.notification.registerErrorTitle"),
+								message: i18nHandler.getValue("panel.registerPanel.notification.registerErrorMessage")
+							});
 					}
 				})
       }

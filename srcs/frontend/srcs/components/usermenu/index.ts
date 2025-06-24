@@ -1,9 +1,11 @@
 import UserHandler from "../../handlers/UserHandler";
 import { userMenuManager } from "../../managers/UserMenuManager";
 import { createLogoutButton } from "../buttons";
-import { createDialog } from "../dialog";
+import { createDialog } from "../backdropDialog";
 import createTextbox from "../input/textbox";
 import createUserAvatar from "./userAvatar";
+import NotificationManager from "../../managers/NotificationManager";
+import { i18nHandler } from "../../handlers/i18nHandler";
 
 export function createUserDialog(): HTMLDialogElement {
 	const dialog = createDialog({allowClose: true});
@@ -86,7 +88,11 @@ export function createUserDialog(): HTMLDialogElement {
 				UserHandler.fetchUser();
 			} else {
 				console.error("Failed to update profile");
-				alert("Failed to update profile. Please try again.");
+				NotificationManager.notify({
+					"level": "error",
+					"title": i18nHandler.getValue("panel.updateProfile.notification.updateErrorTitle"),
+					"message": i18nHandler.getValue("panel.updateProfile.notification.updateErrorMessage")
+				});
 			}
 		});
 	};
