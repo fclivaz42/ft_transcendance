@@ -242,17 +242,17 @@ class UsersSdk {
 	 * 
 	 * @param rep fastify reply object
 	 * @param token JWT token to set in the cookie.
-	 * @param exp optional expiration time in seconds for the cookie, defaults to 3600 seconds (1 hour).
+	 * @param exp optional expiration time in seconds for the cookie, defaults to 7776000 seconds (90 days).
 	 */
 	public static showerCookie(rep: FastifyReply | any, token: string, exp?: number) {
-		rep.header("Set-Cookie", `token=${token}; Path=/; HttpOnly; SameSite=Strict; Secure; Max-Age=${exp || 3600}`);
+		rep.header("Set-Cookie", `token=${token}; Path=/; HttpOnly; SameSite=Strict; Secure; Max-Age=${exp || 7776000}`);
 	}
 
 	/**
 	 * 
 	 * @param rep fastify reply object
 	 * @param token JWT token to set in the cookie.
-	 * @param exp optional expiration time in seconds for the cookie, defaults to 3600 seconds (1 hour).
+	 * @param exp optional expiration time in seconds for the cookie, defaults to 7776000 seconds (90 days).
 	 */
 	public showerCookie(rep: FastifyReply | any, token: string, exp?: number) {
 		UsersSdk.showerCookie(rep, token, exp);

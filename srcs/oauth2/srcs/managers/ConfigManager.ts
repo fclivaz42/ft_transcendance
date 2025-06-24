@@ -75,7 +75,7 @@ class OauthConfig {
 		this._secret = process.env.OAUTH_SECRET;
 		if (!process.env.OAUTH_SESSION_TIMEOUT) {
 			Logger.warn("Missing OAUTH_SESSION_TIMEOUT env, setting 60000ms as default..");
-			process.env.OAUTH_SESSION_TIMEOUT = "60000";
+			process.env.OAUTH_SESSION_TIMEOUT = "600";
 		}
 		this._session_timeout = parseInt(process.env.OAUTH_SESSION_TIMEOUT);
 		if (isNaN(this._session_timeout)) throw new Error("OAUTH_SESSION_TIMEOUT must be an integer");

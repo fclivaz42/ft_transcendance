@@ -36,7 +36,7 @@ class StateManager {
 		this.states.set(state, client_id);
 		setTimeout(() => {
 			this.states.delete(state);
-		}, config.OauthConfig.session_timeout);
+		}, config.OauthConfig.session_timeout * 1000);
 		return state;
 	}
 
@@ -59,7 +59,7 @@ class StateManager {
 		this.session.set(state, current_session);
 		setTimeout(() => {
 			this.session.delete(state);
-		}, config.OauthConfig.session_timeout);
+		}, config.OauthConfig.session_timeout * 1000);
 		this.removeState(state);
 		return current_session;
 	}
