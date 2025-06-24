@@ -1,5 +1,8 @@
 // createPasswordInput() crée l'élément HTML de l'input de mot de passe contient la logique de VÉRIFICATION
 //checkPasswordStrength(password: string) qui calcule si un mot de passe respecte les critères (majuscule, minuscule, chiffre, etc.)
+
+import createTextbox from "./textbox";
+
 // -----> (passwordStrengthChange, passwordInputFocus, passwordInputBlur).
 export interface PasswordStrengthResult { 
     minLength: boolean;
@@ -56,26 +59,11 @@ export function createPasswordInput(
     const container = document.createElement("div") as CustomPasswordInputContainer;
     container.className = "relative w-full"; // Ces classes sont bonnes
 
-    const input = document.createElement("input");
-    input.type = "password";
-    input.name = name;
-    input.placeholder = placeholder;
-    input.className = `
-    w-full
-        px-4
-        py-2
-        mt-2
-        text-white         // Texte blanc
-        bg-gray-800        // Fond gris très foncé
-        border             // Bordure
-        border-gray-700    // Bordure gris foncé (peut-être pas assez clair)
-        rounded-lg
-        focus:outline-none
-        focus:ring-2
-        focus:ring-blue-500
-        pr-10
-        transition-all duration-300 ease-in-out
-    `.replace(/\s+/g, " ");
+	const input = createTextbox({
+		type: "password",
+		placeholder: placeholder,
+		name: name,
+	});
 
     const toggleButton = document.createElement("button");
     toggleButton.type = "button";

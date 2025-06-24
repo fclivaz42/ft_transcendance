@@ -65,28 +65,26 @@ export async function getCallback(req: FastifyRequest, rep: FastifyReply) {
 	await updateUser(token, await getMatchingOauthUser(token));
 	// log the user in using the OAuth ID
 	const userSdk = new UsersSdk();
-	// TODO: Fix db to respond when user is created or updated
-	await new Promise(resolve => setTimeout(resolve, 500)); // wait for the user to be created or updated
-	const login = (await userSdk.postOauthLogin({OAuthID: token.jwt_decode.subject})).data;
-	return rep.status(200).send({...login});
+	const login = (await userSdk.postOauthLogin({ OAuthID: token.jwt_decode.subject })).data;
+	return rep.status(200).send({ ...login });
 }
 
 async function getMatchingOauthUser(token: OauthToken) {
 	if (!token.jwt_decode)
 		throw new Error("Token does not contain jwt_decode");
 	try {
-		return (await axios.get<Users>(`http://sarif_db:3000/Players/oauth/${token.jwt_decode.subject}`, {
+		return (await axios.get<Users>(`http://db:3000/Players/oauth/${token.jwt_decode.subject}`, {
 			headers: {
 				"Authorization": process.env.API_KEY || "",
 				"Content-Type": "application/json",
-		},
+			},
 			httpsAgent: new https.Agent({ rejectUnauthorized: false }),
 		})).data;
 	} catch (error) {
 		Logger.debug(error);
 		Logger.debug("No user found with OAuth ID, checking by email.");
 		try {
-			const matchingUser = (await axios.get<Users>(`http://sarif_db:3000/Players/email/${token.jwt_decode.email}`, {
+			const matchingUser = (await axios.get<Users>(`http://db:3000/Players/email/${token.jwt_decode.email}`, {
 				headers: {
 					"Authorization": process.env.API_KEY || "",
 					"Content-Type": "application/json",
@@ -117,7 +115,7 @@ async function updateUser(token: OauthToken, matchingUser: Users | undefined) {
 			Password: "",
 			OAuthID: token.jwt_decode.subject,
 		};
-		await axios.post<Users>("http://sarif_db:3000/Players", userRegister, {
+		await axios.post<Users>("http://db:3000/Players", userRegister, {
 			headers: {
 				"Authorization": process.env.API_KEY || "",
 				"Content-Type": "application/json",
@@ -129,7 +127,7 @@ async function updateUser(token: OauthToken, matchingUser: Users | undefined) {
 		const updateUser: Partial<Users> = {
 			OAuthID: token.jwt_decode.subject,
 		}
-		await axios.put<Users>(`http://sarif_db:3000/Players/id/${matchingUser.PlayerID}`, updateUser, {
+		await axios.put<Users>(`http://db:3000/Players/id/${matchingUser.PlayerID}`, updateUser, {
 			headers: {
 				"Authorization": process.env.API_KEY || "",
 				"Content-Type": "application/json",

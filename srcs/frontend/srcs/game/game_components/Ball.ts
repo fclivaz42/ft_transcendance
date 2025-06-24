@@ -4,7 +4,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh.js";
 import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder.js";
 
 import { BallInit, BallUpdate} from "../types.js";
-import { MeshBuilder } from "@babylonjs/core";
+import { MeshBuilder, StandardMaterial, Color3} from "@babylonjs/core";
 
 
 export class Ball {
@@ -20,6 +20,11 @@ export class Ball {
 			scene,
 		)
 		this.mesh.position.set(init.curr_position[0], init.curr_position[1], 0);
+
+		this.mesh.renderOutline = true;
+		this.mesh.outlineWidth = 0.1;
+		this.mesh.outlineColor = new Color3(0, 1, 0);
+
 		console.log("Ball position: ", this.mesh.position.asArray());
 	}
 

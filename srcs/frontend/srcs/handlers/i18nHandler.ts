@@ -37,7 +37,6 @@ class I18nHandler {
 
   public reload(): void {
     const elements = document.querySelectorAll("[data-i18n]");
-    const lang = this._currentLang;
     elements.forEach((element) => {
       element.textContent = this.getValue(element.getAttribute("data-i18n") || "");
     });

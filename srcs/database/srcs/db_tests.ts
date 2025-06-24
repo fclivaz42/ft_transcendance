@@ -6,43 +6,53 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/05/31 20:07:43 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/20 20:34:47 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/23 00:03:25 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import Database from "better-sqlite3"
 import { tables } from "./db_vars.ts"
+import fs from "fs"
 const print = console.log
 const printobj = console.dir
-console.log(process.argv[2])
 
 
-const db = new Database(process.argv[2]);
 
-console.log(db.pragma("table_info(Players)"))
-console.log(db.pragma("index_list(Players)"))
-console.log(db.pragma("index_info(sqlite_autoindex_Players_3)"))
-
-interface idlist {
-	seq: number,
-	name: string,
-	unique: number,
-	origin: string,
-	partial: number
+const filename = process.argv[2]
+const folder: Array<string> = fs.readdirSync(process.env.FILELOCATION as string)
+for (const item of folder) {
+	const test_name = item.split('.')[0]
+	if (filename === test_name)
+		print(filename)
 }
 
-interface idinfo {
-	seqno: number,
-	cid: number,
-	name: string
-}
 
-for (const table in tables) {
-	for (const item of db.pragma(`index_list(${tables[table].Name})`) as Array<idlist>) {
-		const truc = db.pragma(`index_info(${item.name})`) as Array<idinfo>
-		console.log(`${truc[0].name} is unique!`)
-	}
-}
+// const db = new Database(process.argv[2]);
+//
+// console.log(db.pragma("table_info(Players)"))
+// console.log(db.pragma("index_list(Players)"))
+// console.log(db.pragma("index_info(sqlite_autoindex_Players_3)"))
+//
+// interface idlist {
+// 	seq: number,
+// 	name: string,
+// 	unique: number,
+// 	origin: string,
+// 	partial: number
+// }
+//
+// interface idinfo {
+// 	seqno: number,
+// 	cid: number,
+// 	name: string
+// }
+//
+// for (const table in tables) {
+// 	for (const item of db.pragma(`index_list(${tables[table].Name})`) as Array<idlist>) {
+// 		const truc = db.pragma(`index_info(${item.name})`) as Array<idinfo>
+// 		console.log(`${truc[0].name} is unique!`)
+// 	}
+// }
 
 // const methods = ["GET", "POST", "DELETE", "PUT"]
 //

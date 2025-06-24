@@ -18,6 +18,8 @@ export function createButton(props: ButtonProps): HTMLAnchorElement {
 			props.f();
 		}
 	}
+	if (props.addClasses)
+		button.classList.add(props.addClasses);
   return button;
 }
 

@@ -1,13 +1,18 @@
 {
-  
- 
   "home": {
+    "title": "Welcome to SARIF's Pong",
     "guestButton": {
       "label": "Jouer en Guest"
     },
     "accountButton": {
       "label": "Utiliser un compte"
     }
+  },
+  "leaderboard": {
+    "title": "Leaderboard"
+  },
+  "history": {
+    "title": "History"
   },
   "header": {
     "usermenu": {
@@ -17,6 +22,9 @@
     }
   },
   "navbar": {
+    "home": {
+      "label": "Home"
+    },
     "pong": {
       "label": "Pong",
       "title": "Pong Game",

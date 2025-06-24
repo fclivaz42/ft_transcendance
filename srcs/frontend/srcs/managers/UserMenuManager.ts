@@ -1,38 +1,35 @@
 import { createLoginButton, createLogoutButton, createRegisterButton } from "../components/buttons/index.js";
+import createUserMenu, { createUserMenuSettings } from "../components/usermenu/index.js";
+import UserHandler from "../handlers/UserHandler.js";
+import { headerManager } from "./HeaderManager.js";
 
-function getCookie(name: string): string | null {
-  let dc = document.cookie;
-  let prefix = name + "=";
-  let begin = dc.indexOf("; " + prefix);
-  if (begin == -1) {
-    begin = dc.indexOf(prefix);
-    if (begin != 0) return null;
-  } else {
-    begin += 2;
-  }
-  let end = document.cookie.indexOf(";", begin);
-  if (end == -1) {
-    end = dc.length;
-  }
-  return decodeURIComponent(dc.substring(begin, end));
-}
+class UserMenuManager {
+	private _userMenu: HTMLDivElement = createUserMenu();
+	private _uploadFile: HTMLInputElement = document.createElement("input");
 
-export default class UserMenuManager {
   public initialize() {
-    const userMenu = document.getElementById("userMenu");
-		if (!getCookie("session")) {
-      // userMenu?.appendChild(createRegisterButton());
-			fetch("/users/authorize", {
-				method: "GET",
-			}).then((response) => {
-				if (response.ok)
-					userMenu?.appendChild(createLogoutButton());
-				else // TODO: Create a "user" button with username
-					userMenu?.appendChild(createLoginButton());
-			});
-    }
-    else {
-      userMenu?.appendChild(createLogoutButton());
-    }
+		this._uploadFile.type = "file";
+		this._uploadFile.accept = "image/*";
+		this.update();
+		headerManager.header.appendChild(this._userMenu);
   }
+
+	public update() {
+		this._userMenu.innerHTML = "";
+		if (UserHandler.isLogged)
+			this._userMenu.appendChild(createUserMenuSettings());
+		else
+			this._userMenu.appendChild(createLoginButton());
+		this._uploadFile.files = null;
+	}
+
+	public get userMenu(): HTMLDivElement {	
+		return this._userMenu;
+	}
+
+	public get uploadFile(): HTMLInputElement {
+		return this._uploadFile;
+	}
 }
+
+export const userMenuManager = new UserMenuManager();

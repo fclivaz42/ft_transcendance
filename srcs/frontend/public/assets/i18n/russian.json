@@ -1,11 +1,18 @@
 {
   "home": {
+    "title": "Добро пожаловать в SARIF's Pong",
     "guestButton": {
       "label": "Играть как гость"
     },
     "accountButton": {
       "label": "Использовать аккаунт"
     }
+  },
+  "leaderboard": {
+    "title": "Таблица лидеров"
+  },
+  "history": {
+    "title": "История"
   },
   "header": {
     "usermenu": {
@@ -15,6 +22,9 @@
     }
   },
   "navbar": {
+    "home": {
+      "label": "Главная"
+    },
     "pong": {
       "label": "Понг",
       "title": "Игра Понг",

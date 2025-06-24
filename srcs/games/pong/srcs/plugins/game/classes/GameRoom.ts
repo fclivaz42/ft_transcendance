@@ -1,8 +1,7 @@
 import Game from "./GameClass.ts"
 import PlayerSession from "./PlayerSession.ts";
 import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
-
-const FPS_OVERRIDE: number = 30;
+import { DEFAULT_FPS } from "./Playfield.ts";
 
 interface BallUpdate {
 	curr_speed: number;
@@ -14,12 +13,18 @@ interface PaddleUpdate {
 	position: number[];
 }
 
+interface RoomScore {
+	p1: number,
+	p2: number
+}
+
 interface UpdatePayload {
 	type: "update";
 	payload: {
 		ball: BallUpdate;
 		p1: PaddleUpdate;
 		p2: PaddleUpdate;
+		score: RoomScore;
 	}
 }
 
@@ -27,7 +32,7 @@ interface BallInit extends BallUpdate {
 	size: number[];
 }
 
-interface PaddleInit extends PaddleUpdate {}
+interface PaddleInit extends PaddleUpdate { }
 
 interface WallsInit {
 	[key: string]: {
@@ -52,17 +57,17 @@ interface InitPayload {
 type GameMessage = InitPayload | UpdatePayload;
 
 export default class GameRoom {
-	
-		public id: string;
-		public players: PlayerSession[] = [];
-		public game: Game;
-		public score: { p1: number | null; p2: number | null };
+
+	public id: string;
+	public players: PlayerSession[] = [];
+	public game: Game;
+	public score: { p1: number; p2: number};
 
 
 	constructor(id: string) {
 		this.id = id;
 		this.game = new Game();
-		this.score = {p1: null, p2: null};
+		this.score = { p1: 0, p2: 0 };
 	}
 
 	public isFull(): boolean {
@@ -72,6 +77,10 @@ export default class GameRoom {
 
 	public getGame(): Game {
 		return this.game;
+	}
+
+	public getScore(): {p1: number, p2: number} {
+		return this.score;
 	}
 
 	public addPlayer(playerSession: PlayerSession): void {
@@ -91,14 +100,19 @@ export default class GameRoom {
 		}
 	}
 
-	startGame() {
-		
+	public addScore(player: number) {
+		player === 1 ? this.score.p1++ : this.score.p2++;
+	}
+
+	public startGame() {
+
 		this.game.setBroadcastFunction(() => {
 			this.broadcast(this.buildUpdatePayload());
 		});
 
+		this.game.setRoom(this);
 		this.broadcast(this.buildInitPayload());
-		this.game.gameStart(FPS_OVERRIDE);
+		this.game.gameStart(DEFAULT_FPS);
 	}
 
 	public broadcast(message: GameMessage): void {
@@ -113,29 +127,29 @@ export default class GameRoom {
 
 	private buildInitPayload(): InitPayload {
 		const game = this.game;
-        const ball = game.getBall();
-        const [p1, p2] = game.getPaddles();
-        const walls = game.getWallsForWs()
-        const lightsCamera = game.getField();
+		const ball = game.getBall();
+		const [p1, p2] = game.getPaddles();
+		const walls = game.getWallsForWs()
+		const lightsCamera = game.getField();
 
-        const initPayload: InitPayload = {
-            type: 'init',
-            payload: {
-                ball: ball.getBallInitInfo(),
-                p1: p1.getInitInfo(),
-                p2: p2.getInitInfo(),
-                walls: walls,
-                camera: lightsCamera.getCameraInitInfo(),
-                light: lightsCamera.getLightInitInfo()
-            }
-        }
+		const initPayload: InitPayload = {
+			type: 'init',
+			payload: {
+				ball: ball.getBallInitInfo(),
+				p1: p1.getInitInfo(),
+				p2: p2.getInitInfo(),
+				walls: walls,
+				camera: lightsCamera.getCameraInitInfo(),
+				light: lightsCamera.getLightInitInfo()
+			}
+		}
 		return initPayload;
 	}
 
 	private buildUpdatePayload(): UpdatePayload {
 		const game = this.game;
-        const ball = game.getBall();
-        const [p1, p2] = game.getPaddles();
+		const ball = game.getBall();
+		const [p1, p2] = game.getPaddles();
 
 		const updatePayload: UpdatePayload = {
 			type: 'update',
@@ -151,6 +165,10 @@ export default class GameRoom {
 				p2: {
 					max_speed: p2.getSpeed(),
 					position: p2.getPosition().asArray()
+				},
+				score: {
+					p1: this.score.p1,
+					p2: this.score.p2
 				}
 			}
 		}

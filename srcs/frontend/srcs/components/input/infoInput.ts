@@ -1,3 +1,5 @@
+import createTextbox from "./textbox";
+
 //Cree un champ de input de type texte, defini  en gris dedans ce qui est requis
 export interface CustomInputContainer extends HTMLDivElement {
     inputElement: HTMLInputElement;
@@ -13,28 +15,12 @@ export function createInfoInput(labelName: string, inputName: string): CustomInp
 
     
 
-    const input = document.createElement('input');
-    input.type = "text"; // Ou "email", "password", etc., selon le besoin
-    input.name = inputName;
-    input.id = inputName; // Important pour associer le label
-    input.placeholder = `${labelName}`;
-    input.className = `
-    
-    w-full
-        px-4
-        py-2
-        mt-2
-        text-white        
-        bg-gray-800       
-        border            
-        border-gray-700   
-        rounded-lg
-        focus:outline-none
-        focus:ring-2
-        focus:ring-blue-500
-        pr-10
-        transition-all duration-300 ease-in-out
-    `.replace(/\s+/g, " ");
+	const input = createTextbox({
+		type: "text",
+		placeholder: labelName,
+		name: inputName,
+		id: inputName, // Important pour associer le label
+	});
 
     // --- NOUVEL ÉLÉMENT POUR L'ICÔNE D'ERREUR ---
     const errorIcon = document.createElement('div');

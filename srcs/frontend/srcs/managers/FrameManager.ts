@@ -1,9 +1,14 @@
-import { createFrame } from "../components/frame/index.js";
+import createFrame from "../components/frame/index.js";
+import { mainManager } from "./MainManager.js";
 
-export default class FrameManager {
+class FrameManager {
+	private _frame: HTMLElement = createFrame();
   public initialize() {
-    const main = document.getElementById("main");
-    const frame = createFrame();
-    main?.appendChild(frame);
+		mainManager.main.appendChild(this._frame);
   }
+	public get frame(): HTMLElement {
+		return this._frame;
+	}
 }
+
+export const frameManager = new FrameManager();
