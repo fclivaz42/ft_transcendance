@@ -82,6 +82,7 @@ export default class Ball {
 		this._colliders = [];
 		this._lastHit = null;
 		this._isLaunched = false;
+
 	}
 
 	public getMesh(): Mesh { return this._mesh; }

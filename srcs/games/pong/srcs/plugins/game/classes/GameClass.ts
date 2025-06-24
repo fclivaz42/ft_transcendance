@@ -142,6 +142,11 @@ export default class Game {
 		this._ball.getHitbox().refreshBoundingInfo(true);
 
 		// set ia brut
+		// this._p1.setAI(true);
+		// if (this._p1.getIsIA()) {
+		// 	this._p1.setBall(this._ball);
+		// 	this._p1.setWalls(this._walls);
+		// }
 		this._p2.setAI(true);
 		if (this._p2.getIsIA()) {
 			this._p2.setBall(this._ball);

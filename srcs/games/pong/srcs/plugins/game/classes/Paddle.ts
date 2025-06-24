@@ -40,12 +40,13 @@ export default class Paddle {
 
 	private _moveDirection: "up" | "down" | null = null;
 	private _bounds: { minY: number, maxY: number } = { minY: -Infinity, maxY: Infinity };
-	private _ball: Ball | null = null;
+	private _ball: Ball;
 	private _walls: WallMap;
 	private _upMoove: number;
 	private _downMoove: number;
+	private _ballDirection: Vector3;
 
-	static _ballPos: number | undefined = undefined;
+	static _ballPos: Vector3;
 
 	constructor(
 		scene: Scene,
@@ -146,9 +147,10 @@ export default class Paddle {
 		// this.getMesh().position.addInPlace(this._direction.scale(this._speed));
 		if (this._isAi)
 			this.manageIA(fps);
+		// if (true) {
 		else {
 			if (!this._moveDirection) return;
-			console.log("received command to move, attempting to move");
+			// console.log("received command to move, attempting to move");
 			const deltaY = this._moveDirection === "up" ? this.getSpeed() : -this.getSpeed();
 			const currentY = this.getMesh().position.y;
 			const newY = currentY + deltaY;
@@ -165,36 +167,13 @@ export default class Paddle {
 
 	public printIAInfo(debug: number = 0): void {
 		if (debug === 1) {
-			const paddlSpeed = this.getSpeed();
-			const ballSpeed = this._ball?.getCurrSpeed();
-			const ballY = this._ball?.getMesh().position.y;
-			const currentPaddle = this.getMesh().position.y;
-			const nWallY = this._walls.northWall.getMesh().position.y;
-			const nWallX = this._walls.northWall.getMesh().position.x;
-			const sWallY = this._walls.southWall.getMesh().position.y;
-			const sWallX = this._walls.southWall.getMesh().position.x;
-
-			const boundingInfo = this.getMesh().getBoundingInfo();
-			const halfHeight = boundingInfo.boundingBox.extendSize.y;
-
-			const maxY = this._bounds.maxY - halfHeight;
-			const minY = this._bounds.minY + halfHeight;
-			console.log(`\n--------------\npaddleSpedd: ${paddlSpeed}`);
-			console.log(`ballSpeed: ${ballSpeed}`);
-			console.log(`ballY: ${ballY}`);
-			console.log(`currentPaddle: ${currentPaddle}`);
-			console.log(`nWallY: ${nWallY}`);
-			console.log(`nWallX: ${nWallX}`);
-			console.log(`sWallY: ${sWallY}`);
-			console.log(`sWallX: ${sWallX}`);
 			console.log(`upMoove: ${this._upMoove}`);
 			console.log(`downMoove: ${this._downMoove}`);
-			console.log(`maxY: ${maxY}`);
-			console.log(`minY: ${minY}\n----------------\n`);
 			// console.log(`: ${}`);
 		}
 		else if (debug === 2) {
-			console.log(`ballVector: ${this._ball?.getPosition()}`);
+			console.log(`ballDir: ${this._ballDirection}`);
+			console.log(`ballPos: ${Paddle._ballPos}\n`);
 		}
 		else if (debug === 3) {
 
@@ -202,18 +181,14 @@ export default class Paddle {
 	}
 
 	public predictBall(): number {
-		const pos: Vector3 | undefined = this._ball?.getMesh().position;
-		const vel: Vector3 | undefined = this._ball?.getPosition();
+		const bPos: Vector3 = Paddle._ballPos;
+		const bVel: Vector3 = this._ballDirection;
 
-		if (!pos || !vel)
-			return 1;
-		const dirX = Math.sin(vel.x);
-		if (dirX === 0)
-			console.log("Ball doesn't moove in predict");
-		const goalX = vel.x > 0 ? this._walls.eastWall.getMesh().position.x : this._walls.westWall.getMesh().position.x;
-		const dx = goalX - pos.x;
-		const timeToImpact = dx / vel.x;
-		const rawY = pos.y + vel.y * timeToImpact;
+		const goalX = bVel.x > 0 ? this._walls.eastWall.getMesh().position.x : this._walls.westWall.getMesh().position.x;
+
+		const dToX = goalX - bPos.x;
+		const timeToImpact = dToX / bVel.x;
+		const rawY = bPos.y + bVel.y * timeToImpact;
 
 		const nWallY = this._walls.northWall.getMesh().position.y;
 		const sWallY = this._walls.southWall.getMesh().position.y;
@@ -229,7 +204,7 @@ export default class Paddle {
 		else
 			predictedY = (halfHeight - (modulo % halfHeight)) * -Math.sign(rawY);
 
-		console.log(`Impact prévu à x = ${goalX}, y = ${predictedY}`);
+		console.log(`Impact at x = ${goalX}, y = ${predictedY} `);
 		return (predictedY);
 	}
 
@@ -245,24 +220,28 @@ export default class Paddle {
 			const minY = this._bounds.minY + halfHeight;
 
 			if (fps === 1) {
-				this.printIAInfo(1);
-				const vel: Vector3 | undefined = this._ball?.getPosition();
-
-				if (vel) {
-					const dirX = Math.sin(vel.x);
-					if (dirX === 0)
-						console.log("Ball doesn't moove");
-					else {
-						const predictY = this.predictBall();
-						const diff = Math.floor(Math.max(predictY, this.getPosition().y - Math.min(predictY, this.getPosition().y)));
-						console.log(`diff: ${diff}`);
-						predictY > 0 ? this._upMoove = diff : this._downMoove = diff;
-					}
+				const vel: Vector3 = this._ballDirection.clone();
+				const pad: number = this.getPosition().x;
+				const dir: boolean = ((vel.x < 0 && pad < 0) || vel.x > 0 && pad > 0) ? true : false;
+				if (Paddle._ballPos.x === 0) {
+					// console.log("Ball doesn't moove");
+				}
+				else {
+					const predictY = this.predictBall();
+					const diff = Math.abs(Math.max(predictY, currentPaddle) - Math.min(predictY, currentPaddle));
+					const moov: number = Math.floor(diff / paddlSpeed);
+					console.log(`currentPaddle: ${currentPaddle}`);
+					console.log(`diff: ${diff}`);
+					console.log(`moov: ${moov}`);
+					if (predictY === 0)
+						currentPaddle < 0 ? this._upMoove = moov : this._downMoove = moov;
+					else
+						predictY > currentPaddle ? this._upMoove = moov : this._downMoove = moov;
+					// this.getMesh().position.y = predictY;
+					this.printIAInfo(1);
+					this.printIAInfo(2);
 				}
 			}
-
-			// if (fps === 1)
-			// 	this.printIAInfo(2);
 
 			if (this._upMoove) {
 				if (currentPaddle + paddlSpeed < maxY)
@@ -282,9 +261,17 @@ export default class Paddle {
 
 	public async manageIA(fps: number) {
 
-		if (fps === 1)
-			Paddle._ballPos = this._ball?.getHitbox().position.y;
-		this.randMoove(fps);
+		if (fps === 1) {
+			let tmp: Vector3 | undefined = this._ball?.getHitbox().position.clone();
+			if (tmp === undefined)
+				return;
+			Paddle._ballPos = tmp;
+			tmp = this._ball?.direction;
+			if (tmp === undefined)
+				return;
+			this._ballDirection = tmp;
+		}
+		// this.randMoove(fps);
 		this.iaAlgo(fps);
 	}
 
@@ -293,7 +280,7 @@ export default class Paddle {
 		const refresh = 30;
 		const ran = Math.floor((Math.random() * 10000) % coef);
 		if (fps === refresh && this._downMoove === 0 && this._upMoove === 0) {
-			// console.log(`ran: ${ran}`);
+			// console.log(`ran: ${ ran } `);
 			if (ran > coef / 2)
 				this._upMoove += ran;
 			else if (ran < coef / 2)
