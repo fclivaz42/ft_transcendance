@@ -7,6 +7,8 @@ import https from "https";
 import checkRequestAuthorization from "../managers/AuthorizationManager.ts";
 import type { Users } from "../../../libs/interfaces/Users.ts";
 import usersOauthLoginEndpoint from "./users/oauthLogin.ts";
+import { httpReply } from "../../../libs/helpers/httpResponse.ts";
+import UsersValidation from "../handlers/UsersValidation.ts";
 
 export default async function initializeRoute(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.get("/:uuid", async (request, reply) => {
@@ -47,7 +49,15 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		const params = request.params as { uuid: string };
 		const body = request.body as Partial<Users>;
 		if (body.PlayerID)
-			return reply.code(400).send({ error: "PlayerID is not allowed to be set manually" });
+			return httpReply({
+				detail: "PlayerID is not allowed to be set manually",
+				status: 400,
+				module: "usermanager",
+			}, reply, request);
+
+		let resp: undefined;
+		if (resp = UsersValidation.enforceUserValidation(reply, request, body))
+			return resp;
 
 		const db = await axios.put(`http://db:3000/Players/id/${params.uuid}`, body, {
 			headers: {

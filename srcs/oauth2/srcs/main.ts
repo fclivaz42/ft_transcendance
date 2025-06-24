@@ -22,3 +22,5 @@ server.listen({ port: config.ServerConfig.port, host: "0.0.0.0" }, (err, address
 	}
 	server.log.info(`Server listening at ${address}`);
 });
+
+betterFastify(server);

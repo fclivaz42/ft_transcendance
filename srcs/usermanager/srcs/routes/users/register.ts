@@ -3,9 +3,9 @@ import { jwt } from '../../managers/JwtManager.ts';
 import checkRequestAuthorization from '../../managers/AuthorizationManager.ts';
 import type { UserRegisterProps, Users } from '../../../../libs/interfaces/Users.ts';
 import databaseSdk from '../../../../libs/helpers/databaseSdk.ts';
-import { httpReply } from '../../../../libs/helpers/httpResponse.ts';
 import axios from 'axios';
 import https from 'https';
+import UsersValidation from "../../handlers/UsersValidation.ts";
 
 export default async function usersRegisterEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.post("/register", async (request, reply) => {
@@ -14,6 +14,11 @@ export default async function usersRegisterEndpoint(app: FastifyInstance, opts: 
 			return authorization;
 
 		const userRegister = request.body as UserRegisterProps;
+
+		let resp: undefined;
+		if (resp = UsersValidation.enforceUserValidation(reply, request, userRegister))
+			return resp;
+
 		const dbSdk = new databaseSdk();
 
 		// TODO: Remove axios request, use sdk instead once the databaseSdk is fully implemented.
