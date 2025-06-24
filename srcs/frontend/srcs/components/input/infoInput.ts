@@ -1,3 +1,5 @@
+import createTextbox from "./textbox";
+
 //Cree un champ de input de type texte, defini  en gris dedans ce qui est requis
 export interface CustomInputContainer extends HTMLDivElement {
     inputElement: HTMLInputElement;
@@ -13,28 +15,12 @@ export function createInfoInput(labelName: string, inputName: string): CustomInp
 
     
 
-    const input = document.createElement('input');
-    input.type = "text"; // Ou "email", "password", etc., selon le besoin
-    input.name = inputName;
-    input.id = inputName; // Important pour associer le label
-    input.placeholder = `${labelName.toLowerCase()}`;
-    input.className = `
-    
-    w-full
-        px-4
-        py-2
-        mt-2
-        text-white         // Texte blanc
-        bg-gray-800        // Fond gris très foncé
-        border             // Bordure
-        border-gray-700    // Bordure gris foncé (peut-être pas assez clair)
-        rounded-lg
-        focus:outline-none
-        focus:ring-2
-        focus:ring-blue-500
-        pr-10
-        transition-all duration-300 ease-in-out
-    `.replace(/\s+/g, " ");
+	const input = createTextbox({
+		type: "text",
+		placeholder: labelName,
+		name: inputName,
+		id: inputName, // Important pour associer le label
+	});
 
     // --- NOUVEL ÉLÉMENT POUR L'ICÔNE D'ERREUR ---
     const errorIcon = document.createElement('div');
@@ -44,7 +30,7 @@ export function createInfoInput(labelName: string, inputName: string): CustomInp
         pointer-events-none 
         text-red-500 hidden 
     `.replace(/\s+/g, " ");
-    // Vous pouvez insérer un SVG d'icône ici, par exemple un X ou un point d'exclamation
+    //  insérer un SVG d'icône ici
     errorIcon.innerHTML = `<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>`;
     // Ou juste un point si vous préférez : errorIcon.textContent = "•"; // Avec des styles pour le rendre rouge et gras
 
@@ -70,7 +56,7 @@ export function createInfoInput(labelName: string, inputName: string): CustomInp
     // Ajouter un getter pour la valeur de l'input
     Object.defineProperty(container, 'value', {
         get: () => input.value,
-        set: (val) => { input.value = val; } // Permet de définir la valeur via container.value si nécessaire
+        set: (val) => { input.value = val; } 
     });
 
     return container;
@@ -79,6 +65,6 @@ declare global {
     interface HTMLElementEventMap {
         'inputFocus': CustomEvent<{ inputName: string }>;
         'inputBlur': CustomEvent<{ inputName: string }>;
-        // Gardez les événements de passwordStrengthChange si vous les avez déjà
+        
     }
 }

@@ -1,0 +1,117 @@
+{
+  "home": {
+    "title": "Bienvenido a SARIF's Pong",
+    "guestButton": {
+      "label": "Jugar como invitado"
+    },
+    "accountButton": {
+      "label": "Usar una cuenta"
+    }
+  },
+  "leaderboard": {
+    "title": "Clasificación"
+  },
+  "history": {
+    "title": "Historial"
+  },
+  "header": {
+    "usermenu": {
+      "login": "Iniciar sesión",
+      "register": "Registrarse",
+      "logout": "Cerrar sesión"
+    }
+  },
+  "navbar": {
+    "home": {
+      "label": "Inicio"
+    },
+    "pong": {
+      "label": "Pong",
+      "title": "Juego de Pong",
+      "submenu": {
+        "play": "Jugar ahora",
+        "solo": "Modo individual",
+        "join": "Unirse a partida privada",
+        "create": "Crear partida privada"
+      }
+    },
+    "tetris": {
+      "label": "Tetris",
+      "title": "Juego de Tetris",
+      "submenu": {
+        "play": "Jugar ahora"
+      }
+    },
+    "leaderboard": {
+      "label": "Clasificación",
+      "title": "Clasificación",
+      "submenu": {
+      }
+    },
+    "history": {
+      "label": "Historial",
+      "title": "Historial"
+    },
+    "settings": {
+      "label": "Ajustes",
+      "title": "Ajustes",
+      "submenu": {
+        "appearance": {
+          "title": "Apariencia",
+          "submenu": {
+            "dark_mode": "Modo oscuro",
+            "language": "Idioma"
+          }
+        }
+      }
+    }
+  },
+"panel": {
+    "usernameLabel": "Nombre de usuario",
+    "passwordLabel": "Contraseña",
+    "emailLabel": "Correo electrónico",
+    "loginPanel": {
+      "panelTitle": "Inicio de sesión",
+      "rememberMe": "Recordarme",
+      "connexionButton": "Iniciar sesión",
+      "validation": {
+        "usernameRequired": "Por favor, introduce tu nombre de usuario.",
+        "passwordRequired": "La contraseña es obligatoria."
+      },
+      "link": {
+        "subscribePanel": "¡Crear una cuenta!",
+        "forgotPasswordPanel": "¿Olvidaste tu contraseña?"
+      }
+    },
+    "registerPanel": {
+      "panelTitle": "Crea una cuenta",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "registerButton": "Continuar",
+      "validation": {
+        "usernameRequired": "Por favor, introduce tu nombre de usuario.",
+        "emailRequired": "Por favor, introduce tu correo electrónico.",
+        "passwordRequired": "La contraseña es obligatoria.",
+        "confirmPasswordRequired": "Por favor, confirma tu contraseña.",
+        "passwordMismatch": "Las contraseñas no coinciden.",
+        "lengthError": "El nombre de usuario debe tener entre 3 y 20 caracteres.",
+        "charactersError": "El nombre de usuario solo puede contener [a-z], [0-9] y guiones [-].",
+        "emailFormatError": "Por favor, introduce una dirección de correo electrónico válida."
+      },
+      "link": {
+        "loginPanel": "¿Ya tienes una cuenta? Iniciar sesión"
+      }
+    },
+    "forgotPasswordPanel": {
+      "panelTitle": "Forgot Password",
+      "sendButton": "Enviar enlace de restablecimiento",
+      "validation": {
+        "code" : "Por favor, introduce el código enviado a tu correo electrónico.",
+        "emailRequired": "Por favor, introduce tu correo electrónico.",
+        "emailFormatError": "Por favor, introduce una dirección de correo electrónico válida."
+      },
+      "link": {
+        "loginPanel": "¿Recordaste tu contraseña? Iniciar sesión"
+      }
+    }
+  }
+}

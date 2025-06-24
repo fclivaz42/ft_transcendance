@@ -13,4 +13,5 @@ export interface ButtonProps extends TitleProps {
 	color?: string;
   darkColor?: string;
 	href?: string;
+	addClasses?:string;
 }

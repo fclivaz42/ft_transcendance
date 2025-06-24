@@ -13,6 +13,8 @@ const server = fastify({
 
 server.register(oauthRoutes, {prefix: "/oauth"});
 
+betterFastify(server);
+
 server.listen({ port: config.ServerConfig.port, host: "0.0.0.0" }, (err, address) => {
 	if (err) {
 		server.log.error(err);

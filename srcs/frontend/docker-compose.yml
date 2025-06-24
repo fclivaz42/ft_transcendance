@@ -1,7 +1,7 @@
 services:
   frontend-builder:
     build: ./
-    container_name: sarif_frontend
+    container_name: frontend
     environment:
       - TZ=Europe/Zurich
     volumes:

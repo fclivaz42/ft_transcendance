@@ -1,0 +1,117 @@
+{
+  "home": {
+    "title": "Добро пожаловать в SARIF's Pong",
+    "guestButton": {
+      "label": "Играть как гость"
+    },
+    "accountButton": {
+      "label": "Использовать аккаунт"
+    }
+  },
+  "leaderboard": {
+    "title": "Таблица лидеров"
+  },
+  "history": {
+    "title": "История"
+  },
+  "header": {
+    "usermenu": {
+      "login": "Вход",
+      "register": "Регистрация",
+      "logout": "Выход"
+    }
+  },
+  "navbar": {
+    "home": {
+      "label": "Главная"
+    },
+    "pong": {
+      "label": "Понг",
+      "title": "Игра Понг",
+      "submenu": {
+        "play": "Играть сейчас",
+        "solo": "Одиночный режим",
+        "join": "Присоединиться к приватной игре",
+        "create": "Создать приватную игру"
+      }
+    },
+    "tetris": {
+      "label": "Тетрис",
+      "title": "Игра Тетрис",
+      "submenu": {
+        "play": "Играть сейчас"
+      }
+    },
+    "leaderboard": {
+      "label": "Таблица лидеров",
+      "title": "Таблица лидеров",
+      "submenu": {
+      }
+    },
+    "history": {
+      "label": "История",
+      "title": "История"
+    },
+    "settings": {
+      "label": "Настройки",
+      "title": "Настройки",
+      "submenu": {
+        "appearance": {
+          "title": "Внешний вид",
+          "submenu": {
+            "dark_mode": "Темный режим",
+            "language": "Язык"
+          }
+        }
+      }
+    }
+  },
+  "panel": {
+    "usernameLabel": "Имя пользователя",
+    "passwordLabel": "Пароль",
+    "emailLabel": "Адрес электронной почты",
+    "loginPanel": {
+      "panelTitle": "Войти",
+      "rememberMe": "Запомнить меня",
+      "connexionButton": "Войти",
+      "validation": {
+        "usernameRequired": "Пожалуйста, введите имя пользователя.",
+        "passwordRequired": "Пароль обязателен."
+      },
+      "link": {
+        "subscribePanel": "Создать аккаунт!",
+        "forgotPasswordPanel": "Забыли пароль?"
+      }
+    },
+    "registerPanel": {
+      "panelTitle": "Создать аккаунт",
+      "confirmPasswordLabel": "Подтвердите пароль",
+      "registerButton": "Продолжить",
+      "validation": {
+        "usernameRequired": "Пожалуйста, введите имя пользователя.",
+        "emailRequired": "Пожалуйста, введите адрес электронной почты.",
+        "passwordRequired": "Пароль обязателен.",
+        "confirmPasswordRequired": "Пожалуйста, подтвердите пароль.",
+        "passwordMismatch": "Пароли не совпадают.",
+        "lengthError": "Имя пользователя должно содержать от 3 до 20 символов.",
+        "charactersError": "Имя пользователя может содержать только буквы [a-z], цифры [0-9] и тире [-].",
+        "emailFormatError": "Пожалуйста, введите действительный адрес электронной почты."
+      },
+      "link": {
+        "loginPanel": "Уже есть аккаунт? Войти"
+      }
+    },
+    "forgotPasswordPanel": {
+      "panelTitle": "Забыли пароль? ",
+      "sendButton": "Отправить ссылку для сброса",
+      "validation": {
+        "code" : "Пожалуйста, введите код, отправленный на ваш адрес электронной почты.",
+        "emailRequired": "Пожалуйста, введите адрес электронной почты.",
+        "emailFormatError": "Пожалуйста, введите действительный адрес электронной почты."
+      },
+      "link": {
+        "loginPanel": "Вспомнили пароль? Войти"
+      }
+    }
+  }
+}

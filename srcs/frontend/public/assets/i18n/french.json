@@ -1,12 +1,19 @@
 {
   "home": {
-  "guestButton": {
-    "label": "Jouer en Guest"
+    "title": "Bienvenue sur SARIF's Pong",
+    "guestButton": {
+      "label": "Jouer en Guest"
+    },
+    "accountButton": {
+      "label": "Utiliser un compte"
+    }
   },
-  "accountButton": {
-    "label": "Utiliser un compte"
-  }
-},
+  "leaderboard": {
+    "title": "Classement"
+  },
+  "history": {
+    "title": "Historique"
+  },
   "header": {
     "usermenu": {
       "login": "Se connecter",
@@ -15,6 +22,9 @@
     }
   },
   "navbar": {
+    "home": {
+      "label": "Accueil"
+    },
     "pong": {
       "label": "Pong",
       "title": "Jeu de Pong",
@@ -53,6 +63,55 @@
             "language": "Langue"
           }
         }
+      }
+    }
+  },
+"panel": {
+    "usernameLabel": "Nom d'utilisateur",
+    "passwordLabel": "Mot de passe",
+    "emailLabel": "Adresse e-mail",
+    "loginPanel": {
+      "panelTitle": "Se connecter",
+      "rememberMe": "Se souvenir de moi",
+      "connexionButton": "Se connecter",
+
+      "validation": {
+        "usernameRequired": "Veuillez saisir votre nom d'utilisateur.",
+        "passwordRequired": "Mot de passe requis."
+      },
+      "link": {
+        "subscribePanel": "Pas encore inscrit ? Créer un compte !",
+        "forgotPasswordPanel": "Mot de passe oublié ?"
+      }
+    },
+    "registerPanel": {
+      "panelTitle": "Créer un compte",
+      "confirmPasswordLabel": "Confirmer le mot de passe",
+      "registerButton": "Continuer",
+      "validation": {
+        "usernameRequired": "Veuillez saisir votre nom d'utilisateur.",
+        "emailRequired": "Veuillez saisir votre adresse e-mail.",
+        "passwordRequired": "Le mot de passe est requis.",
+        "confirmPasswordRequired": "Veuillez confirmer votre mot de passe.",
+        "passwordMismatch": "Les mots de passe ne correspondent pas.",
+        "lengthError": "Le nom d'utilisateur doit contenir entre 3 et 20 caractères.",
+        "charactersError": "Le nom d'utilisateur ne peut contenir que des lettres [a-z], des chiffres [0-9] et des tirets [-].",
+        "emailFormatError": "Veuillez saisir une adresse e-mail valide."
+      },
+      "link": {
+        "loginPanel": "Déjà un compte ? Se connecter"
+      }
+    },
+    "forgotPasswordPanel": {
+      "panelTitle": "Petit oubli?",
+      "sendButton": "Réinitialiser le mot de passe",
+      "validation": {
+        "code" : "Rentrez le code reçu par mail.",
+        "emailRequired": "Veuillez saisir votre adresse e-mail.",
+        "emailFormatError": "Veuillez saisir une adresse e-mail valide."
+      },
+      "link": {
+        "loginPanel": "La mémoire revient? Se connecter"
       }
     }
   }

@@ -6,9 +6,9 @@
 // ==============================
 import { createInfoInput, CustomInputContainer } from '../input/infoInput.js';
 import { createPasswordInput, CustomPasswordInputContainer } from '../input/createPasswordInput.js';
-import { LoginDialogOptions } from './index.js';
+import { LoginDialogOptions } from './loginDialog.js';
 import { updateFieldAppearance } from '../input/utils.js'; 
-
+import { i18nHandler } from "../../handlers/i18nHandler.js";
 
 // ==============================
 // 2. EXPORT MAIN FUNCTION: createLoginPanel
@@ -42,7 +42,8 @@ export function createLoginPanel(options: LoginDialogOptions)
         let errorMessage: string | null = null;
         if (value === '') {
             isValid = false;
-            errorMessage = "Merci de saisir votre nom d'utilisateur.";//ajouter les regles?
+            errorMessage = i18nHandler.getValue("panel.loginPanel.validation.usernameRequired");//ajouter les regles?
+                  
         }
         return { isValid, errorMessage };
     };
@@ -53,7 +54,8 @@ export function createLoginPanel(options: LoginDialogOptions)
         let errorMessage: string | null = null;
         if (value === '') {
             isValid = false;
-            errorMessage = "Le mot de passe est requis.";
+            errorMessage = i18nHandler.getValue("panel.loginPanel.validation.passwordRequired");
+
         }
         return { isValid, errorMessage };
     };
@@ -82,12 +84,12 @@ export function createLoginPanel(options: LoginDialogOptions)
 // (Inputs, checkbox, bouton, liens)
 // ============================================================
     //champ Nom user
-  const loginDisplayNameContainer = createInfoInput("Nom d'utilisateur", "displayName");
+  const loginDisplayNameContainer = createInfoInput(i18nHandler.getValue("panel.usernameLabel"), "displayName");
   const displayNameErrorFeedback = document.createElement("div");
   displayNameErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
   loginDisplayNameContainer.appendChild(displayNameErrorFeedback);
    // Champ Mot de passe
-  const loginPasswordContainer: CustomPasswordInputContainer = createPasswordInput("Mot de passe", "password", false); // Force à false pour ne pas montrer la force ici
+  const loginPasswordContainer: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.passwordLabel"), "password", false); // Force à false pour ne pas montrer la force ici
   const passwordErrorFeedback = document.createElement("div");
   passwordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
   loginPasswordContainer.appendChild(passwordErrorFeedback);
@@ -107,14 +109,14 @@ export function createLoginPanel(options: LoginDialogOptions)
 
   const rememberMeLabel = document.createElement("label");
   rememberMeLabel.htmlFor = "rememberMe";
-  rememberMeLabel.textContent = "Se souvenir de moi";
+  rememberMeLabel.textContent = i18nHandler.getValue("panel.loginPanel.rememberMe");
   rememberMeLabel.className = "text-gray-300 text-sm cursor-pointer";
 
   rememberMeContainer.appendChild(rememberMeCheckbox);
   rememberMeContainer.appendChild(rememberMeLabel);
     // Bouton de connexion
   const loginButton = document.createElement("button");
-  loginButton.textContent = "Connexion";
+  loginButton.textContent = i18nHandler.getValue("panel.loginPanel.connexionButton");;
   loginButton.type = "submit";
   loginButton.className = `
     bg-blue-600 font-semibold py-2 px-4 rounded
@@ -127,17 +129,15 @@ export function createLoginPanel(options: LoginDialogOptions)
     // Liens bas de panneau ->vers autre panel
   const switchToForgotPasswordLink = document.createElement("a");
   switchToForgotPasswordLink.href = "#";
-  switchToForgotPasswordLink.textContent = "Mot de passe oublié ?";
+  switchToForgotPasswordLink.textContent = i18nHandler.getValue("panel.loginPanel.link.forgotPasswordPanel");;
   switchToForgotPasswordLink.className = "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer";
 //   loginPanel.appendChild(switchToForgotPasswordLink);
 
   const switchToRegisterLink = document.createElement("a");
   switchToRegisterLink.href = "#";
-  switchToRegisterLink.textContent = "Pas encore de compte ? S'inscrire";
+  switchToRegisterLink.textContent = i18nHandler.getValue("panel.loginPanel.link.subscribePanel");
   switchToRegisterLink.className = "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer";
-//   "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer"
-//   loginPanel.appendChild(switchToRegisterLink);
-//   loginPanel.appendChild(switchToForgotPasswordLink);
+
 
 // 2.4. ASSEMBLAGE DU DOM
 // (Ajout des éléments créés aux conteneurs appropriés)

@@ -9,6 +9,7 @@ import path from 'node:path'
 import { betterFastify } from '../../libs/helpers/fastifyHelper.ts'
 import Logger from '../../libs/helpers/loggers.ts'
 import frontendRoutes from './modules/frontend/routes.ts'
+import websocketPlugin from '@fastify/websocket'
 
 if (process.env.KEYPATH === undefined || process.env.CERTPATH === undefined) {
 	Logger.error("Keypath and/or Certpath are not defined. Exiting.")
@@ -31,18 +32,25 @@ async function load_modules() {
 	for (const file of ts_files) {
 		const file_path: string = path.join(subfolder, file)
 		const module_routes = (await import(`file://${file_path}`))
-		fastify.register(module_routes, { prefix: `/${file.split(".")[0]}`.toLowerCase() })
+		await fastify.register(module_routes, { prefix: `/api/${file.split(".")[0]}`.toLowerCase() })
 	}
 }
-await load_modules()
 
-fastify.register(frontendRoutes);
+await fastify.register(websocketPlugin);
+await load_modules()
+await fastify.register(frontendRoutes);
+
+betterFastify(fastify);
+
+fastify.addHook('onSend', async (request, reply, payload) => {
+  reply.header('Server', 'Sarifcore Webserver');
+  return payload;
+});
+
 
 fastify.listen({ port: 443, host: '::' }, (err) => {
 	if (err) {
 		fastify.log.error(err)
 		process.exit(1)
 	}
-})
-
-betterFastify(fastify);
+});

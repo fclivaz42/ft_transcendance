@@ -1,5 +1,8 @@
 // createPasswordInput() crée l'élément HTML de l'input de mot de passe contient la logique de VÉRIFICATION
 //checkPasswordStrength(password: string) qui calcule si un mot de passe respecte les critères (majuscule, minuscule, chiffre, etc.)
+
+import createTextbox from "./textbox";
+
 // -----> (passwordStrengthChange, passwordInputFocus, passwordInputBlur).
 export interface PasswordStrengthResult { 
     minLength: boolean;
@@ -56,26 +59,11 @@ export function createPasswordInput(
     const container = document.createElement("div") as CustomPasswordInputContainer;
     container.className = "relative w-full"; // Ces classes sont bonnes
 
-    const input = document.createElement("input");
-    input.type = "password";
-    input.name = name;
-    input.placeholder = placeholder;
-    input.className = `
-    w-full
-        px-4
-        py-2
-        mt-2
-        text-white         // Texte blanc
-        bg-gray-800        // Fond gris très foncé
-        border             // Bordure
-        border-gray-700    // Bordure gris foncé (peut-être pas assez clair)
-        rounded-lg
-        focus:outline-none
-        focus:ring-2
-        focus:ring-blue-500
-        pr-10
-        transition-all duration-300 ease-in-out
-    `.replace(/\s+/g, " ");
+	const input = createTextbox({
+		type: "password",
+		placeholder: placeholder,
+		name: name,
+	});
 
     const toggleButton = document.createElement("button");
     toggleButton.type = "button";
@@ -89,24 +77,49 @@ absolute inset-y-1 right-2
     focus:outline-none 
     z-10 cursor-pointer
     `.replace(/\s+/g, " ");
-    const eyeIcon = document.createElement("span");
-    eyeIcon.className = "icon";
-    eyeIcon.textContent = "👁️";
-    const eyeSlashIcon = document.createElement("span");
-    eyeSlashIcon.className = "icon hidden";
-    eyeSlashIcon.textContent = "🙈";
+    // const eyeIcon = document.createElement("span");
+    // eyeIcon.className = "icon";
+    // eyeIcon.textContent = "👁️";
+    // const eyeSlashIcon = document.createElement("span");
+    // eyeSlashIcon.className = "icon hidden";
+    // eyeSlashIcon.textContent = "🙈";
+    // toggleButton.appendChild(eyeIcon);
+    // toggleButton.appendChild(eyeSlashIcon);
+    // Icône "œil ouvert"
+    const eyeIcon = document.createElement("img");
+    eyeIcon.src = "./assets/ui/eye-open.svg"; // <--- Chemin vers votre SVG pour l'œil ouvert
+    eyeIcon.alt = "Afficher le mot de passe"; // Texte alternatif pour l'accessibilité
+    eyeIcon.className = "w-5 h-5"; // Taille de l'icône, ajustez si besoin
+
+    // Icône "œil barré" (cachée par défaut)
+    const eyeSlashIcon = document.createElement("img");
+    eyeSlashIcon.src = "./assets/ui/eye-closed.svg"; // <--- Chemin vers votre SVG pour l'œil fermé
+    eyeSlashIcon.alt = "Cacher le mot de passe"; // Texte alternatif pour l'accessibilité
+    eyeSlashIcon.className = "w-5 h-5 hidden"; // Taille et 'hidden' pour qu'elle soit cachée au départ
+
     toggleButton.appendChild(eyeIcon);
     toggleButton.appendChild(eyeSlashIcon);
 
+    // toggleButton.addEventListener("click", () => {
+    //     if (input.type === "password") {
+    //         input.type = "text";
+    //         eyeIcon.classList.add("hidden");
+    //         eyeSlashIcon.classList.remove("hidden");
+    //     } else {
+    //         input.type = "password";
+    //         eyeIcon.classList.remove("hidden");
+    //         eyeSlashIcon.classList.add("hidden");
+    //     }
+    // });
     toggleButton.addEventListener("click", () => {
         if (input.type === "password") {
             input.type = "text";
-            eyeIcon.classList.add("hidden");
-            eyeSlashIcon.classList.remove("hidden");
+            eyeIcon.classList.add("hidden");        // Cache l'œil ouvert
+            eyeSlashIcon.classList.remove("hidden"); // Affiche l'œil barré
         } else {
             input.type = "password";
-            eyeIcon.classList.remove("hidden");
-            eyeSlashIcon.classList.add("hidden");
+            eyeIcon.classList.remove("hidden");     // Affiche l'œil ouvert
+            eyeSlashIcon.classList.add("hidden");   // Cache l'œil barré
         }
     });
 

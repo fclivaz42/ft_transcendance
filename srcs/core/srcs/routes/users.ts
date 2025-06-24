@@ -1,8 +1,9 @@
 import axios from "axios";
 import type { FastifyInstance, FastifyPluginOptions, FastifyReply } from 'fastify'
 import UsersSdk from '../../../libs/helpers/usersSdk.ts';
-import type { UserLoginProps, UserRegisterProps } from '../../../libs/interfaces/Users.ts';
+import type { UserLoginProps, UserRegisterProps, Users } from '../../../libs/interfaces/Users.ts';
 import Logger from "../../../libs/helpers/loggers.ts";
+import { httpReply } from "../../../libs/helpers/httpResponse.ts";
 
 const usersSdk = new UsersSdk();
 
@@ -67,7 +68,29 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only PUT or PATCH method is allowed for user update.' });
 
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
-		// TODO: Implement user data update logic
+		const userId = authorization.data.sub;
+		if (!request.body)
+			return httpReply({
+				module: 'usermanager',
+				detail: 'No user data provided for update.',
+				status: 400,
+		}, reply, request);
+		const data = request.body as Partial<Users>;
+		if (data.PlayerID)
+			return httpReply({
+				module: 'usermanager',
+				detail: 'PlayerID cannot be updated.',
+				status: 400,
+			}, reply, request);
+		const resp = await usersSdk.updateUser(userId, request.body as Partial<Users>);
+		if (resp.status >= 400) {
+			return httpReply({
+				module: 'usermanager',
+				detail: `Failed to update user data: ${resp.statusText}`,
+				status: resp.status,
+			}, reply, request);
+		}
+		reply.code(resp.status).send(usersSdk.filterUserData(resp.data));
 	});
 
 	// Get public user data by UUID
@@ -79,5 +102,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (userData.status !== 200)
 			return reply.code(userData.status).send(userData.data);
 		return reply.code(userData.status).send(usersSdk.filterPublicUserData(userData.data));
+	});
+
+	fastify.all('/logout', async (request, reply) => {
+		if (request.method !== 'GET')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for logout.' });
+		return reply
+			.header("Set-Cookie", `token=; Path=/; HttpOnly; SameSite=Strict; Secure; Max-Age=0`)
+			.header("location", "/")
+			.code(303).send({ message: 'Logged out successfully' });
 	});
 }

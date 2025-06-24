@@ -1,14 +1,18 @@
 services:
   usermanager:
     build: ./
-    container_name: sarif_usermanager
+    container_name: usermanager
     environment:
       - TZ=Europe/Zurich
       - API_KEY
     env_file:
       - .env
-    restart: on-failure
     networks:
       - sarifntw
     volumes:
       - sarif-libs:/libs/
+    depends_on:
+      libs:
+        condition: service_completed_successfully
+        restart: true
+    restart: on-failure

@@ -1,12 +1,18 @@
 {
-  
   "home": {
+    "title": "Welcome to SARIF's Pong",
     "guestButton": {
       "label": "Jouer en Guest"
     },
     "accountButton": {
       "label": "Utiliser un compte"
     }
+  },
+  "leaderboard": {
+    "title": "Leaderboard"
+  },
+  "history": {
+    "title": "History"
   },
   "header": {
     "usermenu": {
@@ -16,6 +22,9 @@
     }
   },
   "navbar": {
+    "home": {
+      "label": "Home"
+    },
     "pong": {
       "label": "Pong",
       "title": "Pong Game",
@@ -54,6 +63,55 @@
             "language": "Language"
           }
         }
+      }
+    }
+  },
+"panel": {
+    "usernameLabel": "Username",
+    "passwordLabel": "Password",
+    "emailLabel": "Email Address",
+    "loginPanel": {
+      "panelTitle": "Sign in",
+      "rememberMe": "Remember me",
+      "connexionButton": "Sign in",
+    
+      "validation": {
+        "usernameRequired": "Please enter your username.",
+        "passwordRequired": "Password is required."
+      },
+      "link": {
+        "subscribePanel": "Create an account!",
+        "forgotPasswordPanel": "Forgot password?"
+      }
+    },
+    "registerPanel": {
+      "panelTitle": "Create Your Account",
+      "confirmPasswordLabel": "Confirm Password",
+      "registerButton": "Continue",
+      "validation": {
+        "usernameRequired": "Please enter your username.",
+        "emailRequired": "Please enter your email.",
+        "passwordRequired": "Password is required.",
+        "confirmPasswordRequired": "Please confirm your password.",
+        "passwordMismatch": "Passwords do not match.",
+        "lengthError": "Username must be between 3 and 20 characters.",
+        "charactersError": "Username can only contain [a-z], [0-9], [-].",
+        "emailFormatError": "Please enter a valid email address."
+      },
+      "link": {
+        "loginPanel": "Already have an account? Login"
+      }
+    },
+    "forgotPasswordPanel": {
+      "panelTitle": "Forgot Password",
+      "sendButton": "Send Reset Link",
+      "validation": {
+        "code" : "Please enter the code sent to your email.",
+        "emailRequired": "Please enter your email.",
+        "emailFormatError": "Please enter a valid email address."
+      },
+      "link": {
+        "loginPanel": "Remembered your password? Login"
       }
     }
   }

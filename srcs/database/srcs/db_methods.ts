@@ -6,16 +6,16 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/20 19:51:31 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/23 01:29:11 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import Database from "better-sqlite3"
 import { tables } from "./db_vars.ts"
-import { randomUUID, randomBytes, scrypt } from "node:crypto"
+import { randomUUID } from "node:crypto"
 import type * as sqlt from "better-sqlite3"
-import type { db_definition } from "./db_vars.ts"
-import { hash_password } from "./db_helpers.ts"
+import fs from "node:fs";
+import path from "node:path";
 
 //
 // Export as a non-instantiable class in order to directly call the static members.
@@ -27,37 +27,25 @@ export default class DatabaseWorker {
 	private constructor() { }
 
 	//
-	// Return a row from the table "table", in which "query" exists in the row's "field".
+	// Return a row from the table "table", in which "query" exists in the row's "field" if mode is "get".
+	// Return all rows from the table "table", in which "query" exists in the row's "field" if mode is "all".
+	// DELETE all rows from the table "table", in which "query" exists in the row's "field" if mode is "run".
 	//
 
-	static get(table: string, field: string, query: string) {
-		const db = new Database(process.env.DBLOCATION, { readonly: true });
-		let response: object;
+	static get_del(table: string, field: string, query: string, mode: "get" | "all" | "run") {
+		const db = new Database(process.env.DBLOCATION, { readonly: mode === "run" ? false : true });
+		let response: object | Array<object> | sqlt.RunResult;
+		const sql = mode === "run" ? "DELETE" : "SELECT *"
 		try {
-			response = db.prepare(`SELECT * FROM ${table} WHERE ${field} = ?`).get(query) as object
-			if (response === undefined)
-				throw { code: 404, string: "error.value.notfound" }
-		} catch (exception) {
-			if (process.env.RUNMODE === "debug")
-				console.dir(exception)
-			if (typeof exception.code === "string")
-				throw { code: 500, string: exception.code }
-			throw { code: exception.code, string: exception.string }
-		} finally {
-			db.close()
-		}
-		return response;
-	}
-
-	//
-	// Delete a row from the table "table", in which "query" exists in the row's "field".
-	//
-
-	static del(table: string, field: string, query: string) {
-		const db = new Database(process.env.DBLOCATION);
-		let response: sqlt.RunResult;
-		try {
-			response = db.prepare(`DELETE FROM ${table} WHERE ${field} = ?`).run(query);
+			if (table === tables.Players.Name && mode === "run") {
+				response = db.prepare(`SELECT * FROM ${table} WHERE ${field} = ?`).get(query) as object
+				const filename = response[tables.Players.Fields[0]]
+				const folder: Array<string> = fs.readdirSync(process.env.FILELOCATION as string)
+				for (const item of folder)
+					if (filename === item.split('.')[0])
+						fs.rmSync(path.join(process.env.FILELOCATION as string, item))
+			}
+			response = db.prepare(`${sql} FROM ${table} WHERE ${field} = ?`)[mode](query) as object
 			if (response === undefined)
 				throw { code: 404, string: "error.value.notfound" }
 		} catch (exception) {
@@ -82,6 +70,7 @@ export default class DatabaseWorker {
 
 	static post(table: string, table_fields: Array<string>, body: object) {
 		const db = new Database(process.env.DBLOCATION);
+		let retobj = {}
 		try {
 			let sql = `INSERT INTO ${table} VALUES (`;
 			if (tables[table].Identification.HasID) {
@@ -98,6 +87,7 @@ export default class DatabaseWorker {
 					body[key] = null
 			}
 			db.prepare(sql.replace(/.$/, ")")).run(body)
+			retobj = db.prepare(`SELECT * FROM ${table} WHERE ${table_fields[0]} = ?`).get(body[table_fields[0]]) as object
 		} catch (exception) {
 			if (process.env.RUNMODE === "debug")
 				console.dir(exception)
@@ -109,7 +99,7 @@ export default class DatabaseWorker {
 		} finally {
 			db.close()
 		}
-		return JSON.stringify(body);
+		return JSON.stringify(retobj);
 	}
 
 	//
@@ -120,7 +110,7 @@ export default class DatabaseWorker {
 
 	static put(table: string, table_fields: Array<string>, body: object, field: string, query: string) {
 		const db = new Database(process.env.DBLOCATION);
-		let response: sqlt.RunResult;
+		let response: object;
 		try {
 			if (db.prepare(`SELECT * FROM ${table} WHERE ${field} = ?`).get(query) === undefined)
 				throw { code: 404, string: "error.invalid.uuid" }
@@ -141,7 +131,8 @@ export default class DatabaseWorker {
 				throw { code: 400, string: "error.missing.fields" }
 			sql = sql.slice(0, -1)
 			sql += `\nWHERE ${field} = ?`
-			response = db.prepare(sql).run(body, query)
+			db.prepare(sql).run(body, query)
+			response = db.prepare(`SELECT * FROM ${table} WHERE ${field} = ?`).get(query) as object
 		} catch (exception) {
 			if (process.env.RUNMODE === "debug")
 				console.dir(exception)
@@ -165,6 +156,31 @@ export default class DatabaseWorker {
 			response = db.prepare(`SELECT * FROM ${table}`).get() as object
 			if (response === undefined)
 				return undefined;
+		} catch (exception) {
+			if (process.env.RUNMODE === "debug")
+				console.dir(exception)
+			throw { code: 500, string: exception.code }
+		} finally {
+			db.close()
+		}
+		return response;
+	}
+
+	static multiget(table: string, field: string | undefined, array: string | undefined) {
+		const db = new Database(process.env.DBLOCATION, { readonly: true });
+		let response: Array<object>;
+		try {
+			if (field === undefined || array === undefined) {
+				response = db.prepare(`SELECT * FROM ${table}`).all() as Array<object>
+			}
+			else {
+				const uarray = JSON.parse(array)
+				response = []
+				for (const item of uarray)
+					response.push(db.prepare(`SELECT * FROM ${table} WHERE ${field} = ?`).get(item) as object)
+			}
+			if (response === undefined)
+				throw { code: 404, string: "error.values.notfound" }
 		} catch (exception) {
 			if (process.env.RUNMODE === "debug")
 				console.dir(exception)
@@ -214,8 +230,6 @@ function check_duplicate(db: sqlt.Database, table: string, body: object, field: 
 		if (body[truc[0].name] !== undefined) {
 			const test = db.prepare(`SELECT * FROM ${table} WHERE ${truc[0].name} = ?`).get(body[truc[0].name]) as object
 			if (test !== undefined && ((field === null && query === null) || (test[field as string] !== query))) {
-				console.log(`duplicate found!`)
-				console.dir(test)
 				throw { code: 409, string: `error.duplicate.${truc[0].name}` }
 			}
 		}

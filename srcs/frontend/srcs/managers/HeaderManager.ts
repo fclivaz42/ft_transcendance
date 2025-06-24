@@ -1,9 +1,16 @@
 import { createHeader } from "../components/header/index.js";
 
-export default class HeaderManager {
+class HeaderManager {
+	private _header: HTMLDivElement = createHeader();
   public initialize() {
     const app = document.getElementById("app");
     if (!app) return;
-    app.insertBefore(createHeader(), app.firstChild);
+    app.insertBefore(this._header, app.firstChild);
   }
+
+	public get header(): HTMLDivElement {
+		return this._header;
+	}
 }
+
+export const headerManager = new HeaderManager();
