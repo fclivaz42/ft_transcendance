@@ -3,6 +3,7 @@ import Oauth2sdk from "../../../libs/helpers/oauthSdk.ts";
 import { httpReply } from "../../../libs/helpers/httpResponse.ts";
 import { Logger } from "../../../libs/helpers/loggers.ts";
 import UsersSdk from "../../../libs/helpers/usersSdk.ts";
+import axios from "axios";
 
 
 const oauth2sdk = new Oauth2sdk();
@@ -49,15 +50,22 @@ async function oauth_routes(app: FastifyInstance, opts: FastifyPluginOptions) {
 				module: "oauth2",
 			}, rep, req);
 
-    const response = await oauth2sdk.getCallback(code, state);
-    if (!response)
-      return httpReply({
-				detail: "No response from OAuth2 module",
-				status: 500,
-				module: "oauth2",
-			}, rep, req);
-		UsersSdk.showerCookie(rep, response.data.token, response.data.exp - response.data.iat);
-		rep.status(303).header('Location', '/');
+    await oauth2sdk.getCallback(code, state)
+			.then(response => {
+				UsersSdk.showerCookie(rep, response.data.token, response.data.exp - response.data.iat);
+				rep.status(303).header('Location', '/');
+			})
+			.catch(err => {
+				console.log("oops");
+				if (!axios.isAxiosError(err)) {
+					Logger.error(`Unexpected error in /callback route:\n${err}`);
+					return rep.status(304).header('Location', '/?error=unkown').send();
+				}
+				if (err.response?.status === 404)
+					return rep.status(304).header('Location', '/?error=oauth2_timeout').send();
+				Logger.error(`Error in /callback route:\n${err}`);
+				return rep.status(304).header('Location', '/?error=unkown').send();
+			});
   });
 }
 
