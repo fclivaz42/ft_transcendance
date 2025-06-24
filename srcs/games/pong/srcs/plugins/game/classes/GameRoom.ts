@@ -61,8 +61,7 @@ export default class GameRoom {
 	public id: string;
 	public players: PlayerSession[] = [];
 	public game: Game;
-	public score: { p1: number; p2: number};
-
+	public score: { p1: number; p2: number };
 
 	constructor(id: string) {
 		this.id = id;
@@ -79,7 +78,7 @@ export default class GameRoom {
 		return this.game;
 	}
 
-	public getScore(): {p1: number, p2: number} {
+	public getScore(): { p1: number, p2: number } {
 		return this.score;
 	}
 

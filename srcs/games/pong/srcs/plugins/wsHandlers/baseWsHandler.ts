@@ -65,13 +65,13 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 			try {
 				const { type, payload }: ClientMessage = JSON.parse(msg.toString());
 				if (type === 'ball' && payload?.direction && payload.direction == "launch") {
-					console.log(`Launch command from ${session.getPaddleId()} | user: ${session.getUserId()}`);
+					// console.log(`Launch command from ${session.getPaddleId()} | user: ${session.getUserId()}`);
 					let ball = session.getRoom()?.getGame().getBall();
 					ball?.launch();
 					ball?.setCurrSpeed(0.25);
 				}
 				else if (type === 'move' && payload?.direction) {
-					console.log(`Move command from ${session.getPaddleId()} | user: ${session.getUserId()}`);
+					// console.log(`Move command from ${session.getPaddleId()} | user: ${session.getUserId()}`);
 					const paddle = session.getPaddle();
 
 					if (paddle) {

@@ -33,7 +33,7 @@ interface BroadcastFunction {
 	(): void;
 }
 
-interface WallMap {
+export interface WallMap {
 	[key: string]: Wall;
 }
 
@@ -140,11 +140,18 @@ export default class Game {
 		this._p1.getMesh().refreshBoundingInfo(true);
 		this._p2.getMesh().refreshBoundingInfo(true);
 		this._ball.getHitbox().refreshBoundingInfo(true);
-		// set ia brut
-		/* this._p2.setAI(true);
-		if (this._p2.getIsIA())
-			this._p2.setBall(this._ball); */
 
+		// set ia brut
+		// this._p1.setAI(true);
+		// if (this._p1.getIsIA()) {
+		// 	this._p1.setBall(this._ball);
+		// 	this._p1.setWalls(this._walls);
+		// }
+		// this._p2.setAI(true);
+		// if (this._p2.getIsIA()) {
+		// 	this._p2.setBall(this._ball);
+		// 	this._p2.setWalls(this._walls);
+		// }
 
 		/* Setting colliders for the paddles and the ball */
 		this._p1.setColliders([this._walls.northWall, this._walls.southWall]);
@@ -189,7 +196,6 @@ export default class Game {
 
 		const southHalf = (south.scaling.y || 1) * (south.getBoundingInfo()?.boundingBox.extendSize.y ?? 0.25);
 		const minY = (south.position.y - southHalf - (-0.5));
-
 		return { minY, maxY };
 	}
 
@@ -215,7 +221,7 @@ export default class Game {
 
 	public score(player: number): void {
 		if (this._room) {
-			this._room.addScore(player); 
+			this._room.addScore(player);
 		}
 	}
 
