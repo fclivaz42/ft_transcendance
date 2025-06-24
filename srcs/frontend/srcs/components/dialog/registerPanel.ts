@@ -5,7 +5,7 @@
 // ==============================
 import { createInfoInput, CustomInputContainer } from '../input/infoInput.js';
 import { createPasswordInput, CustomPasswordInputContainer, checkPasswordStrength } from '../input/createPasswordInput.js';
-import { LoginDialogOptions } from './index.js';
+import { LoginDialogOptions } from './loginDialog.js';
 import { updateFieldAppearance } from '../input/utils.js'; // Chemin vers la fonction générique
 import { createPasswordStrengthList} from '../input/passwordStrengh.js';
 import { i18nHandler } from "../../handlers/i18nHandler.js";

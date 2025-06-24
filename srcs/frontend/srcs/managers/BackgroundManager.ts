@@ -1,9 +1,9 @@
 import { InteractivBubble } from "../components/background/index.js";
+import { mainManager } from "./MainManager.js";
 
 export default class FrameManager {
   public initialize() {
-    const main = document.getElementById("main");
     const frame = InteractivBubble();
-    main?.appendChild(frame);
+		mainManager.main.appendChild(frame);
   }
 }
