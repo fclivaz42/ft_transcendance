@@ -1,8 +1,10 @@
-import SarifDialog from "../class/SarifDialog"
+import BackdropDialog from "../class/BackdropDialog"
+import NotificationDialog from "../class/NotificationDialog";
 
 class ElementHandler {
 	public initialize() {
-		customElements.define("sarif-dialog", SarifDialog, { extends: "dialog" });
+		customElements.define("sarif-dialog", BackdropDialog, { extends: "dialog" });
+		customElements.define("notification-dialog", NotificationDialog, { extends: "dialog" });
 	}
 }
 

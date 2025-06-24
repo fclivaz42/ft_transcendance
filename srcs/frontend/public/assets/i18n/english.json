@@ -74,7 +74,6 @@
       "panelTitle": "Sign in",
       "rememberMe": "Remember me",
       "connexionButton": "Sign in",
-    
       "validation": {
         "usernameRequired": "Please enter your username.",
         "passwordRequired": "Password is required."
@@ -82,6 +81,11 @@
       "link": {
         "subscribePanel": "Create an account!",
         "forgotPasswordPanel": "Forgot password?"
+      },
+      "notification": {
+        "loginErrorTitle": "Login Error",
+        "loginErrorMessage": "An error occurred while trying to log in.",
+        "loginBadCredentials": "Invalid username or password."
       }
     },
     "registerPanel": {
@@ -100,6 +104,12 @@
       },
       "link": {
         "loginPanel": "Already have an account? Login"
+      },
+      "notification": {
+        "registerErrorTitle": "Registration Error",
+        "registerErrorMessage": "An error occurred while trying to register.",
+        "registerCredentialTaken": "This username or email is already taken.",
+        "registerPassMismatch": "The passwords do not match. Please try again."
       }
     },
     "forgotPasswordPanel": {
@@ -113,6 +123,18 @@
       "link": {
         "loginPanel": "Remembered your password? Login"
       }
+    },
+    "updateProfile": {
+      "notification": {
+        "updateErrorTitle": "Profile Update Error",
+        "updateErrorMessage": "An error occurred while trying to update your profile.\nPlease check your details and try again."
+      }
+    }
+  },
+  "notification": {
+    "oauth2": {
+      "callbackError": "Remote login failed",
+      "noSession": "No session found. Please try again."
     }
   }
 }

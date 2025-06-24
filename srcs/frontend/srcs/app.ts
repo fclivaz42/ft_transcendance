@@ -17,14 +17,14 @@ import RoutingHandler from "./handlers/RoutingHandler.js";
 // language initialization
 await i18nHandler.initialize();
 
+// Custom elements initialization
+ElementsHandler.initialize();
+
 // Initialize the routing handler
 RoutingHandler.initialize();
 
 // Initialize main container
 mainManager.initialize();
-
-// Custom elements initialization
-ElementsHandler.initialize();
 
 // Initialize the user handler
 await UserHandler.initialize();

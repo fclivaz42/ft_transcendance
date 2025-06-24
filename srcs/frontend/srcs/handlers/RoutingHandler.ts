@@ -3,7 +3,10 @@ import createHomeFrame from "../components/frame/frameHome";
 import createLeaderboardFrame from "../components/frame/frameLeaderboard";
 import createPongFrame from "../components/frame/framePong";
 import createUserFrame from "../components/frame/frameUser";
+import { NotificationDialogLevel, NotificationDialogLevels, NotificationProps } from "../components/notificationDialog";
 import { frameManager } from "../managers/FrameManager";
+import NotificationManager from "../managers/NotificationManager";
+import { i18nHandler } from "./i18nHandler";
 
 const validRoutes: Record<string, () => HTMLElement> = {
 	"/": createHomeFrame,
@@ -28,8 +31,28 @@ class RoutingHandler {
 		this.displayRoute();
 	}
 
+	displayNotification(props: NotificationProps) {
+		NotificationManager.notify(props);
+	}
+
 	displayRoute(): void {
 		this._searchParams = new URLSearchParams(window.location.search);
+		for(const param of this._searchParams.keys()) {
+			if (NotificationDialogLevels.includes(param as NotificationDialogLevel)) {
+				const message = this._searchParams.get(param) || "No message provided";
+				this._searchParams.delete(param);
+				this.displayNotification({
+					title: i18nHandler.getValue(message.split(";")[0]) || "Notification",
+					message: i18nHandler.getValue(message.split(";")[1]),
+					level: param as NotificationDialogLevel,
+				});
+			}
+		}
+		if (this._searchParams.toString()) 
+			window.history.replaceState({}, "", `${window.location.pathname}?${this._searchParams.toString()}`);
+		else
+			window.history.replaceState({}, "", window.location.pathname);
+
 		frameManager.frame.innerHTML = "";
 		const currentRoute = window.location.pathname;
 		if (validRoutes[currentRoute]) {

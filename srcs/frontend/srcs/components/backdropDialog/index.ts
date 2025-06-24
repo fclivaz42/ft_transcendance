@@ -1,5 +1,5 @@
 import createDialogBackdrop, { dialogBackdropProps } from './backDrop.js';
-import SarifDialog from '../../class/SarifDialog.js';
+import BackdropDialog from '../../class/BackdropDialog.js';
 
 export { createLoginPanel } from './loginPanel.js';
 export { createRegisterPanel } from './registerPanel.js';
@@ -12,7 +12,7 @@ export interface DialogProps {
 
 export function createDialog(props?: DialogProps) {
 	const backdrop = createDialogBackdrop(props as dialogBackdropProps);
-	const dialog = document.createElement("dialog", { is: "sarif-dialog" }) as SarifDialog;
+	const dialog = document.createElement("dialog", { is: "sarif-dialog" }) as BackdropDialog;
   
   if (props?.allowClose) {
 		document.addEventListener("keydown", (e) => {
