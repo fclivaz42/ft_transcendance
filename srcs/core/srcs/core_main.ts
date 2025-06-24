@@ -53,4 +53,4 @@ fastify.listen({ port: 443, host: '::' }, (err) => {
 		fastify.log.error(err)
 		process.exit(1)
 	}
-})
+});

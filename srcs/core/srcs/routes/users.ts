@@ -45,8 +45,17 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 	fastify.all('/register', async (request, reply) => {
 		if (request.method !== 'POST')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only POST method is allowed for registration.' });
-
-		const register = await usersSdk.postRegister(request.body as UserRegisterProps);
+		const register = await usersSdk.postRegister(request.body as UserRegisterProps).catch((err: any) => {
+			if (axios.isAxiosError(err)) {
+				Logger.error(`User registration failed: ${err.message}`);
+				return httpReply({
+					module: 'usermanager',
+					detail: err.response?.data?.detail || 'User registration failed',
+					status: err.response?.status || 500,
+				}, reply, request);
+			}
+			throw err;
+		});
 		UsersSdk.showerCookie(reply, register.data.token, register.data.exp);
 		return reply.code(register.status).send(register.data);
 	});

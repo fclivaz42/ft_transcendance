@@ -10,6 +10,7 @@ import { Logger } from "../../../libs/helpers/loggers.ts";
 import type { Users, UserRegisterOauthProps } from "../../../libs/interfaces/Users.ts";
 import https from "https";
 import UsersSdk from "../../../libs/helpers/usersSdk.ts";
+import crypto from "crypto";
 
 function validateParams(query: OauthCallbackRequest) {
 	if (!query.code) {
@@ -107,21 +108,38 @@ async function updateUser(token: OauthToken, matchingUser: Users | undefined) {
 	if (!token.jwt_decode)
 		throw new Error("Token does not contain jwt_decode");
 
+	const displayName = token.jwt_decode.email.split("@")[0].replace(/[^a-zA-Z0-9]/g, "").substring(0, 9);
 	if (!matchingUser) {
-		// create a new user with OAuth ID
-		const userRegister: UserRegisterOauthProps = {
-			DisplayName: token.jwt_decode.email,
-			EmailAddress: token.jwt_decode.email,
-			Password: "",
-			OAuthID: token.jwt_decode.subject,
-		};
-		await axios.post<Users>("http://db:3000/Players", userRegister, {
-			headers: {
-				"Authorization": process.env.API_KEY || "",
-				"Content-Type": "application/json",
-			},
-			httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-		});
+		const maxTry = 10;
+		for (let i = 0; i < maxTry; i++) {
+			const uniqueSuffix = crypto.randomBytes(4).toString('hex').substring(0, 13 - displayName.length);
+			// create a new user with OAuth ID
+			const userRegister: UserRegisterOauthProps = {
+				DisplayName: `${displayName}.${uniqueSuffix}`,
+				EmailAddress: token.jwt_decode.email,
+				Password: "",
+				OAuthID: token.jwt_decode.subject,
+			};
+			try {
+				await axios.post<Users>("http://db:3000/Players", userRegister, {
+					headers: {
+						"Authorization": process.env.API_KEY || "",
+						"Content-Type": "application/json",
+					},
+					httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+				});
+				break; // if user is created successfully
+			} catch (error) {
+				if (error.response && error.response.status === 409) {
+					// Brute force if already exists
+					userRegister.DisplayName = `${displayName}${i}`;
+					if (i === maxTry - 1)
+						throw new Error("Failed to create user after multiple attempts");
+					continue;
+				} else
+					throw new Error("Failed to create user");
+			}
+		}
 	} else if (!matchingUser.OAuthID) {
 		// update user by email with OAuth ID
 		const updateUser: Partial<Users> = {
