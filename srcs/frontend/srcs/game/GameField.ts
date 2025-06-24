@@ -9,11 +9,7 @@ import { Paddle } from "./game_components/Paddle.js";
 import { Wall } from "./game_components/Wall.js";
 
 import { InitPayload, UpdatePayload, CameraInitInfo, LightInitInfo } from "./types.js";
-<<<<<<< HEAD
-import { MeshBuilder } from "@babylonjs/core";
-=======
 import { GlowLayer } from "@babylonjs/core";
->>>>>>> origin
 
 // Temp values, overriding WebSocket info
 const ALPHA: number = Math.PI / 2;

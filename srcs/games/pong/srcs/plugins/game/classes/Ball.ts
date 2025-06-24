@@ -130,17 +130,17 @@ export default class Ball {
 	}
 
 	public update(fps: number): void {
-		console.log(`Player bounces: ${this._playerBounces}`);
+		// console.log(`Player bounces: ${this._playerBounces}`);
 		if (this._playerBounces > 1
 			&& this._playerBounces % 4 === 0
 			&& this._playerBounces !== this._lastSpeedIncreaseBounce
 			&& this._currSpeed < this._maxSpeed) {
 			this._currSpeed += 0.025;
 			this._lastSpeedIncreaseBounce = this._playerBounces;
-			console.log("INCREASING SPEED MOD!");
+			// console.log("INCREASING SPEED MOD!");
 		}
 		this._hitbox.position.addInPlace(this.direction.scale(this._currSpeed));
-		console.log(`ball curr_speed: ${this._currSpeed}`);
+		// console.log(`ball curr_speed: ${this._currSpeed}`);
 
 		// add launch control option
 
