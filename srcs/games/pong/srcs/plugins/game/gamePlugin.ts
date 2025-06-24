@@ -4,17 +4,16 @@ import fastifyPlugin from "fastify-plugin";
 import GameClass from "./classes/GameClass.ts";
 
 declare module "fastify" {
-    interface FastifyInstance {
-        game: GameClass;
-    }
+	interface FastifyInstance {
+		game: GameClass;
+	}
 }
 
 const gamePlugin: FastifyPluginAsync = async (
-    fastify: FastifyInstance
+	fastify: FastifyInstance
 ) => {
-    const game: GameClass = new GameClass();
-    fastify.decorate("game", game);
-    game.gameStart(30);
+	const game: GameClass = new GameClass();
+	fastify.decorate("game", game);
 }
 
 export default fastifyPlugin(gamePlugin);

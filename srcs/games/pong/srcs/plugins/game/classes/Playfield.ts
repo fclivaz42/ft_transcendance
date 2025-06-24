@@ -15,7 +15,7 @@ import {
 const WIDTH: number = 512;
 const HEIGHT: number = 256;
 
-const DEFAULT_FPS: number = 30;
+export const DEFAULT_FPS: number = 60;
 
 const ALPHA: number = Math.PI / 2;
 const BETA: number = Math.PI / 2;
@@ -34,7 +34,7 @@ export interface LightInitInfo {
 }
 
 interface Updatable {
-	update(): void;
+	update(fps: number): void;
 }
 
 
@@ -46,9 +46,10 @@ export default class PlayField {
 	private _camera: ArcRotateCamera;
 	private _light: HemisphericLight;
 	private _bg: Mesh;
+	private static _fps: number = 0;
 
 	constructor() {
-		
+
 		this._engine.setSize(WIDTH, HEIGHT);
 		this._scene = new Scene(this._engine);
 		this._camera = this._setupCamera();
@@ -74,7 +75,7 @@ export default class PlayField {
 	}
 
 	private _setupBackground(): Mesh {
-		const bg = MeshBuilder.CreatePlane("bg", {size: 30}, this._scene);
+		const bg = MeshBuilder.CreatePlane("bg", { size: 30 }, this._scene);
 		const bgMaterial = new StandardMaterial("bgMat", this._scene);
 		bgMaterial.diffuseColor = Color3.Blue();
 		bg.material = bgMaterial;
@@ -94,7 +95,7 @@ export default class PlayField {
 			name: this.getCamera().name,
 			position: this.getCamera().position.asArray(),
 			target: this.getCamera().target.asArray(),
-		
+
 			mode: this.getCamera().mode,
 		};
 		return initInfo;
@@ -118,15 +119,16 @@ export default class PlayField {
 		}
 	}
 
-	public start(fps: number = DEFAULT_FPS, broadCast?: () => void ): void {
+	public start(fps: number = DEFAULT_FPS, broadCast?: () => void): void {
 		if (this._intervalId !== null) {
 			this.stop();
 		}
 		const frameTime = 1000 / fps;
 		this._intervalId = setInterval(() => {
 			for (const obj of this._updatables) {
-				obj.update();
+				obj.update(PlayField._fps);
 			}
+			PlayField._fps < 60 ? PlayField._fps++ : PlayField._fps = 0;
 			if (broadCast) broadCast();
 			this._scene.render();
 		}, frameTime);

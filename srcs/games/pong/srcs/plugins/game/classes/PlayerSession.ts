@@ -22,16 +22,16 @@ export default class PlayerSession {
 		this._paddleId = null;
 	}
 
-	public getSocket(): WebSocket 						{ return this._socket; }
-	public getUserId(): string | null 					{ return this._userId; }
-	public isReady(): boolean 							{ return this._playerReady; }
-	public getPaddleId(): string | null 				{ return this._paddleId; }
-	public getRoom(): GameRoom | null 					{ return this._room; }
-	
-	public setReady(ready: boolean): void 				{ this._playerReady = ready; }
-	public setRoom(room: GameRoom | null): void 		{ this._room = room; }
-	public setPaddleId(paddleId: string | null): void 	{ this._paddleId = paddleId; }
-	
+	public getSocket(): WebSocket { return this._socket; }
+	public getUserId(): string | null { return this._userId; }
+	public isReady(): boolean { return this._playerReady; }
+	public getPaddleId(): string | null { return this._paddleId; }
+	public getRoom(): GameRoom | null { return this._room; }
+
+	public setReady(ready: boolean): void { this._playerReady = ready; }
+	public setRoom(room: GameRoom | null): void { this._room = room; }
+	public setPaddleId(paddleId: string | null): void { this._paddleId = paddleId; }
+
 	public getPaddle(): Paddle | null {
 		const room = this.getRoom();
 		if (!room) return null;
@@ -43,7 +43,7 @@ export default class PlayerSession {
 		if (this._paddleId === "p2") return p2;
 		return null;
 	}
-	
+
 	public send(message: OutgoingMessage): void {
 		try {
 			this._socket.send(JSON.stringify(message));
