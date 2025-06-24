@@ -6,7 +6,7 @@
 // ==============================
 import { createInfoInput, CustomInputContainer } from '../input/infoInput.js';
 import { createPasswordInput, CustomPasswordInputContainer } from '../input/createPasswordInput.js';
-import { LoginDialogOptions } from './index.js';
+import { LoginDialogOptions } from './loginDialog.js';
 import { updateFieldAppearance } from '../input/utils.js'; 
 import { i18nHandler } from "../../handlers/i18nHandler.js";
 

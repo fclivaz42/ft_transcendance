@@ -332,6 +332,12 @@ class UsersSdk {
 		}
 		return output;
 	}
+
+	public async updateUser(userId: string, data: Partial<Users>): Promise<AxiosResponse<Users>> {
+		return this.apiRequest<Users>("put", userId, {
+			data,
+		});
+	}
 }
 
 export default UsersSdk;

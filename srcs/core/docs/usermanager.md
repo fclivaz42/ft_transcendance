@@ -10,6 +10,7 @@ This document provides information about the internal Usermanager module's API u
 - [`GET /users/me`](#get-users-me)
 - [`POST /users/login`](#get-users-login)
 - [`POST /users/register`](#get-users-login)
+- [`GET /users/logout`](#get-users-logout)
 - [`POST /users/oauthLogin`](#get-users-login)
 - [`GET /users/:uuid`](#get-users-uuid)
 - [`POST /users`](#post-users)
@@ -181,6 +182,17 @@ Validates the user's JWT token and returns the user information if valid.
 | Field   | Type   | Description                                                                |
 | ------- | ------ | -------------------------------------------------------------------------- |
 | `token` | string | The JWT token that the user can use for subsequent authenticated requests. |
+
+## `GET /users/logout`
+Logs out the user by invalidating their JWT token.
+
+### Example Response:
+
+```json
+{
+  "message": "User logged out successfully."
+}
+```
 
 ## `POST /users/oathLogin`
 

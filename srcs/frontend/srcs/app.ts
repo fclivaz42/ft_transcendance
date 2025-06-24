@@ -1,49 +1,49 @@
 import { i18nHandler } from "./handlers/i18nHandler.js";
-import FrameManager from "./managers/FrameManager.js";
-import HeaderManager from "./managers/HeaderManager.js";
-import NavbarManager from "./managers/NavbarManager.js";
-import UserMenuManager from "./managers/UserMenuManager.js";
-import DarkmodeManager from "./handlers/DarkmodeHandler.js";
+import { frameManager } from "./managers/FrameManager.js";
+import { headerManager } from "./managers/HeaderManager.js";
+import { navbarManager } from "./managers/NavbarManager.js";
+import { userMenuManager } from "./managers/UserMenuManager.js";
+import { darkmodeManager } from "./handlers/DarkmodeHandler.js";
 import BackgroundManager from "./managers/BackgroundManager.js";
-import { startGame } from "./game/GameLaunch.js";
 import HomeManager from "./managers/HomeManager.js";
+import ElementsHandler from "./handlers/ElementsHandler.js";
+import UserHandler from "./handlers/UserHandler.js";
+import { mainManager } from "./managers/MainManager.js";
+import RoutingHandler from "./handlers/RoutingHandler.js";
 
 
 // some rework is needed to make the code more readable and maintainable
 
+// language initialization
+await i18nHandler.initialize();
+
+// Initialize the routing handler
+RoutingHandler.initialize();
+
 // Initialize main container
-const app = document.getElementById("app");
-const main = document.createElement("div");
-main.className = "flex flex-grow h-full w-full";
-main.id = "main";
-app?.appendChild(main);
+mainManager.initialize();
 
-// Initialize i18nHandler (language handler)
-await i18nHandler.initialize().finally(() => {
-	// Initialize dark mode
-	const darkmodeManager = new DarkmodeManager();
-	darkmodeManager.initialize();
+// Custom elements initialization
+ElementsHandler.initialize();
 
-	// Initialize header
-	const headerManager = new HeaderManager();
-	headerManager.initialize();
+// Initialize the user handler
+await UserHandler.initialize();
 
-	// Initialize the managers
-	const navbarManager = new NavbarManager();
-	navbarManager.initialize();
+darkmodeManager.initialize();
 
-	// const backgroundManager = new BackgroundManager();
-	// backgroundManager.initialize();
+// Initialize components
+headerManager.initialize();
+navbarManager.initialize();
 
-	// // WARN: freeze le site
-	// const homeManager = new HomeManager(); // NOUVEAU: Instanciez le HomeManager
-	// homeManager.initialize(main); // Passez 'main' comme parent pour la page d'accueil
+// const backgroundManager = new BackgroundManager();
+// backgroundManager.initialize();
 
-	const frameManager = new FrameManager();
-	frameManager.initialize();
-	const userMenuManager = new UserMenuManager();
-	userMenuManager.initialize();
+// // WARN: freeze le site
+// const homeManager = new HomeManager(); // NOUVEAU: Instanciez le HomeManager
+// homeManager.initialize(main); // Passez 'main' comme parent pour la page d'accueil
 
-	// note that the loginDialogManager is not initialized here, it is initialized on its own when needed (e.g., when the login button is clicked)
-	// this should be the case for all dialog managers, as they are only needed when the user interacts with the UI
-});
+frameManager.initialize();
+userMenuManager.initialize();
+
+// note that the loginDialogManager is not initialized here, it is initialized on its own when needed (e.g., when the login button is clicked)
+// this should be the case for all dialog managers, as they are only needed when the user interacts with the UI

@@ -1,4 +1,4 @@
-export default class DarkmodeManager {
+class DarkmodeManager {
   public initialize(): void {
     const darkModeSetting = localStorage.getItem("darkMode");
     if (darkModeSetting) {
@@ -14,3 +14,5 @@ export default class DarkmodeManager {
     }
   }
 }
+
+export const darkmodeManager = new DarkmodeManager();

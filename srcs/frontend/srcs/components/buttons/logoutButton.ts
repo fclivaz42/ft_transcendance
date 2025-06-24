@@ -1,4 +1,5 @@
 import { i18nHandler } from "../../handlers/i18nHandler.js";
+import UserHandler from "../../handlers/UserHandler.js";
 import { createButton } from "./index.js";
 
 export function createLogoutButton(): HTMLElement {
@@ -9,11 +10,11 @@ export function createLogoutButton(): HTMLElement {
     color: "bg-red-100",
 		darkColor: "dark:bg-red-400",
 		f: () => {
-			fetch("/users/logout", {
+			fetch("/api/users/logout", {
 				method: "GET",
 			}).then((response) => {
 				if (response.ok)
-					window.location.reload();
+					UserHandler.fetchUser();
 			});
 		},
     id: "logoutButton",

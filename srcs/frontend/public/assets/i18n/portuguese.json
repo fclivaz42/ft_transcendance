@@ -1,13 +1,19 @@
 {
-  
   "home": {
+    "title": "Bem-vindo ao SARIF's Pong",
     "guestButton": {
       "label": "Jogar como convidado"
     },
     "accountButton": {
       "label": "Usar uma conta"
     }
-},
+  },
+  "leaderboard": {
+    "title": "Classificação"
+  },
+  "history": {
+    "title": "Histórico"
+  },
   "header": {
     "usermenu": {
       "login": "Iniciar sessão",
@@ -16,6 +22,9 @@
     }
   },
   "navbar": {
+    "home": {
+      "label": "Início"
+    },
     "pong": {
       "label": "Pong",
       "title": "Jogo Pong",

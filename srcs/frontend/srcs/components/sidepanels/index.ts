@@ -35,7 +35,7 @@ export function createSidePanelTitle(props: TitleProps): HTMLElement {
 	titleElement.className = "text-lg font-bold text-gray-700 dark:text-gray-100";
 	titleElement.textContent = props.title;
 	if (props.i18n)
-		titleElement.setAttribute("i18n", props.i18n);
+		titleElement.setAttribute("data-i18n", props.i18n);
 	return titleElement;
 }
 

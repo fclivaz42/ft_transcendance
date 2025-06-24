@@ -4,7 +4,7 @@ import { ServerMessage, InitPayload, UpdatePayload } from "./types.js";
 type InitHandler = (payload: InitPayload["payload"]) => void;
 type UpdateHanlder = (payload: UpdatePayload["payload"]) => void;
 
-const HOST: string = `wss://${location.host}/game/remote`
+const HOST: string = `wss://${location.host}/api/game/remote`
 export class WebSocketManager {
 	private socket: WebSocket;
 
