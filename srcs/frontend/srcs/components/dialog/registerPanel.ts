@@ -43,7 +43,7 @@ export function createRegisterPanel(options: LoginDialogOptions) {
     if (value === '') {
       isValid = false;
       errorMessage = i18nHandler.getValue("panel.registerPanel.validation.usernameRequired");
-    } else if (value.length < 3) {
+    } else if (value.length < 3 || value.length > 14) {
       isValid = false;
       errorMessage = i18nHandler.getValue("panel.registerPanel.validation.lenghtError");
     } else if (!/^[a-zA-Z0-9_]+$/.test(value)) {

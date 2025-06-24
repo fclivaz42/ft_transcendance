@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import { httpReply } from '../../handlers/HttpResponse.ts';
+import { httpReply } from '../../../../libs/helpers/httpResponse.ts';
 import { jwt } from '../../managers/JwtManager.ts';
 import checkRequestAuthorization from '../../managers/AuthorizationManager.ts';
 import axios from 'axios';
@@ -11,7 +11,11 @@ export default async function usersAuthorizeEndpoint(app: FastifyInstance, opts:
 		if (req)
 			return req;
 		if (!request.headers["x-jwt-token"])
-			return httpReply(reply, request, 401, "X-JWT-Token header is missing");
+			return httpReply({
+				detail: "X-JWT-Token header is missing",
+				status: 400,
+				module: "usermanager",
+			}, reply, request);
 
 		const XJWTToken = request.headers["x-jwt-token"].toString();
 
@@ -20,13 +24,25 @@ export default async function usersAuthorizeEndpoint(app: FastifyInstance, opts:
 			if (jwtToken.error === 'JWT token has expired'
 				|| jwtToken.error === 'Invalid JWT signature'
 				|| jwtToken.error === 'Invalid JWT issuer')
-				return httpReply(reply, request, 403, "Forbidden: " + jwtToken.error);
-			return httpReply(reply, request, 401, "Invalid JWT token");
+				return httpReply({
+					detail: jwtToken.error,
+					status: 401,
+					module: "usermanager",
+				}, reply, request);
+			return httpReply({
+				detail: "Invalid JWT token",
+				status: 401,
+				module: "usermanager",
+			}, reply, request);
 		}
 
 		// TODO: Replace db axios with sdk call
 		if (!jwtToken.payload)
-			return httpReply(reply, request, 401, "JWT token payload is missing");
+			return httpReply({
+				detail: "JWT token payload is missing",
+				status: 401,
+				module: "usermanager",
+			}, reply, request);
 		// Check if the user exists in the database
 		try {
 			await axios.get(`http://db:3000/Players/id/${jwtToken.payload.sub}`, {
@@ -37,7 +53,11 @@ export default async function usersAuthorizeEndpoint(app: FastifyInstance, opts:
 				httpsAgent: new https.Agent({ rejectUnauthorized: false }),
 			});
 		} catch (err) {
-			return httpReply(reply, request, 401, "Invalid JWT token: User not found");
+			return httpReply({
+				detail: "User not found",
+				status: 404,
+				module: "usermanager",
+			}, reply, request);
 		}
 		return reply.send({ ...jwtToken.payload });
 	});
