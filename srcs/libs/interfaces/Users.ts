@@ -4,11 +4,12 @@ export interface Users {
 	EmailAddress: string,
 	Password: string,
 	OAuthID?: string,
-	FriendsList?: string,
+	FriendsList?: Array<string>,
 	PhoneNumber?: string,
 	FirstName?: string,
 	FamilyName?: string,
 	Bappy?: number,
+	Private?: number
 };
 
 export interface UserLoginProps {

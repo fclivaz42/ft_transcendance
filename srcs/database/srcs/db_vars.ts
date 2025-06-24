@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/22 19:12:38 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/24 19:06:00 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -88,21 +88,21 @@ const PlayersTable: db_table =
 	"Methods": {
 		"GET": [
 			"/multiget",
-			"/id/:PlayerID",
-			"/oauth/:OAuthID",
-			"/username/:DisplayName",
-			"/email/:EmailAddress"
+			"/PlayerID/:PlayerID",
+			"/OAuthID/:OAuthID",
+			"/DisplayName/:DisplayName",
+			"/EmailAddress/:EmailAddress"
 		],
 		"POST": [
 			""
 		],
 		"DELETE": [
-			"/id/:PlayerID",
-			"/username/:DisplayName",
-			"/email/:EmailAddress"
+			"/PlayerID/:PlayerID",
+			"/DisplayName/:DisplayName",
+			"/EmailAddress/:EmailAddress"
 		],
 		"PUT": [
-			"/id/:PlayerID",
+			"/PlayerID/:PlayerID",
 		]
 	},
 	"Identification": {
@@ -137,8 +137,8 @@ const MatchesTable: db_table =
 	"Methods": {
 		"GET": [
 			"/multiget",
-			"/search/:PlayerID",
-			"/id/:MatchID",
+			"/PlayerID/:PlayerID",
+			"/MatchID/:MatchID",
 		],
 		"POST": [
 			""
@@ -163,7 +163,7 @@ const TournamentsTable: db_table =
 	],
 	"Methods": {
 		"GET": [
-			"/id/:TournamentID",
+			"/TournamentID/:TournamentID",
 		],
 		"POST": [
 			""

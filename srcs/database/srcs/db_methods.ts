@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/23 01:29:11 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/24 20:42:04 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -99,7 +99,7 @@ export default class DatabaseWorker {
 		} finally {
 			db.close()
 		}
-		return JSON.stringify(retobj);
+		return retobj;
 	}
 
 	//

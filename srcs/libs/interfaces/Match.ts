@@ -1,4 +1,5 @@
 export interface Match {
+	MatchID?: string,
 	WPlayerID: string,
 	LPLayerID: string,
 	WScore: number,
