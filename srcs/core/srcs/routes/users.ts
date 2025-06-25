@@ -1,10 +1,10 @@
-import axios from "axios";
-import type { FastifyInstance, FastifyPluginOptions, FastifyReply } from 'fastify'
+import axios from 'axios';
+import type { AxiosResponse } from "axios";
+import type { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import UsersSdk from '../../../libs/helpers/usersSdk.ts';
 import type { UserLoginProps, UserRegisterProps, User, UserWithPicture } from '../../../libs/interfaces/User.ts';
 import Logger from "../../../libs/helpers/loggers.ts";
 import { httpReply } from "../../../libs/helpers/httpResponse.ts";
-import type { Multipart } from "@fastify/multipart";
 
 const usersSdk = new UsersSdk();
 
@@ -79,28 +79,54 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 		const userId = authorization.data.sub;
-		const data = await request.file() as Multipart
-		if (!data) {
+		const formdata = new FormData();
+		for await (const part of request.parts()) {
+			if (part.type === "file") {
+				if (formdata.keys.length !== 0)
+					continue;
+				if (part.mimetype.includes("image/")) {
+					const chunks: Uint8Array[] = [];
+					const file = part.file;
+					for await (const chunk of file)
+						chunks.push(chunk);
+					const buffer = Buffer.concat(chunks);
+					formdata.append("file", new File([buffer], part.filename, { type: part.mimetype}));
+				}
+				continue;
+			}
+
+			switch (part.fieldname) {
+				case "DisplayName":
+					formdata.append("DisplayName", part.value as string);
+					break;
+				case "EmailAddress":
+					formdata.append("EmailAddress", part.value as string);
+					break;
+				case "Password":
+					formdata.append("Password", part.value as string);
+					break;
+			}
+		}
+		if (![...formdata.entries()].length) {
 			return httpReply({
 				module: 'usermanager',
 				detail: 'No user data provided for update.',
 				status: 400,
 			}, reply, request);
 		}
-		if (data.fields.PlayerID)
-			return httpReply({
-				module: 'usermanager',
-				detail: 'PlayerID cannot be updated.',
-				status: 400,
-			}, reply, request);
-		const resp = await usersSdk.updateUser(userId, data)
-			.catch(err => { console.dir(err) })
-		if (resp.status >= 400) {
-			return httpReply({
-				module: 'usermanager',
-				detail: `Failed to update user data: ${resp.statusText}`,
-				status: resp.status,
-			}, reply, request);
+		let resp: AxiosResponse<User> | undefined;
+		try {
+			resp = await usersSdk.updateUser(userId, formdata);
+		} catch (err) {
+			if (axios.isAxiosError(err)) {
+				Logger.error(`User update failed: ${err.message}`);
+				return httpReply({
+					module: 'usermanager',
+					detail: err.response?.data?.detail || 'User update failed',
+					status: err.response?.status || 500,
+				}, reply, request);
+			}
+			throw err;
 		}
 		reply.code(resp.status).send(usersSdk.filterUserData(resp.data));
 	});

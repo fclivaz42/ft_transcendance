@@ -335,19 +335,10 @@ class UsersSdk {
 		return output;
 	}
 
-	public async updateUser(userId: string, data: Multipart): Promise<AxiosResponse<User>> {
+	public async updateUser(userId: string, data: FormData): Promise<AxiosResponse<User>> {
 		console.log("requesting...")
-		let send_data = new FormData(data);
-		for (const item in data.fields) {
-			console.log("-------------------------------------------------------")
-			if ((data.fields[item] as any).value) {
-				console.log(`added ${item}`)
-				send_data.append(item, (data.fields[item] as any).value)
-			}
-			console.log((data.fields[item] as any).value)
-		}
 		return this.apiRequest<User>("put", userId, {
-			data: send_data,
+			data
 		});
 	}
 }
