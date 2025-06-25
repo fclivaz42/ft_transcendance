@@ -5,6 +5,7 @@ type InitHandler = (payload: InitPayload["payload"]) => void;
 type UpdateHanlder = (payload: UpdatePayload["payload"]) => void;
 
 const HOST: string = `wss://${location.host}/api/game/remote`
+
 export class WebSocketManager {
 	private socket: WebSocket;
 
@@ -25,6 +26,14 @@ export class WebSocketManager {
 						direction: "up"
 					}
 				}))
+			}
+			else if (event.key === 's') {
+				this.socket.send(JSON.stringify({
+					type: "move",
+					payload: {
+						direction: "down"
+					}
+				}))
 			};
 		});
 
@@ -36,23 +45,8 @@ export class WebSocketManager {
 						direction: "stop"
 					}
 				}))
-			};
-		});
-
-		window.addEventListener('keydown', (event) => {
-			if (event.key === 's') {
-				this.socket.send(JSON.stringify({
-					type: "move",
-					payload: {
-						direction: "down"
-					}
-				}))
-			};
-		});
-
-
-		window.addEventListener('keyup', (event) => {
-			if (event.key === 's') {
+			}
+			else if (event.key === 's') {
 				this.socket.send(JSON.stringify({
 					type: "move",
 					payload: {
@@ -71,6 +65,22 @@ export class WebSocketManager {
 					}
 				}))
 			}
+			else if (event.key === 'o') {
+				this.socket.send(JSON.stringify({
+					type: "ia",
+					payload: {
+						direction: "p1"
+					}
+				}))
+			}
+			else if (event.key === 'p') {
+				this.socket.send(JSON.stringify({
+					type: "ia",
+					payload: {
+						direction: "p2"
+					}
+				}))
+			};
 		});
 
 		this.socket.onmessage = (event) => {

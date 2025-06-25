@@ -97,7 +97,7 @@ export default class Game {
 		this._p1 = new Paddle(
 			this._scene,
 			"player1",
-			new Vector3(-13.0, 0, 0), {
+			new Vector3(-12.5, 0, 0), {
 			color: Color3.White(),
 			speed: PADDLE_SPEED,
 			height: PLAYER_HEIGHT,
@@ -110,7 +110,7 @@ export default class Game {
 		this._p2 = new Paddle(
 			this._scene,
 			"player2",
-			new Vector3(13.0, 0, 0), {
+			new Vector3(12.5, 0, 0), {
 			color: Color3.White(),
 			speed: PADDLE_SPEED,
 			height: PLAYER_HEIGHT,
@@ -141,23 +141,14 @@ export default class Game {
 		this._p2.getMesh().refreshBoundingInfo(true);
 		this._ball.getHitbox().refreshBoundingInfo(true);
 
+		// set ball and walls
+		this._p1.setBall(this._ball);
+		this._p1.setWalls(this._walls);
+		this._p2.setBall(this._ball);
+		this._p2.setWalls(this._walls);
+
 		if (vsAI)
 			this._p2.setAI(true);
-			if (this._p2.getIsIA()) {
-				this._p2.setBall(this._ball);
-				this._p2.setWalls(this._walls);
-			}
-		// set ia brut
-		// this._p1.setAI(true);
-		// if (this._p1.getIsIA()) {
-		// 	this._p1.setBall(this._ball);
-		// 	this._p1.setWalls(this._walls);
-		// }
-		// this._p2.setAI(true);
-		// if (this._p2.getIsIA()) {
-		// 	this._p2.setBall(this._ball);
-		// 	this._p2.setWalls(this._walls);
-		// }
 
 		/* Setting colliders for the paddles and the ball */
 		this._p1.setColliders([this._walls.northWall, this._walls.southWall]);
@@ -171,6 +162,14 @@ export default class Game {
 			this._p2,
 		]);
 	};
+
+	public setP1IA(isAI: boolean) {
+		this._p1.setAI(isAI);
+	}
+
+	public setP2IA(isAI: boolean) {
+		this._p2.setAI(isAI);
+	}
 
 	/* Methods */
 	public getBall(): Ball {

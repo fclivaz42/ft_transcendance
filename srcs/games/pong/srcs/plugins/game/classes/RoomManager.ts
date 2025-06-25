@@ -38,8 +38,8 @@ export default class RoomManager {
 	}
 
 	private _generateRoomId(): string {
-		const letters = Array.from({length: 2}, () => this._generateRandomLetter());
-		const numbers = Array.from({length: 2}, () => this._generateRandomNumber().toString());
+		const letters = Array.from({ length: 2 }, () => this._generateRandomLetter());
+		const numbers = Array.from({ length: 2 }, () => this._generateRandomNumber().toString());
 		return this._shuffle(letters.concat(numbers)).join('');
 	}
 
@@ -61,7 +61,7 @@ export default class RoomManager {
 	}
 
 	public assignPlayer(socket: WebSocket, options: AssignPlayerOptions): PlayerSession {
-		const { userId, mode = 'remote', roomId = null } = options;
+		const { userId, mode, roomId = null } = options;
 		const session = new PlayerSession(socket, userId);
 
 		let room: GameRoom | undefined;

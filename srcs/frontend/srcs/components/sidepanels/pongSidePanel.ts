@@ -16,7 +16,7 @@ export function createPongSidePanel() {
 		title: i18nHandler.getValue("navbar.pong.submenu.play"),
 		i18n: "navbar.pong.submenu.play",
 		logo: buttonLogo,
-		f: () =>  {
+		f: () => {
 			RoutingHandler.setRoute("/pong");
 			startGame(`wss://${location.host}/api/game/remote`)
 		},

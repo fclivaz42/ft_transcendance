@@ -100,6 +100,16 @@ export default class GameRoom {
 		}
 	}
 
+	public addPlayerIA(playerSession: PlayerSession): void {
+		this.players.push(playerSession);
+		playerSession.setRoom(this);
+
+		playerSession.setPaddleId('p2');
+		this.game.setP2IA(true);
+
+		this.startGame();
+	}
+
 	public addScore(player: number) {
 		player === 1 ? this.score.p1++ : this.score.p2++;
 	}
