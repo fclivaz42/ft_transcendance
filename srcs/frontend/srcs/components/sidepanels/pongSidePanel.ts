@@ -1,7 +1,6 @@
 import { createSidePanel, createSidePanelButton } from "./index.js";
 
 import { i18nHandler } from "../../handlers/i18nHandler.js";
-import { startGame } from "../../game/GameLaunch.js";
 import RoutingHandler from "../../handlers/RoutingHandler.js";
 
 export function createPongSidePanel() {
@@ -10,26 +9,20 @@ export function createPongSidePanel() {
 		i18n: "navbar.pong.title"
 	});
 	sidePanel.id = "pongSidePanel";
-	const buttonLogo = "./assets/ui/login-door-1-svgrepo-com.svg";
+	const buttonLogo = "/assets/ui/login-door-1-svgrepo-com.svg";
 
 	sidePanel.appendChild(createSidePanelButton({
 		title: i18nHandler.getValue("navbar.pong.submenu.play"),
 		i18n: "navbar.pong.submenu.play",
 		logo: buttonLogo,
-		f: () => {
-			RoutingHandler.setRoute("/pong");
-			startGame(`wss://${location.host}/api/game/remote`)
-		},
+		f: () => RoutingHandler.setRoute("/pong"),
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
 		title: i18nHandler.getValue("navbar.pong.submenu.solo"),
 		i18n: "navbar.pong.submenu.solo",
 		logo: buttonLogo,
-		f: () => {
-			RoutingHandler.setRoute("/pong");
-			startGame(`wss://${location.host}/api/game/computer`);
-		}
+		f: () => RoutingHandler.setRoute("/pong?mode=solo"),
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({

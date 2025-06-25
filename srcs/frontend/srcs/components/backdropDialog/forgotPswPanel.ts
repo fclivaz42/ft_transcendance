@@ -92,7 +92,7 @@ export function createForgotPasswordPanel(options: LoginDialogOptions) {
 
   // L'icône ouverte commence le plus à GAUCHE possible, hors du viewport
   const mailOpenIcon = document.createElement("img");
-  mailOpenIcon.src = "./assets/ui/mail-open.svg";
+  mailOpenIcon.src = "/assets/ui/mail-open.svg";
   mailOpenIcon.alt = "Mail envoyé";
   mailOpenIcon.className = `
     absolute w-10 h-10
@@ -102,7 +102,7 @@ export function createForgotPasswordPanel(options: LoginDialogOptions) {
 
   // L'icône fermée est initialement à la même position de départ, mais cachée
   const mailClosedIcon = document.createElement("img");
-  mailClosedIcon.src = "./assets/ui/mail-open.svg";
+  mailClosedIcon.src = "/assets/ui/mail-open.svg";
   mailClosedIcon.alt = "Mail envoyé";
   mailClosedIcon.className = `
     absolute w-10 h-10

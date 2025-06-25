@@ -9,6 +9,10 @@ class FrameManager {
 	public get frame(): HTMLElement {
 		return this._frame;
 	}
+	public set frameChild(value: HTMLElement) {
+		this.frame.innerHTML = "";
+		this.frame.appendChild(value);
+	}
 }
 
 export const frameManager = new FrameManager();
