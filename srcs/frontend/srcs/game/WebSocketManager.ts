@@ -80,4 +80,8 @@ export class WebSocketManager {
 			console.log("[WS] Closed connection");
 		}
 	}
+
+	public get socketInstance() {
+		return this.socket;
+	}
 }
