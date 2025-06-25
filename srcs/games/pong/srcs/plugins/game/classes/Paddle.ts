@@ -269,7 +269,6 @@ export default class Paddle {
 		// console.log(`fps: ${fps}`);
 		if (fps === 1) {
 			let tmp: Vector3 | undefined = this._ball?.getHitbox().position.clone();
-			console.log(`${this._ball}`);
 			if (tmp === undefined)
 				return;
 			Paddle._ballPos = tmp;
