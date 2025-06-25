@@ -14,18 +14,24 @@ function serveFront(request: FastifyRequest, reply: FastifyReply) {
 	
 	if (filePath.endsWith('/'))
 		filePath += 'index.html';
-	let data: string | undefined;
+	let data: string | Buffer | undefined = undefined;
 	try {
-		data = fs.readFileSync(filePath, "utf-8");
+		data = fs.readFileSync(filePath);
 	} catch (err) {
 		Logger.warn(`File not found: ${filePath}`);
 	}
 	if (!data) {
-		reply.code(404).type("text/html").send("<style>body {background-color: black; color: white;}</style><h1>404 Not Found</h1><p>The requested resource could not be found.</p><p>Sarifcore Webserver</p>");
+		data = fs.readFileSync(path.join(staticPath, 'index.html'));
+		if (!data) {
+			reply.code(404).send('File not found');
+			Logger.error(`Failed to serve file: ${filePath}`);
+			return;
+		}
+		Logger.warn(`Serving default index.html for missing file: ${filePath}`);
+		reply.code(404).type('text/html').send(data);
 		return;
 	}
 	return reply.headers({
-		'Cache-Control': 'public, max-age=3600, immutable',
 	}).type(getMimeType(filePath)).send(data);
 }
 

@@ -3,7 +3,6 @@ import { PONG_HOST } from "../../game/WebSocketManager";
 import { i18nHandler } from "../../handlers/i18nHandler";
 import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler from "../../handlers/UserHandler";
-import NotificationManager from "../../managers/NotificationManager";
 import createUserAvatar from "../usermenu/userAvatar";
 
 export function createPongCanvas(): HTMLDivElement {
@@ -51,13 +50,7 @@ export function createPongLoading(): HTMLDivElement {
 	`;
 	const loadingContainer = template.content.firstElementChild as HTMLDivElement;
 		if (!UserHandler.isLogged) {
-			NotificationManager.notify({
-				level: "error",
-				title: i18nHandler.getValue("pong.error"),
-				message: i18nHandler.getValue("pong.errorNotLogged"),
-			});
-			RoutingHandler.setRoute("/");
-			throw new Error("User not logged in");
+			throw new Error("notification.user.notLogged");
 		}
 
 		let url: URL | undefined;
@@ -75,9 +68,10 @@ export function createPongLoading(): HTMLDivElement {
 	return loadingContainer;
 }
 
-export default function createPongFrame(): HTMLElement {
+export default function createPongFrame() {
 	const url = RoutingHandler.url;
 	const searchParams = RoutingHandler.searchParams;
-	const pongFrame = createPongLoading();
+	let pongFrame: HTMLDivElement;
+	pongFrame = createPongLoading();
 	return pongFrame;
 }
