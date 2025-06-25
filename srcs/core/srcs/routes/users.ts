@@ -1,9 +1,10 @@
 import axios from "axios";
 import type { FastifyInstance, FastifyPluginOptions, FastifyReply } from 'fastify'
 import UsersSdk from '../../../libs/helpers/usersSdk.ts';
-import type { UserLoginProps, UserRegisterProps, User } from '../../../libs/interfaces/User.ts';
+import type { UserLoginProps, UserRegisterProps, User, UserWithPicture } from '../../../libs/interfaces/User.ts';
 import Logger from "../../../libs/helpers/loggers.ts";
 import { httpReply } from "../../../libs/helpers/httpResponse.ts";
+import type { Multipart } from "@fastify/multipart";
 
 const usersSdk = new UsersSdk();
 
@@ -78,20 +79,22 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 		const userId = authorization.data.sub;
-		if (!request.body)
+		const data = await request.file() as Multipart
+		if (!data) {
 			return httpReply({
 				module: 'usermanager',
 				detail: 'No user data provided for update.',
 				status: 400,
 			}, reply, request);
-		const data = request.body as Partial<User>;
-		if (data.PlayerID)
+		}
+		if (data.fields.PlayerID)
 			return httpReply({
 				module: 'usermanager',
 				detail: 'PlayerID cannot be updated.',
 				status: 400,
 			}, reply, request);
-		const resp = await usersSdk.updateUser(userId, request.body as Partial<User>);
+		const resp = await usersSdk.updateUser(userId, data)
+			.catch(err => { console.dir(err) })
 		if (resp.status >= 400) {
 			return httpReply({
 				module: 'usermanager',

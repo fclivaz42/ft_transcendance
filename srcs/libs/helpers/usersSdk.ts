@@ -5,6 +5,7 @@ import type { UserLoginOauthProps, UserLoginProps, UserRegisterProps, User } fro
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { Logger } from "./loggers.ts";
 import { httpReply } from "./httpResponse.ts";
+import type { Multipart } from "@fastify/multipart";
 
 export interface UsersSdkConfig {
 	apiKey: string;
@@ -80,7 +81,8 @@ class UsersSdk {
 		if (options?.data) {
 			if (!options.headers)
 				options.headers = {};
-			options.headers["Content-Type"] = "application/json";
+			if (!options.headers["Content-Type"])
+				options.headers["Content-Type"] = "application/json";
 		}
 		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 		const url = `${this._config.serverUrl}/users/${endpoint}`/*${options.params ? `?${options.params.toString()}` : ""}`*/;
@@ -333,9 +335,19 @@ class UsersSdk {
 		return output;
 	}
 
-	public async updateUser(userId: string, data: Partial<User>): Promise<AxiosResponse<User>> {
+	public async updateUser(userId: string, data: Multipart): Promise<AxiosResponse<User>> {
+		console.log("requesting...")
+		let send_data = new FormData(data);
+		for (const item in data.fields) {
+			console.log("-------------------------------------------------------")
+			if ((data.fields[item] as any).value) {
+				console.log(`added ${item}`)
+				send_data.append(item, (data.fields[item] as any).value)
+			}
+			console.log((data.fields[item] as any).value)
+		}
 		return this.apiRequest<User>("put", userId, {
-			data,
+			data: send_data,
 		});
 	}
 }

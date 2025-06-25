@@ -22,6 +22,9 @@ export interface UserRegisterProps extends UserLoginProps {
 	DisplayName: string;
 	EmailAddress: string;
 }
+export interface UserWithPicture extends User {
+	Avatar: File;
+}
 
 export interface UserLoginOauthProps {
 	OAuthID: string;

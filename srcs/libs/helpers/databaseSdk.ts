@@ -1,3 +1,15 @@
+// ************************************************************************** //
+//                                                                            //
+//                                                        :::      ::::::::   //
+//   databaseSdk.ts                                     :+:      :+:    :+:   //
+//                                                    +:+ +:+         +:+     //
+//   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
+//                                                +#+#+#+#+#+   +#+           //
+//   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
+//   Updated: 2025/06/25 19:14:34 by fclivaz          ###   LAUSANNE.ch       //
+//                                                                            //
+// ************************************************************************** //
+
 import axios from "axios";
 import https from "https";
 import type { AxiosResponse, InternalAxiosRequestConfig } from "axios";
@@ -14,8 +26,6 @@ interface db_sdk_options {
 	body?: any
 }
 
-// WARN: DELETE/UPDATE USER!
-
 export default class DatabaseSDK {
 
 	private api_key = process.env.API_KEY
@@ -28,7 +38,8 @@ export default class DatabaseSDK {
 		if (options?.body) {
 			if (!options.headers)
 				options.headers = {};
-			options.headers["Content-Type"] = "application/json";
+			if (!options.headers["Content-Type"])
+				options.headers["Content-Type"] = "application/json";
 		}
 		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
@@ -66,6 +77,24 @@ export default class DatabaseSDK {
 		})
 	}
 
+	public async create_user(user: User): Promise<AxiosResponse<User>> {
+		return await this.api_request<User>("POST", "Players", undefined, { body: user })
+	}
+
+	public async get_user(identifier: string, type: "PlayerID" | "DisplayName" | "EmailAddress" | "OAuthID"): Promise<AxiosResponse<User>> {
+		return await this.api_request<User>("GET", "Players", `/${type}/${this.param_str}`, { params: identifier })
+	}
+
+	public async update_user(user: User): Promise<AxiosResponse<User>> {
+		if (!user.PlayerID)
+			throw "error.missing.playerid"
+		return await this.api_request<User>("PUT", "Players", `/PlayerID/${this.param_str}`, { body: user, params: user.PlayerID })
+	}
+
+	public async delete_user(user: UUIDv4): Promise<AxiosResponse<string>> {
+		return await this.api_request<string>("DELETE", "Players", `/PlayerID/${this.param_str}`, { params: user })
+	}
+
 	private async get_friends_from_uuid(user: UUIDv4): Promise<AxiosResponse<Array<User>>> {
 		const req_user: User = (await this.get_user(user, "PlayerID")).data
 		return await this.get_friends_from_user(req_user)
@@ -77,12 +106,15 @@ export default class DatabaseSDK {
 		return await this.get_friends_from_user(user)
 	}
 
-	public async get_user_picture(user: User) {
-
+	public async get_user_picture(identifier: UUIDv4): Promise<AxiosResponse<File>> {
+		return await this.api_request<File>("GET", "Players", `/PlayerID/${this.param_str}/picture`, { params: identifier })
 	}
 
-	public async set_user_picture(user: User, picture) {
-
+	public async set_user_picture(identifier: UUIDv4, picture: File): Promise<AxiosResponse<File>> {
+		let data = new FormData();
+		data.append("image", picture)
+		console.dir(data)
+		return await this.api_request<File>("POST", "Players", `/PlayerID/${this.param_str}/picture`, { params: identifier, body: data, headers: { "Content-Type": "multipart/form-data" } })
 	}
 
 	public async log_user(query: string, type: "PlayerID" | "DisplayName" | "EmailAddress", plaintext: string): Promise<AxiosResponse<User>> {
@@ -94,15 +126,10 @@ export default class DatabaseSDK {
 		})
 	}
 
-	public async create_user(user: User): Promise<AxiosResponse<User>> {
-		return await this.api_request<User>("POST", "Players", undefined, { body: user })
+	// WARN: DOUBLE-CHECK THIS
+	public async create_tournament(tournament: Tournament_metadata) {
+		return await this.api_request<Tournament_metadata>("POST", "Tournaments", undefined, { body: tournament })
 	}
-
-	public async get_user(identifier: string, type: "PlayerID" | "DisplayName" | "EmailAddress" | "OAuthID"): Promise<AxiosResponse<User>> {
-		return await this.api_request<User>("GET", "Players", `/${type}/${this.param_str}`, { params: identifier })
-	}
-
-	public async create_tournament(tournament: Tournament_metadata) { }
 
 	public async get_tournament(tournament_id: UUIDv4) {
 		return await this.api_request<User>("GET", "Tournaments", `/TournamentID/${this.param_str}`, { params: tournament_id })
@@ -129,7 +156,10 @@ export default class DatabaseSDK {
 		return await this.get_player_matchlist_from_user(user)
 	}
 
-	public async create_match(match: Match_lite) { }
+	// WARN: DOUBLE-CHECK THIS
+	public async create_match(match: Match) {
+		return await this.api_request<Match>("POST", "Matches", undefined, { body: match })
+	}
 
 	public async get_match(match_id: UUIDv4) {
 		return await this.api_request<User>("GET", "Matches", `/MatchID/${this.param_str}`, { params: match_id })

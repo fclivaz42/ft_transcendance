@@ -8,7 +8,7 @@ import NotificationManager from "../../managers/NotificationManager";
 import { i18nHandler } from "../../handlers/i18nHandler";
 
 export function createUserDialog(): HTMLDialogElement {
-	const dialog = createDialog({allowClose: true});
+	const dialog = createDialog({ allowClose: true });
 	dialog.className += " w-[500px] max-w-[90vw]";
 
 	const profilePicture = createUserAvatar({
@@ -73,18 +73,19 @@ export function createUserDialog(): HTMLDialogElement {
 	saveButton.className = "w-full p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50";
 	saveButton.onclick = () => {
 		const multipartFormData = new FormData();
-		multipartFormData.append("avatar", userMenuManager.uploadFile.files?.[0] || "");
+		if (userMenuManager.uploadFile.files?.[0]) {
+			console.log("adding picture !")
+			multipartFormData.append("Avatar", userMenuManager.uploadFile.files[0]);
+		}
 		if (passwordTextbox.value)
 			multipartFormData.append("Password", passwordTextbox.value);
 		if (emailTextbox.value)
 			multipartFormData.append("EmailAddress", emailTextbox.value);
 		if (displayNameTextbox.value)
 			multipartFormData.append("DisplayName", displayNameTextbox.value);
+		console.log("absolutely sending t!")
 		fetch("/api/users/update", {
 			method: "PUT",
-			headers: {
-				"Content-Type": "application/json"
-			},
 			body: multipartFormData
 		}).then(response => {
 			if (response.ok) {

@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/22 16:33:04 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/25 19:12:48 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -27,19 +27,19 @@ import { extra_routes } from "./db_extras.ts"
 // Exit if any is missing.
 //
 
-if (process.env.API_KEY === undefined ||
-	process.env.DBLOCATION === undefined ||
-	process.env.FILELOCATION === undefined ||
-	process.env.ADMIN_NAME === undefined ||
-	process.env.ADMIN_PASSWORD === undefined ||
-	process.env.RUNMODE === undefined) {
+if (!process.env.API_KEY ||
+	!process.env.DBLOCATION ||
+	!process.env.FILELOCATION ||
+	!process.env.ADMIN_NAME ||
+	!process.env.ADMIN_PASSWORD ||
+	!process.env.RUNMODE) {
 	console.error("At least one of the necessary variables to run this program isn't set:",
-		process.env.API_KEY === undefined ? "API_KEY" : "",
-		process.env.DBLOCATION === undefined ? "DBLOCATION" : "",
-		process.env.FILELOCATION === undefined ? "FILELOCATION" : "",
-		process.env.ADMIN_NAME === undefined ? "ADMIN_NAME" : "",
-		process.env.ADMIN_PASSWORD === undefined ? "ADMIN_PASSWORD" : "",
-		process.env.RUNMODE === undefined ? "RUNMODE" : ""
+		!process.env.API_KEY ? "API_KEY" : "",
+		!process.env.DBLOCATION ? "DBLOCATION" : "",
+		!process.env.FILELOCATION ? "FILELOCATION" : "",
+		!process.env.ADMIN_NAME ? "ADMIN_NAME" : "",
+		!process.env.ADMIN_PASSWORD ? "ADMIN_PASSWORD" : "",
+		!process.env.RUNMODE ? "RUNMODE" : ""
 	)
 	process.exit(1)
 }
@@ -95,7 +95,7 @@ for (const method of methods) {
 		if (tables[item].Methods[method] !== undefined) {
 			for (const route of tables[item].Methods[method]) {
 				fastify.register(async function tophandler(fastify: fft.FastifyInstance) {
-					fastify[method.toLowerCase()]<{ Params: Parameters }>(`/${tables[item].Name}${route}`, async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
+					fastify[method.toLowerCase()]<{ Params: db_params }>(`/${tables[item].Name}${route}`, async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
 						await RequestHandler[method.toLowerCase()](request, reply, tables[item].Name, tables[item].Fields)
 					})
 				})

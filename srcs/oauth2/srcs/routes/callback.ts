@@ -127,17 +127,11 @@ async function updateUser(token: OauthToken, matchingUser: User | undefined) {
 		}
 	} else if (!matchingUser.OAuthID) {
 		// update user by email with OAuth ID
-		// WARN: UPDATE USER!
-		const updateUser: Partial<Users> = {
+		const updateUser: Partial<User> = {
+			PlayerID: matchingUser.PlayerID,
 			OAuthID: token.jwt_decode.subject,
 		}
-		await axios.put<Users>(`http://db:3000/Players/id/${matchingUser.PlayerID}`, updateUser, {
-			headers: {
-				"Authorization": process.env.API_KEY || "",
-				"Content-Type": "application/json",
-			},
-			httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-		});
+		await db_sdk.update_user(updateUser as User)
 	}
 	else {
 		// simple login the user

@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/18 20:58:12 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/24 20:24:17 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/25 19:10:28 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -69,6 +69,7 @@ async function logger_preparser(request: fft.FastifyRequest, reply: fft.FastifyR
 }
 
 async function upload_picture(request: fft.FastifyRequest, reply: fft.FastifyReply, params: db_params, file: MultipartFile) {
+	let return_name: string;
 	try {
 		if (!request.headers["authorization"])
 			throw { code: 401, string: "error.missing.authorization" }
@@ -91,16 +92,19 @@ async function upload_picture(request: fft.FastifyRequest, reply: fft.FastifyRep
 		await pump(file.file, fs.createWriteStream(path.join(process.env.FILELOCATION as string, filename)));
 		const ftype = await fileTypeFromFile(path.join(process.env.FILELOCATION as string, filename))
 		if (ftype && ftype.mime !== 'image/png' && ftype.mime !== 'image/jpeg' && ftype.mime !== 'image/webp') {
+			if (process.env.RUNMODE === "debug")
+				console.dir(ftype)
 			fs.rmSync(path.join(process.env.FILELOCATION as string, filename))
 			throw { code: 415, string: "error.not.image" }
 		}
+		return_name = filename
 	} catch (exception) {
 		if (typeof exception.code === "number")
 			return reply.code(exception.code).send(exception.string)
 		console.dir(exception)
 		return reply.code(500).send("error.save.failed")
 	}
-	return reply.code(200).send({ skill: "solution" })
+	return reply.code(201).sendFile(return_name)
 }
 
 async function get_picture(request: fft.FastifyRequest, reply: fft.FastifyReply, params: db_params) {

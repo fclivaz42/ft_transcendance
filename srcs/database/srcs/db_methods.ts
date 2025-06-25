@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/24 20:42:04 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/25 14:08:41 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -39,6 +39,8 @@ export default class DatabaseWorker {
 		try {
 			if (table === tables.Players.Name && mode === "run") {
 				response = db.prepare(`SELECT * FROM ${table} WHERE ${field} = ?`).get(query) as object
+				if (response === undefined)
+					throw { code: 404, string: "error.value.notfound" }
 				const filename = response[tables.Players.Fields[0]]
 				const folder: Array<string> = fs.readdirSync(process.env.FILELOCATION as string)
 				for (const item of folder)
