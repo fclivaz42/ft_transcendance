@@ -6,6 +6,11 @@ import { PADDLE_SPEED } from "./GameClass.ts";
 import { match } from "assert";
 import type { WallMap } from "./GameClass.ts";
 
+interface Score {
+	p1: number;
+	p2: number;
+}
+
 interface PaddleOptions {
 	color: Color3;
 	width: number;
@@ -92,6 +97,7 @@ export default class Paddle {
 	}
 
 	public getIsIA(): boolean { return this._isAi; }
+	public getName(): string { return this._name; }
 	public getMesh(): Mesh { return this._mesh; }
 	public getPosition(): Vector3 { return this.getMesh().position; }
 	public getSpeed(): number { return this._speed; }
@@ -143,12 +149,9 @@ export default class Paddle {
 
 	public update(fps: number): void {
 
-		// this._direction.set(0, 0, 0);
-		// this.getMesh().position.addInPlace(this._direction.scale(this._speed));
 		if (this._isAi)
 			this.manageIA(fps);
-		if (true) {
-			// else {
+		else {
 			if (!this._moveDirection) return;
 			// console.log("received command to move, attempting to move");
 			const deltaY = this._moveDirection === "up" ? this.getSpeed() : -this.getSpeed();
@@ -232,9 +235,9 @@ export default class Paddle {
 					const predictY = this.predictBall();
 					const diff = Math.abs(Math.max(predictY, currentPaddle) - Math.min(predictY, currentPaddle));
 					const moov: number = Math.floor(diff / paddlSpeed);
-					console.log(`currentPaddle: ${currentPaddle}`);
-					console.log(`diff: ${diff}`);
-					console.log(`moov: ${moov}`);
+					// console.log(`currentPaddle: ${currentPaddle}`);
+					// console.log(`diff: ${diff}`);
+					// console.log(`moov: ${moov}`);
 					if (predictY === 0)
 						currentPaddle < 0 ? this._upMoove = moov : this._downMoove = moov;
 					else
@@ -263,23 +266,35 @@ export default class Paddle {
 
 	public async manageIA(fps: number) {
 
+		// console.log(`fps: ${fps}`);
 		if (fps === 1) {
 			let tmp: Vector3 | undefined = this._ball?.getHitbox().position.clone();
+			console.log(`${this._ball}`);
 			if (tmp === undefined)
 				return;
+			console.log("HERE");
 			Paddle._ballPos = tmp;
 			tmp = this._ball?.direction;
 			if (tmp === undefined)
 				return;
+			console.log("NO HERE");
 			this._ballDirection = tmp;
 		}
-		// const diff =  getscoreinfo;
+		// const score: Scores =  getscoreinfo;
+		// 	const diff: number = score.p1 - score.p2;
+		// if (this._name === "p1"){
+		// 	if (diff > 0)
+		// 	this.randMoove(fps, 0);
+		// }
+		// if (this._name === p2){
+		//
+		// }
 		this.randMoove(fps, 0);
 		this.iaAlgo(fps);
 	}
 
 	public randMoove(fps: number, diff: number): void {
-		const coef = 2 * diff;
+		const coef = 1 * diff;
 		const refresh = 30;
 		const ran = Math.floor((Math.random() * 10000) % coef);
 		if (fps === refresh && this._downMoove === 0 && this._upMoove === 0) {

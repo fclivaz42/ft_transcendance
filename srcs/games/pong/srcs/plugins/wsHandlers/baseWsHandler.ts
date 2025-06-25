@@ -85,6 +85,16 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 						}
 					}
 				}
+				else if (type === 'ia' && payload?.direction) {
+					const paddle = session.getPaddle();
+					if (paddle) {
+						console.log(`payload: ${payload.direction}`);
+						if (payload.direction === 'p1' && paddle.getName() === 'player1')
+							paddle.getIsIA() === true ? paddle.setAI(false) : paddle.setAI(true);
+						if (payload.direction === 'p2' && paddle.getName() === 'player2')
+							paddle.getIsIA() === true ? paddle.setAI(false) : paddle.setAI(true);
+					}
+				}
 			} catch (err) {
 				console.error('Invalid message from client:', err);
 			}

@@ -47,12 +47,10 @@ export default class Game {
 	private _ball: Ball;
 	private _walls: WallMap;
 	private _room: GameRoom | null = null;
-	private _isAI: boolean;
 
-	constructor(isAI: boolean = false) {
+	constructor() {
 		this._field = new PlayField();
 		this._scene = this._field.getScene();
-		this._isAI = isAI;
 
 		/* Building all Walls */
 		this._walls = {
@@ -143,8 +141,12 @@ export default class Game {
 		this._p2.getMesh().refreshBoundingInfo(true);
 		this._ball.getHitbox().refreshBoundingInfo(true);
 
-		this.setP2IA(true);
-		this.setP1IA(true);
+		// set ball and walls
+		this._p1.setBall(this._ball);
+		this._p1.setWalls(this._walls);
+		this._p2.setBall(this._ball);
+		this._p2.setWalls(this._walls);
+
 		/* Setting colliders for the paddles and the ball */
 		this._p1.setColliders([this._walls.northWall, this._walls.southWall]);
 		this._p2.setColliders([this._walls.northWall, this._walls.southWall]);
@@ -158,16 +160,12 @@ export default class Game {
 		]);
 	};
 
-	public setP1IA(bol: boolean) {
-		this._p1.setAI(bol);
-		this._p1.setBall(this._ball);
-		this._p1.setWalls(this._walls);
+	public setP1IA(isAI: boolean) {
+		this._p1.setAI(isAI);
 	}
 
-	public setP2IA(bol: boolean) {
-		this._p2.setAI(bol);
-		this._p2.setBall(this._ball);
-		this._p2.setWalls(this._walls);
+	public setP2IA(isAI: boolean) {
+		this._p2.setAI(isAI);
 	}
 
 	/* Methods */
