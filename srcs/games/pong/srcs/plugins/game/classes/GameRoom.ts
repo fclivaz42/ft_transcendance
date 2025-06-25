@@ -63,9 +63,9 @@ export default class GameRoom {
 	public game: Game;
 	public score: { p1: number; p2: number };
 
-	constructor(id: string) {
+	constructor(id: string, isAI: boolean = false) {
 		this.id = id;
-		this.game = new Game();
+		this.game = new Game(isAI);
 		this.score = { p1: 0, p2: 0 };
 	}
 
@@ -97,6 +97,16 @@ export default class GameRoom {
 			console.log("GAME READY TO BE STARTED.");
 			this.startGame();
 		}
+	}
+
+	public addPlayerIA(playerSession: PlayerSession): void {
+		this.players.push(playerSession);
+		playerSession.setRoom(this);
+
+		playerSession.setPaddleId('p2');
+		this.game.setP2IA(true);
+
+		this.startGame();
 	}
 
 	public addScore(player: number) {

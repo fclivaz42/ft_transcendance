@@ -38,14 +38,14 @@ export default class RoomManager {
 	}
 
 	private _generateRoomId(): string {
-		const letters = Array.from({length: 2}, () => this._generateRandomLetter());
-		const numbers = Array.from({length: 2}, () => this._generateRandomNumber().toString());
+		const letters = Array.from({ length: 2 }, () => this._generateRandomLetter());
+		const numbers = Array.from({ length: 2 }, () => this._generateRandomNumber().toString());
 		return this._shuffle(letters.concat(numbers)).join('');
 	}
 
-	public createRoom(): GameRoom {
+	public createRoom(isAI: boolean = false): GameRoom {
 		const roomId = this._generateRoomId();
-		const room = new GameRoom(roomId);
+		const room = new GameRoom(roomId, isAI);
 		this._rooms.set(roomId, room);
 		console.log(`Created Room with ID: ${roomId}`);
 		return room;
@@ -61,7 +61,7 @@ export default class RoomManager {
 	}
 
 	public assignPlayer(socket: WebSocket, options: AssignPlayerOptions): PlayerSession {
-		const { userId, mode = 'remote', roomId = null } = options;
+		const { userId, mode, roomId = null } = options;
 		const session = new PlayerSession(socket, userId);
 
 		let room: GameRoom | undefined;
@@ -87,14 +87,13 @@ export default class RoomManager {
 				// room.forceLocalPlayer(session); // assign both paddles, change controls
 				return session;
 			case "computer":
-				room = this.createRoom();
+				room = this.createRoom(true);
 				room.addPlayer(session);
-				//room.addAI(); integrate fake player
+				room.addPlayerIA();
 				return session;
 			default:
 				throw new Error(`Unknown mode: ${mode}`);
 		}
-
 		room?.addPlayer(session);
 		return session;
 	}

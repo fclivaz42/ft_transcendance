@@ -147,8 +147,8 @@ export default class Paddle {
 		// this.getMesh().position.addInPlace(this._direction.scale(this._speed));
 		if (this._isAi)
 			this.manageIA(fps);
-		// if (true) {
-		else {
+		if (true) {
+			// else {
 			if (!this._moveDirection) return;
 			// console.log("received command to move, attempting to move");
 			const deltaY = this._moveDirection === "up" ? this.getSpeed() : -this.getSpeed();
@@ -195,17 +195,19 @@ export default class Paddle {
 		const totalHeight = nWallY - sWallY;
 		const halfHeight = totalHeight / 2;
 
-		let y = rawY;
-		let modulo = Math.abs(y) % totalHeight;
+		const modulo = Math.abs(rawY) % totalHeight;
+
+		const goingUp = Math.floor(modulo / halfHeight) % 2 === 0;
+
+		const offset = modulo % halfHeight;
 		let predictedY: number;
 
-		if (Math.floor(modulo / halfHeight) % 2 === 0)
-			predictedY = (modulo % halfHeight) * Math.sign(rawY);
+		if (goingUp)
+			predictedY = offset;
 		else
-			predictedY = (halfHeight - (modulo % halfHeight)) * -Math.sign(rawY);
+			predictedY = halfHeight - offset;
 
-		console.log(`Impact at x = ${goalX}, y = ${predictedY} `);
-		return (predictedY);
+		return rawY >= 0 ? predictedY : -predictedY;
 	}
 
 	public iaAlgo(fps: number): void {
@@ -226,7 +228,7 @@ export default class Paddle {
 				if (Paddle._ballPos.x === 0) {
 					// console.log("Ball doesn't moove");
 				}
-				else {
+				else if (dir) {
 					const predictY = this.predictBall();
 					const diff = Math.abs(Math.max(predictY, currentPaddle) - Math.min(predictY, currentPaddle));
 					const moov: number = Math.floor(diff / paddlSpeed);
@@ -271,12 +273,13 @@ export default class Paddle {
 				return;
 			this._ballDirection = tmp;
 		}
-		// this.randMoove(fps);
+		// const diff =  getscoreinfo;
+		this.randMoove(fps, 0);
 		this.iaAlgo(fps);
 	}
 
-	public randMoove(fps: number): void {
-		const coef = 6;
+	public randMoove(fps: number, diff: number): void {
+		const coef = 2 * diff;
 		const refresh = 30;
 		const ran = Math.floor((Math.random() * 10000) % coef);
 		if (fps === refresh && this._downMoove === 0 && this._upMoove === 0) {
@@ -286,7 +289,7 @@ export default class Paddle {
 			else if (ran < coef / 2)
 				this._downMoove += ran;
 			else if (ran === coef / 2)
-				Math.random() < 0.5 ? this._upMoove = coef * 2 : this._downMoove = coef * 2;
+				Math.random() < 0.5 ? this._upMoove = coef * 1.5 : this._downMoove = coef * 1.5;
 		}
 	}
 }

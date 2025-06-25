@@ -128,7 +128,7 @@ export default class PlayField {
 			for (const obj of this._updatables) {
 				obj.update(PlayField._fps);
 			}
-			PlayField._fps < 60 ? PlayField._fps++ : PlayField._fps = 0;
+			PlayField._fps < DEFAULT_FPS ? PlayField._fps++ : PlayField._fps = 0;
 			if (broadCast) broadCast();
 			this._scene.render();
 		}, frameTime);

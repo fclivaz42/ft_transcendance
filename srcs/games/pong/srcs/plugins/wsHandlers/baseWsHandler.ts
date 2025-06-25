@@ -28,8 +28,6 @@ interface CreateWsHandlerParams {
 
 export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 	return (socket: WebSocket, req: FastifyRequest<{ Querystring: GameWsQuery }>) => {
-		// /game/remote?userId=<uuid>&roomId=AB12
-		//               ^ obligatoire    ^ que pour friend_join
 		const query = req.query;
 
 		if (!query.userId) {
@@ -52,10 +50,15 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 				mode,
 				roomId: query.roomId
 			});
+		} else if (mode === 'computer') {
+			session = manager.assignPlayer(socket, {
+				userId: query.userId,
+				mode: 'computer'
+			});
 		} else {
 			session = manager.assignPlayer(socket, {
 				userId: query.userId,
-				mode
+				mode: 'remote'
 			});
 		}
 
