@@ -36,35 +36,26 @@ export class WebSocketManager {
 			if (this.socket.readyState !== WebSocket.OPEN)
 				return;
 			console.log("Key press event:", event.key);
+			let data: any | undefined;
 			switch (event.key) {
-				case "w": {
-					this.socket.send(JSON.stringify({
-						type: "move",
-						payload: {
-							direction: "up"
-						}
-					}));
+				case "w":
+					data = { type: "move", payload: { direction: "up" } };
 					break;
-				}
-				case "s": {
-					this.socket.send(JSON.stringify({
-						type: "move",
-						payload: {
-							direction: "down"
-						}
-					}));
+				case "s":
+					data = { type: "move", payload: { direction: "down" } };
 					break;
-				}
-				case " ": {
-					this.socket.send(JSON.stringify({
-						type: "ball",
-						payload: {
-							direction: "launch"
-						}
-					}));
+				case " ":
+					data = { type: "ball", payload: { direction: "launch" } };
 					break;
-				}
+				case "o":
+					data = { type: "ia", payload: { direction: "p1" } };
+					break;
+				case "p":
+					data = { type: "ia", payload: { direction: "p2" } };
+					break;
 			}
+			if (data)
+				this.socket.send(JSON.stringify(data));
 		});
 
 		this.socket.onmessage = (event) => {
