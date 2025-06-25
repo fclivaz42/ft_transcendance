@@ -1,4 +1,4 @@
-export interface Users {
+export interface User {
 	PlayerID?: string,
 	DisplayName: string,
 	EmailAddress: string,

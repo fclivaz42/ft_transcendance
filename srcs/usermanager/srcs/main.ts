@@ -15,7 +15,7 @@ server.register(initializeRoute, { prefix: "/users" });
 
 betterFastify(server);
 
-server.listen({ port: config.ServerConfig.port, host: "0.0.0.0" }, (err, address) => {
+server.listen({ port: config.ServerConfig.port, host: "::" }, (err, address) => {
 	if (err) {
 		server.log.error(err);
 		process.exit(1);

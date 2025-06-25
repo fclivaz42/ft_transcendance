@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { AxiosResponse } from "axios";
 import https from "https";
-import type { UserLoginOauthProps, UserLoginProps, UserRegisterProps, Users } from "../interfaces/Users.ts";
+import type { UserLoginOauthProps, UserLoginProps, UserRegisterProps, User } from "../interfaces/User.ts";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { Logger } from "./loggers.ts";
 import { httpReply } from "./httpResponse.ts";
@@ -116,8 +116,8 @@ class UsersSdk {
 	 * @param uuid User uuid to retrieve information for.
 	 * @returns a promise with the user information response from axios
 	 */
-	public async getUser(uuid: string): Promise<AxiosResponse<Users>> {
-		return this.apiRequest<Users>("get", uuid);
+	public async getUser(uuid: string): Promise<AxiosResponse<User>> {
+		return this.apiRequest<User>("get", uuid);
 	}
 
 	/**
@@ -169,7 +169,7 @@ class UsersSdk {
 	 * @param user User object to filter.
 	 * @returns Filtered user object without sensitive information.
 	 */
-	static filterUserData(user: Users) {
+	static filterUserData(user: User) {
 		const { Password, OAuthID, ...filteredUser } = user;
 		return filteredUser;
 	}
@@ -179,7 +179,7 @@ class UsersSdk {
 	 * @param user User object to filter.
 	 * @returns Filtered user object without sensitive information.
 	*/
-	filterUserData(user: Users) {
+	filterUserData(user: User) {
 		return UsersSdk.filterUserData(user);
 	}
 
@@ -188,7 +188,7 @@ class UsersSdk {
 	 * @param user User object to filter.
 	 * @returns Public user object without sensitive information.
 	 */
-	public static filterPublicUserData(user: Users) {
+	public static filterPublicUserData(user: User) {
 		const filteredUser = this.filterUserData(user);
 
 		const { Bappy, EmailAddress, FamilyName, FirstName, FriendsList, PhoneNumber, ...publicUser } = filteredUser;
@@ -200,7 +200,7 @@ class UsersSdk {
 	 * @param user User object to filter.
 	 * @returns Public user object without sensitive information.
 	 */
-	filterPublicUserData(user: Users) {
+	filterPublicUserData(user: User) {
 		return UsersSdk.filterPublicUserData(user);
 	}
 
@@ -333,8 +333,8 @@ class UsersSdk {
 		return output;
 	}
 
-	public async updateUser(userId: string, data: Partial<Users>): Promise<AxiosResponse<Users>> {
-		return this.apiRequest<Users>("put", userId, {
+	public async updateUser(userId: string, data: Partial<User>): Promise<AxiosResponse<User>> {
+		return this.apiRequest<User>("put", userId, {
 			data,
 		});
 	}

@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/24 19:06:00 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/25 00:55:44 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -120,6 +120,8 @@ const MatchesTable: db_table =
 		"LPlayerID",
 		"WScore",
 		"LScore",
+		"WGuestName",
+		"LGuestName",
 		"StartTime",
 		"EndTime",
 		"MatchIndex"
@@ -130,6 +132,8 @@ const MatchesTable: db_table =
 		`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET NULL`,
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL",
+		"TEXT DEFAULT NULL",
+		"TEXT DEFAULT NULL",
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL"
