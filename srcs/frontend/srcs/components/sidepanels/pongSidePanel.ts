@@ -28,8 +28,8 @@ export function createPongSidePanel() {
 		logo: buttonLogo,
 		f: () => {
 			RoutingHandler.setRoute("/pong");
-			startGame(`wss://${location.host}/api/game/computer`)
-		},
+			startGame(`wss://${location.host}/api/game/computer`);
+		}
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
