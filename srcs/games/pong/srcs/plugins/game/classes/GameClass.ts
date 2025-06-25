@@ -48,7 +48,7 @@ export default class Game {
 	private _walls: WallMap;
 	private _room: GameRoom | null = null;
 
-	constructor() {
+	constructor(vsAI: boolean = false) {
 		this._field = new PlayField();
 		this._scene = this._field.getScene();
 
@@ -141,6 +141,12 @@ export default class Game {
 		this._p2.getMesh().refreshBoundingInfo(true);
 		this._ball.getHitbox().refreshBoundingInfo(true);
 
+		if (vsAI)
+			this._p2.setAI(true);
+			if (this._p2.getIsIA()) {
+				this._p2.setBall(this._ball);
+				this._p2.setWalls(this._walls);
+			}
 		// set ia brut
 		// this._p1.setAI(true);
 		// if (this._p1.getIsIA()) {

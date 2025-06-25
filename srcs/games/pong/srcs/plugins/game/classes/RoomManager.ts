@@ -43,9 +43,9 @@ export default class RoomManager {
 		return this._shuffle(letters.concat(numbers)).join('');
 	}
 
-	public createRoom(): GameRoom {
+	public createRoom(vsAI: boolean = false): GameRoom {
 		const roomId = this._generateRoomId();
-		const room = new GameRoom(roomId);
+		const room = new GameRoom(roomId, vsAI);
 		this._rooms.set(roomId, room);
 		console.log(`Created Room with ID: ${roomId}`);
 		return room;
@@ -54,7 +54,7 @@ export default class RoomManager {
 	public findAvailableRoom(): GameRoom | null {
 		console.log("Searching for room...");
 		for (const room of this._rooms.values()) {
-			if (!room.isFull()) return room;
+			if (!room.isFull() && !room.lock) return room;
 		}
 		console.log("Available room not found...");
 		return null;
@@ -69,13 +69,16 @@ export default class RoomManager {
 		switch (mode) {
 			case "remote":
 				room = this.findAvailableRoom() ?? this.createRoom();
+				room.addPlayer(session);
 				break;
 			case "friend_host":
 				room = roomId && this._rooms.get(roomId) || this.createRoom();
+				room.addPlayer(session);
 				break;
 			case "friend_join":
 				if (roomId && this._rooms.has(roomId)) {
 					room = this._rooms.get(roomId);
+					room?.addPlayer(session);
 				} else {
 					console.log(`Room: ${roomId} not found.`)
 					socket.close();
@@ -87,15 +90,13 @@ export default class RoomManager {
 				// room.forceLocalPlayer(session); // assign both paddles, change controls
 				return session;
 			case "computer":
-				room = this.createRoom();
+				room = this.createRoom(true);
+				room.lock = true;
 				room.addPlayer(session);
-				//room.addAI(); integrate fake player
-				return session;
+				break;
 			default:
 				throw new Error(`Unknown mode: ${mode}`);
 		}
-
-		room?.addPlayer(session);
 		return session;
 	}
 }
