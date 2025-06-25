@@ -4,7 +4,7 @@ import path from "path";
 
 export default defineConfig({
 	root: "public",
-	base: "./",
+	base: "/",
 	server: {
 		host: true,
 		watch: {

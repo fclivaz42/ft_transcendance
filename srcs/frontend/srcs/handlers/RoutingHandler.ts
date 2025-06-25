@@ -1,3 +1,4 @@
+import create404Frame from "../components/frame/frame404";
 import createHistoryFrame from "../components/frame/frameHistory";
 import createHomeFrame from "../components/frame/frameHome";
 import createLeaderboardFrame from "../components/frame/frameLeaderboard";
@@ -6,6 +7,7 @@ import createUserFrame from "../components/frame/frameUser";
 import { NotificationDialogLevel, NotificationDialogLevels, NotificationProps } from "../components/notificationDialog";
 import { frameManager } from "../managers/FrameManager";
 import NotificationManager from "../managers/NotificationManager";
+import PongGameManager from "../managers/PongGameManager";
 import { i18nHandler } from "./i18nHandler";
 
 const validRoutes: Record<string, () => HTMLElement> = {
@@ -14,7 +16,6 @@ const validRoutes: Record<string, () => HTMLElement> = {
 	"/leaderboard": createLeaderboardFrame,
 	"/user": createUserFrame,
 	"/pong": createPongFrame,
-	"play": createPongFrame,
 };
 
 class RoutingHandler {
@@ -36,7 +37,7 @@ class RoutingHandler {
 		NotificationManager.notify(props);
 	}
 
-	displayRoute(): void {
+	displayRoute() {
 		this._url = new URL(window.location.href);
 		for(const param of this._url.searchParams.keys()) {
 			if (NotificationDialogLevels.includes(param as NotificationDialogLevel)) {
@@ -53,10 +54,23 @@ class RoutingHandler {
 
 		const currentRoute = window.location.pathname;
 		if (validRoutes[currentRoute]) {
-			frameManager.frameChild = validRoutes[currentRoute]();
+			try {
+				frameManager.frameChild = validRoutes[currentRoute]();
+			} catch (error) {
+				const err = error as Error;
+				console.error(`Error displaying route ${currentRoute}:`, err);
+				NotificationManager.notify({
+					level: "error",
+					title: i18nHandler.getValue("notification.generic.errorTitle"),
+					message: i18nHandler.getValue(err.message || "notification.generic.errorMessage"),
+				});
+				this.setRoute("/");
+			}
 		} else {
 			console.warn(`No component found for route: ${currentRoute}`);
-			frameManager.frame.innerHTML = "<h1>404 Not Found</h1>";
+			create404Frame().then((frame) => {
+				frameManager.frameChild = frame;
+			});
 		}
 	}
 
@@ -68,6 +82,7 @@ class RoutingHandler {
 		}
 		window.history.pushState({}, "", url);
 		this.displayRoute();
+		PongGameManager.reset();
 	}
 
 	get url(): URL {

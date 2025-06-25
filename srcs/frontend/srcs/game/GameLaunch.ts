@@ -1,5 +1,5 @@
-import { BabylonGame } from "./BabylonGame.js";
+import PongGameManager from "../managers/PongGameManager.js";
 
 export function startGame(addr: string) {
-	new BabylonGame(addr);
+	PongGameManager.initialize(addr);
 }

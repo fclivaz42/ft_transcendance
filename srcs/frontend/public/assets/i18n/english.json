@@ -132,9 +132,16 @@
     }
   },
   "notification": {
+    "generic": {
+      "errorTitle": "Error",
+      "errorMessage": "An error occurred. Please try again later."
+    },
     "oauth2": {
       "callbackError": "Remote login failed",
       "noSession": "No session found. Please try again."
+    },
+    "user": {
+      "notLogged": "You are not logged in."
     }
   }
 }
