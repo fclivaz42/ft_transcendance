@@ -72,17 +72,20 @@ export function createUserDialog(): HTMLDialogElement {
 	saveButton.textContent = "Save Changes";
 	saveButton.className = "w-full p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50";
 	saveButton.onclick = () => {
+		const multipartFormData = new FormData();
+		multipartFormData.append("avatar", userMenuManager.uploadFile.files?.[0] || "");
+		if (passwordTextbox.value)
+			multipartFormData.append("Password", passwordTextbox.value);
+		if (emailTextbox.value)
+			multipartFormData.append("EmailAddress", emailTextbox.value);
+		if (displayNameTextbox.value)
+			multipartFormData.append("DisplayName", displayNameTextbox.value);
 		fetch("/api/users/update", {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify({
-				DisplayName: displayNameTextbox.value || undefined,
-				EmailAddress: emailTextbox.value || undefined,
-				Password: passwordTextbox.value || undefined,
-				Avatar: userMenuManager.uploadFile.files?.[0] ? userMenuManager.uploadFile.files[0] : undefined
-			})
+			body: multipartFormData
 		}).then(response => {
 			if (response.ok) {
 				UserHandler.fetchUser();
