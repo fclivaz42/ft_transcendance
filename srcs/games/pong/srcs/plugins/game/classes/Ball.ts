@@ -2,7 +2,7 @@ import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mes
 
 const DIAMETER: number = 0.05;
 const SEGMENTS: number = 32;
-const HITBOX_MOD: number = 1.5;
+const HITBOX_MOD: number = 2;
 const MAX_SPEED: number = 0.35;
 
 interface BallOptions {

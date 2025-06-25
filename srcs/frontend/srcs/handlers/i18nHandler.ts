@@ -43,7 +43,7 @@ class I18nHandler {
   }
 
   private async loadLanguageFile(lang: string) {
-    await fetch(`./assets/i18n/${lang.toLowerCase()}.json`)
+    await fetch(`/assets/i18n/${lang.toLowerCase()}.json`)
       .then((response) => response.json())
       .then((data) => {
         this._i18n[lang] = this.flattenJson(data);

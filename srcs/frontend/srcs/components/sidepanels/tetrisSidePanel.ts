@@ -7,7 +7,7 @@ export function createTetrisSidePanel() {
 		i18n: "navbar.tetris.title"
 	});
 	sidePanel.id = "tetrisSidePanel";
-	const buttonLogo = "./assets/ui/login-door-1-svgrepo-com.svg";
+	const buttonLogo = "/assets/ui/login-door-1-svgrepo-com.svg";
 
 	sidePanel.appendChild(createSidePanelButton({
 		title: i18nHandler.getValue("navbar.tetris.submenu.play"),

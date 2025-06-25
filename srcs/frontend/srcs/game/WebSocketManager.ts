@@ -4,7 +4,8 @@ import { ServerMessage, InitPayload, UpdatePayload } from "./types.js";
 type InitHandler = (payload: InitPayload["payload"]) => void;
 type UpdateHanlder = (payload: UpdatePayload["payload"]) => void;
 
-const HOST: string = `wss://${location.host}/api/game/remote`
+export const PONG_HOST = `wss://${location.host}/api/game/`
+
 export class WebSocketManager {
 	private socket: WebSocket;
 
@@ -17,42 +18,11 @@ export class WebSocketManager {
 		console.log("I am being called!");
 		console.log(this.socket);
 
-		window.addEventListener('keydown', (event) => {
-			if (event.key === 'w') {
-				this.socket.send(JSON.stringify({
-					type: "move",
-					payload: {
-						direction: "up"
-					}
-				}))
-			};
-		});
-
 		window.addEventListener('keyup', (event) => {
-			if (event.key === 'w') {
-				this.socket.send(JSON.stringify({
-					type: "move",
-					payload: {
-						direction: "stop"
-					}
-				}))
-			};
-		});
-
-		window.addEventListener('keydown', (event) => {
-			if (event.key === 's') {
-				this.socket.send(JSON.stringify({
-					type: "move",
-					payload: {
-						direction: "down"
-					}
-				}))
-			};
-		});
-
-
-		window.addEventListener('keyup', (event) => {
-			if (event.key === 's') {
+			if (this.socket.readyState !== WebSocket.OPEN)
+				return;
+			console.log("Key up event:", event.key);
+			if (event.key === 'w' || event.key === "s") {
 				this.socket.send(JSON.stringify({
 					type: "move",
 					payload: {
@@ -63,14 +33,29 @@ export class WebSocketManager {
 		});
 
 		window.addEventListener('keypress', (event) => {
-			if (event.key === " ") {
-				this.socket.send(JSON.stringify({
-					type: "ball",
-					payload: {
-						direction: "launch"
-					}
-				}))
+			if (this.socket.readyState !== WebSocket.OPEN)
+				return;
+			console.log("Key press event:", event.key);
+			let data: any | undefined;
+			switch (event.key) {
+				case "w":
+					data = { type: "move", payload: { direction: "up" } };
+					break;
+				case "s":
+					data = { type: "move", payload: { direction: "down" } };
+					break;
+				case " ":
+					data = { type: "ball", payload: { direction: "launch" } };
+					break;
+				case "o":
+					data = { type: "ia", payload: { direction: "p1" } };
+					break;
+				case "p":
+					data = { type: "ia", payload: { direction: "p2" } };
+					break;
 			}
+			if (data)
+				this.socket.send(JSON.stringify(data));
 		});
 
 		this.socket.onmessage = (event) => {
@@ -89,4 +74,14 @@ export class WebSocketManager {
 		this.socket.onerror = (e) => console.error("[WS] Error", e);
 	}
 
+	public close() {
+		if (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING) {
+			this.socket.close();
+			console.log("[WS] Closed connection");
+		}
+	}
+
+	public get socketInstance() {
+		return this.socket;
+	}
 }

@@ -1,0 +1,12 @@
+{
+  "404": {
+    "images": [
+      "/assets/httpErrors/404/404-1.jpg",
+      "/assets/httpErrors/404/404-2.jpg",
+      "/assets/httpErrors/404/404-3.png",
+      "/assets/httpErrors/404/404-4.jpeg",
+      "/assets/httpErrors/404/404-5.jpg",
+      "/assets/httpErrors/404/404-6.jpeg"
+    ]
+  }
+}

@@ -20,14 +20,14 @@ await i18nHandler.initialize();
 // Custom elements initialization
 ElementsHandler.initialize();
 
+// Initialize the user handler
+await UserHandler.initialize();
+
 // Initialize the routing handler
 RoutingHandler.initialize();
 
 // Initialize main container
 mainManager.initialize();
-
-// Initialize the user handler
-await UserHandler.initialize();
 
 darkmodeManager.initialize();
 
