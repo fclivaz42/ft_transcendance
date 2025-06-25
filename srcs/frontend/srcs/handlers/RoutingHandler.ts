@@ -14,10 +14,11 @@ const validRoutes: Record<string, () => HTMLElement> = {
 	"/leaderboard": createLeaderboardFrame,
 	"/user": createUserFrame,
 	"/pong": createPongFrame,
+	"play": createPongFrame,
 };
 
 class RoutingHandler {
-	private _searchParams: URLSearchParams = new URLSearchParams(window.location.search);
+	private _url: URL = new URL(window.location.href);
 
 	initialize(): void {
 		window.addEventListener("popstate", () => {
@@ -36,11 +37,11 @@ class RoutingHandler {
 	}
 
 	displayRoute(): void {
-		this._searchParams = new URLSearchParams(window.location.search);
-		for(const param of this._searchParams.keys()) {
+		this._url = new URL(window.location.href);
+		for(const param of this._url.searchParams.keys()) {
 			if (NotificationDialogLevels.includes(param as NotificationDialogLevel)) {
-				const message = this._searchParams.get(param) || "No message provided";
-				this._searchParams.delete(param);
+				const message = this._url.searchParams.get(param) || "No message provided";
+				this._url.searchParams.delete(param);
 				this.displayNotification({
 					title: i18nHandler.getValue(message.split(";")[0]) || "Notification",
 					message: i18nHandler.getValue(message.split(";")[1]),
@@ -48,15 +49,11 @@ class RoutingHandler {
 				});
 			}
 		}
-		if (this._searchParams.toString()) 
-			window.history.replaceState({}, "", `${window.location.pathname}?${this._searchParams.toString()}`);
-		else
-			window.history.replaceState({}, "", window.location.pathname);
+		window.history.replaceState({}, "", this._url.toString());
 
-		frameManager.frame.innerHTML = "";
 		const currentRoute = window.location.pathname;
 		if (validRoutes[currentRoute]) {
-			frameManager.frame.appendChild(validRoutes[currentRoute]());
+			frameManager.frameChild = validRoutes[currentRoute]();
 		} else {
 			console.warn(`No component found for route: ${currentRoute}`);
 			frameManager.frame.innerHTML = "<h1>404 Not Found</h1>";
@@ -64,16 +61,21 @@ class RoutingHandler {
 	}
 
 	setRoute(route: string): void {
-		if (!validRoutes[route]) {
-			console.warn(`Invalid route: ${route}`);
+		const url = new URL(route, window.location.origin);
+		if (!validRoutes[url.pathname]) {
+			console.warn(`Invalid route: ${url.pathname}`);
 			return;
 		}
-		window.history.pushState({}, "", route);
+		window.history.pushState({}, "", url);
 		this.displayRoute();
 	}
 
+	get url(): URL {
+		return this._url;
+	}
+
 	get searchParams(): URLSearchParams {
-		return this._searchParams;
+		return this._url.searchParams;
 	}
 }
 

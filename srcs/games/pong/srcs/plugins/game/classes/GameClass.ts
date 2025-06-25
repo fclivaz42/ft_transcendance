@@ -33,7 +33,7 @@ interface BroadcastFunction {
 	(): void;
 }
 
-interface WallMap {
+export interface WallMap {
 	[key: string]: Wall;
 }
 
@@ -48,7 +48,7 @@ export default class Game {
 	private _walls: WallMap;
 	private _room: GameRoom | null = null;
 
-	constructor() {
+	constructor(vsAI: boolean = false) {
 		this._field = new PlayField();
 		this._scene = this._field.getScene();
 
@@ -97,7 +97,7 @@ export default class Game {
 		this._p1 = new Paddle(
 			this._scene,
 			"player1",
-			new Vector3(-13.0, 0, 0), {
+			new Vector3(-12.5, 0, 0), {
 			color: Color3.White(),
 			speed: PADDLE_SPEED,
 			height: PLAYER_HEIGHT,
@@ -110,7 +110,7 @@ export default class Game {
 		this._p2 = new Paddle(
 			this._scene,
 			"player2",
-			new Vector3(13.0, 0, 0), {
+			new Vector3(12.5, 0, 0), {
 			color: Color3.White(),
 			speed: PADDLE_SPEED,
 			height: PLAYER_HEIGHT,
@@ -140,11 +140,15 @@ export default class Game {
 		this._p1.getMesh().refreshBoundingInfo(true);
 		this._p2.getMesh().refreshBoundingInfo(true);
 		this._ball.getHitbox().refreshBoundingInfo(true);
-		// set ia brut
-		/* this._p2.setAI(true);
-		if (this._p2.getIsIA())
-			this._p2.setBall(this._ball); */
 
+		// set ball and walls
+		this._p1.setBall(this._ball);
+		this._p1.setWalls(this._walls);
+		this._p2.setBall(this._ball);
+		this._p2.setWalls(this._walls);
+
+		if (vsAI)
+			this._p2.setAI(true);
 
 		/* Setting colliders for the paddles and the ball */
 		this._p1.setColliders([this._walls.northWall, this._walls.southWall]);
@@ -158,6 +162,14 @@ export default class Game {
 			this._p2,
 		]);
 	};
+
+	public setP1IA(isAI: boolean) {
+		this._p1.setAI(isAI);
+	}
+
+	public setP2IA(isAI: boolean) {
+		this._p2.setAI(isAI);
+	}
 
 	/* Methods */
 	public getBall(): Ball {
@@ -189,7 +201,6 @@ export default class Game {
 
 		const southHalf = (south.scaling.y || 1) * (south.getBoundingInfo()?.boundingBox.extendSize.y ?? 0.25);
 		const minY = (south.position.y - southHalf - (-0.5));
-
 		return { minY, maxY };
 	}
 
@@ -215,7 +226,7 @@ export default class Game {
 
 	public score(player: number): void {
 		if (this._room) {
-			this._room.addScore(player); 
+			this._room.addScore(player);
 		}
 	}
 

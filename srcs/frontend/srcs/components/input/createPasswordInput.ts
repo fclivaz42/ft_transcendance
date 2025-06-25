@@ -87,13 +87,13 @@ absolute inset-y-1 right-2
     // toggleButton.appendChild(eyeSlashIcon);
     // Icône "œil ouvert"
     const eyeIcon = document.createElement("img");
-    eyeIcon.src = "./assets/ui/eye-open.svg"; // <--- Chemin vers votre SVG pour l'œil ouvert
+    eyeIcon.src = "/assets/ui/eye-open.svg"; // <--- Chemin vers votre SVG pour l'œil ouvert
     eyeIcon.alt = "Afficher le mot de passe"; // Texte alternatif pour l'accessibilité
     eyeIcon.className = "w-5 h-5"; // Taille de l'icône, ajustez si besoin
 
     // Icône "œil barré" (cachée par défaut)
     const eyeSlashIcon = document.createElement("img");
-    eyeSlashIcon.src = "./assets/ui/eye-closed.svg"; // <--- Chemin vers votre SVG pour l'œil fermé
+    eyeSlashIcon.src = "/assets/ui/eye-closed.svg"; // <--- Chemin vers votre SVG pour l'œil fermé
     eyeSlashIcon.alt = "Cacher le mot de passe"; // Texte alternatif pour l'accessibilité
     eyeSlashIcon.className = "w-5 h-5 hidden"; // Taille et 'hidden' pour qu'elle soit cachée au départ
 

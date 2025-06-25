@@ -6,7 +6,7 @@ export function createLogoutButton(): HTMLElement {
 	const i18nId = "header.usermenu.logout";
   return createButton({
     title: i18nHandler.getValue(i18nId),
-    logo: "./assets/ui/login-door-1-svgrepo-com.svg",
+    logo: "/assets/ui/login-door-1-svgrepo-com.svg",
     color: "bg-red-100",
 		darkColor: "dark:bg-red-400",
 		f: () => {

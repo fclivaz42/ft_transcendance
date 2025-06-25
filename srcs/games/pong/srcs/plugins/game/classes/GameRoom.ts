@@ -61,12 +61,12 @@ export default class GameRoom {
 	public id: string;
 	public players: PlayerSession[] = [];
 	public game: Game;
-	public score: { p1: number; p2: number};
+	public score: { p1: number; p2: number };
+	public lock: boolean = false;
 
-
-	constructor(id: string) {
+	constructor(id: string, vsAI: boolean = false) {
 		this.id = id;
-		this.game = new Game();
+		this.game = new Game(vsAI);
 		this.score = { p1: 0, p2: 0 };
 	}
 
@@ -79,7 +79,7 @@ export default class GameRoom {
 		return this.game;
 	}
 
-	public getScore(): {p1: number, p2: number} {
+	public getScore(): { p1: number, p2: number } {
 		return this.score;
 	}
 
@@ -93,11 +93,21 @@ export default class GameRoom {
 			playerSession.setPaddleId('p2');
 		}
 
-		if (this.isFull()) {
-			console.log(`Room ${this.id} full with players: [${this.players[0].getUserId()}, ${this.players[1].getUserId()}]`);
+		if (this.isFull() || this.lock) {
+			// console.log(`Room ${this.id} full with players: [${this.players[0].getUserId()}, ${this.players[1].getUserId()}]`);
 			console.log("GAME READY TO BE STARTED.");
 			this.startGame();
 		}
+	}
+
+	public addPlayerIA(playerSession: PlayerSession): void {
+		this.players.push(playerSession);
+		playerSession.setRoom(this);
+
+		playerSession.setPaddleId('p2');
+		this.game.setP2IA(true);
+
+		this.startGame();
 	}
 
 	public addScore(player: number) {
