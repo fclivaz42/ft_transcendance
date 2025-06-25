@@ -272,12 +272,10 @@ export default class Paddle {
 			console.log(`${this._ball}`);
 			if (tmp === undefined)
 				return;
-			console.log("HERE");
 			Paddle._ballPos = tmp;
 			tmp = this._ball?.direction;
 			if (tmp === undefined)
 				return;
-			console.log("NO HERE");
 			this._ballDirection = tmp;
 		}
 		// const score: Scores =  getscoreinfo;
