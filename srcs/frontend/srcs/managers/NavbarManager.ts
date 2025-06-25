@@ -21,7 +21,7 @@ class NavbarManager {
 				{
 					id: "btnHome",
 					title: i18nHandler.getValue("navbar.home.label"),
-					logo: "./assets/ui/home-svgrepo-com.svg",
+					logo: "/assets/ui/home-svgrepo-com.svg",
 					i18n: "navbar.home.label",
 					f: () => {
 						RoutingHandler.setRoute("/");
@@ -30,14 +30,14 @@ class NavbarManager {
 				{
 					id: "btnPong",
 					title: i18nHandler.getValue("navbar.pong.label"),
-					logo: "./assets/ui/ping-pong-svgrepo-com.svg",
+					logo: "/assets/ui/ping-pong-svgrepo-com.svg",
 					panelId: "pongSidePanel",
 					i18n: "navbar.pong.label",
 				},
 				{
 					id: "btnLeaderboard",
 					title: i18nHandler.getValue("navbar.leaderboard.label"),
-					logo: "./assets/ui/leaderboard-svgrepo-com.svg",
+					logo: "/assets/ui/leaderboard-svgrepo-com.svg",
 					//panelId: "leaderboardSidePanel",
 					i18n: "navbar.leaderboard.label",
 					f: () => {
@@ -47,7 +47,7 @@ class NavbarManager {
 				{
 					id: "btnHistory",
 					title: i18nHandler.getValue("navbar.history.label"),
-					logo: "./assets/ui/history-svgrepo-com.svg",
+					logo: "/assets/ui/history-svgrepo-com.svg",
 					//panelId: "historySidePanel",
 					i18n: "navbar.history.label",
 					f: () => {
@@ -57,7 +57,7 @@ class NavbarManager {
 				{
 					id: "btnSettings",
 					title: i18nHandler.getValue("navbar.settings.label"),
-					logo: "./assets/ui/settings-svgrepo-com.svg",
+					logo: "/assets/ui/settings-svgrepo-com.svg",
 					panelId: "settingsSidePanel",
 					bottom: true,
 					animation: "group-hover:animate-rotate-180 group-hover:animate-duration-[500ms]",
