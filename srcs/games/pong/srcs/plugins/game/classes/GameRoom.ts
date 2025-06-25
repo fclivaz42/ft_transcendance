@@ -1,4 +1,5 @@
 import Game from "./GameClass.ts"
+import Paddle from "./Paddle.ts";
 import PlayerSession from "./PlayerSession.ts";
 import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
 import { DEFAULT_FPS } from "./Playfield.ts";
@@ -67,6 +68,9 @@ export default class GameRoom {
 	constructor(id: string, vsAI: boolean = false) {
 		this.id = id;
 		this.game = new Game(vsAI);
+		const paddles: Paddle[] = this.game.getPaddles();
+		paddles.at(0)?.setGameRoom(this);
+		paddles.at(1)?.setGameRoom(this);
 		this.score = { p1: 0, p2: 0 };
 	}
 
@@ -98,16 +102,6 @@ export default class GameRoom {
 			console.log("GAME READY TO BE STARTED.");
 			this.startGame();
 		}
-	}
-
-	public addPlayerIA(playerSession: PlayerSession): void {
-		this.players.push(playerSession);
-		playerSession.setRoom(this);
-
-		playerSession.setPaddleId('p2');
-		this.game.setP2IA(true);
-
-		this.startGame();
 	}
 
 	public addScore(player: number) {
