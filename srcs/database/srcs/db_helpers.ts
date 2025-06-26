@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/21 21:57:13 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/24 21:16:00 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/26 17:12:59 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -87,6 +87,8 @@ function get_del_db(request: fft.FastifyRequest, reply: fft.FastifyReply, table:
 
 export async function hash_password(password: string) {
 	return new Promise((resolve, reject) => {
+		if (password === "")
+			resolve("");
 		randomBytes(66, (err, buf) => {
 			if (err) return reject(err);
 			const salt = buf.toString('base64').substring(0, 64)
