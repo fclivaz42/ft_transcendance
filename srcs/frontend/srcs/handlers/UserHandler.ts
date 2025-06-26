@@ -85,6 +85,13 @@ class UserHandler {
 			}
 		});
 
+		const userEmailElements = document.querySelectorAll("[data-user='email']");
+		userEmailElements.forEach(element => {
+			if (element instanceof HTMLElement) {
+				element.textContent = this.emailAddress || "Email Address";
+			}
+		});
+
 		userMenuManager.initialize();
 	}
 }
