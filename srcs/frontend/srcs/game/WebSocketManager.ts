@@ -60,6 +60,10 @@ export class WebSocketManager {
 		});
 
 		this.socket.onmessage = (event) => {
+			if (event.data === "pong!") {
+				PongGameManager.calculatePing();
+				return;
+			}
 			const msg: ServerMessage = JSON.parse(event.data);
 			if (msg.type === "init") {
 				console.log(msg);

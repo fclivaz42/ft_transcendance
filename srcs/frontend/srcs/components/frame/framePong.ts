@@ -14,7 +14,10 @@ export function createPongCanvas(): HTMLDivElement {
 						<div class="flex justify-between items-center min-h-0">
 							<div class="flex items-center justify-center gap-4">
 								${createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}).outerHTML}
-								<p data-user="username" class="text-xl lg:text-3xl font-bold text-center select-text">${UserHandler.displayName}</p>
+								<div class="flex flex-col items-start justify-center">
+									<p data-user="username" class="text-xl lg:text-3xl font-bold text-center select-text">${UserHandler.displayName}</p>
+									<p data-ping="p1" class="text-base lg:text-lg">calculating...</p>
+								</div>
 							</div>
 							<div id="score" class="text-3xl lg:text-6xl font-bold text-center flex items-center justify-center flex-nowrap gap-x-2 lg:gap-x-4">
 								<p data-score="p1" class="text-right w-16 lg:w-32">0</p>
@@ -23,7 +26,10 @@ export function createPongCanvas(): HTMLDivElement {
 							</div>
 							<div class="flex flex-row-reverse items-center justify-center gap-4">
 								${createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}).outerHTML}
-								<p data-user="username" class="text-xl lg:text-3xl font-bold text-center select-text">${UserHandler.displayName}</p>
+								<div class="flex flex-col items-end justify-center">
+									<p data-user="username" class="text-xl lg:text-3xl font-bold text-center select-text">${UserHandler.displayName}</p>
+									<p data-ping="p2" class="text-base lg:text-lg">calculating...</p>
+								</div>
 							</div>
 						</div>
 						<canvas id="game" class="rounded-xl flex-grow bg-panel dark:bg-panel_dark w-full h-full"></canvas>

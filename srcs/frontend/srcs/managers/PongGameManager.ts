@@ -24,6 +24,35 @@ class PongGameManager {
 	private started: boolean = false;
 	private frontElements: frontElements | undefined;
 	private websocketManager: WebSocketManager | undefined;
+	private pingInterval: {
+		lastCheck: number | undefined;
+		ping: number | undefined;
+		sentPing: number | undefined;
+	} = {ping: undefined, sentPing: undefined, endTime: undefined};
+
+	public calculatePing() {
+		if (this.pingInterval.sentPing === undefined) {
+			if (!this.websocketManager || !this.websocketManager.socket)
+				throw new Error("WebSocketManager or socket is not initialized.");
+			this.pingInterval.sentPing = Date.now();
+			this.websocketManager.socketInstance.send("ping!");
+			return;
+		}
+		this.pingInterval.ping = Date.now() - this.pingInterval.sentPing;
+		// TODO: send ping to server
+		/*this.websocketManager?.socketInstance.send(JSON.stringify({
+			type: "ping",
+			payload: {
+				ping: this.pingInterval.ping
+			}
+		}));*/
+		this.pingInterval.sentPing = undefined;
+		const pingElemens = document.querySelectorAll<HTMLSpanElement>("[data-ping]");
+		for (const element of pingElemens) {
+			// TODO: differentiate between players
+			element.textContent = `${this.pingInterval.ping}ms`;
+		}
+	}
 
 	public reset() {
 		if (this.started) {
@@ -36,7 +65,6 @@ class PongGameManager {
 
 	public initialize(addr: string) {
 		this.reset();
-
 		const canvasContainer = createPongCanvas();
 		this.frontElements = {
 			canvasContainer: canvasContainer,
@@ -57,6 +85,10 @@ class PongGameManager {
 					this.getEngine.resize();
 					this.started = true;
 					this.getEngine.runRenderLoop(() => {
+						if (!this.pingInterval.sentPing && (!this.pingInterval.lastCheck || Date.now() - this.pingInterval.lastCheck > 3000)) {
+							this.calculatePing();
+							this.pingInterval.lastCheck = Date.now();
+						}
 						if (!this.getField)
 							throw new Error("GameField is not initialized.");
 						this.getField.scene.render();
