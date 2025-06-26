@@ -24,6 +24,18 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		return reply.code(resp.status).send(resp.data);
 	});
 
+	app.get("/:uuid/picture", async (request, reply) => {
+		const authorization = checkRequestAuthorization(request, reply);
+		if (authorization)
+			return authorization;
+		const params = request.params as { uuid: string };
+		const resp = await db_sdk.get_user_picture(params.uuid)
+		if (resp.status > 300)
+			return reply.code(resp.status).send(resp.statusText);
+		if (!resp.data)
+			return reply.code(404).send("User picture not found");
+		return reply.headers(resp.headers as any).send(resp.data);
+	});
 	app.delete("/:uuid", async (request, reply) => {
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)

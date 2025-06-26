@@ -5,7 +5,6 @@ import type { UserLoginOauthProps, UserLoginProps, UserRegisterProps, User } fro
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { Logger } from "./loggers.ts";
 import { httpReply } from "./httpResponse.ts";
-import type { Multipart } from "@fastify/multipart";
 
 export interface UsersSdkConfig {
 	apiKey: string;
@@ -52,6 +51,10 @@ export interface UsersSdkOptions {
 	 */
 	headers?: Record<string, string>;
 	/**
+	* let Axios know what we are dealing with
+	*/
+	response_type?: "arraybuffer" | "blob" | "json" | "text" | "stream" | "document" | "formdata"
+	/**
 	 * Payload to send in the request body.
 	 */
 	data?: any;
@@ -93,6 +96,7 @@ class UsersSdk {
 			},
 			data: options?.data,
 			params: options?.params,
+			responseType: options?.response_type,
 			validateStatus: (status => (status >= 200 && status < 300) || status === 401 || status === 403),
 		});
 	}
@@ -330,10 +334,13 @@ class UsersSdk {
 	}
 
 	public async updateUser(userId: string, data: FormData): Promise<AxiosResponse<User>> {
-		console.log("requesting...")
 		return this.apiRequest<User>("put", userId, {
 			data,
 		});
+	}
+
+	public async getUserPicture(uuid: string): Promise<AxiosResponse<ArrayBuffer>> {
+		return this.apiRequest<ArrayBuffer>("get", `${uuid}/picture`, { response_type: "arraybuffer" });
 	}
 }
 
