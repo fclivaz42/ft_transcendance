@@ -98,16 +98,10 @@ class PongGameManager {
 
 	public onScoreUpdate(score: Record<string, number>) {
 		for (const element of this.getFrontElements.scoreElement.children) {
-			console.log("loop element", element);
 			const identifier = element.getAttribute("data-score");
 			if (!identifier || !(identifier in score)) continue;
-			console.log("identifier", identifier, "score", score[identifier]);
-			console.log("condition check", element.textContent, "==", score[identifier].toString());
-			console.log(element.textContent === score[identifier].toString());
 			const updatedScore = score[identifier].toString();
 			if (element.textContent === updatedScore) continue;
-			console.log("Updating score for", identifier, "to", updatedScore);
-			// Update text content with animation
 			window.requestAnimationFrame(() => {
 					element.classList.add("animate-slide-up-fade");
 					element.textContent = updatedScore;
