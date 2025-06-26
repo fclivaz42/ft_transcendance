@@ -1,14 +1,15 @@
-export interface Users {
+export interface User {
 	PlayerID?: string,
 	DisplayName: string,
 	EmailAddress: string,
 	Password: string,
 	OAuthID?: string,
-	FriendsList?: string,
+	FriendsList?: Array<string>,
 	PhoneNumber?: string,
 	FirstName?: string,
 	FamilyName?: string,
 	Bappy?: number,
+	Private?: number
 };
 
 export interface UserLoginProps {
@@ -20,6 +21,9 @@ export interface UserLoginProps {
 export interface UserRegisterProps extends UserLoginProps {
 	DisplayName: string;
 	EmailAddress: string;
+}
+export interface UserWithPicture extends User {
+	Avatar: File;
 }
 
 export interface UserLoginOauthProps {
