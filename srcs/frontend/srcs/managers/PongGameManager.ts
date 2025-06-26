@@ -6,12 +6,23 @@ import { GameField } from "../game/GameField.js";
 import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
 
+function enforceDefined<T>(value: T | undefined, message: string): T {
+	if (!value)
+		throw new Error(message);
+	return value;
+}
+
+interface frontElements {
+	canvasContainer: HTMLDivElement;
+	canvas: HTMLCanvasElement;
+	scoreElement: HTMLSpanElement;
+}
+
 class PongGameManager {
 	private engine: Engine | undefined;
 	private field: GameField | undefined;
 	private started: boolean = false;
-	private canvasContainer: HTMLDivElement | undefined;
-	private canvas: HTMLCanvasElement | undefined;
+	private frontElements: frontElements | undefined;
 	private websocketManager: WebSocketManager | undefined;
 
 	public reset() {
@@ -26,9 +37,13 @@ class PongGameManager {
 	public initialize(addr: string) {
 		this.reset();
 
-		this.canvasContainer = createPongCanvas();
-		this.canvas = this.canvasContainer.querySelector<HTMLCanvasElement>("canvas") || undefined;
-		this.engine = new Engine(this.getCanvas, true);
+		const canvasContainer = createPongCanvas();
+		this.frontElements = {
+			canvasContainer: canvasContainer,
+			canvas: enforceDefined(canvasContainer.querySelector<HTMLCanvasElement>("canvas"), "Canvas element not found in the container.") as HTMLCanvasElement,
+			scoreElement: enforceDefined(canvasContainer.querySelector<HTMLSpanElement>("#score"), "Score element not found in the container.") as HTMLSpanElement
+		}
+		this.engine = new Engine(this.getFrontElements.canvas, true);
 		this.field = new GameField(this.engine);
 
 		if (this.websocketManager)
@@ -38,9 +53,7 @@ class PongGameManager {
 				console.log("WebSocket payload received:", payload);
 				this.getField.init(payload);
 				if (!this.started) {
-					if (!this.canvasContainer)
-						throw new Error("Canvas is not initialized.");
-					frameManager.frameChild = this.canvasContainer;
+					frameManager.frameChild = this.getFrontElements.canvasContainer;
 					this.getEngine.resize();
 					this.started = true;
 					this.getEngine.runRenderLoop(() => {
@@ -59,39 +72,50 @@ class PongGameManager {
 	}
 
 	private cleanupGame() {
-		if (this.canvasContainer) {
-			this.canvasContainer.remove();
-			this.canvasContainer = undefined;
-		}
-		if (this.canvas) {
-			this.canvas.remove();
-			this.canvas = undefined;
-		}
-		if (this.websocketManager) {
-			this.websocketManager.close();
-			this.websocketManager = undefined;
-		}
+		if (this.frontElements)
+				for (const element of Object.values(this.frontElements))
+					if (element) element.remove();
+		this.frontElements = undefined;
 	}
 
 	private get getEngine(): Engine {
-		if (!this.engine) {
+		if (!this.engine)
 			throw new Error("Engine is not initialized.");
-		}
 		return this.engine;
 	}
 
 	private get getField(): GameField {
-		if (!this.field) {
+		if (!this.field)
 			throw new Error("GameField is not initialized.");
-		}
 		return this.field;
 	}
 
-	private get getCanvas(): HTMLCanvasElement {
-		if (!this.canvas) {
-			throw new Error("Canvas is not initialized.");
+	private get getFrontElements(): frontElements{
+		if (!this.frontElements)
+			throw new Error("Front elements are not initialized.");
+		return this.frontElements;
+	}
+
+	public onScoreUpdate(score: Record<string, number>) {
+		for (const element of this.getFrontElements.scoreElement.children) {
+			console.log("loop element", element);
+			const identifier = element.getAttribute("data-score");
+			if (!identifier || !(identifier in score)) continue;
+			console.log("identifier", identifier, "score", score[identifier]);
+			console.log("condition check", element.textContent, "==", score[identifier].toString());
+			console.log(element.textContent === score[identifier].toString());
+			const updatedScore = score[identifier].toString();
+			if (element.textContent === updatedScore) continue;
+			console.log("Updating score for", identifier, "to", updatedScore);
+			// Update text content with animation
+			window.requestAnimationFrame(() => {
+					element.classList.add("animate-slide-up-fade");
+					element.textContent = updatedScore;
+					setTimeout(() => {
+							element.classList.remove("animate-slide-up-fade");
+					}, 1000);
+			});
 		}
-		return this.canvas;
 	}
 }
 

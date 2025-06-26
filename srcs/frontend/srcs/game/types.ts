@@ -26,6 +26,11 @@ export interface UpdatePayload {
 		ball: BallUpdate;
 		p1: PaddleUpdate;
 		p2: PaddleUpdate;
+		// Move score to another interface
+		score: {
+			p1: number;
+			p2: number;
+		};
 	}
 }
 

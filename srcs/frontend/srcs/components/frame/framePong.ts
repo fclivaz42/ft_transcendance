@@ -8,18 +8,22 @@ import createUserAvatar from "../usermenu/userAvatar";
 export function createPongCanvas(): HTMLDivElement {
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<div class="absolute top-10 left-10 bottom-10 right-10 gap-4 flex items-start justify-center">
+		<div class="absolute top-10 left-10 bottom-10 right-10 gap-4 flex items-start justify-center select-none">
 				<div class="aspect-[3/2] w-full max-h-full">
 					<div class="aspect-[3/2] max-w-full h-full mx-auto flex flex-col min-h-0 gap-8">
 						<div class="flex justify-between items-center min-h-0">
 							<div class="flex items-center justify-center gap-4">
-								${createUserAvatar({sizeClass: "w-20 h-20"}).outerHTML}
-								<p data-user="userName" class="text-3xl font-bold text-center">${UserHandler.displayName}</p>
+								${createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}).outerHTML}
+								<p data-user="userName" class="text-xl lg:text-3xl font-bold text-center select-text">${UserHandler.displayName}</p>
 							</div>
-							<span id="score" class="text-6xl font-bold text-center">0 : 0</span>
+							<div id="score" class="text-3xl lg:text-6xl font-bold text-center flex items-center justify-center flex-nowrap">
+								<p data-score="p1" class="w-12 lg:w-16">0</p>
+								<span>:</span>
+								<p data-score="p2" class="w-12 lg:w-16">0</p>
+							</div>
 							<div class="flex flex-row-reverse items-center justify-center gap-4">
-								${createUserAvatar({sizeClass: "w-20 h-20"}).outerHTML}
-								<p data-user="userName" class="text-3xl font-bold text-center">${UserHandler.displayName}</p>
+								${createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}).outerHTML}
+								<p data-user="userName" class="text-xl lg:text-3xl font-bold text-center select-text">${UserHandler.displayName}</p>
 							</div>
 						</div>
 						<canvas id="game" class="rounded-xl flex-grow bg-panel dark:bg-panel_dark w-full h-full"></canvas>
