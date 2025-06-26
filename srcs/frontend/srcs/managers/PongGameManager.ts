@@ -108,6 +108,11 @@ class PongGameManager {
 				for (const element of Object.values(this.frontElements))
 					if (element) element.remove();
 		this.frontElements = undefined;
+		this.pingInterval = {
+			ping: undefined,
+			sentPing: undefined,
+			lastCheck: undefined
+		}
 	}
 
 	private get getEngine(): Engine {
