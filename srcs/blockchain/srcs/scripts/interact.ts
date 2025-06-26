@@ -50,7 +50,7 @@ export async function addMatchScore(contractAddress: string, id: string, winnerN
 		console.log("║\t -- [ Score added successfully ] --");
 		console.log("║");
 		console.log("╚══════════════════════════════════════\n");
-		return (await contract.getAddress());
+		return (await tx.getTransaction());
 	}
 	catch (error) {
 		return ("Error with contract interaction");
@@ -92,7 +92,7 @@ export async function addTournamentScore(contractAddress: string, id: string, wi
 		console.log("║\t -- [ Score added successfully ] --");
 		console.log("║");
 		console.log("╚══════════════════════════════════════\n");
-		return (await contract.getAddress());
+		return (await tx.getTransaction());
 	}
 	catch (error) {
 		return ("Error with contract interaction");

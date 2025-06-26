@@ -6,7 +6,7 @@ interface Match {
 	winner: string,
 	winnerScore: number,
 	loser: string,
-	loserScore: number
+	loserScore: number,
 };
 
 interface IdParams {

@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/26 16:22:23 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/26 21:54:34 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -88,6 +88,10 @@ export default class DatabaseSDK {
 	private async get_friends_from_uuid(user: UUIDv4): Promise<AxiosResponse<Array<User>>> {
 		const req_user: User = (await this.get_user(user, "PlayerID")).data
 		return await this.get_friends_from_user(req_user)
+	}
+
+	public async get_current_contract(): Promise<AxiosResponse<string>> {
+		return await this.api_request("GET", "CurrentContract", undefined)
 	}
 
 	/**
