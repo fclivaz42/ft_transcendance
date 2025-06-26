@@ -42,15 +42,9 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const userPicture = await usersSdk.getUserPicture(authorization.data.sub);
 		if (userPicture.status !== 200)
 			throw new Error(`Failed to fetch user picture: ${userPicture.statusText}`);
-		const file = userPicture.data as File;
-		if (!file)
+		if (!userPicture.data)
 			return reply.code(404).send("User picture not found");
-		console.log("Sending user picture", file.name, file.type);
-		const headers: Record<string, string> = {
-			"Content-Type": file.type,
-			"Content-Disposition": `attachment; filename="${file.name}"`,
-		};
-		return reply.headers(headers).send(file);
+		return reply.headers(userPicture.headers as any).send(userPicture.data);
 	});
 
 	// Returns a JWT token that can be used to authenticate further requests.

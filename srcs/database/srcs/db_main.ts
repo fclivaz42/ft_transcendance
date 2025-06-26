@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/25 19:12:48 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/26 18:49:21 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -50,7 +50,7 @@ if (!process.env.API_KEY ||
 
 let status = init_db()
 
-fs.mkdir(process.env.FILELOCATION, { recursive: true, mode: 0o700 }, (err) => {
+fs.mkdir(process.env.FILELOCATION, { recursive: true, mode: 0o755 }, (err) => {
 	if (err) {
 		console.dir(err)
 		process.exit(1)

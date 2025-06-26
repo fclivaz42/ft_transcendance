@@ -51,6 +51,10 @@ export interface UsersSdkOptions {
 	 */
 	headers?: Record<string, string>;
 	/**
+	* let Axios know what we are dealing with
+	*/
+	response_type?: "arraybuffer" | "blob" | "json" | "text" | "stream" | "document" | "formdata"
+	/**
 	 * Payload to send in the request body.
 	 */
 	data?: any;
@@ -92,6 +96,7 @@ class UsersSdk {
 			},
 			data: options?.data,
 			params: options?.params,
+			responseType: options?.response_type,
 			validateStatus: (status => (status >= 200 && status < 300) || status === 401 || status === 403),
 		});
 	}
@@ -334,8 +339,8 @@ class UsersSdk {
 		});
 	}
 
-	public async getUserPicture(uuid: string): Promise<AxiosResponse<File>> {
-		return this.apiRequest<File>("get", `${uuid}/picture`);
+	public async getUserPicture(uuid: string): Promise<AxiosResponse<ArrayBuffer>> {
+		return this.apiRequest<ArrayBuffer>("get", `${uuid}/picture`, { response_type: "arraybuffer" });
 	}
 }
 

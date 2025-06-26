@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/26 16:22:23 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/26 19:38:33 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -23,6 +23,7 @@ export type UUIDv4 = string
 interface db_sdk_options {
 	params?: string;
 	headers?: Record<string, string>;
+	response_type?: "arraybuffer" | "blob" | "json" | "text" | "stream" | "document" | "formdata"
 	body?: any
 }
 
@@ -55,6 +56,7 @@ export default class DatabaseSDK {
 				...options?.headers,
 			},
 			data: options?.body,
+			responseType: options?.response_type
 		})
 	}
 
@@ -145,8 +147,8 @@ export default class DatabaseSDK {
 	* @param identifier The user's UUIDv4 string.
 	* @returns An AxiosResponse Promise containing a File.
 	*/
-	public async get_user_picture(identifier: UUIDv4): Promise<AxiosResponse<File>> {
-		return await this.api_request<File>("GET", "Players", `/PlayerID/${this.param_str}/picture`, { params: identifier })
+	public async get_user_picture(identifier: UUIDv4): Promise<AxiosResponse<ArrayBuffer>> {
+		return await this.api_request<ArrayBuffer>("GET", "Players", `/PlayerID/${this.param_str}/picture`, { params: identifier, response_type: "arraybuffer" })
 	}
 
 	/**
@@ -155,8 +157,8 @@ export default class DatabaseSDK {
 	* @param picture FormData containing the picture.
 	* @returns An AxiosResponse Promise containing a File.
 	*/
-	public async set_user_picture(identifier: UUIDv4, picture: FormData): Promise<AxiosResponse<File>> {
-		return await this.api_request<File>("POST", "Players", `/PlayerID/${this.param_str}/picture`, { params: identifier, body: picture })
+	public async set_user_picture(identifier: UUIDv4, picture: FormData): Promise<AxiosResponse<ArrayBuffer>> {
+		return await this.api_request<ArrayBuffer>("POST", "Players", `/PlayerID/${this.param_str}/picture`, { params: identifier, body: picture, response_type: "arraybuffer" })
 	}
 
 	/**
