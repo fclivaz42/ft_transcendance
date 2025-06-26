@@ -6,6 +6,7 @@ class UserHandler {
 		PlayerID: string;
 		DisplayName: string;
 		EmailAddress: string;
+		Avatar?: string,
 	} | undefined;
 
 	constructor() {
@@ -44,7 +45,7 @@ class UserHandler {
 	}
 
 	public get avatarUrl() {
-		return `https://placehold.co/100x100?text=${this.displayName?.substring(0,2) || "?"}&font=roboto&bg=cccccc`;
+		return this._user?.Avatar || `https://placehold.co/100x100?text=${this.displayName?.substring(0,2) || "?"}&font=roboto&bg=cccccc`;
 	}
 
 	public get isLogged() {
@@ -64,6 +65,15 @@ class UserHandler {
 				this._user = undefined;
 			} else {
 				this._user = {...userData};
+				if (!this._user)
+					throw new Error("User data is undefined or null");
+				const avatarFile = await fetch("/api/users/me/picture");
+				if (avatarFile.ok) {
+					if (avatarFile.status === 200)
+						this._user.Avatar = "/api/users/me/picture";
+				} else {
+					console.warn("Failed to fetch user avatar:", avatarFile.statusText);
+				}
 			}
 		}
 		this.updateComponents();

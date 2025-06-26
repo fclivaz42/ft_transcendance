@@ -44,6 +44,7 @@ export default function createUserAvatar(props: UserAvatarProps = {
 				editContainer.classList.add("opacity-0");
 			};
 			editContainer.onclick = () => {
+				userMenuManager.uploadFile.value = "";
 				userMenuManager.uploadFile.click();
 			};
 			userMenuManager.uploadFile.onchange = async () => {
