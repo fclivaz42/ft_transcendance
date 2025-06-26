@@ -5,7 +5,6 @@ import type { UserLoginOauthProps, UserLoginProps, UserRegisterProps, User } fro
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { Logger } from "./loggers.ts";
 import { httpReply } from "./httpResponse.ts";
-import type { Multipart } from "@fastify/multipart";
 
 export interface UsersSdkConfig {
 	apiKey: string;
@@ -330,10 +329,13 @@ class UsersSdk {
 	}
 
 	public async updateUser(userId: string, data: FormData): Promise<AxiosResponse<User>> {
-		console.log("requesting...")
 		return this.apiRequest<User>("put", userId, {
 			data,
 		});
+	}
+
+	public async getUserPicture(uuid: string): Promise<AxiosResponse<File>> {
+		return this.apiRequest<File>("get", `${uuid}/picture`);
 	}
 }
 
