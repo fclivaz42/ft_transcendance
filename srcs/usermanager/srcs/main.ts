@@ -3,6 +3,7 @@ import initializeRoute from "./routes/users.ts";
 import fs from "node:fs";
 import { config } from "./managers/ConfigManager.ts";
 import { betterFastify } from "../../libs/helpers/fastifyHelper.ts";
+import fastifyMultipart from "@fastify/multipart";
 
 const server = fastify({
 	https: {
@@ -11,11 +12,12 @@ const server = fastify({
 	}
 });
 
-server.register(initializeRoute, { prefix: "/users" });
+await server.register(fastifyMultipart)
+await server.register(initializeRoute, { prefix: "/users" });
 
 betterFastify(server);
 
-server.listen({ port: config.ServerConfig.port, host: "0.0.0.0" }, (err, address) => {
+server.listen({ port: config.ServerConfig.port, host: "::" }, (err, address) => {
 	if (err) {
 		server.log.error(err);
 		process.exit(1);

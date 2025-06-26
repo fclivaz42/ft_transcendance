@@ -1,23 +1,23 @@
 
 import type { FastifyReply, FastifyRequest } from "fastify";
-import type { Users } from "../../../libs/interfaces/Users";
+import type { User } from "../../../libs/interfaces/User.ts";
 import { httpReply } from "../../../libs/helpers/httpResponse.ts";
 
 export default class UsersValidation {
-	static enforceUserValidation(reply: FastifyReply, request: FastifyRequest, users: Partial<Users>) {
+	static enforceUserValidation(reply: FastifyReply, request: FastifyRequest, users: Partial<User>) {
 		if (users.EmailAddress && !UsersValidation.validateUserEmail(users.EmailAddress))
 			return httpReply({
 				detail: "Invalid email address format.",
 				status: 400,
 				module: "usermanager",
-		}, reply, request);
+			}, reply, request);
 
 		if (users.DisplayName && !UsersValidation.validateUserName(users.DisplayName))
 			return httpReply({
 				detail: "Invalid display name format. It should be 3 to 14 characters long, alphanumeric and underscores only.",
 				status: 400,
 				module: "usermanager",
-		}, reply, request);
+			}, reply, request);
 		return null;
 	}
 

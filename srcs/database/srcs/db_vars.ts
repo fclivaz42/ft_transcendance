@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/22 19:12:38 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/25 00:55:44 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -88,21 +88,21 @@ const PlayersTable: db_table =
 	"Methods": {
 		"GET": [
 			"/multiget",
-			"/id/:PlayerID",
-			"/oauth/:OAuthID",
-			"/username/:DisplayName",
-			"/email/:EmailAddress"
+			"/PlayerID/:PlayerID",
+			"/OAuthID/:OAuthID",
+			"/DisplayName/:DisplayName",
+			"/EmailAddress/:EmailAddress"
 		],
 		"POST": [
 			""
 		],
 		"DELETE": [
-			"/id/:PlayerID",
-			"/username/:DisplayName",
-			"/email/:EmailAddress"
+			"/PlayerID/:PlayerID",
+			"/DisplayName/:DisplayName",
+			"/EmailAddress/:EmailAddress"
 		],
 		"PUT": [
-			"/id/:PlayerID",
+			"/PlayerID/:PlayerID",
 		]
 	},
 	"Identification": {
@@ -120,6 +120,8 @@ const MatchesTable: db_table =
 		"LPlayerID",
 		"WScore",
 		"LScore",
+		"WGuestName",
+		"LGuestName",
 		"StartTime",
 		"EndTime",
 		"MatchIndex"
@@ -130,6 +132,8 @@ const MatchesTable: db_table =
 		`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET NULL`,
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL",
+		"TEXT DEFAULT NULL",
+		"TEXT DEFAULT NULL",
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL"
@@ -137,8 +141,8 @@ const MatchesTable: db_table =
 	"Methods": {
 		"GET": [
 			"/multiget",
-			"/search/:PlayerID",
-			"/id/:MatchID",
+			"/PlayerID/:PlayerID",
+			"/MatchID/:MatchID",
 		],
 		"POST": [
 			""
@@ -163,7 +167,7 @@ const TournamentsTable: db_table =
 	],
 	"Methods": {
 		"GET": [
-			"/id/:TournamentID",
+			"/TournamentID/:TournamentID",
 		],
 		"POST": [
 			""
