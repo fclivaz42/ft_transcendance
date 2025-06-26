@@ -90,22 +90,11 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 					for await (const chunk of file)
 						chunks.push(chunk);
 					const buffer = Buffer.concat(chunks);
-					formdata.append("file", new File([buffer], part.filename, { type: part.mimetype}));
+					formdata.append("file", new File([buffer], part.filename, { type: part.mimetype }));
 				}
 				continue;
 			}
-
-			switch (part.fieldname) {
-				case "DisplayName":
-					formdata.append("DisplayName", part.value as string);
-					break;
-				case "EmailAddress":
-					formdata.append("EmailAddress", part.value as string);
-					break;
-				case "Password":
-					formdata.append("Password", part.value as string);
-					break;
-			}
+			formdata.append(part.fieldname, part.value as string)
 		}
 		if (![...formdata.entries()].length) {
 			return httpReply({

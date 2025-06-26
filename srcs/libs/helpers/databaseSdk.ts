@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/25 19:14:34 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/26 16:22:23 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -16,7 +16,7 @@ import type { AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import type * as fft from "fastify";
 import type { User } from "../interfaces/User.ts";
 import type { Match, Match_complete } from "../interfaces/Match.ts";
-import type { Tournament_lite, Tournament_metadata } from "../interfaces/Tournament.ts";
+import type { Tournament_full, Tournament_lite, Tournament_metadata } from "../interfaces/Tournament.ts";
 
 export type UUIDv4 = string
 
@@ -38,8 +38,6 @@ export default class DatabaseSDK {
 		if (options?.body) {
 			if (!options.headers)
 				options.headers = {};
-			if (!options.headers["Content-Type"])
-				options.headers["Content-Type"] = "application/json";
 		}
 		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
@@ -77,22 +75,14 @@ export default class DatabaseSDK {
 		})
 	}
 
-	public async create_user(user: User): Promise<AxiosResponse<User>> {
-		return await this.api_request<User>("POST", "Players", undefined, { body: user })
+	private async get_player_matchlist_from_uuid(user: UUIDv4): Promise<AxiosResponse<Array<Match>>> {
+		return await this.api_request<Array<Match>>("GET", "Matches", `/PlayerID/${this.param_str}`, { params: user })
 	}
 
-	public async get_user(identifier: string, type: "PlayerID" | "DisplayName" | "EmailAddress" | "OAuthID"): Promise<AxiosResponse<User>> {
-		return await this.api_request<User>("GET", "Players", `/${type}/${this.param_str}`, { params: identifier })
-	}
-
-	public async update_user(user: User): Promise<AxiosResponse<User>> {
+	private async get_player_matchlist_from_user(user: User): Promise<AxiosResponse<Array<Match>>> {
 		if (!user.PlayerID)
-			throw "error.missing.playerid"
-		return await this.api_request<User>("PUT", "Players", `/PlayerID/${this.param_str}`, { body: user, params: user.PlayerID })
-	}
-
-	public async delete_user(user: UUIDv4): Promise<AxiosResponse<string>> {
-		return await this.api_request<string>("DELETE", "Players", `/PlayerID/${this.param_str}`, { params: user })
+			throw "error.empty.playerid"
+		return await this.get_player_matchlist_from_uuid(user.PlayerID)
 	}
 
 	private async get_friends_from_uuid(user: UUIDv4): Promise<AxiosResponse<Array<User>>> {
@@ -100,26 +90,85 @@ export default class DatabaseSDK {
 		return await this.get_friends_from_user(req_user)
 	}
 
+	/**
+	* Create a new user in the database.
+	* @param user The user you want to create (object).
+	* @returns An AxiosResponse Promise containing the created User's complete data
+	*/
+	public async create_user(user: User): Promise<AxiosResponse<User>> {
+		return await this.api_request<User>("POST", "Players", undefined, { body: user })
+	}
+
+	/**
+	* Get a user's complete data from the database.
+	* @param identifier The string used to identify the user by the second parameter.
+	* @param type The type of the identifier. Can be one of the following: "PlayerID" | "DisplayName" | "EmailAddress" | "OAuthID"
+	* @returns An AxiosResponse Promise containing the User's complete data. Throws in case the user was not found.
+	*/
+	public async get_user(identifier: string, type: "PlayerID" | "DisplayName" | "EmailAddress" | "OAuthID"): Promise<AxiosResponse<User>> {
+		return await this.api_request<User>("GET", "Players", `/${type}/${this.param_str}`, { params: identifier })
+	}
+
+	/**
+	* Update a User's information
+	* @param user The user you want to update. The PlayerID Field is mandatory!
+	* @returns An AxiosResponse Promise containing the created User's complete data. Throws in case the user was not found.
+	*/
+	public async update_user(user: User): Promise<AxiosResponse<User>> {
+		if (!user.PlayerID)
+			throw "error.missing.playerid"
+		return await this.api_request<User>("PUT", "Players", `/PlayerID/${this.param_str}`, { body: user, params: user.PlayerID })
+	}
+
+	/**
+	* Delete a user from SARIF.
+	* @param user the UUIDv4 string of the user.
+	* @returns An AxiosResponse Promise containing a string (the SQL result.) Throws in case the user was not found.
+	*/
+	public async delete_user(user: UUIDv4): Promise<AxiosResponse<string>> {
+		return await this.api_request<string>("DELETE", "Players", `/PlayerID/${this.param_str}`, { params: user })
+	}
+
+	/**
+	* Get the friends data of a specific user.
+	* @param user Either an UUIDv4 string or User object.
+	* @returns An AxiosResponse Promise containing an array of Users, those being the friends.
+	*/
 	public async get_user_friends(user: UUIDv4 | User): Promise<AxiosResponse<Array<User>>> {
 		if (typeof user === "string")
 			return await this.get_friends_from_uuid(user)
 		return await this.get_friends_from_user(user)
 	}
 
+	/**
+	* Get the profile picture from a certain user.
+	* @param identifier The user's UUIDv4 string.
+	* @returns An AxiosResponse Promise containing a File.
+	*/
 	public async get_user_picture(identifier: UUIDv4): Promise<AxiosResponse<File>> {
 		return await this.api_request<File>("GET", "Players", `/PlayerID/${this.param_str}/picture`, { params: identifier })
 	}
 
-	public async set_user_picture(identifier: UUIDv4, picture: File): Promise<AxiosResponse<File>> {
-		let data = new FormData();
-		data.append("image", picture)
-		console.dir(data)
-		return await this.api_request<File>("POST", "Players", `/PlayerID/${this.param_str}/picture`, { params: identifier, body: data, headers: { "Content-Type": "multipart/form-data" } })
+	/**
+	* Get the profile picture from a certain user.
+	* @param identifier The user's UUIDv4 string.
+	* @param picture FormData containing the picture.
+	* @returns An AxiosResponse Promise containing a File.
+	*/
+	public async set_user_picture(identifier: UUIDv4, picture: FormData): Promise<AxiosResponse<File>> {
+		return await this.api_request<File>("POST", "Players", `/PlayerID/${this.param_str}/picture`, { params: identifier, body: picture })
 	}
 
-	public async log_user(query: string, type: "PlayerID" | "DisplayName" | "EmailAddress", plaintext: string): Promise<AxiosResponse<User>> {
+	/**
+	* Checks the given password against the one provided by query.
+	* @param identifier The string used to identify the user by the second parameter.
+	* @param type The type of the identifier. Can be one of the following: "PlayerID" | "DisplayName" | "EmailAddress" | "OAuthID"
+	* @param plaintext The password in plaintext.
+	* @returns An AxiosResponse Promise containing the user or the object { skill: "issue" } if the check fails. (And throws in case it fails)
+	*/
+	public async log_user(identifier: string, type: "PlayerID" | "DisplayName" | "EmailAddress", plaintext: string): Promise<AxiosResponse<User>> {
 		return await this.api_request<User>("GET", "Players", `/${type}/${this.param_str}/check_passwd`, {
-			params: query,
+			params: identifier,
 			headers: {
 				Password: plaintext
 			}
@@ -131,25 +180,29 @@ export default class DatabaseSDK {
 		return await this.api_request<Tournament_metadata>("POST", "Tournaments", undefined, { body: tournament })
 	}
 
-	public async get_tournament(tournament_id: UUIDv4) {
-		return await this.api_request<User>("GET", "Tournaments", `/TournamentID/${this.param_str}`, { params: tournament_id })
+	/**
+	* Get the complete tournament data.
+	* @param tournament_id The UUIDv4 string of the tournament you are trying to get.
+	* @returns An AxiosResponse Promise containing the complete Tournament data.
+	*/
+	public async get_tournament(tournament_id: UUIDv4): Promise<AxiosResponse<Tournament_full>> {
+		return await this.api_request<Tournament_full>("GET", "Tournaments", `/TournamentID/${this.param_str}`, { params: tournament_id })
 
 	}
 
+	/**
+	* Get the complete list of matches present in the database.
+	* @returns An AxiosResponse Promise containing an array of every single Match.
+	*/
 	public async get_matchlist(): Promise<AxiosResponse<Array<Match>>> {
 		return await this.api_request<Array<Match>>("GET", "Matches", "/multiget")
 	}
 
-	private async get_player_matchlist_from_uuid(user: UUIDv4): Promise<AxiosResponse<Array<Match>>> {
-		return await this.api_request<Array<Match>>("GET", "Matches", `/PlayerID/${this.param_str}`, { params: user })
-	}
-
-	private async get_player_matchlist_from_user(user: User): Promise<AxiosResponse<Array<Match>>> {
-		if (!user.PlayerID)
-			throw "error.empty.playerid"
-		return await this.get_player_matchlist_from_uuid(user.PlayerID)
-	}
-
+	/**
+	* Get the complete list of matches in which the User is present.
+	* @param user The UUIDv4 of the User or the User object.
+	* @returns An AxiosResponse Promise containing an array of every single Match.
+	*/
 	public async get_player_matchlist(user: UUIDv4 | User): Promise<AxiosResponse<Array<Match>>> {
 		if (typeof user === "string")
 			return await this.get_player_matchlist_from_uuid(user)
@@ -161,7 +214,12 @@ export default class DatabaseSDK {
 		return await this.api_request<Match>("POST", "Matches", undefined, { body: match })
 	}
 
-	public async get_match(match_id: UUIDv4) {
-		return await this.api_request<User>("GET", "Matches", `/MatchID/${this.param_str}`, { params: match_id })
+	/**
+	* Get the complete match data.
+	* @param match_id The UUIDv4 string of the match you are trying to get.
+	* @returns An AxiosResponse Promise containing the complete Match data.
+	*/
+	public async get_match(match_id: UUIDv4): Promise<AxiosResponse<Match_complete>> {
+		return await this.api_request<Match_complete>("GET", "Matches", `/MatchID/${this.param_str}`, { params: match_id })
 	}
 }

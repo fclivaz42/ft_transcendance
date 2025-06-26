@@ -70,7 +70,6 @@ class UsersSdk {
 	}
 
 	/**
-	 * 
 	 * @param method method to use
 	 * @param endpoint api endpoint to call
 	 * @param params optional parameters to pass to the endpoint
@@ -81,8 +80,6 @@ class UsersSdk {
 		if (options?.data) {
 			if (!options.headers)
 				options.headers = {};
-			if (!options.headers["Content-Type"])
-				options.headers["Content-Type"] = "application/json";
 		}
 		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 		const url = `${this._config.serverUrl}/users/${endpoint}`/*${options.params ? `?${options.params.toString()}` : ""}`*/;
@@ -207,14 +204,14 @@ class UsersSdk {
 	}
 
 	/**
- * Asks the UsersSdk to enforce user authorization based on the provided JWT token.
- * This function will throw an error if the authorization fails or if no token is provided.
- * It will also send Unauthorized responses.
- * @throws Error if the authorization fails or if no token is provided. Will also send Unauthorized responses.
- * @param rep fastify reply object
- * @param req fastify request object
- * @returns
- */
+	* Asks the UsersSdk to enforce user authorization based on the provided JWT token.
+	* This function will throw an error if the authorization fails or if no token is provided.
+	* It will also send Unauthorized responses.
+	* @throws Error if the authorization fails or if no token is provided. Will also send Unauthorized responses.
+	* @param rep fastify reply object
+	* @param req fastify request object
+	* @returns
+	*/
 	async usersEnforceAuthorize(rep: FastifyReply | any, req: FastifyRequest | any) {
 		const reqRef = req as FastifyRequest;
 		const cookies = UsersSdk.unshowerCookie(reqRef.headers.cookie);
@@ -241,7 +238,6 @@ class UsersSdk {
 	}
 
 	/**
-	 * 
 	 * @param rep fastify reply object
 	 * @param token JWT token to set in the cookie.
 	 * @param exp optional expiration time in seconds for the cookie, defaults to 7776000 seconds (90 days).
@@ -251,7 +247,6 @@ class UsersSdk {
 	}
 
 	/**
-	 * 
 	 * @param rep fastify reply object
 	 * @param token JWT token to set in the cookie.
 	 * @param exp optional expiration time in seconds for the cookie, defaults to 7776000 seconds (90 days).
@@ -286,7 +281,6 @@ class UsersSdk {
 	}
 
 	/**
-	 *
 	 * Enforces user authorization by checking the JWT token in the request cookies.
 	 * This function will throw an error if the authorization fails or if no token is provided.
 	 * @throws {status: 401, statusText: "Unauthorized", message: string} if the authorization fails or if no token is provided.
@@ -338,7 +332,7 @@ class UsersSdk {
 	public async updateUser(userId: string, data: FormData): Promise<AxiosResponse<User>> {
 		console.log("requesting...")
 		return this.apiRequest<User>("put", userId, {
-			data
+			data,
 		});
 	}
 }

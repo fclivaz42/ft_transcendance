@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyPluginOptions } from "fastify";
+import type { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
 import usersLoginEndpoint from "./users/login.ts";
 import usersAuthorizeEndpoint from "./users/authorize.ts";
 import usersRegisterEndpoint from "./users/register.ts";
@@ -34,44 +34,46 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 	});
 
 	app.put("/:uuid", async (request, reply) => {
-		console.log("WE'RE HEREEE")
-		console.dir(request.headers)
-		// const user: Partial<User> = {}
-		// for (const item in data.fields) {
-		// 	console.log("-------------------------------------------------------")
-		// 	if ((data.fields[item] as any).value) {
-		// 		console.log(`added ${item}`)
-		// 		user[item] = (data.fields[item] as any).value
-		// 	}
-		// 	console.log((data.fields[item] as any).value)
-		// }
-		// user.PlayerID = userId
-		// console.log("Ok done")
-		// console.dir(user)
-		let avatar: File | null = null;
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
 			return authorization;
+		const user: Partial<User> = {}
 		const params = request.params as { uuid: string };
-		const body = request.body as Partial<UserWithPicture>;
-		if (body.Avatar) {
-			avatar = body.Avatar
-			delete body.Avatar
+		let resp: undefined | object;
+		const formdata = new FormData();
+		for await (const part of request.parts()) {
+			if (part.type === "field")
+				user[part.fieldname] = part.value
+			else {
+				if (formdata.keys.length !== 0)
+					continue;
+				if (part.mimetype.includes("image/")) {
+					const chunks: Uint8Array[] = [];
+					const file = part.file;
+					for await (const chunk of file)
+						chunks.push(chunk);
+					const buffer = Buffer.concat(chunks);
+					formdata.append("file", new File([buffer], part.filename, { type: part.mimetype }));
+				}
+			}
 		}
-		body.PlayerID = params.uuid;		// Override PlayerID in case someone tried to set it manually
-		let resp: undefined;
-		if (resp = UsersValidation.enforceUserValidation(reply, request, body))
+		if (resp = UsersValidation.enforceUserValidation(reply, request, user))
 			return resp;
-		if (avatar) {
-			console.log("updating pfp")
-			console.dir(avatar)
-			const update = await db_sdk.set_user_picture(params.uuid, avatar)
+		resp = undefined;
+		if (formdata.has("file")) {
+			const update = await db_sdk.set_user_picture(params.uuid, formdata)
 			if (update.status > 300)
 				return reply.code(update.status).send(update.statusText);
-			console.log("pfp updated!")
+			resp = { status: update.status, picture: update.statusText }
 		}
-		const db = await db_sdk.update_user(body as User)
-		return reply.code(db.status).send(db.data);
+		if (JSON.stringify(user) !== "{}") {
+			user.PlayerID = params.uuid;		// Override PlayerID in case someone tried to set it manually
+			const db = await db_sdk.update_user(user as User)
+			resp = { status: db.status, code: db.data }
+		}
+		if (!resp)
+			return reply.code(200).send("Nothing to do")
+		return reply.code(resp.status).send(resp.data);
 	});
 
 	app.post("/", async (request, reply) => {
