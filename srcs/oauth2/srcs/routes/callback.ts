@@ -108,7 +108,7 @@ async function updateUser(token: OauthToken, matchingUser: User | undefined) {
 			const userRegister: UserRegisterOauthProps = {
 				DisplayName: `${displayName}.${uniqueSuffix}`,
 				EmailAddress: token.jwt_decode.email,
-				Password: crypto.randomBytes(32).toString("utf8"),
+				Password: "",
 				OAuthID: token.jwt_decode.subject,
 			};
 			try {

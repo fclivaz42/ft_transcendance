@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/18 20:58:12 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/25 19:10:28 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/26 17:12:39 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -29,7 +29,7 @@ async function check_password(user: string, field: "PlayerID" | "DisplayName" | 
 		let user_data: object = {};
 		try {
 			user_data = DatabaseWorker.get_del("Players", field, user, "get");
-			if (user_data["OAuthID"])
+			if (!user_data[tables.Players.Fields[3]])
 				return reject({ code: 403, string: "error.use.oauth" })
 		} catch (exception) {
 			console.dir(exception)
