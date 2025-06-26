@@ -103,8 +103,8 @@ export function createUserDialog(): HTMLDialogElement {
 			body: multipartFormData
 		}).then(response => {
 			if (response.ok) {
-				UserHandler.fetchUser();
 				dialog.remove();
+				UserHandler.fetchUser();
 			} else {
 				console.error("Failed to update profile");
 				NotificationManager.notify({
