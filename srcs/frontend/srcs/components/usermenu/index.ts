@@ -7,8 +7,16 @@ import createUserAvatar from "./userAvatar";
 import NotificationManager from "../../managers/NotificationManager";
 import { i18nHandler } from "../../handlers/i18nHandler";
 
+function maskEmail(email: string): string {
+	const [user, domain] = email.split("@");
+	const maskedUser = user.slice(0, 3) + "*".repeat(Math.max(1, user.length - 3));
+	const [domainName, domainExt] = domain.split(".");
+	const maskedDomain = "*".repeat(domainName.length) + "." + domainExt;
+	return `${maskedUser}@${maskedDomain}`;
+}
+
 export function createUserDialog(): HTMLDialogElement {
-	const dialog = createDialog({allowClose: true});
+	const dialog = createDialog({ allowClose: true });
 	dialog.className += " w-[500px] max-w-[90vw]";
 
 	const profilePicture = createUserAvatar({
@@ -16,16 +24,25 @@ export function createUserDialog(): HTMLDialogElement {
 		editable: true,
 	});
 
-	const userNameElement = document.createElement("span");
+	const userIdentifier = document.createElement("div");
+	userIdentifier.className = "flex  flex-col items-center";
+	const userNameElement = document.createElement("p");
 	userNameElement.className = "text-xl font-semibold text-gray-800 dark:text-gray-200";
 	userNameElement.textContent = UserHandler.displayName || "User Name";
 	userNameElement.setAttribute("data-user", "username");
+
+	const emailElement = document.createElement("p");
+	emailElement.className = "text-sm text-gray-600 dark:text-gray-400";
+	emailElement.textContent = UserHandler.emailAddress ? maskEmail(UserHandler.emailAddress) : "Email Address";
+	emailElement.setAttribute("data-user", "email");
+
+	userIdentifier.appendChild(userNameElement);
+	userIdentifier.appendChild(emailElement);
 
 	const logoutButton = document.createElement("button");
 	logoutButton.textContent = "Logout";
 	logoutButton.className = "w-2/3 p-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50";
 	logoutButton.onclick = () => {
-		// Handle logout logic here
 		fetch("/api/users/logout", {
 			method: "GET",
 		}).then(() => {
@@ -73,7 +90,8 @@ export function createUserDialog(): HTMLDialogElement {
 	saveButton.className = "w-full p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50";
 	saveButton.onclick = () => {
 		const multipartFormData = new FormData();
-		multipartFormData.append("avatar", userMenuManager.uploadFile.files?.[0] || "");
+		if (userMenuManager.uploadFile.files?.[0])
+			multipartFormData.append("avatar", userMenuManager.uploadFile.files[0], userMenuManager.uploadFile.files[0].name);
 		if (passwordTextbox.value)
 			multipartFormData.append("Password", passwordTextbox.value);
 		if (emailTextbox.value)
@@ -82,13 +100,11 @@ export function createUserDialog(): HTMLDialogElement {
 			multipartFormData.append("DisplayName", displayNameTextbox.value);
 		fetch("/api/users/update", {
 			method: "PUT",
-			headers: {
-				"Content-Type": "application/json"
-			},
 			body: multipartFormData
 		}).then(response => {
 			if (response.ok) {
 				UserHandler.fetchUser();
+				dialog.remove();
 			} else {
 				console.error("Failed to update profile");
 				NotificationManager.notify({
@@ -106,7 +122,7 @@ export function createUserDialog(): HTMLDialogElement {
 	buttonsContainer.appendChild(saveButton);
 
 	dialog.appendChild(profilePicture);
-	dialog.appendChild(userNameElement);
+	dialog.appendChild(userIdentifier);
 	dialog.appendChild(logoutButton);
 	dialog.appendChild(hr);
 	dialog.appendChild(editProfileTitle);

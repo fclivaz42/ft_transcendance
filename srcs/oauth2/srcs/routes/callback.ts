@@ -7,9 +7,10 @@ import { config } from "../managers/ConfigManager.ts";
 import { stateManager } from "../managers/StateManager.ts";
 import { GoogleJwtManager } from "../managers/GoogleJwtManager.ts";
 import { Logger } from "../../../libs/helpers/loggers.ts";
-import type { Users, UserRegisterOauthProps } from "../../../libs/interfaces/Users.ts";
+import type { User, UserRegisterOauthProps } from "../../../libs/interfaces/User.ts";
 import https from "https";
 import UsersSdk from "../../../libs/helpers/usersSdk.ts";
+import DatabaseSDK from "../../../libs/helpers/databaseSdk.ts";
 import crypto from "crypto";
 
 function validateParams(query: OauthCallbackRequest) {
@@ -71,27 +72,16 @@ export async function getCallback(req: FastifyRequest, rep: FastifyReply) {
 }
 
 async function getMatchingOauthUser(token: OauthToken) {
+	const db_sdk = new DatabaseSDK();
 	if (!token.jwt_decode)
 		throw new Error("Token does not contain jwt_decode");
 	try {
-		return (await axios.get<Users>(`http://db:3000/Players/oauth/${token.jwt_decode.subject}`, {
-			headers: {
-				"Authorization": process.env.API_KEY || "",
-				"Content-Type": "application/json",
-			},
-			httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-		})).data;
+		return (await db_sdk.get_user(token.jwt_decode?.subject as string, "OAuthID")).data;
 	} catch (error) {
 		Logger.debug(error);
 		Logger.debug("No user found with OAuth ID, checking by email.");
 		try {
-			const matchingUser = (await axios.get<Users>(`http://db:3000/Players/email/${token.jwt_decode.email}`, {
-				headers: {
-					"Authorization": process.env.API_KEY || "",
-					"Content-Type": "application/json",
-				},
-				httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-			})).data;
+			const matchingUser = (await db_sdk.get_user(token.jwt_decode.email, "EmailAddress")).data
 
 			if (matchingUser.OAuthID)
 				throw new Error("User already exists with OAuth ID");
@@ -104,11 +94,12 @@ async function getMatchingOauthUser(token: OauthToken) {
 	}
 }
 
-async function updateUser(token: OauthToken, matchingUser: Users | undefined) {
+async function updateUser(token: OauthToken, matchingUser: User | undefined) {
 	if (!token.jwt_decode)
 		throw new Error("Token does not contain jwt_decode");
 
 	const displayName = token.jwt_decode.email.split("@")[0].replace(/[^a-zA-Z0-9]/g, "").substring(0, 9);
+	const db_sdk = new DatabaseSDK();
 	if (!matchingUser) {
 		const maxTry = 10;
 		for (let i = 0; i < maxTry; i++) {
@@ -121,13 +112,7 @@ async function updateUser(token: OauthToken, matchingUser: Users | undefined) {
 				OAuthID: token.jwt_decode.subject,
 			};
 			try {
-				await axios.post<Users>("http://db:3000/Players", userRegister, {
-					headers: {
-						"Authorization": process.env.API_KEY || "",
-						"Content-Type": "application/json",
-					},
-					httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-				});
+				await db_sdk.create_user(userRegister as User)
 				break; // if user is created successfully
 			} catch (error) {
 				if (error.response && error.response.status === 409) {
@@ -142,16 +127,11 @@ async function updateUser(token: OauthToken, matchingUser: Users | undefined) {
 		}
 	} else if (!matchingUser.OAuthID) {
 		// update user by email with OAuth ID
-		const updateUser: Partial<Users> = {
+		const updateUser: Partial<User> = {
+			PlayerID: matchingUser.PlayerID,
 			OAuthID: token.jwt_decode.subject,
 		}
-		await axios.put<Users>(`http://db:3000/Players/id/${matchingUser.PlayerID}`, updateUser, {
-			headers: {
-				"Authorization": process.env.API_KEY || "",
-				"Content-Type": "application/json",
-			},
-			httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-		});
+		await db_sdk.update_user(updateUser as User)
 	}
 	else {
 		// simple login the user

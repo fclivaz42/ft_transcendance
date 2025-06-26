@@ -2,11 +2,13 @@ import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { jwt } from '../../managers/JwtManager.ts';
 import { randomBytes } from 'crypto';
 import checkRequestAuthorization from '../../managers/AuthorizationManager.ts';
-import type { UserLoginOauthProps, Users } from '../../../../libs/interfaces/Users.ts';
+import type { UserLoginOauthProps, User } from '../../../../libs/interfaces/User.ts';
 import databaseSdk from "../../../../libs/helpers/databaseSdk.ts"
 import { httpReply } from "../../../../libs/helpers/httpResponse.ts";
 import axios from 'axios';
 import https from 'https';
+import DatabaseSDK from '../../../../libs/helpers/databaseSdk.ts';
+import Logger from '../../../../libs/helpers/loggers.ts';
 
 export default async function usersOauthLoginEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.post("/oauthLogin", async (request, reply) => {
@@ -15,18 +17,16 @@ export default async function usersOauthLoginEndpoint(app: FastifyInstance, opts
 			return authorization;
 
 		const userLogin = request.body as UserLoginOauthProps;
-		const dbSdk = new databaseSdk();
+		const db_sdk = new DatabaseSDK();
 
-		// TODO: Polish the code once the databaseSdk is fully implemented.
-		const loggedUser = (await axios.get<Users>(`http://db:3000/Players/oauth/${userLogin.OAuthID}`, {
-			headers: {
-				Authorization: process.env.API_KEY || '',
-				"Content-Type": "application/json",
-			},
-			httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-		})).data;
-		if (!loggedUser.PlayerID)
-			throw new Error("User not found");
+		const loggedUser = await db_sdk.get_user(userLogin.OAuthID, "OAuthID")
+			.then(response => response.data)
+			.catch(error => {
+				Logger.error("Error fetching user by OAuthID:" + error);
+				return undefined;
+			})
+		if (!loggedUser || !loggedUser.PlayerID)
+			return reply.status(404).send("User not found")
 		const jwtToken = jwt.createJwtToken({
 			sub: loggedUser.PlayerID,
 			data: {
