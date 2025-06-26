@@ -67,6 +67,7 @@ export function createPasswordInput(
 
     const toggleButton = document.createElement("button");
     toggleButton.type = "button";
+    toggleButton.tabIndex = -1;
     toggleButton.className = `
 absolute inset-y-1 right-2 
     flex items-center justify-center
@@ -77,15 +78,7 @@ absolute inset-y-1 right-2
     focus:outline-none 
     z-10 cursor-pointer
     `.replace(/\s+/g, " ");
-    // const eyeIcon = document.createElement("span");
-    // eyeIcon.className = "icon";
-    // eyeIcon.textContent = "👁️";
-    // const eyeSlashIcon = document.createElement("span");
-    // eyeSlashIcon.className = "icon hidden";
-    // eyeSlashIcon.textContent = "🙈";
-    // toggleButton.appendChild(eyeIcon);
-    // toggleButton.appendChild(eyeSlashIcon);
-    // Icône "œil ouvert"
+
     const eyeIcon = document.createElement("img");
     eyeIcon.src = "/assets/ui/eye-open.svg"; // <--- Chemin vers votre SVG pour l'œil ouvert
     eyeIcon.alt = "Afficher le mot de passe"; // Texte alternatif pour l'accessibilité

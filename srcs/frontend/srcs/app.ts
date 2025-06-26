@@ -33,7 +33,7 @@ darkmodeManager.initialize();
 
 // Initialize components
 headerManager.initialize();
-navbarManager.initialize();
+// navbarManager.initialize();
 
 // const backgroundManager = new BackgroundManager();
 // backgroundManager.initialize();

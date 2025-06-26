@@ -6,6 +6,7 @@ export interface CustomInputContainer extends HTMLDivElement {
     errorIconElement: HTMLDivElement; // Ou SVGElement, si c'est une icône SVG
     value: string; // Pour un accès facile à la valeur de l'input
     _touched: boolean;// si vierge ou pas
+    _hadPreviousError: boolean;
 }
 //sait quand l'input est focus, blur, ou change
 //ajout de listeners pour focus et blur -> panel va le gerer
