@@ -6,7 +6,7 @@ import { Server } from "https";
 export function fastifyLogger(request: FastifyRequest | any, response?: FastifyReply | any): void {
 	const [req, res] = [request, response] as [FastifyRequest, FastifyReply];
 	const ip = req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || 'unknown';
-	let message = `${req.method} ${req.url} - ${req.ip}`;
+	let message = `${req.method} ${req.url} - ${ip}`;
 	if (response) {
 		message += ` - Response ${res.statusCode}`;
 		if (res.statusCode >= 400) {
