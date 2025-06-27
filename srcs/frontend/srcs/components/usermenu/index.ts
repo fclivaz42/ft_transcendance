@@ -105,6 +105,7 @@ export function createUserDialog(): HTMLDialogElement {
 			if (response.ok) {
 				dialog.remove();
 				UserHandler.fetchUser();
+				dialog.remove();
 			} else {
 				console.error("Failed to update profile");
 				NotificationManager.notify({
