@@ -3,8 +3,8 @@ import type { AxiosResponse } from "axios";
 import https from "https";
 import type { UserLoginOauthProps, UserLoginProps, UserRegisterProps, User } from "../interfaces/User.ts";
 import type { FastifyReply, FastifyRequest } from "fastify";
-import { Logger } from "./loggers.ts";
 import { httpReply } from "./httpResponse.ts";
+import type { Match, Match_complete } from "../interfaces/Match.ts";
 
 export interface UsersSdkConfig {
 	apiKey: string;
@@ -42,6 +42,10 @@ export interface UsersSdkToken extends UsersSdkAuthorizeResponse {
 }
 
 export interface UsersSdkOptions {
+	/**
+	 * Base URL for the API endpoint.
+	 */
+	baseUrl?: string;
 	/**
 	 * Parameters to pass to the API endpoint.
 	 */
@@ -85,7 +89,7 @@ class UsersSdk {
 				options.headers = {};
 		}
 		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
-		const url = `${this._config.serverUrl}/users/${endpoint}`/*${options.params ? `?${options.params.toString()}` : ""}`*/;
+		const url = `${this._config.serverUrl}/${options?.baseUrl || "users"}/${endpoint}`/*${options.params ? `?${options.params.toString()}` : ""}`*/;
 		return axios({
 			httpsAgent,
 			method,
@@ -280,7 +284,7 @@ class UsersSdk {
 	 * @param cookieHeader The cookie header string to convert.
 	 * @returns An object representing the cookies.
 	 */
-	public unshowerCookie(cookieHeader: string) {
+	public unshowerCookie(cookieHeader: string | undefined) {
 		return UsersSdk.unshowerCookie(cookieHeader);
 	}
 
@@ -341,6 +345,20 @@ class UsersSdk {
 
 	public async getUserPicture(uuid: string): Promise<AxiosResponse<ArrayBuffer>> {
 		return this.apiRequest<ArrayBuffer>("get", `${uuid}/picture`, { response_type: "arraybuffer" });
+	}
+
+	public async getMatchById(matchId: string): Promise<AxiosResponse<Match>> {
+		return this.apiRequest<Match>("get", `${matchId}`, {
+			baseUrl: "matches",
+		});
+	}
+
+	public async getUserMatches(uuid: string, token: string): Promise<AxiosResponse<Match_complete[]>> {
+		return this.apiRequest<Match_complete[]>("get", `${uuid}/matches`, {
+			headers: {
+				"X-JWT-Token": token,
+			},
+		});
 	}
 }
 

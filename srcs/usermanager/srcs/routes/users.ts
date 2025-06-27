@@ -1,15 +1,14 @@
-import type { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
+import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import usersLoginEndpoint from "./users/login.ts";
 import usersAuthorizeEndpoint from "./users/authorize.ts";
 import usersRegisterEndpoint from "./users/register.ts";
-import axios from "axios";
-import https from "https";
 import checkRequestAuthorization from "../managers/AuthorizationManager.ts";
-import type { User, UserWithPicture } from "../../../libs/interfaces/User.ts";
+import type { User } from "../../../libs/interfaces/User.ts";
 import usersOauthLoginEndpoint from "./users/oauthLogin.ts";
 import { httpReply } from "../../../libs/helpers/httpResponse.ts";
 import UsersValidation from "../handlers/UsersValidation.ts";
 import DatabaseSDK from "../../../libs/helpers/databaseSdk.ts";
+import Logger from "../../../libs/helpers/loggers.ts";
 
 export default async function initializeRoute(app: FastifyInstance, opts: FastifyPluginOptions) {
 
@@ -104,6 +103,33 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 
 		const db = await db_sdk.create_user(body as User)
 		return reply.code(db.status).send(db.data);
+	});
+
+	app.get("/:uuid/matches", async (request, reply) => {
+		Logger.info("Received request for matches");
+		const authorization = checkRequestAuthorization(request, reply);
+		if (authorization)
+			return authorization;
+
+		if (!request.headers["x-jwt-token"])
+			return httpReply({
+				detail: "X-JWT-Token header is missing",
+				status: 400,
+				module: "usermanager",
+			}, reply, request);
+
+		let matches = (await db_sdk.get_matchlist()).data;
+		const params = request.params as { uuid: string };
+		// TODO: Filter matches on sql database side
+		matches = matches.filter((match) => match.WPlayerID === params.uuid || match.LPLayerID === params.uuid);
+		if (matches.length === 0) {
+			return httpReply({
+				detail: "No matches found for the user.",
+				status: 404,
+				module: "usermanager",
+			}, reply, request);
+		}
+		return reply.send(matches);
 	});
 
 	usersAuthorizeEndpoint(app, opts);

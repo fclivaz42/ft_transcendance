@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AxiosResponse } from "axios";
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import UsersSdk from '../../../libs/helpers/usersSdk.ts';
-import type { UserLoginProps, UserRegisterProps, User, UserWithPicture } from '../../../libs/interfaces/User.ts';
+import type { UserLoginProps, UserRegisterProps, User } from '../../../libs/interfaces/User.ts';
 import Logger from "../../../libs/helpers/loggers.ts";
 import { httpReply } from "../../../libs/helpers/httpResponse.ts";
 
@@ -152,5 +152,28 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			.header("Set-Cookie", `token=; Path=/; HttpOnly; SameSite=Strict; Secure; Max-Age=0`)
 			.header("location", "/")
 			.code(303).send({ message: 'Logged out successfully' });
+	});
+
+	fastify.all('/:uuid/matches', async (request, reply) => {
+		if (request.method !== 'GET')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user matches.' });
+		await usersSdk.usersEnforceAuthorize(reply, request);
+		const token = usersSdk.unshowerCookie(request.headers.cookie)["token"];
+		if (!token)
+			return httpReply({detail: "Non authorized request, missing token.", status: 401, module: "usermanager"}, reply, request);
+		const params = request.params as { uuid: string };
+		const userMatches = await usersSdk.getUserMatches(params.uuid, token)
+			.then(response => response)
+			.catch((err: any) => {
+				if (!axios.isAxiosError(err))
+					throw err;	
+				return reply.code(err.response?.status || 500).send(
+					err.response?.data || {
+						detail: 'Failed to fetch user matches',
+						status: err.response?.status || 500,
+						module: 'usermanager'
+					});
+			});
+		return reply.code(userMatches.status).send(userMatches.data);
 	});
 }
