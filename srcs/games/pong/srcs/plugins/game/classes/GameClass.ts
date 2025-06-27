@@ -97,7 +97,7 @@ export default class Game {
 		this._p1 = new Paddle(
 			this._scene,
 			"player1",
-			new Vector3(-13.0, 0, 0), {
+			new Vector3(-12.5, 0, 0), {
 			color: Color3.White(),
 			speed: PADDLE_SPEED,
 			height: PLAYER_HEIGHT,
@@ -110,7 +110,7 @@ export default class Game {
 		this._p2 = new Paddle(
 			this._scene,
 			"player2",
-			new Vector3(13.0, 0, 0), {
+			new Vector3(12.5, 0, 0), {
 			color: Color3.White(),
 			speed: PADDLE_SPEED,
 			height: PLAYER_HEIGHT,
