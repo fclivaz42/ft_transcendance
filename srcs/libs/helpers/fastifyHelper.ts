@@ -4,10 +4,12 @@ import type { AddressInfo } from 'node:net';
 import { Server } from "https";
 
 export function fastifyLogger(request: FastifyRequest | any, response?: FastifyReply | any): void {
-	let message = `${request.method} ${request.url} - ${request.ip}`;
+	const [req, res] = [request, response] as [FastifyRequest, FastifyReply];
+	const ip = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.ip || req.socket.remoteAddress || 'unknown';
+	let message = `${req.method} ${req.url} - ${ip}`;
 	if (response) {
-		message += ` - Response ${response.statusCode}`;
-		if (response.statusCode >= 400) {
+		message += ` - Response ${res.statusCode}`;
+		if (res.statusCode >= 400) {
 			Logger.warn(message);
 			return;
 		}

@@ -2,9 +2,12 @@
 import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh, Vector2 } from "@babylonjs/core";
 import Ball from "./Ball.ts";
 import { Session } from "inspector/promises";
-import { PADDLE_SPEED } from "./GameClass.ts";
+import Game, { PADDLE_SPEED } from "./GameClass.ts";
 import { match } from "assert";
 import type { WallMap } from "./GameClass.ts";
+import GameRoom from "./GameRoom.ts";
+
+const DIFF_SCORE_PLAYER = 5;
 
 interface Score {
 	p1: number;
@@ -26,12 +29,6 @@ interface InitInfo {
 	size: number[];
 }
 
-interface BallState {
-	position: Vector3 | undefined;
-	velocity: Vector3 | undefined;
-}
-
-
 export default class Paddle {
 
 	protected _scene: Scene;
@@ -46,6 +43,7 @@ export default class Paddle {
 	private _moveDirection: "up" | "down" | null = null;
 	private _bounds: { minY: number, maxY: number } = { minY: -Infinity, maxY: Infinity };
 	private _ball: Ball;
+	private _gameRoom: GameRoom;
 	private _walls: WallMap;
 	private _upMoove: number;
 	private _downMoove: number;
@@ -64,8 +62,8 @@ export default class Paddle {
 			width = 0.5,
 			height = 0.5,
 			depth = 0.5,
-			speed = 0.05, // can remove and replace with setter
-			isAi = false // can remove and replace with setter
+			speed = 0.05,
+			isAi = false
 		} = options;
 
 		this._scene = scene;
@@ -112,6 +110,7 @@ export default class Paddle {
 		};
 	}
 
+	public setGameRoom(gameRoom: GameRoom) { this._gameRoom = gameRoom; }
 	public setBall(ball: Ball): void { this._ball = ball; }
 	public setWalls(walls: WallMap): void { this._walls = walls; }
 	public setSpeed(speed: number): void { this._speed = speed; }
@@ -231,7 +230,8 @@ export default class Paddle {
 				if (Paddle._ballPos.x === 0) {
 					// console.log("Ball doesn't moove");
 				}
-				else if (dir) {
+				else {
+					// else if (twoAI && dir) {
 					const predictY = this.predictBall();
 					const diff = Math.abs(Math.max(predictY, currentPaddle) - Math.min(predictY, currentPaddle));
 					const moov: number = Math.floor(diff / paddlSpeed);
@@ -242,9 +242,8 @@ export default class Paddle {
 						currentPaddle < 0 ? this._upMoove = moov : this._downMoove = moov;
 					else
 						predictY > currentPaddle ? this._upMoove = moov : this._downMoove = moov;
-					// this.getMesh().position.y = predictY;
-					this.printIAInfo(1);
-					this.printIAInfo(2);
+					// this.printIAInfo(1);
+					// this.printIAInfo(2);
 				}
 			}
 
@@ -266,7 +265,6 @@ export default class Paddle {
 
 	public async manageIA(fps: number) {
 
-		// console.log(`fps: ${fps}`);
 		if (fps === 1) {
 			let tmp: Vector3 | undefined = this._ball?.getHitbox().position.clone();
 			if (tmp === undefined)
@@ -277,25 +275,22 @@ export default class Paddle {
 				return;
 			this._ballDirection = tmp;
 		}
-		// const score: Scores =  getscoreinfo;
-		// 	const diff: number = score.p1 - score.p2;
-		// if (this._name === "p1"){
-		// 	if (diff > 0)
-		// 	this.randMoove(fps, 0);
-		// }
-		// if (this._name === p2){
-		//
-		// }
-		this.randMoove(fps, 0);
+		const score: Score = this._gameRoom.score;
+		let diff: number = score.p1 - score.p2;
+		if (fps === 1) {
+			console.log(`\nscore{ p1: ${this._gameRoom.score.p1}, p2: ${this._gameRoom.score.p2}}`);
+			console.log(`difference score: ${diff}`);
+			console.log(`AI power: ${DIFF_SCORE_PLAYER - diff > 0 ? DIFF_SCORE_PLAYER - diff : 0}`);
+		}
+		DIFF_SCORE_PLAYER - diff < 0 ? this.randMoove(fps, DIFF_SCORE_PLAYER) : this.randMoove(fps, diff);
 		this.iaAlgo(fps);
 	}
 
 	public randMoove(fps: number, diff: number): void {
-		const coef = 1 * diff;
+		const coef = DIFF_SCORE_PLAYER - diff;
 		const refresh = 30;
 		const ran = Math.floor((Math.random() * 10000) % coef);
 		if (fps === refresh && this._downMoove === 0 && this._upMoove === 0) {
-			// console.log(`ran: ${ ran } `);
 			if (ran > coef / 2)
 				this._upMoove += ran;
 			else if (ran < coef / 2)

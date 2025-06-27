@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { AxiosResponse } from "axios";
 import https from "https";
-import type { UserLoginOauthProps, UserLoginProps, UserRegisterProps, Users } from "../interfaces/Users.ts";
+import type { UserLoginOauthProps, UserLoginProps, UserRegisterProps, User } from "../interfaces/User.ts";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { Logger } from "./loggers.ts";
 import { httpReply } from "./httpResponse.ts";
@@ -51,6 +51,10 @@ export interface UsersSdkOptions {
 	 */
 	headers?: Record<string, string>;
 	/**
+	* let Axios know what we are dealing with
+	*/
+	response_type?: "arraybuffer" | "blob" | "json" | "text" | "stream" | "document" | "formdata"
+	/**
 	 * Payload to send in the request body.
 	 */
 	data?: any;
@@ -69,7 +73,6 @@ class UsersSdk {
 	}
 
 	/**
-	 * 
 	 * @param method method to use
 	 * @param endpoint api endpoint to call
 	 * @param params optional parameters to pass to the endpoint
@@ -80,7 +83,6 @@ class UsersSdk {
 		if (options?.data) {
 			if (!options.headers)
 				options.headers = {};
-			options.headers["Content-Type"] = "application/json";
 		}
 		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 		const url = `${this._config.serverUrl}/users/${endpoint}`/*${options.params ? `?${options.params.toString()}` : ""}`*/;
@@ -94,6 +96,7 @@ class UsersSdk {
 			},
 			data: options?.data,
 			params: options?.params,
+			responseType: options?.response_type,
 			validateStatus: (status => (status >= 200 && status < 300) || status === 401 || status === 403),
 		});
 	}
@@ -116,8 +119,8 @@ class UsersSdk {
 	 * @param uuid User uuid to retrieve information for.
 	 * @returns a promise with the user information response from axios
 	 */
-	public async getUser(uuid: string): Promise<AxiosResponse<Users>> {
-		return this.apiRequest<Users>("get", uuid);
+	public async getUser(uuid: string): Promise<AxiosResponse<User>> {
+		return this.apiRequest<User>("get", uuid);
 	}
 
 	/**
@@ -169,7 +172,7 @@ class UsersSdk {
 	 * @param user User object to filter.
 	 * @returns Filtered user object without sensitive information.
 	 */
-	static filterUserData(user: Users) {
+	static filterUserData(user: User) {
 		const { Password, OAuthID, ...filteredUser } = user;
 		return filteredUser;
 	}
@@ -179,7 +182,7 @@ class UsersSdk {
 	 * @param user User object to filter.
 	 * @returns Filtered user object without sensitive information.
 	*/
-	filterUserData(user: Users) {
+	filterUserData(user: User) {
 		return UsersSdk.filterUserData(user);
 	}
 
@@ -188,7 +191,7 @@ class UsersSdk {
 	 * @param user User object to filter.
 	 * @returns Public user object without sensitive information.
 	 */
-	public static filterPublicUserData(user: Users) {
+	public static filterPublicUserData(user: User) {
 		const filteredUser = this.filterUserData(user);
 
 		const { Bappy, EmailAddress, FamilyName, FirstName, FriendsList, PhoneNumber, ...publicUser } = filteredUser;
@@ -200,19 +203,19 @@ class UsersSdk {
 	 * @param user User object to filter.
 	 * @returns Public user object without sensitive information.
 	 */
-	filterPublicUserData(user: Users) {
+	filterPublicUserData(user: User) {
 		return UsersSdk.filterPublicUserData(user);
 	}
 
 	/**
- * Asks the UsersSdk to enforce user authorization based on the provided JWT token.
- * This function will throw an error if the authorization fails or if no token is provided.
- * It will also send Unauthorized responses.
- * @throws Error if the authorization fails or if no token is provided. Will also send Unauthorized responses.
- * @param rep fastify reply object
- * @param req fastify request object
- * @returns
- */
+	* Asks the UsersSdk to enforce user authorization based on the provided JWT token.
+	* This function will throw an error if the authorization fails or if no token is provided.
+	* It will also send Unauthorized responses.
+	* @throws Error if the authorization fails or if no token is provided. Will also send Unauthorized responses.
+	* @param rep fastify reply object
+	* @param req fastify request object
+	* @returns
+	*/
 	async usersEnforceAuthorize(rep: FastifyReply | any, req: FastifyRequest | any) {
 		const reqRef = req as FastifyRequest;
 		const cookies = UsersSdk.unshowerCookie(reqRef.headers.cookie);
@@ -239,7 +242,6 @@ class UsersSdk {
 	}
 
 	/**
-	 * 
 	 * @param rep fastify reply object
 	 * @param token JWT token to set in the cookie.
 	 * @param exp optional expiration time in seconds for the cookie, defaults to 7776000 seconds (90 days).
@@ -249,7 +251,6 @@ class UsersSdk {
 	}
 
 	/**
-	 * 
 	 * @param rep fastify reply object
 	 * @param token JWT token to set in the cookie.
 	 * @param exp optional expiration time in seconds for the cookie, defaults to 7776000 seconds (90 days).
@@ -284,7 +285,6 @@ class UsersSdk {
 	}
 
 	/**
-	 *
 	 * Enforces user authorization by checking the JWT token in the request cookies.
 	 * This function will throw an error if the authorization fails or if no token is provided.
 	 * @throws {status: 401, statusText: "Unauthorized", message: string} if the authorization fails or if no token is provided.
@@ -333,10 +333,14 @@ class UsersSdk {
 		return output;
 	}
 
-	public async updateUser(userId: string, data: Partial<Users>): Promise<AxiosResponse<Users>> {
-		return this.apiRequest<Users>("put", userId, {
+	public async updateUser(userId: string, data: FormData): Promise<AxiosResponse<User>> {
+		return this.apiRequest<User>("put", userId, {
 			data,
 		});
+	}
+
+	public async getUserPicture(uuid: string): Promise<AxiosResponse<ArrayBuffer>> {
+		return this.apiRequest<ArrayBuffer>("get", `${uuid}/picture`, { response_type: "arraybuffer" });
 	}
 }
 

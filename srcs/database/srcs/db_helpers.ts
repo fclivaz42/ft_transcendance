@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/21 21:57:13 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/22 19:52:52 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/26 17:12:59 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -15,6 +15,7 @@ import type * as fft from 'fastify'
 import { randomBytes, scrypt } from "crypto"
 import type { db_params } from "./db_main.ts"
 import Logger from "../../libs/helpers/loggers.ts"
+import { tables } from "./db_vars.ts"
 
 //
 // Basic checks (eg. API-KEY, Content-Type, etc)
@@ -33,6 +34,17 @@ export function check_request_format(headers: object, method: string, params: ob
 		throw { code: 400, string: "error.empty.params" }
 }
 
+function convert_flist(player: object) {
+	if (!player)
+		return;
+	if (!player[tables.Players.Fields[5]])
+		return;
+	if (typeof player[tables.Players.Fields[5]] === "string")
+		player[tables.Players.Fields[5]] = JSON.parse(player[tables.Players.Fields[5]])
+	else if (typeof player[tables.Players.Fields[5]] === "object")
+		player[tables.Players.Fields[5]] = JSON.stringify(player[tables.Players.Fields[5]])
+}
+
 //
 // GET and DELETE are so goddamn similar i just threw them in the same boat.
 // Easier to maintain i guess.
@@ -47,13 +59,19 @@ function get_del_db(request: fft.FastifyRequest, reply: fft.FastifyReply, table:
 		const regex = new RegExp(`^/${table}\\/multiget$`)
 		if (regex.test(request.url)) {
 			response = DatabaseWorker.multiget(table, request.headers["field"] as string | undefined, request.headers["array"] as string | undefined) as Array<object>;
+			for (const item of response as Array<object>)
+				convert_flist(item)
 		}
-		else if (/^\/Matches\/search\//.test(request.url)) {
+		else if (/^\/Matches\/PlayerID\//.test(request.url)) {
 			response = DatabaseWorker.get_del(table, table_fields[1], params.PlayerID as string, "all")
 			response = [...response as Array<object>, ...DatabaseWorker.get_del(table, table_fields[2], params.PlayerID as string, "all") as Array<object>];
+			for (const item of response as Array<object>)
+				convert_flist(item)
 		}
-		else
+		else {
 			response = DatabaseWorker.get_del(table, Object.keys(params)[0], params[Object.keys(params)[0]], meth === "get" ? "get" : "run") as object;
+			convert_flist(response)
+		}
 	} catch (exception) {
 		if (typeof exception.code === "string")
 			return reply.code(500).send(exception.code)
@@ -69,6 +87,8 @@ function get_del_db(request: fft.FastifyRequest, reply: fft.FastifyReply, table:
 
 export async function hash_password(password: string) {
 	return new Promise((resolve, reject) => {
+		if (password === "")
+			resolve("");
 		randomBytes(66, (err, buf) => {
 			if (err) return reject(err);
 			const salt = buf.toString('base64').substring(0, 64)
@@ -105,19 +125,21 @@ export default class RequestHandler {
 	static async post(request: fft.FastifyRequest, reply: fft.FastifyReply, table: string, table_fields: Array<string>) {
 		const body = request.body as object;
 		const params: db_params = request.params as db_params
-		let response: string;
+		let response: object;
 		try {
 			if (table === "Players") {
 				body["Password"] = await hash_password(body["Password"])
 				body["Admin"] = 0;
 			}
 			check_request_format(request.headers, request.method, params)
+			convert_flist(body)
 			response = DatabaseWorker.post(table, table_fields, body)
 		} catch (exception) {
 			if (typeof exception.code === "number")
 				return reply.code(exception.code).send(exception.string)
 			return reply.code(500).send(exception)
 		}
+		convert_flist(response)
 		return reply.code(201).send(response)
 	}
 	static async put(request: fft.FastifyRequest, reply: fft.FastifyReply, table: string, table_fields: Array<string>) {
@@ -128,12 +150,14 @@ export default class RequestHandler {
 			if (table === "Players" && body["Password"] !== undefined)
 				body["Password"] = await hash_password(body["Password"])
 			check_request_format(request.headers, request.method, params)
+			convert_flist(body)
 			response = DatabaseWorker.put(table, table_fields, body, Object.keys(params)[0], params[Object.keys(params)[0]]);
 		} catch (exception) {
 			if (typeof exception.code === "number")
 				return reply.code(exception.code).send(exception.string)
 			return reply.code(500).send(exception)
 		}
+		convert_flist(response)
 		return reply.code(205).send(response)
 	}
 }

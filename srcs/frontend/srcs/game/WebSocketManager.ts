@@ -1,3 +1,4 @@
+import PongGameManager from "../managers/PongGameManager.js";
 import { GameField } from "./GameField.js";
 import { ServerMessage, InitPayload, UpdatePayload } from "./types.js";
 
@@ -64,7 +65,11 @@ export class WebSocketManager {
 				console.log(msg);
 				this.onInit(msg.payload);
 			}
-			else if (msg.type === "update") this.onUpdate(msg.payload);
+			else if (msg.type === "update") {
+				this.onUpdate(msg.payload);
+				// TODO: Seperate score update with a different type
+				PongGameManager.onScoreUpdate(msg.payload.score);
+			}
 		};
 
 		this.socket.onopen = () => {

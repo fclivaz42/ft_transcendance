@@ -22,7 +22,6 @@ function maskEmail(email: string): string {
 	return `${maskedUser}@${maskedDomain}`;
 }
 
-
 export function createUserDialog(): HTMLDialogElement {
 	const dialog = createDialog({ allowClose: true });
 	dialog.className += " w-[500px] max-w-[90vw]";
@@ -32,9 +31,8 @@ export function createUserDialog(): HTMLDialogElement {
 		editable: true,
 	});
 
-
 	const userIdentifier = document.createElement("div");
-	userIdentifier.className = "flex flex-col items-center"; 
+	userIdentifier.className = "flex  flex-col items-center";
 	const userNameElement = document.createElement("p");
 	userNameElement.className = "text-xl font-semibold text-gray-800 dark:text-gray-200";
 	userNameElement.textContent = UserHandler.displayName || "User Name";
@@ -145,57 +143,31 @@ export function createUserDialog(): HTMLDialogElement {
 		}
 
 		// Si le formulaire est valide, procéder à la soumission
-		const multipartFormData = new FormData();
-		if (userMenuManager.uploadFile.files?.[0]) {
+			const multipartFormData = new FormData();
+		if (userMenuManager.uploadFile.files?.[0])
 			multipartFormData.append("avatar", userMenuManager.uploadFile.files[0], userMenuManager.uploadFile.files[0].name);
-		}
-		if (passwordTextbox.inputElement.value) { 
-			multipartFormData.append("Password", passwordTextbox.inputElement.value);
-		}
-		if (emailTextbox.inputElement.value && emailTextbox.inputElement.value !== UserHandler.emailAddress) { 
-			multipartFormData.append("EmailAddress", emailTextbox.inputElement.value);
-		}
-		if (displayNameTextbox.inputElement.value && displayNameTextbox.inputElement.value !== UserHandler.displayName) { 
-			multipartFormData.append("DisplayName", displayNameTextbox.inputElement.value);
-		}
-		
-		if (!multipartFormData.entries().next().done) {
-			fetch("/api/users/update", {
-				method: "PUT",
-				body: multipartFormData
-			}).then(response => {
-				if (response.ok) {
-					UserHandler.fetchUser();
-					NotificationManager.notify({
-						"level": "success",
-						"title": i18nHandler.getValue("panel.updateProfile.notification.updateSuccessTitle"),
-						"message": i18nHandler.getValue("panel.updateProfile.notification.updateSuccessMessage")
-					});
-					dialog.remove();
-				} else {
-					console.error("Failed to update profile");
-					NotificationManager.notify({
-						"level": "error",
-						"title": i18nHandler.getValue("panel.updateProfile.notification.updateErrorTitle"),
-						"message": i18nHandler.getValue("panel.updateProfile.notification.updateErrorMessage")
-					});
-				}
-			}).catch(error => {
-				console.error("Network error during profile update:", error);
+		if (passwordTextbox.value)
+			multipartFormData.append("Password", passwordTextbox.value);
+		if (emailTextbox.value)
+			multipartFormData.append("EmailAddress", emailTextbox.value);
+		if (displayNameTextbox.value)
+			multipartFormData.append("DisplayName", displayNameTextbox.value);
+		fetch("/api/users/update", {
+			method: "PUT",
+			body: multipartFormData
+		}).then(response => {
+			if (response.ok) {
+				UserHandler.fetchUser();
+				dialog.remove();
+			} else {
+				console.error("Failed to update profile");
 				NotificationManager.notify({
 					"level": "error",
-					"title": i18nHandler.getValue("panel.updateProfile.notification.networkErrorTitle"),
-					"message": i18nHandler.getValue("panel.updateProfile.notification.networkErrorMessage")
+					"title": i18nHandler.getValue("panel.updateProfile.notification.updateErrorTitle"),
+					"message": i18nHandler.getValue("panel.updateProfile.notification.updateErrorMessage")
 				});
-			});
-		} else {
-			NotificationManager.notify({
-				"level": "info",
-				"title": i18nHandler.getValue("panel.updateProfile.notification.noChangesTitle"),
-				"message": i18nHandler.getValue("panel.updateProfile.notification.noChangesMessage")
-			});
-			dialog.remove();
-		}
+			}
+		});
 	};
 
 
