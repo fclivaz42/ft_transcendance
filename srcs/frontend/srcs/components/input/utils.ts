@@ -139,12 +139,7 @@ export const updateFieldAppearance = (
         inputContainer.inputElement.classList.add("focus:ring-blue-500", "focus:border-blue-500");
     }
 
-    // Gère les styles de focus génériques (si tu en as)
-    // if (isFocused) {
-    //     inputContainer.inputElement.classList.add('ring-2', 'ring-offset-2');
-    // } else {
-    //     inputContainer.inputElement.classList.remove('ring-2', 'ring-offset-2');
-    // }
+   
 
     return isValid;
 };

@@ -78,7 +78,7 @@ export function createUserDialog(): HTMLDialogElement {
 	// --- Email ---
 	// Remplacement de createTextbox par createInfoInput
 	const emailTextbox: CustomInputContainer = createInfoInput(i18nHandler.getValue("panel.emailLabel"), "email");
-	emailTextbox.inputElement.value = UserHandler.emailAddress || ""; // Pré-remplir
+	// emailTextbox.inputElement.value = UserHandler.emailAddress || ""; // Pré-remplir
 	emailTextbox.inputElement.type = "email"; 
 	const emailErrorFeedback = document.createElement("div");
 	emailErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";

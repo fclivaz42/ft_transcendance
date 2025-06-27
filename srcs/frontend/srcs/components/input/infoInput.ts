@@ -22,7 +22,7 @@ export function createInfoInput(labelName: string, inputName: string): CustomInp
 		name: inputName,
 		id: inputName, // Important pour associer le label
 	});
-
+    
     // --- NOUVEL ÉLÉMENT POUR L'ICÔNE D'ERREUR ---
     const errorIcon = document.createElement('div');
     errorIcon.className = `
