@@ -80,27 +80,25 @@ async function createHistoryElement(match: Matches): Promise<HTMLDivElement | nu
 	}
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<a href="https://subnets-test.avax.network/c-chain/tx/${match.HashAddress}" target="_blank" class="w-fit bg-panel dark:bg-panel_dark p-4 mb-4 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center hover:animate-scale hover:animate-duration-100">
-			<div>
-				<div class="flex items-center justify-between gap-4">
-					<div class="flex items-center justify-start gap-2 w-[210px]">
-						<div class="relative">
-							<p data-i18n="history.winner" class="text-xl absolute -bottom-4 left-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${i18nHandler.getValue("history.winner")}</p>
-							<p class="text-2xl font-bold bottom-0 -right-16 absolute">${match.WScore}</p>
-							${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[0].PlayerID, oponents[0].DisplayName), sizeClass: "w-24 h-24"}).outerHTML}
-						</div>
-						<p class="text-center text-sm font-semibold">${oponents[0].DisplayName}</p>
+		<a href="https://subnets-test.avax.network/c-chain/tx/${match.HashAddress}" target="_blank" class="select-none w-fit bg-panel dark:bg-panel_dark p-4 mb-4 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center hover:animate-scale hover:animate-duration-100">
+			<div class="flex items-center justify-between gap-4">
+				<div class="flex items-center justify-start gap-2 w-[250px]">
+					<div class="relative">
+						<p data-i18n="history.winner" class="text-xl absolute -bottom-4 left-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${i18nHandler.getValue("history.winner")}</p>
+						<p class="text-2xl font-bold bottom-0 -right-16 absolute">${match.WScore}</p>
+						${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[0].PlayerID, oponents[0].DisplayName), sizeClass: "w-24 h-24"}).outerHTML}
 					</div>
-					<p class="text-2xl font-bold text-gray-700 dark:text-gray-200">
-						VS
-					</p>
-					<div class="flex items-center justify-end gap-2 w-[210px]">
-						<p class="text-center text-sm font-semibold">${oponents[1].DisplayName}</p>
-						<div class="relative">
-							<p data-i18n="history.loser" class="text-xl absolute -bottom-4 right-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${i18nHandler.getValue("history.loser")}</p>
-							<p class="text-2xl font-bold bottom-0 -left-16 absolute">${match.LScore}</p>
-							${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[1].PlayerID, oponents[1].DisplayName), sizeClass: "w-24 h-24"}).outerHTML}
-						</div>
+					<p class="truncate max-w-32 text-lg font-semibold">${oponents[0].DisplayName}</p>
+				</div>
+				<p class="text-2xl font-bold text-gray-700 dark:text-gray-200">
+					VS
+				</p>
+				<div class="flex items-center justify-end gap-2 w-[250px]">
+					<p class="truncate max-w-32 text-lg font-semibold">${oponents[1].DisplayName}</p>
+					<div class="relative">
+						<p data-i18n="history.loser" class="text-xl absolute -bottom-4 right-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${i18nHandler.getValue("history.loser")}</p>
+						<p class="text-2xl font-bold bottom-0 -left-16 absolute">${match.LScore}</p>
+						${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[1].PlayerID, oponents[1].DisplayName), sizeClass: "w-24 h-24"}).outerHTML}
 					</div>
 				</div>
 			</div>
@@ -141,7 +139,8 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 	let page = Number(RoutingHandler.searchParams.get("p")) || 1;
 	if (Number.isNaN(page) || page < 1)
 		page = 1;
-	const elemPerPage = RoutingHandler.searchParams.get("limit") || 3;
+	const limitParam = RoutingHandler.searchParams.get("limit");
+	const elemPerPage: number = Number(limitParam) || 4;
 	const matches = await fetchHistory(RoutingHandler.searchParams.get("playerId") || undefined);
 	const template = document.createElement("template");
 	const matchElements: string[] = [];
