@@ -25,7 +25,8 @@
     "title": "History",
     "empty": "No history available.",
     "winner": "Winner",
-    "loser": "Loser"
+    "loser": "Loser",
+    "notchain": "Match not in blockchain"
   },
   "header": {
     "usermenu": {

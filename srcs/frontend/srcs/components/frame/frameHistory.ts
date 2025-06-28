@@ -80,7 +80,8 @@ async function createHistoryElement(match: Matches): Promise<HTMLDivElement | nu
 	}
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<a href="https://subnets-test.avax.network/c-chain/tx/${match.HashAddress}" target="_blank" class="select-none w-fit bg-panel dark:bg-panel_dark p-4 mb-4 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center hover:animate-scale hover:animate-duration-100">
+		<a ${match.HashAddress ? `href="https://subnets-test.avax.network/c-chain/tx/${match.HashAddress}" target="_blank"` : ""} class="relative cursor-pointer select-none w-fit bg-panel dark:bg-panel_dark p-4 mb-4 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center hover:animate-scale hover:animate-duration-100">
+
 			<div class="flex items-center justify-between gap-4">
 				<div class="flex items-center justify-start gap-2 lg:w-[250px] w-[160px]">
 					<div class="relative">
@@ -103,9 +104,12 @@ async function createHistoryElement(match: Matches): Promise<HTMLDivElement | nu
 				</div>
 			</div>
 			<hr class="w-full my-2">
-			<div class="flex items-center justify-around w-full">
-				<p>Hash: <a href="https://subnets-test.avax.network/c-chain/tx/${match.HashAddress}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">${match.HashAddress}</a></p>
-			</div>
+			${(() => {
+				if (!match.HashAddress)
+					return `<p class="absolute -top-4 mx-auto text-xs  bg-red-100 dark:bg-red-900 rounded-md p-2">
+						! ${i18nHandler.getValue("history.notchain")}
+						</p>`;
+			})()}
 		</a>
 	`;
 	return template.content.firstElementChild as HTMLDivElement;
