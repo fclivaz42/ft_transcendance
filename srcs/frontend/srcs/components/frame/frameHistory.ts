@@ -120,8 +120,8 @@ async function loadHistory(matchElements: string[], page: number, elemPerPage: n
 			title: i18nHandler.getValue("notification.generic.infoTitle"),
 		});
 		template.innerHTML = `
-			<div class="bg-panel dark:bg-panel_dark p-4 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center">
-				<p class="text-center text-3xl font-bold">
+			<div class="bg-panel dark:bg-panel_dark p-8 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center mb-8">
+				<p class="text-center text-xl">
 					${i18nHandler.getValue("history.empty")}
 				</p>
 			</div>
@@ -169,7 +169,7 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 						logo: "/assets/ui/previous-svgrepo-com.svg",
 					}).outerHTML}
 					<p id="history-page" class="text-sm text-gray-500 dark:text-gray-400 select-none text-center w-10">
-						${page} / ${Math.ceil(matches.length / elemPerPage)}
+						${page} / ${Math.max(Math.ceil(matches.length / elemPerPage), 1)}
 					</p>
 					${createButton({
 						id: "history-next",
@@ -205,5 +205,5 @@ async function updatePage(page: number, matches: Matches[], matchElements: strin
 	const newMatches = await loadHistory(matchElements, page, elemPerPage);
 	historyContainer.append(...newMatches.content.childNodes);
 	const pageElement = document.querySelector("#history-page") as HTMLParagraphElement;
-	pageElement.innerHTML = `${page} / ${Math.ceil(matches.length / elemPerPage)}`;
+	pageElement.innerHTML = `${page} / ${Math.max(Math.ceil(matches.length / elemPerPage), 1)}`;
 }

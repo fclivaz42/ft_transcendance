@@ -9,6 +9,7 @@ import { httpReply } from "../../../libs/helpers/httpResponse.ts";
 import UsersValidation from "../handlers/UsersValidation.ts";
 import DatabaseSDK from "../../../libs/helpers/databaseSdk.ts";
 import Logger from "../../../libs/helpers/loggers.ts";
+import axios from "axios";
 
 export default async function initializeRoute(app: FastifyInstance, opts: FastifyPluginOptions) {
 
@@ -35,6 +36,13 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 			return authorization;
 		const params = request.params as { uuid: string };
 		const resp = await db_sdk.get_user_picture(params.uuid)
+			.catch((error) => {
+				if (axios.isAxiosError(error) && error.response) {
+					Logger.debug(`Error getting user picture for ${params.uuid}`);
+					return httpReply({module: "usermanager", detail: error.response.statusText, status: error.response.status}, reply, request);
+				}
+				throw error;
+			});
 		if (resp.status > 300)
 			return reply.code(resp.status).send(resp.statusText);
 		if (!resp.data)
@@ -126,7 +134,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 
 		const params = request.params as { uuid: string };
 		const matches = await db_sdk.get_player_matchlist(params.uuid);
-		return reply.send(matches);
+		return reply.code(matches.status).send(matches.data);
 	});
 
 	usersAuthorizeEndpoint(app, opts);
