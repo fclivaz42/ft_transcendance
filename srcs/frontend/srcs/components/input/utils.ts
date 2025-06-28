@@ -61,3 +61,46 @@ export const updateFieldAppearance = (
 
     return isValid;
 };
+
+
+export function simpleupdateFieldAppearance(
+     inputContainer: CustomInputContainer | CustomPasswordInputContainer,
+    errorFeedbackElement: HTMLDivElement,
+    validationFunction: (value: string) => { isValid: boolean; errorMessage: string | null },
+    showErrorsImmediately: boolean, // Si true, affiche l'erreur dès qu'elle apparaît (input/focus)
+    validateIfEmpty = false // NOUVEAU: Si true, valide même si le champ est vide (pour soumission finale)
+) {
+    const value = inputContainer.inputElement.value.trim(); // Important: trim pour les espaces
+
+    if (value === '' && !validateIfEmpty) {
+        inputContainer.inputElement.classList.remove("border-red-500"); // Enlève les bordures de validation
+        errorFeedbackElement.classList.add("hidden"); 
+        return true; // Considéré comme valide car vide
+    }
+
+    //const validationResult = validationFunction(value);
+
+  // Effectue la validation réelle du contenu (si le champ n'est pas vide ou si validateIfEmpty est true)
+    const { isValid, errorMessage } = validationFunction(value);
+
+    // Mise à jour de l'apparence
+    if (isValid) 
+    {
+        inputContainer.inputElement.classList.remove("border-red-500");
+        errorFeedbackElement.classList.add("hidden");
+    }
+    else 
+    {
+        inputContainer.inputElement.classList.add("border-red-500");
+        if (showErrorsImmediately) 
+        {
+            errorFeedbackElement.textContent = errorMessage;
+            errorFeedbackElement.classList.remove("hidden");
+        }
+         else {
+            // Si showErrorsImmediately est false, on cache l'erreur pour ne pas l'afficher "trop tôt"
+            errorFeedbackElement.classList.add("hidden");
+         }
+    }
+    return isValid;
+}
