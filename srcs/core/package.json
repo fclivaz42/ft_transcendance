@@ -10,6 +10,7 @@
   "author": "fclivaz",
   "license": "GPL-3.0",
   "dependencies": {
+    "@fastify/multipart": "^9.0.3",
     "@fastify/websocket": "^11.1.0",
     "axios": "^1.8.4",
     "fastify": "^5.3.2",

@@ -4,10 +4,12 @@ import { jwt } from '../../managers/JwtManager.ts';
 import checkRequestAuthorization from '../../managers/AuthorizationManager.ts';
 import axios from 'axios';
 import https from 'https';
+import DatabaseSDK from '../../../../libs/helpers/databaseSdk.ts';
 
 export default async function usersAuthorizeEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.get("/authorize", async (request, reply) => {
 		const req = checkRequestAuthorization(request, reply);
+		const db_sdk = new DatabaseSDK();
 		if (req)
 			return req;
 		if (!request.headers["x-jwt-token"])
@@ -36,7 +38,6 @@ export default async function usersAuthorizeEndpoint(app: FastifyInstance, opts:
 			}, reply, request);
 		}
 
-		// TODO: Replace db axios with sdk call
 		if (!jwtToken.payload)
 			return httpReply({
 				detail: "JWT token payload is missing",
@@ -45,13 +46,7 @@ export default async function usersAuthorizeEndpoint(app: FastifyInstance, opts:
 			}, reply, request);
 		// Check if the user exists in the database
 		try {
-			await axios.get(`http://db:3000/Players/id/${jwtToken.payload.sub}`, {
-				headers: {
-					"Authorization": process.env.API_KEY || "",
-					"Content-Type": "application/json",
-				},
-				httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-			});
+			await db_sdk.get_user(jwtToken.payload.sub, "PlayerID")
 		} catch (err) {
 			return httpReply({
 				detail: "User not found",

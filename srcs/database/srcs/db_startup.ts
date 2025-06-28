@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/22 19:56:58 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/23 22:29:28 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -105,28 +105,26 @@ export async function init_db() {
 //
 
 export async function add_default_user() {
-	return new Promise((resolve, reject) => {
-		(async () => {
-			try {
-				const test = DatabaseWorker.get_del(tables.Players.Name, tables.Players.Fields[1], process.env.ADMIN_NAME as string, "get")
-				if (test[tables.Players.Fields[1]] === process.env.ADMIN_NAME as string)
-					return resolve(true);
-			} catch (e) {
-				if (e.code !== 404) {
-					console.dir(e);
-					return reject(false);
-				}
-			}
-			const default_user: object = { DisplayName: process.env.ADMIN_NAME, EmailAddress: "DEFAULTEMAIL", Admin: 1 };
-			try {
-				default_user["Password"] = await hash_password(process.env.ADMIN_PASSWORD as string)
-				DatabaseWorker.post(tables.Players.Name, tables.Players.Fields, default_user)
-			} catch (e) {
+	return new Promise(async (resolve, reject) => {
+		try {
+			const test = DatabaseWorker.get_del(tables.Players.Name, tables.Players.Fields[1], process.env.ADMIN_NAME as string, "get")
+			if (test[tables.Players.Fields[1]] === process.env.ADMIN_NAME as string)
+				return resolve(true);
+		} catch (e) {
+			if (e.code !== 404) {
 				console.dir(e);
 				return reject(false);
 			}
-			return resolve(true);
-		})()
+		}
+		const default_user: object = { DisplayName: process.env.ADMIN_NAME, EmailAddress: "DEFAULTEMAIL", Admin: 1 };
+		try {
+			default_user["Password"] = await hash_password(process.env.ADMIN_PASSWORD as string)
+			DatabaseWorker.post(tables.Players.Name, tables.Players.Fields, default_user)
+		} catch (e) {
+			console.dir(e);
+			return reject(false);
+		}
+		return resolve(true);
 	})
 }
 

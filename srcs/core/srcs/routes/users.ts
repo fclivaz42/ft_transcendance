@@ -1,7 +1,8 @@
-import axios from "axios";
-import type { FastifyInstance, FastifyPluginOptions, FastifyReply } from 'fastify'
+import axios from 'axios';
+import type { AxiosResponse } from "axios";
+import type { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import UsersSdk from '../../../libs/helpers/usersSdk.ts';
-import type { UserLoginProps, UserRegisterProps, Users } from '../../../libs/interfaces/Users.ts';
+import type { UserLoginProps, UserRegisterProps, User, UserWithPicture } from '../../../libs/interfaces/User.ts';
 import Logger from "../../../libs/helpers/loggers.ts";
 import { httpReply } from "../../../libs/helpers/httpResponse.ts";
 
@@ -17,7 +18,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for authorization.' });
 
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
-	
+
 		return reply.code(authorization.status).send(authorization.data);
 	});
 
@@ -30,6 +31,20 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 
 		const currentUser = await usersSdk.getUser(authorization.data.sub);
 		return reply.code(currentUser.status).send(usersSdk.filterUserData(currentUser.data));
+	});
+
+	fastify.all('/me/picture', async (request, reply) => {
+		if (request.method !== 'GET')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user picture.' });
+
+		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+
+		const userPicture = await usersSdk.getUserPicture(authorization.data.sub);
+		if (userPicture.status !== 200)
+			throw new Error(`Failed to fetch user picture: ${userPicture.statusText}`);
+		if (!userPicture.data)
+			return reply.code(404).send("User picture not found");
+		return reply.headers(userPicture.headers as any).send(userPicture.data);
 	});
 
 	// Returns a JWT token that can be used to authenticate further requests.
@@ -78,26 +93,43 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 		const userId = authorization.data.sub;
-		if (!request.body)
+		const formdata = new FormData();
+		for await (const part of request.parts()) {
+			if (part.type === "file") {
+				if (formdata.keys.length !== 0)
+					continue;
+				if (part.mimetype.includes("image/")) {
+					const chunks: Uint8Array[] = [];
+					const file = part.file;
+					for await (const chunk of file)
+						chunks.push(chunk);
+					const buffer = Buffer.concat(chunks);
+					formdata.append("file", new File([buffer], part.filename, { type: part.mimetype }));
+				}
+				continue;
+			}
+			formdata.append(part.fieldname, part.value as string)
+		}
+		if (![...formdata.entries()].length) {
 			return httpReply({
 				module: 'usermanager',
 				detail: 'No user data provided for update.',
 				status: 400,
-		}, reply, request);
-		const data = request.body as Partial<Users>;
-		if (data.PlayerID)
-			return httpReply({
-				module: 'usermanager',
-				detail: 'PlayerID cannot be updated.',
-				status: 400,
 			}, reply, request);
-		const resp = await usersSdk.updateUser(userId, request.body as Partial<Users>);
-		if (resp.status >= 400) {
-			return httpReply({
-				module: 'usermanager',
-				detail: `Failed to update user data: ${resp.statusText}`,
-				status: resp.status,
-			}, reply, request);
+		}
+		let resp: AxiosResponse<User> | undefined;
+		try {
+			resp = await usersSdk.updateUser(userId, formdata);
+		} catch (err) {
+			if (axios.isAxiosError(err)) {
+				Logger.error(`User update failed: ${err.message}`);
+				return httpReply({
+					module: 'usermanager',
+					detail: err.response?.data?.detail || 'User update failed',
+					status: err.response?.status || 500,
+				}, reply, request);
+			}
+			throw err;
 		}
 		reply.code(resp.status).send(usersSdk.filterUserData(resp.data));
 	});

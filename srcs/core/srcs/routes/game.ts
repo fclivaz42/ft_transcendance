@@ -45,7 +45,6 @@ export default async function game_routes(fastify: FastifyInstance, options: Fas
 			return;
 		const url = new URL(`wss://pong:1337/game/${wildcardMatch}`);
 		url.searchParams.append('userId', token.sub);
-		console.log(url);
 		const proxySocket = new WebSocket(url, {
 			agent: new https.Agent({ rejectUnauthorized: false }),
 		});
