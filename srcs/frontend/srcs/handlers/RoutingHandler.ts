@@ -37,7 +37,7 @@ class RoutingHandler {
 		NotificationManager.notify(props);
 	}
 
-	displayRoute() {
+	async displayRoute() {
 		this._url = new URL(window.location.href);
 		for(const param of this._url.searchParams.keys()) {
 			if (NotificationDialogLevels.includes(param as NotificationDialogLevel)) {
@@ -55,7 +55,7 @@ class RoutingHandler {
 		const currentRoute = window.location.pathname;
 		if (validRoutes[currentRoute]) {
 			try {
-				frameManager.frameChild = validRoutes[currentRoute]();
+				frameManager.frameChild = await validRoutes[currentRoute]();
 			} catch (error) {
 				const err = error as Error;
 				console.error(`Error displaying route ${currentRoute}:`, err);
@@ -72,6 +72,10 @@ class RoutingHandler {
 				frameManager.frameChild = frame;
 			});
 		}
+	}
+
+	updateUrl(): void {
+		window.history.replaceState({}, "", this._url);
 	}
 
 	setRoute(route: string): void {

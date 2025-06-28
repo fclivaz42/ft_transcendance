@@ -1,13 +1,9 @@
 import { userMenuManager } from "../managers/UserMenuManager";
+import type { Users } from "../interfaces/Users";
 
 class UserHandler {
 	private _clientId: string = "";
-	private _user: {
-		PlayerID: string;
-		DisplayName: string;
-		EmailAddress: string;
-		Avatar?: string,
-	} | undefined;
+	private _user: Users | undefined;
 
 	constructor() {
 		let clientId = localStorage.getItem("clientId");
@@ -52,7 +48,15 @@ class UserHandler {
 		return this._user !== undefined;
 	}
 
-	public async fetchUser() {
+	public async fetchUser(playerId?: string): Promise<Users | undefined> {
+		if (playerId) {
+			const user = await fetch(`/api/users/${playerId}`);
+			if (!user.ok) {
+				console.warn("Failed to fetch user data:", user.statusText);
+				return undefined;
+			}
+			return await user.json() as Users;
+		}
 		const user = await fetch("/api/users/me");
 		if (!user.ok) {
 			console.warn("Failed to fetch user data:", user.statusText);
@@ -77,7 +81,16 @@ class UserHandler {
 			}
 		}
 		this.updateComponents();
-		return this._user;
+		return this._user as Users;
+	}
+
+	public async fetchUserPicture(playerId: string, playerName?: string): Promise<string> {
+		if (playerId === this.userId)
+			return this.avatarUrl;
+		const response = await fetch(`/api/users/${playerId}/picture`);
+		if (!response.ok)
+			return `https://placehold.co/100x100?text=${playerName?.substring(0,2) || "?"}&font=roboto&bg=cccccc`;
+		return response.url;
 	}
 
 	private updateComponents() {

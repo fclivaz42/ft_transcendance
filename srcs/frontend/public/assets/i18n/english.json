@@ -8,11 +8,18 @@
       "label": "Utiliser un compte"
     }
   },
+  "pong": {
+    "loading": "Loading...",
+    "waitingPlayer": "Waiting for another player to join..."
+  },
   "leaderboard": {
     "title": "Leaderboard"
   },
   "history": {
-    "title": "History"
+    "title": "History",
+    "empty": "No history available.",
+    "winner": "Winner",
+    "loser": "Loser"
   },
   "header": {
     "usermenu": {
@@ -133,6 +140,7 @@
   },
   "notification": {
     "generic": {
+      "infoTitle": "Login Information",
       "errorTitle": "Error",
       "errorMessage": "An error occurred. Please try again later."
     },
@@ -143,5 +151,17 @@
     "user": {
       "notLogged": "You are not logged in."
     }
+  },
+  "errors": {
+    "http": {
+      "404": {
+        "title": "Oops! Page Not Found",
+        "message": "The page you are looking for does not exist."
+      }
+    },
+    "unauthorized": "Unauthorized access. Please log in.",
+    "forbidden": "Forbidden access. You do not have permission to view this resource.",
+    "notFound": "Resource not found.",
+    "generic": "Ooops! Something went wrong. Please try again later."
   }
 }

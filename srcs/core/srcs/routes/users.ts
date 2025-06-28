@@ -47,6 +47,27 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		return reply.headers(userPicture.headers as any).send(userPicture.data);
 	});
 
+	fastify.all('/me/matches', async (request, reply) => {
+		if (request.method !== 'GET')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user matches.' });
+
+		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		const token = usersSdk.unshowerCookie(request.headers.cookie)["token"];
+		const userMatches = await usersSdk.getUserMatches(authorization.data.sub, token)
+			.then(response => response)
+			.catch((err: any) => {
+				if (!axios.isAxiosError(err))
+					throw err;	
+				return reply.code(err.response?.status || 500).send(
+					err.response?.data || {
+						detail: 'Failed to fetch user matches',
+						status: err.response?.status || 500,
+						module: 'usermanager'
+					});
+			});
+		return reply.code(userMatches.status).send(userMatches.data);
+	});
+
 	// Returns a JWT token that can be used to authenticate further requests.
 	fastify.all('/login', async (request, reply) => {
 		if (request.method !== 'POST')
@@ -145,6 +166,16 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		return reply.code(userData.status).send(usersSdk.filterPublicUserData(userData.data));
 	});
 
+	fastify.all('/:uuid/picture', async (request, reply) => {
+		if (request.method !== 'GET')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user picture.' });
+		const params = request.params as { uuid: string };
+		const userPicture = await usersSdk.getUserPicture(params.uuid);
+		if (userPicture.status !== 200)
+			return reply.code(userPicture.status).send(userPicture.data);
+		return reply.headers(userPicture.headers as any).send(userPicture.data);
+	});
+
 	fastify.all('/logout', async (request, reply) => {
 		if (request.method !== 'GET')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for logout.' });
@@ -159,8 +190,6 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user matches.' });
 		await usersSdk.usersEnforceAuthorize(reply, request);
 		const token = usersSdk.unshowerCookie(request.headers.cookie)["token"];
-		if (!token)
-			return httpReply({detail: "Non authorized request, missing token.", status: 401, module: "usermanager"}, reply, request);
 		const params = request.params as { uuid: string };
 		const userMatches = await usersSdk.getUserMatches(params.uuid, token)
 			.then(response => response)

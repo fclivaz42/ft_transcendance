@@ -3,7 +3,7 @@ import { TitleProps } from "../../../interfaces/baseProps";
 export default function createHeaderFrame(props: TitleProps): HTMLDivElement {
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<div class="bg-panel dark:bg-panel_dark p-4 rounded-lg shadow-lg">
+		<div class="bg-panel dark:bg-panel_dark p-4 rounded-lg shadow-lg mb-16 max-w-[980px] mx-auto">
 			<h1 ${props.i18n ? `data-i18n=${props.i18n}` : ""} class="text-2xl font-bold mb-4">${props.title}</h1>
 		</div>
 	`;

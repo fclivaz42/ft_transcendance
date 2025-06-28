@@ -19,8 +19,14 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		if (authorization)
 			return authorization;
 		const params = request.params as { uuid: string };
-		const resp = await db_sdk.get_user(params.uuid, "PlayerID")
-		return reply.code(resp.status).send(resp.data);
+		const user = await db_sdk.get_user(params.uuid, "PlayerID");
+		try {
+			await db_sdk.get_user_picture(params.uuid);
+			user.data.Avatar = `/api/users/${params.uuid}/picture`;
+		} catch (error) {
+			Logger.debug(`No picture found for user ${params.uuid}:\n${error}`);
+		}
+		return reply.code(user.status).send(user.data);
 	});
 
 	app.get("/:uuid/picture", async (request, reply) => {
@@ -121,14 +127,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		let matches = (await db_sdk.get_matchlist()).data;
 		const params = request.params as { uuid: string };
 		// TODO: Filter matches on sql database side
-		matches = matches.filter((match) => match.WPlayerID === params.uuid || match.LPLayerID === params.uuid);
-		if (matches.length === 0) {
-			return httpReply({
-				detail: "No matches found for the user.",
-				status: 404,
-				module: "usermanager",
-			}, reply, request);
-		}
+		matches = matches.filter((match) => match.WPlayerID === params.uuid || match.LPlayerID === params.uuid);
 		return reply.send(matches);
 	});
 

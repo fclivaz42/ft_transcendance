@@ -3,7 +3,7 @@ import type { User } from "./User";
 export interface Match {
 	MatchID?: string,
 	WPlayerID: string | object,
-	LPLayerID: string | object,
+	LPlayerID: string | object,
 	WScore: number,
 	LScore: number,
 	WGuestName: string,
@@ -16,6 +16,6 @@ export interface Match {
 
 export interface Match_complete extends Match {
 	WPlayerID: User,
-	LPLayerID: User,
+	LPlayerID: User,
 	HashAddress: string
 }
