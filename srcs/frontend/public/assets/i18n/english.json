@@ -1,4 +1,7 @@
 {
+  "generic": {
+    "loading": "Loading..."
+  },
   "home": {
     "title": "Welcome to SARIF's Pong",
     "guestButton": {
@@ -9,7 +12,6 @@
     }
   },
   "pong": {
-    "loading": "Loading...",
     "waitingPlayer": "Waiting for another player to join..."
   },
   "leaderboard": {

@@ -87,7 +87,7 @@ export default function createPongFrame() {
 	else
 		switch (searchParams.get("mode")) {
 			default:
-				pongFrame = createPongLoading("pong.loading");
+				pongFrame = createPongLoading("generic.loading");
 	}
 	return pongFrame;
 }

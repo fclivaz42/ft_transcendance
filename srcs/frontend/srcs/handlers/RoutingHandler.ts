@@ -2,6 +2,7 @@ import create404Frame from "../components/frame/frame404";
 import createHistoryFrame from "../components/frame/frameHistory";
 import createHomeFrame from "../components/frame/frameHome";
 import createLeaderboardFrame from "../components/frame/frameLeaderboard";
+import createLoadingFrame from "../components/frame/frameLoading";
 import createPongFrame from "../components/frame/framePong";
 import createUserFrame from "../components/frame/frameUser";
 import { NotificationDialogLevel, NotificationDialogLevels, NotificationProps } from "../components/notificationDialog";
@@ -55,6 +56,7 @@ class RoutingHandler {
 		const currentRoute = window.location.pathname;
 		if (validRoutes[currentRoute]) {
 			try {
+				frameManager.frameChild = createLoadingFrame();
 				frameManager.frameChild = await validRoutes[currentRoute]();
 			} catch (error) {
 				const err = error as Error;
