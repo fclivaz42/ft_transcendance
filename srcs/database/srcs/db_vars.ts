@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/25 00:55:44 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/28 18:13:17 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -64,10 +64,6 @@ const PlayersTable: db_table =
 		"Password",
 		"OAuthID",
 		"FriendsList",
-		"PhoneNumber",
-		"FirstName",
-		"FamilyName",
-		"Bappy",
 		"Private",
 		"Admin"
 	],
@@ -78,10 +74,6 @@ const PlayersTable: db_table =
 		"TEXT NOT NULL",
 		"TEXT DEFAULT NULL",
 		"TEXT DEFAULT NULL",
-		"TEXT DEFAULT NULL",
-		"TEXT DEFAULT NULL",
-		"TEXT DEFAULT NULL",
-		"INTEGER DEFAULT 0",
 		"INTEGER DEFAULT 0",
 		"INTEGER DEFAULT 0"
 	],
@@ -147,6 +139,9 @@ const MatchesTable: db_table =
 		"POST": [
 			""
 		],
+		"PUT": [
+			"/MatchID/:MatchID",
+		]
 	},
 	"Identification": {
 		"HasID": true,

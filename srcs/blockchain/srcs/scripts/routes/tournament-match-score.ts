@@ -40,7 +40,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			return reply.code(200).send(match);
 		}
 		catch (e) {
-			return reply.code(400).send("throw error to get match score");
+			return reply.code(400).send("error.bad.matchortournamentid");
 		}
 	})
 }

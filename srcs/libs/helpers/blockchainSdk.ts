@@ -3,10 +3,13 @@ import https from "https";
 import type { AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import type { Match, Match_complete } from "../interfaces/Match.ts";
 import type { Tournament_full, Tournament_lite, Tournament_metadata } from "../interfaces/Tournament.ts";
+import type { blockMatch } from "../interfaces/Blockchain.ts";
 
 export type UUIDv4 = string
 
 export type ContractHash = string
+
+export type TXHash = string
 
 interface bc_sdk_options {
 	params?: string;
@@ -47,34 +50,43 @@ export default class BlockchainSDK {
 			data: options?.body,
 		})
 	}
-	;
+
+	private switcheroo(finished_match: Match): blockMatch {
+		return {
+			id: finished_match.MatchID,
+			winner: finished_match.WPlayerID as string,
+			loser: finished_match.LPlayerID as string,
+			winnerScore: finished_match.WScore,
+			loserScore: finished_match.LScore
+		}
+	}
+
+	private rectify(b_match: blockMatch): Partial<Match> {
+		return {
+			MatchID: b_match.id,
+			WPlayerID: b_match.winner,
+			LPlayerID: b_match.loser,
+			WScore: b_match.winnerScore,
+			LScore: b_match.loserScore
+		}
+	}
+
 	public async deploy(hash: string | undefined): Promise<AxiosResponse<ContractHash>> {
 		if (hash === undefined)
 			return await this.api_request<ContractHash>("POST", "deploy", undefined, { body: "", timeout: 15000, headers: { "Content-Type": "application/json" } })
 		return await this.api_request<ContractHash>("POST", "deploy", undefined, { body: hash, timeout: 15000, headers: { "Content-Type": "application/json" } })
 	}
-	//
-	// private async get_player_matchlist_from_uuid(user: UUIDv4): Promise<AxiosResponse<Array<Match>>> {
-	// 	return await this.api_request<Array<Match>>("GET", "Matches", `/PlayerID/${this.param_str}`, { params: user, timeout: 15000 })
-	// }
-	//
-	// private async get_player_matchlist_from_user(user: User): Promise<AxiosResponse<Array<Match>>> {
-	// 	if (!user.PlayerID)
-	// 		throw "error.empty.playerid"
-	// 	return await this.get_player_matchlist_from_uuid(user.PlayerID)
-	// }
-	//
-	// private async get_friends_from_uuid(user: UUIDv4): Promise<AxiosResponse<Array<User>>> {
-	// 	const req_user: User = (await this.get_user(user, "PlayerID")).data
-	// 	return await this.get_friends_from_user(req_user)
-	// }
-	//
-	// /**
-	// * Create a new user in the database.
-	// * @param user The user you want to create (object).
-	// * @returns An AxiosResponse Promise containing the created User's complete data
-	// */
-	// public async create_user(user: User): Promise<AxiosResponse<User>> {
-	// 	return await this.api_request<User>("POST", "Players", undefined, { body: user })
-	// }
+
+	public async add_match_score(finished_match: Match): Promise<AxiosResponse<TXHash>> {
+		if (typeof finished_match.WPlayerID !== "string" || typeof finished_match.LPlayerID !== "string")
+			throw "One of the PlayerID's is not a string."
+		return await this.api_request<TXHash>("POST", "add-match-score", undefined, { body: this.switcheroo(finished_match), timeout: 15000 })
+	}
+
+	public async get_match_score(identifier: UUIDv4): Promise<Partial<Match>> {
+		const req: blockMatch = await this.api_request<blockMatch>("GET", "match-score", `/id/${this.param_str}`, { params: identifier })
+			.then(response => response.data)
+		req.id = identifier
+		return this.rectify(req)
+	}
 }

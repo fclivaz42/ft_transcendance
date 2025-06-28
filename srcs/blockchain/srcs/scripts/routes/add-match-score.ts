@@ -25,7 +25,6 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			return reply.code(401).send("Invalid API-KEY");
 		if (!currentContract)
 			return reply.code(400).send("No contract has been set");
-
 		try {
 			const body = scoreSchema.parse(await request.body);
 			const address: eth.TransactionResponse | null | "Error with contract interaction" = await addMatchScore(currentContract, body.id, body.winner, body.winnerScore, body.loser, body.loserScore);

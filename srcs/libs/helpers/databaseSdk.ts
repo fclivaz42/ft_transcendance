@@ -6,17 +6,18 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/26 21:54:34 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/28 20:40:25 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import axios from "axios";
 import https from "https";
-import type { AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import type * as fft from "fastify";
 import type { User } from "../interfaces/User.ts";
 import type { Match, Match_complete } from "../interfaces/Match.ts";
 import type { Tournament_full, Tournament_lite, Tournament_metadata } from "../interfaces/Tournament.ts";
+import BlockchainSDK, { TXHash } from "./blockchainSdk.ts";
 
 export type UUIDv4 = string
 
@@ -214,8 +215,13 @@ export default class DatabaseSDK {
 	}
 
 	// WARN: DOUBLE-CHECK THIS
-	public async create_match(match: Match) {
-		return await this.api_request<Match>("POST", "Matches", undefined, { body: match })
+	public async create_match(match: Match): Promise<AxiosResponse<Match>> {
+		const finished_match: Match = await this.api_request<Match>("POST", "Matches", undefined, { body: match })
+			.then(response => response.data)
+		const bc_sdk = new BlockchainSDK();
+		const match_tx: TXHash = await bc_sdk.add_match_score(finished_match)
+			.then(response => response.data)
+		return await this.api_request<Match>("PUT", "Matches", `/MatchID/${this.param_str}`, { body: { HashAddress: match_tx }, params: finished_match.MatchID })
 	}
 
 	/**
@@ -223,7 +229,36 @@ export default class DatabaseSDK {
 	* @param match_id The UUIDv4 string of the match you are trying to get.
 	* @returns An AxiosResponse Promise containing the complete Match data.
 	*/
-	public async get_match(match_id: UUIDv4): Promise<AxiosResponse<Match_complete>> {
-		return await this.api_request<Match_complete>("GET", "Matches", `/MatchID/${this.param_str}`, { params: match_id })
+	public async get_match(match_id: UUIDv4): Promise<Match_complete> {
+		const match: Match = await this.api_request<Match>("GET", "Matches", `/MatchID/${this.param_str}`, { params: match_id })
+			.then(response => response.data)
+		let merged: Match | undefined = undefined;
+		if (match.HashAddress) {
+			const bc_sdk = new BlockchainSDK();
+			await bc_sdk.get_match_score(match.MatchID as string)
+				.then(function(response) {
+					merged = { ...match, ...response }
+				})
+				.catch(function() { match.HashAddress = undefined })
+		}
+		if (merged) {
+			if (!match.WPlayerID)
+				(merged as Partial<Match>).WPlayerID = undefined
+			if (!match.LPlayerID)
+				(merged as Partial<Match>).LPlayerID = undefined
+		}
+		else
+			merged = match
+		const u_array: Array<User> = await this.api_request<Array<User>>("GET", "Players", "/multiget", {
+			headers: {
+				Field: "PlayerID",
+				Array: JSON.stringify([merged.WPlayerID, merged.LPlayerID])
+			}
+		}).then(response => response.data)
+		return {
+			...merged,
+			WPlayerID: u_array[0],
+			LPlayerID: u_array[1]
+		}
 	}
 }

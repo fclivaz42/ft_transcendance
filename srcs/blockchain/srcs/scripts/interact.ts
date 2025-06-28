@@ -104,13 +104,7 @@ export async function getTournamentScore(contractAddress: string, id: string) {
 	const provider: eth.JsonRpcProvider = new ethers.JsonRpcProvider(process.env.PROVIDER);
 	const contract: eth.Contract = new ethers.Contract(contractAddress, abi.abi, provider);
 
-	try {
-		const tx = await contract.getTournamentScore(id);
-		return (tx);
-	}
-	catch (error) {
-		console.log("Error to get Tournament score, bad tournament id");
-	}
+	return await contract.getTournamentScore(id);
 }
 
 export async function getTournamentMatchScore(contractAddress: string, id: string, index: number) {
@@ -118,12 +112,7 @@ export async function getTournamentMatchScore(contractAddress: string, id: strin
 	const provider: eth.JsonRpcProvider = new ethers.JsonRpcProvider(process.env.PROVIDER);
 	const contract: eth.Contract = new ethers.Contract(contractAddress, abi.abi, provider);
 
-	try {
-		return (await contract.getTournamentMatchScore(id, index));
-	}
-	catch (error) {
-		console.log("Error to get Match score, bad match id");
-	}
+	return (await contract.getTournamentMatchScore(id, index));
 }
 
 export async function getMatchScore(contractAddress: string, id: string) {
@@ -131,10 +120,5 @@ export async function getMatchScore(contractAddress: string, id: string) {
 	const provider: eth.JsonRpcProvider = new ethers.JsonRpcProvider(process.env.PROVIDER);
 	const contract: eth.Contract = new ethers.Contract(contractAddress, abi.abi, provider);
 
-	try {
-		return (await contract.getMatchScore(id));
-	}
-	catch (error) {
-		console.log("Error to get Match score, bad match id");
-	}
+	return (await contract.getMatchScore(id));
 }

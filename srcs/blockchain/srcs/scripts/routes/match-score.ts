@@ -22,7 +22,11 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (!currentContract)
 			return reply.code(400).send("No contract has been set");
 		const { id } = request.params;
-		const result: Match = await getMatchScore(currentContract, id);
-		return reply.code(200).send(`\nMatch: ${result}\n`);
+		try {
+			const result: Match = await getMatchScore(currentContract, id);
+			return reply.code(200).send(result);
+		} catch (exception) {
+			return reply.code(400).send("error.bad.matchid")
+		}
 	})
 }
