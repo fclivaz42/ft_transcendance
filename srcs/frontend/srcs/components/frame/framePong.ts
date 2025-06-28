@@ -30,7 +30,7 @@ export function createPongCanvas(isComputer: boolean): HTMLDivElement {
 	}
 
 	template.innerHTML = `
-		<div class="pb-12 h-full gap-4 flex items-start justify-center select-none">
+		<div class="h-full gap-4 flex items-start justify-center select-none">
 				<div class="aspect-[3/2] min-w-[606px] w-full max-h-full">
 					<div class="aspect-[3/2] max-w-full h-full mx-auto flex flex-col min-h-0 gap-8">
 						<div class="flex justify-between items-center min-h-0">

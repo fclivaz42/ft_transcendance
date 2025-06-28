@@ -82,23 +82,23 @@ async function createHistoryElement(match: Matches): Promise<HTMLDivElement | nu
 	template.innerHTML = `
 		<a href="https://subnets-test.avax.network/c-chain/tx/${match.HashAddress}" target="_blank" class="select-none w-fit bg-panel dark:bg-panel_dark p-4 mb-4 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center hover:animate-scale hover:animate-duration-100">
 			<div class="flex items-center justify-between gap-4">
-				<div class="flex items-center justify-start gap-2 w-[250px]">
+				<div class="flex items-center justify-start gap-2 lg:w-[250px] w-[160px]">
 					<div class="relative">
-						<p data-i18n="history.winner" class="text-xl absolute -bottom-4 left-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${i18nHandler.getValue("history.winner")}</p>
-						<p class="text-2xl font-bold bottom-0 -right-16 absolute">${match.WScore}</p>
-						${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[0].PlayerID, oponents[0].DisplayName), sizeClass: "w-24 h-24"}).outerHTML}
+						<p data-i18n="history.winner" class="lg:text-xl text-sm absolute -bottom-4 left-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${i18nHandler.getValue("history.winner")}</p>
+						<p class="text-2xl font-bold lg:bottom-0 -bottom-4 lg:-right-16 -right-20 absolute">${match.WScore}</p>
+						${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[0].PlayerID, oponents[0].DisplayName), sizeClass: "lg:w-24 lg:h-24 w-12 h-12"}).outerHTML}
 					</div>
-					<p class="truncate max-w-32 text-lg font-semibold">${oponents[0].DisplayName}</p>
+					<p class="truncate lg:max-w-32 max-w-24 lg:text-lg text-xs font-semibold">${oponents[0].DisplayName}</p>
 				</div>
-				<p class="text-2xl font-bold text-gray-700 dark:text-gray-200">
+				<p class="lg:text-2xl text-lg font-bold text-gray-700 dark:text-gray-200">
 					VS
 				</p>
-				<div class="flex items-center justify-end gap-2 w-[250px]">
-					<p class="truncate max-w-32 text-lg font-semibold">${oponents[1].DisplayName}</p>
+				<div class="flex items-center justify-end gap-2 lg:w-[250px] w-[160px]">
+					<p class="truncate lg:max-w-32 max-w-24 lg:text-lg text-xs font-semibold">${oponents[1].DisplayName}</p>
 					<div class="relative">
-						<p data-i18n="history.loser" class="text-xl absolute -bottom-4 right-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${i18nHandler.getValue("history.loser")}</p>
-						<p class="text-2xl font-bold bottom-0 -left-16 absolute">${match.LScore}</p>
-						${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[1].PlayerID, oponents[1].DisplayName), sizeClass: "w-24 h-24"}).outerHTML}
+						<p data-i18n="history.loser" class="lg:text-xl text-sm absolute -bottom-4 right-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${i18nHandler.getValue("history.loser")}</p>
+						<p class="text-2xl font-bold lg:bottom-0 -bottom-4 lg:-left-16 -left-20 absolute">${match.LScore}</p>
+						${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[1].PlayerID, oponents[1].DisplayName), sizeClass: "lg:w-24 lg:h-24 w-12 h-12"}).outerHTML}
 					</div>
 				</div>
 			</div>
@@ -151,16 +151,13 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 		matchElements.push(historyElement.outerHTML);
 	}
 	template.innerHTML = `
-		<div class="pb-12">
+		<div class="min-w-fit">
 			${createHeaderFrame({
 				title: i18nHandler.getValue("history.title"),
 				i18n: "history.title",
 			}).outerHTML}
-			<div class="flex flex-col items-center">
-				<div class="flex flex-col items-center">
-					<div id="history-elements" class="flex flex-col items-center gap-4">
-						${(await loadHistory(matchElements, page, elemPerPage)).innerHTML}
-					</div>
+				<div id="history-elements" class="mx-auto flex flex-col items-center gap-4 w-fit">
+					${(await loadHistory(matchElements, page, elemPerPage)).innerHTML}
 				</div>
 				<div class="flex items-center justify-center gap-4 mt-4">
 					${createButton({
@@ -177,7 +174,6 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 						logo: "/assets/ui/next-svgrepo-com.svg",
 					}).outerHTML}
 				</div>
-			</div>
 		</div>
 	`;
 

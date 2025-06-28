@@ -1,8 +1,8 @@
-export default function createFrame(): HTMLElement {
+export default function createFrame(): HTMLDivElement {
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<main class="p-12 flex-grow w-full h-full bg-background dark:bg-background_dark overflow-x-auto">
-		</main>
+		<section class="pt-32 p-12 flex-grow  overflow-x-auto">
+		</section>
 	`;
 	const frame = template.content.firstElementChild as HTMLElement;
 

@@ -4,7 +4,7 @@ class MainManager {
 	public initialize() : void {
 		const template = document.createElement("template");
 		template.innerHTML = `
-			<main class="flex flex-grow h-full w-full" id="main">
+			<main class="flex h-full w-full" id="main">
 			</main>
 		`
 		this._main = template.content.firstElementChild as HTMLDivElement;
