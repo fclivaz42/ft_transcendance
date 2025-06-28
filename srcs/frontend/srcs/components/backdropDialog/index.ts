@@ -10,7 +10,7 @@ export interface DialogProps {
   child?: HTMLElement;
 }
 
-export function createDialog(props?: DialogProps) {
+export function createDialog(props?: DialogProps): BackdropDialog {
 	const backdrop = createDialogBackdrop(props as dialogBackdropProps);
 	const dialog = document.createElement("dialog", { is: "sarif-dialog" }) as BackdropDialog;
   

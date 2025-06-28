@@ -1,11 +1,9 @@
-import { i18nHandler } from "../../handlers/i18nHandler.js";
 import { ButtonProps, TitleProps } from "../../interfaces/baseProps.js";
 import { createButton } from "../buttons/index.js";
+import { createFriendSidePanel } from "./friendSidePanel.js";
 import { createHistorySidePanel } from "./historySidePanel.js";
-import { createLeaderboardSidePanel } from "./leaderboardSidePanel.js";
 import { createPongSidePanel } from "./pongSidePanel.js";
 import { createSettingsSidePanel } from "./settingsSidePanel.js";
-// import { createTetrisSidePanel } from "./tetrisSidePanel.js";
 
 export const defaultPanelSize = "w-64";
 
@@ -89,19 +87,18 @@ export function createSidePanelFromDataPanel(attributes: NamedNodeMap): HTMLElem
 	switch (dataPanel) {
 		case "pongSidePanel":
 			return createPongSidePanel();
-		case "leaderboardSidePanel":
-			return createLeaderboardSidePanel();
 		case "settingsSidePanel":
 			return createSettingsSidePanel();
 		case "historySidePanel":
 			return createHistorySidePanel();
+		case "friendSidePanel":
+			return createFriendSidePanel();
 		default:
 			return null;
 	}
 }
 
 export { createPongSidePanel } from "./pongSidePanel.js";
-// export { createTetrisSidePanel }  from "./tetrisSidePanel.js";
-export { createLeaderboardSidePanel } from "./leaderboardSidePanel.js";
 export { createSettingsSidePanel } from "./settingsSidePanel.js";
 export { createHistorySidePanel } from "./historySidePanel.js";
+export { createFriendSidePanel } from "./friendSidePanel.js";

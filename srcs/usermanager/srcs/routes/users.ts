@@ -124,10 +124,8 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 				module: "usermanager",
 			}, reply, request);
 
-		let matches = (await db_sdk.get_matchlist()).data;
 		const params = request.params as { uuid: string };
-		// TODO: Filter matches on sql database side
-		matches = matches.filter((match) => match.WPlayerID === params.uuid || match.LPlayerID === params.uuid);
+		const matches = await db_sdk.get_player_matchlist(params.uuid);
 		return reply.send(matches);
 	});
 

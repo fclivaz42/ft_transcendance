@@ -1,7 +1,6 @@
 import create404Frame from "../components/frame/frame404";
 import createHistoryFrame from "../components/frame/frameHistory";
 import createHomeFrame from "../components/frame/frameHome";
-import createLeaderboardFrame from "../components/frame/frameLeaderboard";
 import createLoadingFrame from "../components/frame/frameLoading";
 import createPongFrame from "../components/frame/framePong";
 import createUserFrame from "../components/frame/frameUser";
@@ -11,10 +10,9 @@ import NotificationManager from "../managers/NotificationManager";
 import PongGameManager from "../managers/PongGameManager";
 import { i18nHandler } from "./i18nHandler";
 
-const validRoutes: Record<string, () => HTMLElement> = {
+const validRoutes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
 	"/": createHomeFrame,
 	"/history": createHistoryFrame,
-	"/leaderboard": createLeaderboardFrame,
 	"/user": createUserFrame,
 	"/pong": createPongFrame,
 };

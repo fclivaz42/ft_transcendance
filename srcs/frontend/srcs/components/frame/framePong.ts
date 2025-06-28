@@ -86,12 +86,20 @@ export function createPongLoading(message: string): HTMLDivElement {
 		}
 
 		let url: URL | undefined;
-		switch (RoutingHandler.searchParams.get("mode")) {
-			case "solo":
+		const room = RoutingHandler.searchParams.get("room");
+		switch (room) {
+			case "computer":
 				url = new URL("computer", PONG_HOST);
 				break;
 			default:
-				url = new URL("remote", PONG_HOST);
+				if (!room)
+					url = new URL("remote", PONG_HOST);
+				else if (room === "host")
+					url = new URL("friend_host", PONG_HOST);
+				else {
+					url = new URL("friend_join", PONG_HOST);
+					url.searchParams.set("roomId", room);
+				}
 				break;
 		}
 		url.searchParams.set("userId", UserHandler.userId as string);
@@ -104,12 +112,10 @@ export default function createPongFrame() {
 	const url = RoutingHandler.url;
 	const searchParams = RoutingHandler.searchParams;
 	let pongFrame: HTMLDivElement;
-	if (!searchParams.has("mode"))
+	const room = searchParams.get("room");
+	if (room !== "computer")
 		pongFrame = createPongLoading("pong.waitingPlayer");
 	else
-		switch (searchParams.get("mode")) {
-			default:
-				pongFrame = createPongLoading("generic.loading");
-	}
+		pongFrame = createPongLoading("generic.loading");
 	return pongFrame;
 }
