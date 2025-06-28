@@ -93,17 +93,6 @@ absolute inset-y-1 right-2
     toggleButton.appendChild(eyeIcon);
     toggleButton.appendChild(eyeSlashIcon);
 
-    // toggleButton.addEventListener("click", () => {
-    //     if (input.type === "password") {
-    //         input.type = "text";
-    //         eyeIcon.classList.add("hidden");
-    //         eyeSlashIcon.classList.remove("hidden");
-    //     } else {
-    //         input.type = "password";
-    //         eyeIcon.classList.remove("hidden");
-    //         eyeSlashIcon.classList.add("hidden");
-    //     }
-    // });
     toggleButton.addEventListener("click", () => {
         if (input.type === "password") {
             input.type = "text";
