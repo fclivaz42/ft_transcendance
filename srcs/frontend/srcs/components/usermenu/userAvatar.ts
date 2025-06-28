@@ -13,7 +13,7 @@ export default function createUserAvatar(props: UserAvatarProps = {
 }): HTMLImageElement {
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<img ${props.src ? "" : "data-user=\"avatar\""} src="${props.src || UserHandler.avatarUrl}" alt="User Avatar" class="border-2 rounded-full object-cover ${props.sizeClass}">
+		<img ${props.src ? "" : "data-user=\"avatar\""} src="${props.src || UserHandler.avatarUrl}" alt="User Avatar" class="border-2 rounded-full object-cover ${props.sizeClass} bg-white">
 	`;
 	const userAvatar = template.content.firstElementChild as HTMLImageElement;
 

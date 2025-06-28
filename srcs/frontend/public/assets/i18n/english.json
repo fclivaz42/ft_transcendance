@@ -12,7 +12,8 @@
     }
   },
   "pong": {
-    "waitingPlayer": "Waiting for another player to join..."
+    "waitingPlayer": "Waiting for another player to join...",
+    "computer": "IA"
   },
   "leaderboard": {
     "title": "Leaderboard"

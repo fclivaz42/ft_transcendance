@@ -5,17 +5,39 @@ import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler from "../../handlers/UserHandler";
 import createUserAvatar from "../usermenu/userAvatar";
 
-export function createPongCanvas(): HTMLDivElement {
+interface PlayerData {
+	displayName: string;
+	avatar: HTMLImageElement;
+}
+
+export function createPongCanvas(isComputer: boolean): HTMLDivElement {
 	const template = document.createElement("template");
+	const p1: PlayerData = {
+		displayName: UserHandler.displayName || "User Name",
+		avatar: createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}),
+	}
+	let p2: PlayerData;
+	if (isComputer) {
+		p2 = {
+			displayName: i18nHandler.getValue("pong.computer") || "Computer",
+			avatar: createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14", src: "/assets/images/computer-virus-1-svgrepo-com.svg"}),
+		}
+	} else {
+		p2 = {
+			displayName: UserHandler.displayName || "User Name",
+			avatar: createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}),
+		}
+	}
+
 	template.innerHTML = `
 		<div class="pb-12 h-full gap-4 flex items-start justify-center select-none">
 				<div class="aspect-[3/2] min-w-[606px] w-full max-h-full">
 					<div class="aspect-[3/2] max-w-full h-full mx-auto flex flex-col min-h-0 gap-8">
 						<div class="flex justify-between items-center min-h-0">
 							<div class="flex items-center justify-center gap-4">
-								${createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}).outerHTML}
-								<div class="flex flex-col items-start justify-center">
-									<p data-user="username" class="text-xl lg:text-3xl font-bold text-center select-text">${UserHandler.displayName}</p>
+								${p1.avatar.outerHTML}
+								<div class="flex flex-col items-start justify-center w-0">
+									<p data-user="username" class="text-xl lg:text-3xl font-bold text-center select-text">${p1.displayName}</p>
 									<p data-ping="p1" class="text-base lg:text-lg">calculating...</p>
 								</div>
 							</div>
@@ -25,9 +47,9 @@ export function createPongCanvas(): HTMLDivElement {
 								<p data-score="p2" class="text-left w-16 lg:w-32">0</p>
 							</div>
 							<div class="flex flex-row-reverse items-center justify-center gap-4">
-								${createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}).outerHTML}
-								<div class="flex flex-col items-end justify-center">
-									<p data-user="username" class="text-xl lg:text-3xl font-bold text-center select-text">${UserHandler.displayName}</p>
+								${p2.avatar.outerHTML}
+								<div class="flex flex-col items-end justify-center w-0">
+									<p data-user="username" class="text-xl lg:text-3xl font-bold text-center select-text">${p2.displayName}</p>
 									<p data-ping="p2" class="text-base lg:text-lg">calculating...</p>
 								</div>
 							</div>

@@ -65,7 +65,7 @@ class PongGameManager {
 
 	public initialize(addr: string) {
 		this.reset();
-		const canvasContainer = createPongCanvas();
+		const canvasContainer = createPongCanvas(addr.includes("computer"));
 		this.frontElements = {
 			canvasContainer: canvasContainer,
 			canvas: enforceDefined(canvasContainer.querySelector<HTMLCanvasElement>("canvas"), "Canvas element not found in the container.") as HTMLCanvasElement,
