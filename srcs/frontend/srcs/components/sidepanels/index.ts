@@ -12,7 +12,7 @@ export function createSidePanel(props: TitleProps): HTMLElement {
 
 	container.className = `${defaultPanelSize} overflow-hidden bg-panel dark:bg-panel_dark h-[80%] rounded-xl p-8`;
 	container.innerHTML = `
-		<h3 class="text-lg text-center font-bold"${props.i18n ? " data-i18n=\"" + props.i18n + "\"" : ""}>${props.title}</h3>
+		<h3 class="text-lg text-center font-bold duration-0 text-black dark:text-white"${props.i18n ? " data-i18n=\"" + props.i18n + "\"" : ""}>${props.title}</h3>
         <hr class="my-4">
 	`;
 	return container;
