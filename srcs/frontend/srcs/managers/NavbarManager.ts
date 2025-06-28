@@ -37,7 +37,7 @@ class NavbarManager {
 				{
 					id: "btnFriend",
 					title: i18nHandler.getValue("navbar.friend.label"),
-					logo: "/assets/ui/user-friends-svgrepo-com.svg",
+					logo: "/assets/ui/friend-svgrepo-com.svg",
 					panelId: "friendSidePanel",
 					i18n: "navbar.friend.label",
 				},
