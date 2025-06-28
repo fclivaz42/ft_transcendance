@@ -62,7 +62,7 @@ export const updateFieldAppearance = (
     return isValid;
 };
 
-
+// Version simplifiée pour l'edit du usermenu
 export function simpleupdateFieldAppearance(
      inputContainer: CustomInputContainer | CustomPasswordInputContainer,
     errorFeedbackElement: HTMLDivElement,
@@ -78,7 +78,6 @@ export function simpleupdateFieldAppearance(
         return true; // Considéré comme valide car vide
     }
 
-    //const validationResult = validationFunction(value);
 
   // Effectue la validation réelle du contenu (si le champ n'est pas vide ou si validateIfEmpty est true)
     const { isValid, errorMessage } = validationFunction(value);
