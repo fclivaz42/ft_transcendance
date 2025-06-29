@@ -40,6 +40,8 @@ export default class Ball {
 	private _lastSpeedIncreaseBounce: number | undefined;
 	public direction: Vector3;
 
+	private _onCollision?: (collisionInfo: string) => void;
+
 	constructor(
 		scene: Scene,
 		name: string,
@@ -152,9 +154,16 @@ export default class Ball {
 			let boxA = this.getCollisionBox();
 			let boxB = collider.getCollisionBox();
 			if (BoundingBox.Intersects(boxA, boxB)) {
+				if (this._onCollision) {
+					this._onCollision(collider.getName());
+				}
 				collider.calculateBounce(this);
 				break;
 			}
 		}
+	}
+
+	public setOnCollision(callback: (collisionInfo: any) => void): void {
+		this._onCollision = callback;
 	}
 }
