@@ -353,12 +353,22 @@ class UsersSdk {
 		});
 	}
 
-	public async getUserMatches(uuid: string, token: string): Promise<AxiosResponse<Match_complete[]>> {
-		return this.apiRequest<Match_complete[]>("get", `${uuid}/matches`, {
-			headers: {
-				"X-JWT-Token": token,
-			},
+	public async getUserMatches(uuid: string): Promise<AxiosResponse<Match_complete[]>> {
+		return this.apiRequest<Match_complete[]>("get", `${uuid}/matches`);
+	}
+
+	public async getUserFriends(uuid: string): Promise<AxiosResponse<User[]>> {
+		return this.apiRequest<User[]>("get", `${uuid}/friends`);
+	}
+
+	public async postUserFriend(uuid: string, friendUuid: string): Promise<AxiosResponse<User>> {
+		return this.apiRequest<User>("post", `${uuid}/friends`, {
+			data: { PlayerID: friendUuid },
 		});
+	}
+
+	public async deleteUserFriend(uuid: string, friendUuid: string): Promise<AxiosResponse<void>> {
+		return this.apiRequest<void>("delete", `${uuid}/friends/${friendUuid}`);
 	}
 }
 

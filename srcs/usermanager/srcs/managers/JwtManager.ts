@@ -1,5 +1,7 @@
 import crypto from 'crypto';
 import { config } from './ConfigManager.ts';
+import DatabaseSDK from '../../../libs/helpers/databaseSdk.ts';
+import type { FastifyRequest } from 'fastify';
 
 interface JwtEncodedToken {
 	token: string;
@@ -73,10 +75,10 @@ class JwtToken {
 	}
 }
 
-interface JwtTokenVerifyResult {
+export interface JwtTokenVerifyResult {
 	valid: boolean;
 	payload?: JwtFullPayload;
-	error?: "Invalid JWT format" | "Invalid JWT signature" | "JWT token has expired" | "Invalid JWT issuer";
+	error?: "Invalid JWT format" | "Invalid JWT signature" | "JWT token has expired" | "Invalid JWT issuer" | "User not found" | "X-JWT-Token header is missing or invalid";
 }
 
 export interface JwtManagerProps {
@@ -134,7 +136,12 @@ class JwtManager {
 		return encodedToken;
 	}
 
-	public verifyToken(token: string): JwtTokenVerifyResult {
+	public async verifyToken(request: FastifyRequest): Promise<JwtTokenVerifyResult> {
+		const xjwtToken = request.headers['x-jwt-token'];
+		if (!xjwtToken || typeof xjwtToken !== 'string')
+			return { valid: false, error: 'X-JWT-Token header is missing or invalid' };
+		const token = xjwtToken.trim();
+
 		let jwtToken: JwtEncodedToken;
 		try {
 			jwtToken = this.parseJwtToken(token);
@@ -151,6 +158,12 @@ class JwtManager {
 		}
 		if (payload.iss !== this.props.issuer) {
 			return { valid: false, error: 'Invalid JWT issuer' };
+		}
+		const dbSdk = new DatabaseSDK();
+		try {
+			await dbSdk.get_user(payload.sub, "PlayerID");
+		} catch (err) {
+			return { valid: false, error: 'User not found' };
 		}
 		return { valid: true, payload };
 	}

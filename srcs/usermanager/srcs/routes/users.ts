@@ -10,6 +10,8 @@ import UsersValidation from "../handlers/UsersValidation.ts";
 import DatabaseSDK from "../../../libs/helpers/databaseSdk.ts";
 import Logger from "../../../libs/helpers/loggers.ts";
 import axios from "axios";
+import UsersSdk from "../../../libs/helpers/usersSdk.ts";
+import type { MultipartFile } from "@fastify/multipart";
 
 export default async function initializeRoute(app: FastifyInstance, opts: FastifyPluginOptions) {
 
@@ -49,6 +51,127 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 			return reply.code(404).send("User picture not found");
 		return reply.headers(resp.headers as any).send(resp.data);
 	});
+
+	app.get("/:uuid/friends", async (request, reply) => {
+		const authorization = checkRequestAuthorization(request, reply);
+		if (authorization)
+			return authorization;
+		const params = request.params as { uuid: string };
+		const friends = await db_sdk.get_user_friends(params.uuid)
+			.catch((err: any) => {
+				if (!axios.isAxiosError(err))
+					throw err;
+				return reply.code(err.response?.status || 500).send(
+					err.response?.data || {
+						detail: "Failed to fetch user friends",
+						status: err.response?.status || 500,
+						module: "usermanager"
+					});
+			});
+
+		// Filter out any undefined or null friends
+		let filteredFriends: any = friends.data.filter((friend: Partial<User>) => friend);
+
+		// Filter users to remove any personal data
+		filteredFriends =  filteredFriends.map((friend: User) => UsersSdk.filterPublicUserData(friend as User));
+
+		// Filter out any friends that are not in the database and delete them
+		filteredFriends = await filteredFriends.filter(async (friend: Partial<User>) => {
+			try {
+				await db_sdk.get_user(friend.PlayerID as string, "PlayerID");
+				return true;
+			} catch (error) {
+				const userSdk = new UsersSdk();
+				// TODO: Remove friend from user's friends list
+			}
+		});
+
+		// Add avatar URL to each friend if available
+		filteredFriends = await Promise.all(filteredFriends.map(async (friend: Partial<User>) => {
+			try {
+				await db_sdk.get_user_picture(friend.PlayerID as string);
+				friend.Avatar = `/api/users/${friend.PlayerID}/picture`;
+			} catch (error) {
+				Logger.debug(`No picture found for friend ${friend.PlayerID}:\n${error}`);
+			}
+			return friend;
+		}));
+
+		// Sort friends by DisplayName
+		filteredFriends.sort((a: Partial<User>, b: Partial<User>) => {
+			if (!a.DisplayName || !b.DisplayName) return 0;
+			return a.DisplayName.localeCompare(b.DisplayName);
+		});
+	
+		// Return the filtered friends list
+		return reply.code(friends.status).send(filteredFriends);
+	});
+
+	app.post("/:uuid/friends", async (request, reply) => {
+		// TODO: Implement friend request logic better once dbSdk supports it
+		const authorization = checkRequestAuthorization(request, reply);
+		if (authorization)
+			return authorization;
+		const params = request.params as { uuid: string };
+		const body = request.body as { PlayerID: string };
+		if (!body.PlayerID)
+			return httpReply({
+				detail: "PlayerID is required",
+				status: 400,
+				module: "usermanager",
+			}, reply, request);
+		const user = (await db_sdk.get_user(params.uuid, "PlayerID")).data;
+		if (user.FriendsList?.includes(body.PlayerID)) {
+			return httpReply({
+				detail: "User is already a friend",
+				status: 409,
+				module: "usermanager",
+			}, reply, request);
+		}
+		user.FriendsList = user.FriendsList || [];
+		user.FriendsList.push(body.PlayerID);
+		const postFriends = await db_sdk.update_user(user)
+			.catch((err: any) => {
+				if (!axios.isAxiosError(err))
+					throw err;
+				return reply.code(err.response?.status || 500).send(
+					err.response?.data || {
+						detail: "Failed to add friend",
+						status: err.response?.status || 500,
+						module: "usermanager"
+					});
+			});
+		return reply.code(postFriends.status).send(postFriends.data);
+	});
+
+	app.delete("/:uuid/friends/:friendId", async (request, reply) => {
+		const authorization = checkRequestAuthorization(request, reply);
+		if (authorization)
+			return authorization;
+		const params = request.params as { uuid: string, friendId: string };
+		const user = (await db_sdk.get_user(params.uuid, "PlayerID")).data;
+		if (!user.FriendsList || !user.FriendsList.includes(params.friendId)) {
+			return httpReply({
+				detail: "User is not a friend",
+				status: 404,
+				module: "usermanager",
+			}, reply, request);
+		}
+		user.FriendsList = user.FriendsList.filter((friendId: string) => friendId !== params.friendId);
+		const deleteFriends = await db_sdk.update_user(user)
+			.catch((err: any) => {
+				if (!axios.isAxiosError(err))
+					throw err;
+				return reply.code(err.response?.status || 500).send(
+					err.response?.data || {
+						detail: "Failed to remove friend",
+						status: err.response?.status || 500,
+						module: "usermanager"
+					});
+			});
+		return reply.code(deleteFriends.status).send(deleteFriends.data);
+	});
+
 	app.delete("/:uuid", async (request, reply) => {
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
@@ -62,9 +185,8 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
 			return authorization;
-		const user: Partial<User> = {}
+		let user: Partial<User> = {}
 		const params = request.params as { uuid: string };
-		let resp: undefined | object;
 		const formdata = new FormData();
 		for await (const part of request.parts()) {
 			if (part.type === "field")
@@ -82,23 +204,17 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 				}
 			}
 		}
-		if (resp = UsersValidation.enforceUserValidation(reply, request, user))
-			return resp;
-		resp = undefined;
-		if (formdata.has("file")) {
-			const update = await db_sdk.set_user_picture(params.uuid, formdata)
-			if (update.status > 300)
-				return reply.code(update.status).send(update.statusText);
-			resp = { status: update.status, picture: update.statusText }
+		const userValidation = UsersValidation.enforceUserValidation(reply, request, user);
+		if (userValidation)
+			return userValidation;
+		
+		if (formdata.has("file"))
+			await db_sdk.set_user_picture(params.uuid, formdata);
+		if (Object.keys(user).length >= 1) {
+			user.PlayerID = params.uuid;
+			await db_sdk.update_user(user as User)
 		}
-		if (JSON.stringify(user) !== "{}") {
-			user.PlayerID = params.uuid;		// Override PlayerID in case someone tried to set it manually
-			const db = await db_sdk.update_user(user as User)
-			resp = { status: db.status, code: db.data }
-		}
-		if (!resp)
-			return reply.code(200).send("Nothing to do")
-		return reply.code(resp.status).send(resp.data);
+		return reply.code(200).send(UsersSdk.filterUserData(user as User));
 	});
 
 	app.post("/", async (request, reply) => {
@@ -124,14 +240,6 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
 			return authorization;
-
-		if (!request.headers["x-jwt-token"])
-			return httpReply({
-				detail: "X-JWT-Token header is missing",
-				status: 400,
-				module: "usermanager",
-			}, reply, request);
-
 		const params = request.params as { uuid: string };
 		const matches = await db_sdk.get_player_matchlist(params.uuid);
 		return reply.code(matches.status).send(matches.data);
