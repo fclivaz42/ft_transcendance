@@ -102,7 +102,6 @@ export function createPongLoading(message: string): HTMLDivElement {
 				}
 				break;
 		}
-		url.searchParams.set("userId", UserHandler.userId as string);
 		startGame(url.toString());
 
 	return loadingContainer;
