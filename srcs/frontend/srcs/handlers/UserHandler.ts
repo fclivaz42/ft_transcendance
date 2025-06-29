@@ -51,6 +51,11 @@ class UserHandler {
 
 	public async fetchUser(playerId?: string): Promise<Users | undefined> {
 		if (playerId) {
+			if (playerId === this.userId) {
+				if (!this._user)
+					return this.fetchUser();
+				return this._user;
+			}
 			const user = await fetch(`/api/users/${playerId}`);
 			if (!user.ok) {
 				console.warn("Failed to fetch user data:", user.statusText);

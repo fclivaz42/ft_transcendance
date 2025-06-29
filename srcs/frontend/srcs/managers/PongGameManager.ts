@@ -1,10 +1,13 @@
 
 import { Engine } from "@babylonjs/core/Engines/engine.js";
 
-import { WebSocketManager } from "../game/WebSocketManager.js";
+import { InitHandler, WebSocketManager } from "../game/WebSocketManager.js";
 import { GameField } from "../game/GameField.js";
 import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
+import { InitPayload } from "../game/types.js";
+import UserHandler from "../handlers/UserHandler.js";
+import { i18nHandler } from "../handlers/i18nHandler.js";
 
 function enforceDefined<T>(value: T | undefined, message: string): T {
 	if (!value)
@@ -47,7 +50,7 @@ class PongGameManager {
 			}
 		}));*/
 		this.pingInterval.sentPing = undefined;
-		const pingElemens = document.querySelectorAll<HTMLSpanElement>("[data-ping]");
+		const pingElemens = document.querySelectorAll<HTMLSpanElement>("[data-pong-ping]");
 		for (const element of pingElemens) {
 			// TODO: differentiate between players
 			element.textContent = `${this.pingInterval.ping}ms`;
@@ -61,6 +64,31 @@ class PongGameManager {
 			if (this.engine)
 				this.engine.dispose();
 		}
+	}
+
+	private async initializeFrontElements(payload: InitPayload["payload"]) {
+		this.getFrontElements.canvasContainer.querySelectorAll("[data-pong-displayname]").forEach((element) => {
+			const identifier = element.getAttribute("data-pong-displayname");
+			if (!identifier || !(identifier in payload)) throw new Error(`Identifier ${identifier} not found in payload.`);
+			const playerData = identifier === "p1" ? payload.connectedPlayers.p1 : payload.connectedPlayers.p2;
+			const avatarElement = this.getFrontElements.canvasContainer.querySelector<HTMLImageElement>(`[data-pong-avatar="${identifier}"]`);
+			if (playerData === undefined) {
+				element.textContent = i18nHandler.getValue("pong.computer") || "Computer";
+				if (avatarElement)
+					avatarElement.src = "/assets/images/computer-virus-1-svgrepo-com.svg";
+				return;
+			}
+			const user = UserHandler.fetchUser(playerData);
+			user.then(async (userData) => {
+				if (!userData) throw new Error(`User data for ${identifier} not found.`);
+				element.textContent = userData.DisplayName;
+				if (avatarElement)
+					avatarElement.src = await UserHandler.fetchUserPicture(userData.PlayerID, userData.DisplayName, userData.Avatar);
+			}).catch((error) => {
+				console.error(`Error fetching user data for ${identifier}:`, error);
+				element.textContent = "Unknown User";
+			});
+		});
 	}
 
 	public initialize(addr: string) {
@@ -79,6 +107,7 @@ class PongGameManager {
 		this.websocketManager = new WebSocketManager(
 			(payload) => {
 				console.log("WebSocket payload received:", payload);
+				this.initializeFrontElements(payload);
 				this.getField.init(payload);
 				if (!this.started) {
 					frameManager.frameChild = this.getFrontElements.canvasContainer;

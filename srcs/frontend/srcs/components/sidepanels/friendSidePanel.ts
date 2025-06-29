@@ -54,8 +54,7 @@ export function createFriendSidePanel() {
 		i18n: "navbar.friend.title",
 	});
 	sidePanel.id = "friendSidePanel";
-	//sidePanel.classList.add("flex", "flex-col", "gap-2", "overflow-y-auto", "p-2");
-	sidePanel.classList.add("py-2", "flex", "flex-col");
+	sidePanel.classList.add("flex", "flex-col");
 
 	const friendContainer = createFriendContainer();
 

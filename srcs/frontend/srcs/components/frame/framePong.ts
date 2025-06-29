@@ -5,29 +5,14 @@ import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler from "../../handlers/UserHandler";
 import createUserAvatar from "../usermenu/userAvatar";
 
-interface PlayerData {
-	displayName: string;
-	avatar: HTMLImageElement;
-}
-
 export function createPongCanvas(isComputer: boolean): HTMLDivElement {
 	const template = document.createElement("template");
-	const p1: PlayerData = {
-		displayName: UserHandler.displayName || "User Name",
-		avatar: createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}),
-	}
-	let p2: PlayerData;
-	if (isComputer) {
-		p2 = {
-			displayName: i18nHandler.getValue("pong.computer") || "Computer",
-			avatar: createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14", src: "/assets/images/computer-virus-1-svgrepo-com.svg"}),
-		}
-	} else {
-		p2 = {
-			displayName: UserHandler.displayName || "User Name",
-			avatar: createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}),
-		}
-	}
+
+	const playerAvatar: HTMLImageElement[] = [];
+	playerAvatar.push(createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14", src:"/assets/images/default_avatar.svg"}));
+	playerAvatar.push(createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14", src:"/assets/images/default_avatar.svg"}));
+	playerAvatar[0].setAttribute("data-pong-avatar", "p1");
+	playerAvatar[1].setAttribute("data-pong-avatar", "p2");
 
 	template.innerHTML = `
 		<div class="h-full gap-4 flex items-start justify-center select-none">
@@ -35,10 +20,10 @@ export function createPongCanvas(isComputer: boolean): HTMLDivElement {
 					<div class="aspect-[3/2] max-w-full h-full mx-auto flex flex-col min-h-0 gap-8">
 						<div class="flex justify-between items-center min-h-0">
 							<div class="flex items-center justify-center gap-4">
-								${p1.avatar.outerHTML}
+								${playerAvatar[0].outerHTML}
 								<div class="flex flex-col items-start justify-center w-0">
-									<p data-user="username" class="text-xl lg:text-3xl font-bold text-center select-text">${p1.displayName}</p>
-									<p data-ping="p1" class="text-base lg:text-lg">calculating...</p>
+									<p data-pong-displayname="p1" class="text-xl lg:text-3xl font-bold text-center select-text">Username</p>
+									<p data-pong-ping="p1" class="text-base lg:text-lg">calculating...</p>
 								</div>
 							</div>
 							<div id="score" class="text-3xl lg:text-6xl font-bold text-center flex items-center justify-center flex-nowrap gap-x-2 lg:gap-x-4">
@@ -47,10 +32,10 @@ export function createPongCanvas(isComputer: boolean): HTMLDivElement {
 								<p data-score="p2" class="text-left w-16 lg:w-32">0</p>
 							</div>
 							<div class="flex flex-row-reverse items-center justify-center gap-4">
-								${p2.avatar.outerHTML}
+								${playerAvatar[1].outerHTML}
 								<div class="flex flex-col items-end justify-center w-0">
-									<p data-user="username" class="text-xl lg:text-3xl font-bold text-center select-text">${p2.displayName}</p>
-									<p data-ping="p2" class="text-base lg:text-lg">calculating...</p>
+									<p data-pong-displayname="p2" class="text-xl lg:text-3xl font-bold text-center select-text">Username</p>
+									<p data-pong-ping="p2" class="text-base lg:text-lg">calculating...</p>
 								</div>
 							</div>
 						</div>
