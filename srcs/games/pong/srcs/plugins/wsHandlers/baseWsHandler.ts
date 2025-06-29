@@ -30,21 +30,31 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 	return (socket: WebSocket, req: FastifyRequest<{ Querystring: GameWsQuery }>) => {
 		const query = req.query;
 
+		console.log(`User ID: ${query.userId}`);
+
 		if (!query.userId) {
 			socket.send(JSON.stringify({ type: '403', message: 'Unauthorized user' }));
 			socket.close();
 			return;
 		}
 
+		if (manager.getSession(query.userId)) {
+			socket.send(JSON.stringify({ type: 'ignored', message: 'Already in an active session'}));
+			socket.close();
+			return;
+		}
+
+
 		let session: PlayerSession;
 
+		
 		if (mode === 'friend_join') {
 			if (!query.roomId) {
 				socket.send(JSON.stringify({ type: '400', message: 'Missing roomId' }));
 				socket.close();
 				return;
 			}
-
+			
 			session = manager.assignPlayer(socket, {
 				userId: query.userId,
 				mode,
@@ -61,9 +71,9 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 				mode: 'remote'
 			});
 		}
-
+		
 		console.log(`Player connected to room ${session.getRoom()?.id} as ${query.userId}`);
-
+		
 		socket.on('message', (msg) => {
 			if (msg.toString() === 'ping!') {
 				socket.send('pong!');
@@ -72,13 +82,11 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 			try {
 				const { type, payload }: ClientMessage = JSON.parse(msg.toString());
 				if (type === 'ball' && payload?.direction && payload.direction == "launch") {
-					// console.log(`Launch command from ${session.getPaddleId()} | user: ${session.getUserId()}`);
 					let ball = session.getRoom()?.getGame().getBall();
 					ball?.launch();
-					ball?.setCurrSpeed(0.25);
+					ball?.setCurrSpeed(0.25); // ball.getBaseSpeed() instead of hardcode?
 				}
 				else if (type === 'move' && payload?.direction) {
-					// console.log(`Move command from ${session.getPaddleId()} | user: ${session.getUserId()}`);
 					const paddle = session.getPaddle();
 
 					if (paddle) {
@@ -99,6 +107,9 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 							paddle.getIsIA() === true ? paddle.setAI(false) : paddle.setAI(true);
 					}
 				}
+				else if (type === 'disconnect') {
+					socket.close();
+				}
 			} catch (err) {
 				console.error('Invalid message from client:', err);
 			}
@@ -106,6 +117,7 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 
 		socket.on('close', () => {
 			console.log(`User: ${query.userId} disconnected.`);
+			manager.removeSession(session);
 		})
 	};
 }

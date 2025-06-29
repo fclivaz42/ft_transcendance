@@ -26,12 +26,55 @@ export interface UpdatePayload {
 		ball: BallUpdate;
 		p1: PaddleUpdate;
 		p2: PaddleUpdate;
-		// Move score to another interface
-		score: {
-			p1: number;
-			p2: number;
-		};
 	}
+}
+
+export interface PlayerConnectedPayload {
+	type: "connect";
+	payload: {
+		playerID: string;
+		roomID: string;
+	}
+};
+
+export interface PlayerDisconnectedPayload {
+	type: "disconnect";
+	payload: {
+		playerID: string;
+	}
+};
+
+export interface CollisionPayload {
+	type: "collision";
+	payload: {
+		collider: string;
+	}
+};
+
+export interface ScoreUpdatePayload {
+	type: "score";
+	payload: {
+		score: {
+			p1: number,
+			p2: number
+		}
+	}
+}
+
+export interface GameOverPayload {
+	type: "gameover";
+	payload: {
+		winner: string;
+		final_score: {
+			p1: number,
+			p2: number
+		}
+	}
+}
+
+export interface ConnectedPlayers {
+	p1: string | undefined;
+	p2: string | undefined;
 }
 
 export interface BallInit extends BallUpdate {
@@ -59,7 +102,15 @@ export interface InitPayload {
 		walls: WallsInit;
 		camera: CameraInitInfo;
 		light: LightInitInfo;
+		roomID: string;
+		connectedPlayers: ConnectedPlayers;
 	}
 }
 
-export type ServerMessage = InitPayload | UpdatePayload;
+export type ServerMessage = InitPayload
+							| UpdatePayload
+							| PlayerConnectedPayload
+							| PlayerDisconnectedPayload
+							| CollisionPayload
+							| ScoreUpdatePayload
+							| GameOverPayload; 

@@ -13,8 +13,9 @@ interface AssignPlayerOptions {
 
 export default class RoomManager {
 	private _rooms: Map<string, GameRoom> = new Map();
-	private roomCount: number = 0;
+	private _connectedSessions: Map<string, PlayerSession> = new Map();
 
+	/* ROOM ID GENERATION -------------------------------------------------------------------------- */
 	private _generateRandomLetter(): string {
 		return String.fromCharCode(65 + Math.floor(Math.random() * 26));
 	}
@@ -42,10 +43,14 @@ export default class RoomManager {
 		const numbers = Array.from({ length: 2 }, () => this._generateRandomNumber().toString());
 		return this._shuffle(letters.concat(numbers)).join('');
 	}
+	/* --------------------------------------------------------------------------------------------- */
 
 	public createRoom(vsAI: boolean = false): GameRoom {
 		const roomId = this._generateRoomId();
-		const room = new GameRoom(roomId, vsAI);
+		const room = new GameRoom(roomId, vsAI, (id) => {
+			this._rooms.delete(id);
+			console.log(`Room ${id} deleted (empty or game over).`);
+		});
 		this._rooms.set(roomId, room);
 		console.log(`Created Room with ID: ${roomId}`);
 		return room;
@@ -63,6 +68,7 @@ export default class RoomManager {
 	public assignPlayer(socket: WebSocket, options: AssignPlayerOptions): PlayerSession {
 		const { userId, mode, roomId = null } = options;
 		const session = new PlayerSession(socket, userId);
+		this.addSession(session);
 
 		let room: GameRoom | undefined;
 
@@ -99,7 +105,30 @@ export default class RoomManager {
 		}
 		return session;
 	}
+
+	/* MANAGING SESSIONS --------------------------------------------------------------------------- */
+	public addSession(session: PlayerSession): void {
+		this._connectedSessions.set(session.getUserId(), session);
+	}
+
+	public getSession(userId: string): PlayerSession | undefined {
+		return this._connectedSessions.get(userId);
+	}
+
+	public removeSession(session: PlayerSession): void {
+		this._connectedSessions.delete(session.getUserId());
+
+		const room = session.getRoom();
+		if (room) {
+			room.removePlayer(session);
+			if (room.isEmpty()) {
+				this._rooms.delete(room.id);
+			}
+		}
+	}
+	/* --------------------------------------------------------------------------------------------- */
 }
+
 
 // TODO: make so that the update payload is broadcasted to all connected player in the given session
 //       work in GameClass.js
