@@ -4,6 +4,7 @@ import type { Users } from "../interfaces/Users";
 class UserHandler {
 	private _clientId: string = "";
 	private _user: Users | undefined;
+	private _friendList: Users[] = [];
 
 	constructor() {
 		let clientId = localStorage.getItem("clientId");
@@ -80,13 +81,27 @@ class UserHandler {
 				}
 			}
 		}
+		try {
+			const friendListResp = await fetch("/api/users/me/friends");
+			if (!friendListResp.ok) {
+				console.warn("Failed to fetch friend list:", friendListResp.statusText);
+				this._friendList = [];
+			} else {
+				this._friendList = await friendListResp.json() as Users[];
+			}
+		} catch (error) {
+			console.error("Error fetching friend list:", error);
+			this._friendList = [];
+		}
 		this.updateComponents();
 		return this._user as Users;
 	}
 
-	public async fetchUserPicture(playerId: string, playerName?: string): Promise<string> {
+	public async fetchUserPicture(playerId: string, playerName?: string, playerAvatar?:string): Promise<string> {
 		if (playerId === this.userId)
 			return this.avatarUrl;
+		if (playerAvatar)
+			return playerAvatar;
 		const response = await fetch(`/api/users/${playerId}/picture`);
 		if (!response.ok)
 			return `https://placehold.co/100x100?text=${playerName?.substring(0,2) || "?"}&font=roboto&bg=cccccc`;
@@ -116,6 +131,22 @@ class UserHandler {
 		});
 
 		userMenuManager.initialize();
+	}
+
+	public async removeFriend(playerId: string): Promise<void> {
+		const response = await fetch(`/api/users/me/friends/${playerId}`, {
+			method: "DELETE",
+		});
+		if (!response.ok) {
+			console.error("Failed to remove friend:", response.statusText);
+			throw new Error("Failed to remove friend");
+		}
+		this._friendList = this._friendList.filter(friend => friend.PlayerID !== playerId);
+		this.updateComponents();
+	}
+
+	public get friendList() {
+		return this._friendList;
 	}
 }
 

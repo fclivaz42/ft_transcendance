@@ -26,7 +26,13 @@
     "empty": "No history available.",
     "winner": "Winner",
     "loser": "Loser",
-    "notchain": "Match not in blockchain"
+    "notchain": "Match not in blockchain",
+    "notificaton": {
+      "private": {
+        "title": "Private user",
+        "message": "This user is private. You cannot view their history."
+      }
+    }
   },
   "header": {
     "usermenu": {
@@ -51,7 +57,8 @@
     },
     "friend": {
       "label": "Friends",
-      "title": "Friend list"
+      "title": "Friend list",
+      "empty": "You have no friends yet."
     },
     "history": {
       "label": "History",

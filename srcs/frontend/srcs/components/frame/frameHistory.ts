@@ -29,17 +29,14 @@ const userBuffer: Record<string, Users> = {};
 async function fetchHistoryUser(playerId: string, guestname: string | null): Promise<Users> {
 	console.log(userBuffer);
 	if (playerId === UserHandler.userId) {
-		console.log("ICIIIIIIIII");
 		return UserHandler.user as Users;
 	}
 	if (userBuffer[playerId]) {
-		console.log("LAAAAAAAAAAA");
 		console.debug(`User ${playerId} found in buffer`);
 		return userBuffer[playerId];
 	}
 	console.debug(`Fetching user ${playerId} from database`);
 	let user = await UserHandler.fetchUser(playerId);
-	console.log("Fetched user:", user?.DisplayName);
 	if (!user) {
 		user = {
 			PlayerID: playerId,
@@ -87,7 +84,7 @@ async function createHistoryElement(match: Matches): Promise<HTMLDivElement | nu
 					<div class="relative">
 						<p data-i18n="history.winner" class="lg:text-xl text-sm absolute -bottom-4 left-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${i18nHandler.getValue("history.winner")}</p>
 						<p class="text-2xl font-bold lg:bottom-0 -bottom-4 lg:-right-16 -right-20 absolute">${match.WScore}</p>
-						${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[0].PlayerID, oponents[0].DisplayName), sizeClass: "lg:w-24 lg:h-24 w-12 h-12"}).outerHTML}
+						${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[0].PlayerID, oponents[0].DisplayName, oponents[0].Avatar), sizeClass: "lg:w-24 lg:h-24 w-12 h-12"}).outerHTML}
 					</div>
 					<p class="truncate lg:max-w-32 max-w-24 lg:text-lg text-xs font-semibold">${oponents[0].DisplayName}</p>
 				</div>
@@ -99,7 +96,7 @@ async function createHistoryElement(match: Matches): Promise<HTMLDivElement | nu
 					<div class="relative">
 						<p data-i18n="history.loser" class="lg:text-xl text-sm absolute -bottom-4 right-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${i18nHandler.getValue("history.loser")}</p>
 						<p class="text-2xl font-bold lg:bottom-0 -bottom-4 lg:-left-16 -left-20 absolute">${match.LScore}</p>
-						${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[1].PlayerID, oponents[1].DisplayName), sizeClass: "lg:w-24 lg:h-24 w-12 h-12"}).outerHTML}
+						${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[1].PlayerID, oponents[1].DisplayName, oponents[1].Avatar), sizeClass: "lg:w-24 lg:h-24 w-12 h-12"}).outerHTML}
 					</div>
 				</div>
 			</div>
@@ -118,11 +115,6 @@ async function createHistoryElement(match: Matches): Promise<HTMLDivElement | nu
 async function loadHistory(matchElements: string[], page: number, elemPerPage: number): Promise<HTMLTemplateElement> {
 	const template = document.createElement("template");
 	if (matchElements.length <= 0) {
-		NotificationManager.notify({
-			level: "info",
-			message: i18nHandler.getValue("history.empty"),
-			title: i18nHandler.getValue("notification.generic.infoTitle"),
-		});
 		template.innerHTML = `
 			<div class="bg-panel dark:bg-panel_dark p-8 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center mb-8">
 				<p class="text-center text-xl">
@@ -140,6 +132,25 @@ async function loadHistory(matchElements: string[], page: number, elemPerPage: n
 }
 
 export default async function createHistoryFrame(): Promise<HTMLDivElement> {
+	const playerId = RoutingHandler.searchParams.get("playerId");
+	const player = playerId ? await UserHandler.fetchUser(playerId) : UserHandler.user;
+	if (!player) {
+		NotificationManager.notify({
+			level: "error",
+			title: i18nHandler.getValue("notification.generic.errorTitle"),
+			message: i18nHandler.getValue("notification.generic.errorMessage"),
+		});
+		RoutingHandler.setRoute("/");
+		return document.createElement("div");
+	} else if (player.Private) {
+		NotificationManager.notify({
+			level: "error",
+			title: i18nHandler.getValue("history.notification.private.title"),
+			message: i18nHandler.getValue("history.notification.private.message"),
+		});
+		RoutingHandler.setRoute("/");
+		return document.createElement("div");
+	}
 	let page = Number(RoutingHandler.searchParams.get("p")) || 1;
 	if (Number.isNaN(page) || page < 1)
 		page = 1;
@@ -157,7 +168,7 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 	template.innerHTML = `
 		<div class="min-w-fit">
 			${createHeaderFrame({
-				title: i18nHandler.getValue("history.title"),
+				title: `${i18nHandler.getValue("history.title")}${playerId ? ` - <span class="text-lg font-normal">${player.DisplayName}</span>` : ""}`,
 				i18n: "history.title",
 			}).outerHTML}
 				<div id="history-elements" class="mx-auto flex flex-col items-center gap-4 w-fit">

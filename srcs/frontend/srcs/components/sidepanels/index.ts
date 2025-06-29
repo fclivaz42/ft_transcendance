@@ -5,7 +5,7 @@ import { createHistorySidePanel } from "./historySidePanel.js";
 import { createPongSidePanel } from "./pongSidePanel.js";
 import { createSettingsSidePanel } from "./settingsSidePanel.js";
 
-export const defaultPanelSize = "w-64";
+export const defaultPanelSize = "w-72";
 
 export function createSidePanel(props: TitleProps): HTMLElement {
 	const container = document.createElement("div");
