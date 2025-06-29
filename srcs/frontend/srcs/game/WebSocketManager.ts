@@ -67,7 +67,8 @@ export class WebSocketManager {
 			}
 			else if (msg.type === "update") {
 				this.onUpdate(msg.payload);
-				// TODO: Seperate score update with a different type
+			}
+			else if (msg.type === "score") {
 				PongGameManager.onScoreUpdate(msg.payload.score);
 			}
 		};
