@@ -60,7 +60,8 @@ interface InitPayload {
 interface PlayerConnectedPayload {
 	type: "connect",
 	payload: {
-		playerID: string
+		playerID: string,
+		roomID: string
 	}
 };
 
@@ -322,7 +323,8 @@ export default class GameRoom {
 		const playerConnectedPayload: PlayerConnectedPayload = {
 			type: "connect",
 			payload: {
-				playerID: sessions.getUserId()
+				playerID: sessions.getUserId(),
+				roomID: this.id
 			}
 		}
 		return playerConnectedPayload;
