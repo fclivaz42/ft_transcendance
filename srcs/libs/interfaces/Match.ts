@@ -22,4 +22,5 @@ export interface Match_hash {
 export interface Match_complete extends Match {
 	WPlayerID: User,
 	LPlayerID: User,
+	HashAddress: string
 }
