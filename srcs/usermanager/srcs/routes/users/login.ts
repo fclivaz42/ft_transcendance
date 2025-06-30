@@ -55,13 +55,13 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 		if (!loggedUser.PlayerID)
 			throw new Error("Missing PlayerID in user data");
 
-		// try {
-		// 	await send2faVerification(loggedUser.EmailAddress);
-		// 	console.log(codeUser.get(loggedUser.EmailAddress));
-		// }
-		// catch (err) {
-		// 	return reply.status(503).send(`Error during 2FA :", ${err}`);
-		// }
+		try {
+			await send2faVerification(loggedUser.EmailAddress);
+			console.log(codeUser.get(loggedUser.EmailAddress));
+		}
+		catch (err) {
+			return reply.status(503).send(`Error during 2FA :", ${err}`);
+		}
 		const jwtToken = jwt.createJwtToken({
 			sub: loggedUser.PlayerID,
 			data: {
