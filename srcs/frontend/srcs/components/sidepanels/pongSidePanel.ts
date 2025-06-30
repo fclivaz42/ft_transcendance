@@ -2,6 +2,7 @@ import { createSidePanel, createSidePanelButton } from "./index.js";
 
 import { i18nHandler } from "../../handlers/i18nHandler.js";
 import RoutingHandler from "../../handlers/RoutingHandler.js";
+import { createPongJoinDialog } from "../dialog/pongJoin/index.js";
 
 export function createPongSidePanel() {
 	const sidePanel = createSidePanel({
@@ -22,19 +23,21 @@ export function createPongSidePanel() {
 		title: i18nHandler.getValue("navbar.pong.submenu.solo"),
 		i18n: "navbar.pong.submenu.solo",
 		logo: buttonLogo,
-		f: () => RoutingHandler.setRoute("/pong?mode=solo"),
+		f: () => RoutingHandler.setRoute("/pong?room=computer"),
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
 		title: i18nHandler.getValue("navbar.pong.submenu.join"),
 		i18n: "navbar.pong.submenu.join",
-		logo: buttonLogo
+		logo: buttonLogo,
+		f: () => createPongJoinDialog(),
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
 		title: i18nHandler.getValue("navbar.pong.submenu.create"),
 		i18n: "navbar.pong.submenu.create",
-		logo: buttonLogo
+		logo: buttonLogo,
+		f: () => RoutingHandler.setRoute("/pong?room=host"),
 	}));
 
 	return sidePanel;

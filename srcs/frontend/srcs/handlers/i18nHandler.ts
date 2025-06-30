@@ -24,7 +24,7 @@ class I18nHandler {
     const lang = this._currentLang;
     if (this._i18n[lang] && this._i18n[lang][key]) {
       return this._i18n[lang][key];
-    } else {
+    } else if (lang !== "English") {
       console.warn(`Missing translation for key: ${key} in language: ${lang}`, "Fallback to English");
       if (this._i18n["English"] && this._i18n["English"][key]) {
         return this._i18n["English"][key];
@@ -32,7 +32,10 @@ class I18nHandler {
         console.warn(`Missing translation for key: ${key} in language: English`);
         return key;
       }
-    }
+    } else {
+			console.warn(`Missing translation for key: ${key} in language: English`);
+			return key;
+		}
   }
 
   public reload(): void {

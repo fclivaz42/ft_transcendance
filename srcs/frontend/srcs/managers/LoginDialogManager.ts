@@ -128,11 +128,9 @@ const dialog = createLoginDialog({
     Object.assign(dialog.style, {
       maxWidth: "400px",
       position: "relative",
-      height: "auto", //s'adapte à la taille du contenu
-      maxHeight: "70vh",    // <-- heeeeeeeere :limite haute raisonnable dialog
-      minHeight: "50vh"   ,
+      height: "auto", //s'adapte à la taille du contenu ,
       overflow: "visible",     // <-- permet au contenu de dépasser si besoin
-      padding: "1.5rem",       
+      padding: "2.5rem",       
     });
 
     document.body.style.overflow = "hidden";

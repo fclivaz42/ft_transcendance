@@ -44,10 +44,6 @@ export default async function frontendRoutes(fastify: FastifyInstance, options: 
 		serveFront(request, reply);
 	});
 
-	fastify.get('/leaderboard', async (request, reply) => {
-		serveFront(request, reply);
-	});
-
 	fastify.get('/history', async (request, reply) => {
 		serveFront(request, reply);
 	});

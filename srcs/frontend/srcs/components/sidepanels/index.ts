@@ -1,20 +1,18 @@
-import { i18nHandler } from "../../handlers/i18nHandler.js";
 import { ButtonProps, TitleProps } from "../../interfaces/baseProps.js";
 import { createButton } from "../buttons/index.js";
+import { createFriendSidePanel } from "./friendSidePanel.js";
 import { createHistorySidePanel } from "./historySidePanel.js";
-import { createLeaderboardSidePanel } from "./leaderboardSidePanel.js";
 import { createPongSidePanel } from "./pongSidePanel.js";
 import { createSettingsSidePanel } from "./settingsSidePanel.js";
-// import { createTetrisSidePanel } from "./tetrisSidePanel.js";
 
-export const defaultPanelSize = "w-64";
+export const defaultPanelSize = "w-72";
 
 export function createSidePanel(props: TitleProps): HTMLElement {
 	const container = document.createElement("div");
 
 	container.className = `${defaultPanelSize} overflow-hidden bg-panel dark:bg-panel_dark h-[80%] rounded-xl p-8`;
 	container.innerHTML = `
-		<h3 class="text-lg text-center font-bold"${props.i18n ? " data-i18n=\"" + props.i18n + "\"" : ""}>${props.title}</h3>
+		<h3 class="text-lg text-center font-bold duration-0 text-black dark:text-white"${props.i18n ? " data-i18n=\"" + props.i18n + "\"" : ""}>${props.title}</h3>
         <hr class="my-4">
 	`;
 	return container;
@@ -89,19 +87,18 @@ export function createSidePanelFromDataPanel(attributes: NamedNodeMap): HTMLElem
 	switch (dataPanel) {
 		case "pongSidePanel":
 			return createPongSidePanel();
-		case "leaderboardSidePanel":
-			return createLeaderboardSidePanel();
 		case "settingsSidePanel":
 			return createSettingsSidePanel();
 		case "historySidePanel":
 			return createHistorySidePanel();
+		case "friendSidePanel":
+			return createFriendSidePanel();
 		default:
 			return null;
 	}
 }
 
 export { createPongSidePanel } from "./pongSidePanel.js";
-// export { createTetrisSidePanel }  from "./tetrisSidePanel.js";
-export { createLeaderboardSidePanel } from "./leaderboardSidePanel.js";
 export { createSettingsSidePanel } from "./settingsSidePanel.js";
 export { createHistorySidePanel } from "./historySidePanel.js";
+export { createFriendSidePanel } from "./friendSidePanel.js";

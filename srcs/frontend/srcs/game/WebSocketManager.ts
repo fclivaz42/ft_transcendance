@@ -60,6 +60,10 @@ export class WebSocketManager {
 		});
 
 		this.socket.onmessage = (event) => {
+			if (event.data === "pong!") {
+				PongGameManager.calculatePing();
+				return;
+			}
 			const msg: ServerMessage = JSON.parse(event.data);
 			if (msg.type === "init") {
 				console.log(msg);
@@ -67,7 +71,8 @@ export class WebSocketManager {
 			}
 			else if (msg.type === "update") {
 				this.onUpdate(msg.payload);
-				// TODO: Seperate score update with a different type
+			}
+			else if (msg.type === "score") {
 				PongGameManager.onScoreUpdate(msg.payload.score);
 			}
 		};
