@@ -49,7 +49,7 @@ export function createUserDialog(): HTMLDialogElement {
     userIdentifier.appendChild(emailElement);
 
     const logoutButton = document.createElement("button");
-    logoutButton.textContent = "Logout";
+    logoutButton.textContent = i18nHandler.getValue("panel.updateProfile.buttons.logout");
     logoutButton.className = "w-2/3 p-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50";
     logoutButton.onclick = () => {
         fetch("/api/users/logout", {
@@ -65,24 +65,24 @@ export function createUserDialog(): HTMLDialogElement {
 
     const editProfileTitle = document.createElement("h2");
     editProfileTitle.className = "text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2";
-    editProfileTitle.textContent = "Edit Profile";
+    editProfileTitle.textContent = i18nHandler.getValue("panel.updateProfile.title");
 
     // --- Display Name ---
-    const displayNameTextbox: CustomInputContainer = createInfoInput(i18nHandler.getValue("panel.usernameLabel"), "displayName");
+    const displayNameTextbox: CustomInputContainer = createInfoInput(i18nHandler.getValue("panel.updateProfile.fields.usernameLabel"), "displayName");
     // displayNameTextbox.inputElement.value = UserHandler.displayName || ""; // Pré-remplir
     const displayNameErrorFeedback = document.createElement("div");
     displayNameErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
     displayNameTextbox.appendChild(displayNameErrorFeedback);
 
     // --- Email ---
-    const emailTextbox: CustomInputContainer = createInfoInput(i18nHandler.getValue("panel.emailLabel"), "email");
-    emailTextbox.inputElement.type = "email";
+    const emailTextbox: CustomInputContainer = createInfoInput(i18nHandler.getValue("panel.updateProfile.fields.emailLabel"), "email");
+    emailTextbox.inputElement.type = "email"
     const emailErrorFeedback = document.createElement("div");
     emailErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
     emailTextbox.appendChild(emailErrorFeedback);
 
     // --- New Password ---
-    const passwordTextbox: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.passwordLabel"), "newPassword", true);
+    const passwordTextbox: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.updateProfile.fields.passwordLabel"), "newPassword", true);
     const passwordErrorFeedback = document.createElement("div");
     passwordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
     passwordTextbox.appendChild(passwordErrorFeedback);
@@ -92,21 +92,21 @@ export function createUserDialog(): HTMLDialogElement {
     passwordTextbox.appendChild(passwordStrengthHelper.element);
 
     // --- Confirm New Password ---
-    const confirmPasswordTextbox: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.registerPanel.confirmPasswordLabel"), "confirmNewPassword", false);
+    const confirmPasswordTextbox: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.updateProfile.fields.confirmPasswordLabel"), "confirmNewPassword", false);
     const confirmPasswordErrorFeedback = document.createElement("div");
     confirmPasswordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
     confirmPasswordTextbox.appendChild(confirmPasswordErrorFeedback);
 
 
     const cancelButton = document.createElement("button");
-    cancelButton.textContent = "Cancel";
+    cancelButton.textContent = i18nHandler.getValue("panel.updateProfile.buttons.cancel");
     cancelButton.className = "w-full p-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50";
     cancelButton.onclick = () => {
         dialog.remove();
     };
 
     const saveButton = document.createElement("button");
-    saveButton.textContent = "Save Changes";
+    saveButton.textContent = i18nHandler.getValue("panel.updateProfile.buttons.save");
     saveButton.className = "w-full p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50";
 
 
@@ -147,7 +147,7 @@ export function createUserDialog(): HTMLDialogElement {
                 NotificationManager.notify({
                     "level": "error",
                     "title": i18nHandler.getValue("panel.updateProfile.notification.validationErrorTitle"),
-                    "message": i18nHandler.getValue("panel.registerPanel.validation.passwordRequiredForConfirm")
+                    "message": i18nHandler.getValue("panel.registerPanel.confirmPasswordLabel")
                 });
                 isFormValidForSubmission = false;
             } else if (!isPasswordActuallyValid) { // Si le nouveau mot de passe est rempli mais invalide
@@ -156,7 +156,7 @@ export function createUserDialog(): HTMLDialogElement {
                 NotificationManager.notify({
                     "level": "error",
                     "title": i18nHandler.getValue("panel.updateProfile.notification.validationErrorTitle"),
-                    "message": i18nHandler.getValue("panel.registerPanel.validation.confirmPasswordRequired")
+                    "message": i18nHandler.getValue("panel.registerPanel.validation.passwordRequired")
                 });
                 isFormValidForSubmission = false;
             } else if (!isConfirmPasswordActuallyValid) { // Si les deux sont remplis mais la confirmation est invalide

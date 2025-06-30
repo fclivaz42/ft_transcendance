@@ -98,9 +98,10 @@
         "passwordRequired": "Password is required.",
         "confirmPasswordRequired": "Please confirm your password.",
         "passwordMismatch": "Passwords do not match.",
-        "lengthError": "Username must be between 3 and 20 characters.",
+        "lengthError": "Must be between [3 - 20] characters.",
         "charactersError": "Username can only contain [a-z], [0-9], [-].",
-        "emailFormatError": "Please enter a valid email address."
+        "emailFormatError": "Please enter a valid email address.",
+        "emailIllegalCharacters": "Email contains invalid characters."
       },
       "link": {
         "loginPanel": "Already have an account? Login"
@@ -125,11 +126,43 @@
       }
     },
     "updateProfile": {
+      "title": "Edit Profile",
+      "fields": {
+        "usernameLabel": "New Username",
+        "emailLabel": "New Email Address",
+        "passwordLabel": "New Password",
+        "confirmPasswordLabel": "Confirm New Password"
+      },
+      "buttons": {
+        "save": "Save Changes",
+        "cancel": "Cancel",
+        "logout": "Logout"
+      },
       "notification": {
+        "validationErrorTitle": "Validation Error",
+        "validationErrorMessage": "Please correct the errors in the form before submitting.",
+        "updateSuccessTitle": "Profile Updated",
+        "updateSuccessMessage": "Your profile has been successfully updated.",
         "updateErrorTitle": "Profile Update Error",
-        "updateErrorMessage": "An error occurred while trying to update your profile.\nPlease check your details and try again."
+        "updateErrorMessage": "An error occurred while trying to update your profile.\nPlease check your details and try again.",
+        "networkErrorTitle": "Network Error",
+        "networkErrorMessage": "Unable to connect to the server. Please try again.",
+        "noChangesTitle": "No Changes",
+        "noChangesMessage": "No changes were made to your profile."
+      },
+      "validation": {
+
+        "confirmPasswordRequired": "Please confirm your new password."
+
       }
     }
+  },
+  "passwordStrength": {
+    "minLength": "At least 8 characters",
+    "hasUppercase": " Need one uppercase letter",
+    "hasLowercase": "Need one  lowercase letter",
+    "hasNumber": "Need one  number",
+    "hasSpecialChar": "Need one special character (!@#$%)"
   },
   "notification": {
     "generic": {
