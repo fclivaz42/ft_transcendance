@@ -8,9 +8,6 @@
       "label": "Utiliser un compte"
     }
   },
-  "leaderboard": {
-    "title": "Classement"
-  },
   "history": {
     "title": "Historique"
   },
@@ -33,19 +30,6 @@
         "solo": "Mode solo",
         "join": "Rejoindre une partie privée",
         "create": "Créer une partie privée"
-      }
-    },
-    "tetris": {
-      "label": "Tetris",
-      "title": "Jeu de Tetris",
-      "submenu": {
-        "play": "Jouer maintenant"
-      }
-    },
-    "leaderboard": {
-      "label": "Classement",
-      "title": "Classement",
-      "submenu": {
       }
     },
     "history": {

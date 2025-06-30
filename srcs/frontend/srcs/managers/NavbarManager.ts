@@ -1,4 +1,4 @@
-//barre laterale gauche [pong, history, leaderboard, settings]
+//barre laterale gauche [pong, history, settings]
 import { createNavbar } from "../components/navbar/index.js";
 import { i18nHandler } from "../handlers/i18nHandler.js";
 import RoutingHandler from "../handlers/RoutingHandler.js";
@@ -35,14 +35,11 @@ class NavbarManager {
 					i18n: "navbar.pong.label",
 				},
 				{
-					id: "btnLeaderboard",
-					title: i18nHandler.getValue("navbar.leaderboard.label"),
-					logo: "/assets/ui/leaderboard-svgrepo-com.svg",
-					//panelId: "leaderboardSidePanel",
-					i18n: "navbar.leaderboard.label",
-					f: () => {
-						RoutingHandler.setRoute("/leaderboard");
-					}
+					id: "btnFriend",
+					title: i18nHandler.getValue("navbar.friend.label"),
+					logo: "/assets/ui/friend-svgrepo-com.svg",
+					panelId: "friendSidePanel",
+					i18n: "navbar.friend.label",
 				},
 				{
 					id: "btnHistory",

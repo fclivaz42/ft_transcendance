@@ -75,6 +75,10 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 		console.log(`Player connected to room ${session.getRoom()?.id} as ${query.userId}`);
 		
 		socket.on('message', (msg) => {
+			if (msg.toString() === 'ping!') {
+				socket.send('pong!');
+				return;
+			}
 			try {
 				const { type, payload }: ClientMessage = JSON.parse(msg.toString());
 				if (type === 'ball' && payload?.direction && payload.direction == "launch") {

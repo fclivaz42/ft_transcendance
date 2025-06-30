@@ -5,16 +5,26 @@ import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler from "../../handlers/UserHandler";
 import createUserAvatar from "../usermenu/userAvatar";
 
-export function createPongCanvas(): HTMLDivElement {
+export function createPongCanvas(isComputer: boolean): HTMLDivElement {
 	const template = document.createElement("template");
+
+	const playerAvatar: HTMLImageElement[] = [];
+	playerAvatar.push(createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14", src:"/assets/images/default_avatar.svg"}));
+	playerAvatar.push(createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14", src:"/assets/images/default_avatar.svg"}));
+	playerAvatar[0].setAttribute("data-pong-avatar", "p1");
+	playerAvatar[1].setAttribute("data-pong-avatar", "p2");
+
 	template.innerHTML = `
-		<div class="pb-12 h-full gap-4 flex items-start justify-center select-none">
+		<div class="h-full gap-4 flex items-start justify-center select-none">
 				<div class="aspect-[3/2] min-w-[606px] w-full max-h-full">
 					<div class="aspect-[3/2] max-w-full h-full mx-auto flex flex-col min-h-0 gap-8">
 						<div class="flex justify-between items-center min-h-0">
 							<div class="flex items-center justify-center gap-4">
-								${createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}).outerHTML}
-								<p data-user="userName" class="text-xl lg:text-3xl font-bold text-center select-text">${UserHandler.displayName}</p>
+								${playerAvatar[0].outerHTML}
+								<div class="flex flex-col items-start justify-center w-0">
+									<p data-pong-displayname="p1" class="text-xl lg:text-3xl font-bold text-center select-text">Username</p>
+									<p data-pong-ping="p1" class="text-base lg:text-lg">calculating...</p>
+								</div>
 							</div>
 							<div id="score" class="text-3xl lg:text-6xl font-bold text-center flex items-center justify-center flex-nowrap gap-x-2 lg:gap-x-4">
 								<p data-score="p1" class="text-right w-16 lg:w-32">0</p>
@@ -22,8 +32,11 @@ export function createPongCanvas(): HTMLDivElement {
 								<p data-score="p2" class="text-left w-16 lg:w-32">0</p>
 							</div>
 							<div class="flex flex-row-reverse items-center justify-center gap-4">
-								${createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}).outerHTML}
-								<p data-user="userName" class="text-xl lg:text-3xl font-bold text-center select-text">${UserHandler.displayName}</p>
+								${playerAvatar[1].outerHTML}
+								<div class="flex flex-col items-end justify-center w-0">
+									<p data-pong-displayname="p2" class="text-xl lg:text-3xl font-bold text-center select-text">Username</p>
+									<p data-pong-ping="p2" class="text-base lg:text-lg">calculating...</p>
+								</div>
 							</div>
 						</div>
 						<canvas id="game" class="rounded-xl flex-grow bg-panel dark:bg-panel_dark w-full h-full"></canvas>
@@ -35,13 +48,13 @@ export function createPongCanvas(): HTMLDivElement {
 	return pongCanvasContainer;
 }
 
-export function createPongLoading(): HTMLDivElement {
+export function createPongLoading(message: string): HTMLDivElement {
 	const template = document.createElement("template");
 	template.innerHTML = `
 		<div class="w-full h-full">
 			<div class="w-full h-full flex flex-col justify-start items-center gap-4">
 				<span class="text-3xl font-bold pt-32"
-				>${i18nHandler.getValue("pong.waitingPlayer")}</span>
+				>${i18nHandler.getValue(message)}</span>
 				<div role="status">
 					<svg aria-hidden="true" class="w-14 h-14 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
@@ -58,15 +71,22 @@ export function createPongLoading(): HTMLDivElement {
 		}
 
 		let url: URL | undefined;
-		switch (RoutingHandler.searchParams.get("mode")) {
-			case "solo":
+		const room = RoutingHandler.searchParams.get("room");
+		switch (room) {
+			case "computer":
 				url = new URL("computer", PONG_HOST);
 				break;
 			default:
-				url = new URL("remote", PONG_HOST);
+				if (!room)
+					url = new URL("remote", PONG_HOST);
+				else if (room === "host")
+					url = new URL("friend_host", PONG_HOST);
+				else {
+					url = new URL("friend_join", PONG_HOST);
+					url.searchParams.set("roomId", room);
+				}
 				break;
 		}
-		url.searchParams.set("userId", UserHandler.userId as string);
 		startGame(url.toString());
 
 	return loadingContainer;
@@ -76,6 +96,10 @@ export default function createPongFrame() {
 	const url = RoutingHandler.url;
 	const searchParams = RoutingHandler.searchParams;
 	let pongFrame: HTMLDivElement;
-	pongFrame = createPongLoading();
+	const room = searchParams.get("room");
+	if (room !== "computer")
+		pongFrame = createPongLoading("pong.waitingPlayer");
+	else
+		pongFrame = createPongLoading("generic.loading");
 	return pongFrame;
 }

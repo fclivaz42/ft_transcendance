@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AxiosResponse } from "axios";
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import UsersSdk from '../../../libs/helpers/usersSdk.ts';
-import type { UserLoginProps, UserRegisterProps, User, UserWithPicture } from '../../../libs/interfaces/User.ts';
+import type { UserLoginProps, UserRegisterProps, User } from '../../../libs/interfaces/User.ts';
 import Logger from "../../../libs/helpers/loggers.ts";
 import { httpReply } from "../../../libs/helpers/httpResponse.ts";
 
@@ -45,6 +45,88 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (!userPicture.data)
 			return reply.code(404).send("User picture not found");
 		return reply.headers(userPicture.headers as any).send(userPicture.data);
+	});
+
+	fastify.all('/me/matches', async (request, reply) => {
+		if (request.method !== 'GET')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user matches.' });
+
+		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		const token = usersSdk.unshowerCookie(request.headers.cookie)["token"];
+		const userMatches = await usersSdk.getUserMatches(authorization.data.sub)
+			.then(response => response)
+			.catch((err: any) => {
+				if (!axios.isAxiosError(err))
+					throw err;	
+				return reply.code(err.response?.status || 500).send(
+					err.response?.data || {
+						detail: err.response?.data?.detail || 'Failed to fetch user matches',
+						status: err.response?.status || 500,
+						module: 'usermanager'
+					});
+			});
+		return reply.code(userMatches.status).send(userMatches.data);
+	});
+
+	fastify.all('/me/friends', async (request, reply) => {
+		if (request.method !== 'GET' && request.method !== 'POST')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user friends.' });
+
+		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+
+		if (request.method === 'POST') {
+			const body = request.body as { PlayerID: string };
+			if (!body.PlayerID)
+				return httpReply({
+					detail: 'PlayerId is required',
+					status: 400,
+					module: 'usermanager',
+				}, reply, request);
+			const addFriend = await usersSdk.postUserFriend(authorization.data.sub, body.PlayerID).catch(err => {
+				if (!axios.isAxiosError(err))
+					throw err;	
+				return reply.code(err.response?.status || 500).send(
+					err.response?.data || {
+						detail: err.response?.data?.detail || 'Failed to add friend',
+						status: err.response?.status || 500,
+						module: 'usermanager'
+					});
+			});
+			return reply.code(addFriend.status).send(addFriend.data);
+		}
+	
+		const userFriends = await usersSdk.getUserFriends(authorization.data.sub)
+			.catch(err => {
+				if (!axios.isAxiosError(err))
+					throw err;	
+				return reply.code(err.response?.status || 500).send(
+					err.response?.data || {
+						detail: err.response?.data?.detail || 'Failed to fetch user friends',
+						status: err.response?.status || 500,
+						module: 'usermanager'
+					});
+			});
+		return reply.code(userFriends.status).send(userFriends.data);
+	});
+
+	fastify.all('/me/friends/:uuid', async (request, reply) => {
+		if (request.method !== 'DELETE')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only DELETE method is allowed for user friend removal.' });
+
+		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		const params = request.params as { uuid: string };
+		const removeFriend = await usersSdk.deleteUserFriend(authorization.data.sub, params.uuid)
+			.catch(err => {
+				if (!axios.isAxiosError(err))
+					throw err;	
+				return reply.code(err.response?.status || 500).send(
+					err.response?.data || {
+						detail: err.response?.data?.detail || 'Failed to remove friend',
+						status: err.response?.status || 500,
+						module: 'usermanager'
+					});
+			});
+		return reply.code(removeFriend.status).send(removeFriend.data);
 	});
 
 	// Returns a JWT token that can be used to authenticate further requests.
@@ -145,6 +227,16 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		return reply.code(userData.status).send(usersSdk.filterPublicUserData(userData.data));
 	});
 
+	fastify.all('/:uuid/picture', async (request, reply) => {
+		if (request.method !== 'GET')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user picture.' });
+		const params = request.params as { uuid: string };
+		const userPicture = await usersSdk.getUserPicture(params.uuid);
+		if (userPicture.status !== 200)
+			return reply.code(userPicture.status).send(userPicture.data);
+		return reply.headers(userPicture.headers as any).send(userPicture.data);
+	});
+
 	fastify.all('/logout', async (request, reply) => {
 		if (request.method !== 'GET')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for logout.' });
@@ -152,5 +244,26 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			.header("Set-Cookie", `token=; Path=/; HttpOnly; SameSite=Strict; Secure; Max-Age=0`)
 			.header("location", "/")
 			.code(303).send({ message: 'Logged out successfully' });
+	});
+
+	fastify.all('/:uuid/matches', async (request, reply) => {
+		if (request.method !== 'GET')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user matches.' });
+		await usersSdk.usersEnforceAuthorize(reply, request);
+		const token = usersSdk.unshowerCookie(request.headers.cookie)["token"];
+		const params = request.params as { uuid: string };
+		const userMatches = await usersSdk.getUserMatches(params.uuid)
+			.then(response => response)
+			.catch((err: any) => {
+				if (!axios.isAxiosError(err))
+					throw err;	
+				return reply.code(err.response?.status || 500).send(
+					err.response?.data || {
+						detail: 'Failed to fetch user matches',
+						status: err.response?.status || 500,
+						module: 'usermanager'
+					});
+			});
+		return reply.code(userMatches.status).send(userMatches.data);
 	});
 }

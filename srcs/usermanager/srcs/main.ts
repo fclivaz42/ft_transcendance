@@ -4,6 +4,7 @@ import fs from "node:fs";
 import { config } from "./managers/ConfigManager.ts";
 import { betterFastify } from "../../libs/helpers/fastifyHelper.ts";
 import fastifyMultipart from "@fastify/multipart";
+import initializeMatchesRoute from "./routes/matches.ts";
 
 const server = fastify({
 	https: {
@@ -14,6 +15,7 @@ const server = fastify({
 
 await server.register(fastifyMultipart)
 await server.register(initializeRoute, { prefix: "/users" });
+await server.register(initializeMatchesRoute, { prefix: "/matches" });
 
 betterFastify(server);
 

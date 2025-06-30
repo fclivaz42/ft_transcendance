@@ -4,6 +4,7 @@ import { userMenuManager } from "../../managers/UserMenuManager";
 export interface UserAvatarProps {
 	sizeClass?: string;
 	editable?: boolean;
+	src?: string;
 }
 
 export default function createUserAvatar(props: UserAvatarProps = {
@@ -12,7 +13,7 @@ export default function createUserAvatar(props: UserAvatarProps = {
 }): HTMLImageElement {
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<img data-user="avatar" src="${UserHandler.avatarUrl}" alt="User Avatar" class="border-2 rounded-full object-cover ${props.sizeClass}">
+		<img ${props.src ? "" : "data-user=\"avatar\""} src="${props.src || UserHandler.avatarUrl}" alt="User Avatar" class="border-2 rounded-full object-cover ${props.sizeClass} bg-white">
 	`;
 	const userAvatar = template.content.firstElementChild as HTMLImageElement;
 

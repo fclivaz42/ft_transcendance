@@ -26,11 +26,11 @@ export default async function create404Frame(): Promise<HTMLDivElement> {
 			${imageSrcs ? `
 				<img src=${imageSrcs[404].images[Math.floor(Math.random() * imageSrcs[404].images.length)]} alt="404 Not Found" class="w-auto h-72 object-cover mb-4 rounded-lg shadow-lg">
 			`: ""}
-			<h1 class="text-4xl font-bold text-center mb-4" id="error-title" data-i18n="httpError.404.title" i18n="${searchParams.get("i18n") || "httpError.404.title"}" i18n-params='{"title": "${i18nHandler.getValue("httpError.404.title")}", "message": "${i18nHandler.getValue("httpError.404.message")}"}'>
-				${i18nHandler.getValue("httpError.404.title")}
+			<h1 class="text-4xl font-bold text-center mb-4" id="error-title" data-i18n="errors.http.404.title" i18n="${searchParams.get("i18n") || "errors.http.404.title"}" i18n-params='{"title": "${i18nHandler.getValue("errors.http.404.title")}", "message": "${i18nHandler.getValue("errors.http.404.message")}"}'>
+				${i18nHandler.getValue("errors.http.404.title")}
 			</h1>
-			<p class="text-lg text-center" id="error-message" data-i18n="httpError.404.message" i18n="${searchParams.get("i18n") || "httpError.404.message"}" i18n-params='{"title": "${i18nHandler.getValue("httpError.404.title")}", "message": "${i18nHandler.getValue("httpError.404.message")}"}'>
-				${i18nHandler.getValue("httpError.404.message")}
+			<p class="text-lg text-center" id="error-message" data-i18n="errors.http.404.message" i18n="${searchParams.get("i18n") || "errors.http.404.message"}" i18n-params='{"title": "${i18nHandler.getValue("errors.http.404.title")}", "message": "${i18nHandler.getValue("errors.http.404.message")}"}'>
+				${i18nHandler.getValue("errors.http.404.message")}
 			</p>
 		</div>
 	`;

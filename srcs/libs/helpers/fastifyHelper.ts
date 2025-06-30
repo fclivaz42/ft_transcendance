@@ -29,8 +29,9 @@ export function betterFastify(serverRef: FastifyInstance | any) {
 	});
 	
 	server.addHook("onError", async (req, res, error) => {
-		Logger.error(`Error occurred:\n${error}`);
+		Logger.error(`Error occurred:\n${error.stack || error}`);
 	});
+
 	
 	server.addHook("onListen", () => {
 		if (process.env.API_KEY)

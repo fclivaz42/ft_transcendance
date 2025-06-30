@@ -6,7 +6,7 @@ export default function createHomeFrame(): HTMLDivElement {
 	const searchParams = RoutingHandler.searchParams;
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<div>
+		<div class="min-w-fit">
 		</div>
 	`;
 	const homeFrame = template.content.firstElementChild as HTMLDivElement;

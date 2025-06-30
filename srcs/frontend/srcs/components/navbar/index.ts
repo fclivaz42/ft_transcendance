@@ -15,7 +15,7 @@ interface NavbarProps {
 
 export function createNavbar(props: NavbarProps): HTMLElement {
   const container = document.createElement("div");
-  container.className = "w-24";
+  container.className = "w-24 min-w-24";
 
   const navBar = document.createElement("nav");
 

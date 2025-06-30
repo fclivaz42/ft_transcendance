@@ -1,11 +1,11 @@
 
 import UserHandler from "../../handlers/UserHandler";
 import { userMenuManager } from "../../managers/UserMenuManager";
-import { createLogoutButton } from "../buttons";
 import { createDialog } from "../backdropDialog";
 import createUserAvatar from "./userAvatar";
 import NotificationManager from "../../managers/NotificationManager";
 import { i18nHandler } from "../../handlers/i18nHandler";
+import RoutingHandler from "../../handlers/RoutingHandler";
 
 
 import { createInfoInput, CustomInputContainer } from "../input/infoInput";

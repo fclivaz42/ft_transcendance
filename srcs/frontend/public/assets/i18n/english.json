@@ -1,4 +1,7 @@
 {
+  "generic": {
+    "loading": "Loading..."
+  },
   "home": {
     "title": "Welcome to SARIF's Pong",
     "guestButton": {
@@ -8,11 +11,28 @@
       "label": "Utiliser un compte"
     }
   },
-  "leaderboard": {
-    "title": "Leaderboard"
+  "pong": {
+    "waitingPlayer": "Waiting for another player to join...",
+    "computer": "IA",
+    "join": {
+      "title": "Join a private game",
+      "description": "Enter the room code to join a private game.",
+      "placeholder": "Room Code",
+      "button": "Join Game"
+    }
   },
   "history": {
-    "title": "History"
+    "title": "History",
+    "empty": "No history available.",
+    "winner": "Winner",
+    "loser": "Loser",
+    "notchain": "Match not in blockchain",
+    "notificaton": {
+      "private": {
+        "title": "Private user",
+        "message": "This user is private. You cannot view their history."
+      }
+    }
   },
   "header": {
     "usermenu": {
@@ -35,18 +55,10 @@
         "create": "Create a Private Game"
       }
     },
-    "tetris": {
-      "label": "Tetris",
-      "title": "Tetris Game",
-      "submenu": {
-        "play": "Play now"
-      }
-    },
-    "leaderboard": {
-      "label": "Leaderboard",
-      "title": "Leaderboard",
-      "submenu": {
-      }
+    "friend": {
+      "label": "Friends",
+      "title": "Friend list",
+      "empty": "You have no friends yet."
     },
     "history": {
       "label": "History",
@@ -166,6 +178,7 @@
   },
   "notification": {
     "generic": {
+      "infoTitle": "Login Information",
       "errorTitle": "Error",
       "errorMessage": "An error occurred. Please try again later."
     },
@@ -176,5 +189,17 @@
     "user": {
       "notLogged": "You are not logged in."
     }
+  },
+  "errors": {
+    "http": {
+      "404": {
+        "title": "Oops! Page Not Found",
+        "message": "The page you are looking for does not exist."
+      }
+    },
+    "unauthorized": "Unauthorized access. Please log in.",
+    "forbidden": "Forbidden access. You do not have permission to view this resource.",
+    "notFound": "Resource not found.",
+    "generic": "Ooops! Something went wrong. Please try again later."
   }
 }
