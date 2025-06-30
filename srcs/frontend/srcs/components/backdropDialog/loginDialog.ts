@@ -1,7 +1,3 @@
-
-
-
-
 // --- Imports ---
 import { createDialog } from "./index.js";
 import { checkPasswordStrength, PasswordStrengthResult } from "../input/createPasswordInput.js";
@@ -79,16 +75,14 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
 
   dialog.appendChild(dialogTitle);
 
-  // **** MODIFICATION ICI : Assurer que les panneaux commencent masqués et positionnés pour l'entrée ****
-  // Avant d'ajouter les panneaux au container, on s'assure qu'ils ont les classes de départ pour la transition.
-  // Ces classes seront ensuite retirées par `switchMode` avec un délai si animation est activée.
+ 
   registerPanel.classList.add('opacity-0', 'translate-x-full'); // Hors écran à droite ou à gauche, selon le sens de la transition d'entrée
   loginPanel.classList.add('opacity-0', 'translate-x-full');
   forgotPasswordPanel.classList.add('opacity-0', 'translate-x-full');
 
 
-  panelsContainer.appendChild(registerPanel);
   panelsContainer.appendChild(loginPanel);
+  panelsContainer.appendChild(registerPanel);
   panelsContainer.appendChild(forgotPasswordPanel);
   dialog.appendChild(panelsContainer);
 	dialog.appendChild((() => {
@@ -179,14 +173,7 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   let currentMode: 'login' | 'register' | 'forgotPassword';
 
   const setPanelContainerHeight = (panel: HTMLElement) => {
-    // Pour mesurer la hauteur, le panneau doit être dans son état "final" (visible, non transformé)
-    // sans pour autant apparaître à l'écran si on veut le mesurer avant sa transition d'entrée.
-    // L'idée est de le rendre visible (opacity-100, translate-x-0) temporairement dans un état
-    // non visible par l'utilisateur (e.g., display: block, position: absolute, top: -9999px)
-    // puis de le remettre dans son état normal.
 
-    // Solution simplifiée qui fonctionne bien si les panneaux sont déjà dans le DOM
-    // et que tu veux juste mesurer la hauteur du panneau ACTIF pour ajuster le conteneur.
     requestAnimationFrame(() => { // S'assurer que le navigateur a eu le temps de rendre
       panelsContainer.style.height = `${panel.scrollHeight}px`;
     });
@@ -308,7 +295,7 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   });
 
   // --- Initial Mode Setup ---
-  // MODIFICATION CRUCIALE ICI : Utiliser switchMode pour l'initialisation
+  
   // Assure que le mode initial est configuré avec ou sans animation.
   // Pour le premier chargement du dialogue, il n'y a pas d'animation "d'entrée"
   // depuis un autre panneau. Le panneau s'affiche juste.
