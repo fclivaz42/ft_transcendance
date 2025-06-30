@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/30 18:42:10 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/30 19:32:22 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -202,10 +202,10 @@ export default class DatabaseSDK {
 	* Get the complete list of matches present in the database.
 	* @returns An AxiosResponse Promise containing an array of every single Match.
 	*/
-	public async get_matchlist(): Promise<AxiosResponse<Array<Match>>> {
+	public async get_matchlist(): Promise<Array<Match>> {
 		const matchlist: Array<Match> = await this.api_request<Array<Match>>("GET", "Matches", "/multiget")
 			.then(response => response.data)
-		for (let item of matchlist) {
+		for (const item of matchlist) {
 			let merged: Match | undefined = undefined;
 			if (item.HashAddress) {
 				const bc_sdk = new BlockchainSDK();
@@ -229,14 +229,11 @@ export default class DatabaseSDK {
 					Array: JSON.stringify([merged.WPlayerID, merged.LPlayerID])
 				}
 			}).then(response => response.data)
-			item = {
-				...merged,
-				WPlayerID: u_array[0],
-				LPlayerID: u_array[1]
-			}
+			Object.assign(item, merged)
+			item.WPlayerID = u_array[0]
+			item.LPlayerID = u_array[1]
 		}
-		return {
-		}
+		return matchlist
 	}
 
 	/**
