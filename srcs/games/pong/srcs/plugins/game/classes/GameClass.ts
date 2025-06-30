@@ -224,6 +224,10 @@ export default class Game {
 		this._field.start(fps, this._broadcastUpdate || undefined);
 	}
 
+	public gameStop(): void {
+		this._field.stop();
+	}
+
 	public score(player: number): void {
 		if (this._room) {
 			this._room.addScore(player);
