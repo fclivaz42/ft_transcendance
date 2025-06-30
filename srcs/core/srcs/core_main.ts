@@ -11,6 +11,9 @@ import Logger from '../../libs/helpers/loggers.ts'
 import frontendRoutes from './modules/frontend/routes.ts'
 import websocketPlugin from '@fastify/websocket'
 import fastifyMultipart from '@fastify/multipart'
+import DatabaseSDK from "../../libs/helpers/databaseSdk.ts";
+import type { Match, Match_complete } from '../../libs/interfaces/Match.ts'
+import type { User } from '../../libs/interfaces/User.ts'
 
 if (process.env.KEYPATH === undefined || process.env.CERTPATH === undefined) {
 	Logger.error("Keypath and/or Certpath are not defined. Exiting.")

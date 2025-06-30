@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/28 20:40:25 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/30 16:30:30 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -17,7 +17,8 @@ import type * as fft from "fastify";
 import type { User } from "../interfaces/User.ts";
 import type { Match, Match_complete } from "../interfaces/Match.ts";
 import type { Tournament_full, Tournament_lite, Tournament_metadata } from "../interfaces/Tournament.ts";
-import BlockchainSDK, { TXHash } from "./blockchainSdk.ts";
+import BlockchainSDK from "./blockchainSdk.ts";
+import type { TXHash } from "./blockchainSdk.ts";
 
 export type UUIDv4 = string
 
@@ -80,9 +81,9 @@ export default class DatabaseSDK {
 		return await this.api_request<Array<Match>>("GET", "Matches", `/PlayerID/${this.param_str}`, { params: user })
 	}
 
-	private async get_player_matchlist_from_user(user: User): Promise<AxiosResponse<Array<Match>>> {
+	private async get_player_matchlist_from_user(user: Partial<User>): Promise<AxiosResponse<Array<Match>>> {
 		if (!user.PlayerID)
-			throw "error.empty.playerid"
+			throw "error.missing.playerid"
 		return await this.get_player_matchlist_from_uuid(user.PlayerID)
 	}
 
@@ -119,7 +120,7 @@ export default class DatabaseSDK {
 	* @param user The user you want to update. The PlayerID Field is mandatory!
 	* @returns An AxiosResponse Promise containing the created User's complete data. Throws in case the user was not found.
 	*/
-	public async update_user(user: User): Promise<AxiosResponse<User>> {
+	public async update_user(user: Partial<User>): Promise<AxiosResponse<User>> {
 		if (!user.PlayerID)
 			throw "error.missing.playerid"
 		return await this.api_request<User>("PUT", "Players", `/PlayerID/${this.param_str}`, { body: user, params: user.PlayerID })
@@ -200,7 +201,40 @@ export default class DatabaseSDK {
 	* @returns An AxiosResponse Promise containing an array of every single Match.
 	*/
 	public async get_matchlist(): Promise<AxiosResponse<Array<Match>>> {
-		return await this.api_request<Array<Match>>("GET", "Matches", "/multiget")
+		const matchlist: Array<Match> = await this.api_request<Array<Match>>("GET", "Matches", "/multiget")
+			.then(response => response.data)
+		for (let item of matchlist) {
+			let merged: Match | undefined = undefined;
+			if (item.HashAddress) {
+				const bc_sdk = new BlockchainSDK();
+				await bc_sdk.get_match_score(item.MatchID as string)
+					.then(function(response) {
+						merged = { ...item, ...response }
+					})
+					.catch(function() { item.HashAddress = undefined })
+			}
+			if (merged) {
+				if (!item.WPlayerID)
+					(merged as Partial<Match>).WPlayerID = undefined
+				if (!item.LPlayerID)
+					(merged as Partial<Match>).LPlayerID = undefined
+			}
+			else
+				merged = item
+			const u_array: Array<User> = await this.api_request<Array<User>>("GET", "Players", "/multiget", {
+				headers: {
+					Field: "PlayerID",
+					Array: JSON.stringify([merged.WPlayerID, merged.LPlayerID])
+				}
+			}).then(response => response.data)
+			item = {
+				...merged,
+				WPlayerID: u_array[0],
+				LPlayerID: u_array[1]
+			}
+		}
+		return {
+		}
 	}
 
 	/**

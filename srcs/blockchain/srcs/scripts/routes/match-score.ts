@@ -1,13 +1,17 @@
 import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { getMatchScore } from "../interact.ts"
 import { currentContract } from "./deploy.ts";
+import type { MatchObj, MatchScore } from "./tournament-match-score.ts";
 
-interface Match {
-	winner: string,
-	winnerScore: number,
-	loser: string,
-	loserScore: number,
-};
+type Player = [
+	name: string,
+	score: number,
+];
+
+type Match = [
+	winner: Player,
+	loser: Player,
+];
 
 interface IdParams {
 	id: string;
@@ -23,8 +27,13 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			return reply.code(400).send("No contract has been set");
 		const { id } = request.params;
 		try {
-			const result: Match = await getMatchScore(currentContract, id);
-			return reply.code(200).send(result);
+			const match: Match = await getMatchScore(currentContract, id);
+			return reply.code(200).send({
+				winner: match[0][0],
+				winnerScore: Number(match[0][1]),
+				loser: match[1][0],
+				loserScore: Number(match[1][1])
+			});
 		} catch (exception) {
 			return reply.code(400).send("error.bad.matchid")
 		}

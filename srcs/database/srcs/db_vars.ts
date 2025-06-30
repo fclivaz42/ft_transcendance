@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/28 18:13:17 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/30 16:38:44 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -116,7 +116,8 @@ const MatchesTable: db_table =
 		"LGuestName",
 		"StartTime",
 		"EndTime",
-		"MatchIndex"
+		"MatchIndex",
+		"HashAddress",
 	],
 	"Arguments": [
 		"TEXT NOT NULL PRIMARY KEY",
@@ -128,7 +129,8 @@ const MatchesTable: db_table =
 		"TEXT DEFAULT NULL",
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL",
-		"INTEGER NOT NULL"
+		"INTEGER NOT NULL",
+		"TEXT DEFAULT NULL"
 	],
 	"Methods": {
 		"GET": [

@@ -2,7 +2,7 @@ import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import { getTournamentMatchScore } from "../interact.ts";
 import { currentContract } from "./deploy.ts";
 
-interface MatchObj {
+export interface MatchObj {
 	winner: string,
 	winnerScore: number,
 	loser: string,
