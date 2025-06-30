@@ -11,7 +11,11 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			return reply.code(401).send("Missing API-KEY");
 		if (request.headers["authorization"] !== process.env.API_KEY)
 			return reply.code(401).send("Invalid API-KEY");
-		if (!currentContract)
+		if (request.body) {
+			console.log(`Recovered CurrentContract from database: ${request.body}`)
+			currentContract = request.body as string
+		}
+		else if (!currentContract)
 			currentContract = await deploy();
 		if (!currentContract)
 			return reply.code(400).send("Contract deployment to the blockchain failed");

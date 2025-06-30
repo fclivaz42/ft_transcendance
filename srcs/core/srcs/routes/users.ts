@@ -57,7 +57,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			.then(response => response)
 			.catch((err: any) => {
 				if (!axios.isAxiosError(err))
-					throw err;	
+					throw err;
 				return reply.code(err.response?.status || 500).send(
 					err.response?.data || {
 						detail: err.response?.data?.detail || 'Failed to fetch user matches',
@@ -84,7 +84,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 				}, reply, request);
 			const addFriend = await usersSdk.postUserFriend(authorization.data.sub, body.PlayerID).catch(err => {
 				if (!axios.isAxiosError(err))
-					throw err;	
+					throw err;
 				return reply.code(err.response?.status || 500).send(
 					err.response?.data || {
 						detail: err.response?.data?.detail || 'Failed to add friend',
@@ -94,11 +94,11 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			});
 			return reply.code(addFriend.status).send(addFriend.data);
 		}
-	
+
 		const userFriends = await usersSdk.getUserFriends(authorization.data.sub)
 			.catch(err => {
 				if (!axios.isAxiosError(err))
-					throw err;	
+					throw err;
 				return reply.code(err.response?.status || 500).send(
 					err.response?.data || {
 						detail: err.response?.data?.detail || 'Failed to fetch user friends',
@@ -118,7 +118,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const removeFriend = await usersSdk.deleteUserFriend(authorization.data.sub, params.uuid)
 			.catch(err => {
 				if (!axios.isAxiosError(err))
-					throw err;	
+					throw err;
 				return reply.code(err.response?.status || 500).send(
 					err.response?.data || {
 						detail: err.response?.data?.detail || 'Failed to remove friend',
@@ -256,7 +256,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			.then(response => response)
 			.catch((err: any) => {
 				if (!axios.isAxiosError(err))
-					throw err;	
+					throw err;
 				return reply.code(err.response?.status || 500).send(
 					err.response?.data || {
 						detail: 'Failed to fetch user matches',
