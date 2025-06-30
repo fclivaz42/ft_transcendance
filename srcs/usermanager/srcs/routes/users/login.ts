@@ -52,6 +52,10 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 		}
 		if (!loggedUser.PlayerID)
 			throw new Error("Missing PlayerID in user data");
+
+		// il est le bon user le batard
+		// implementer le 2FA ici
+		// creer le 2FAtoken, envoyer le lien a l'email du user
 		const jwtToken = jwt.createJwtToken({
 			sub: loggedUser.PlayerID,
 			data: {
