@@ -1,7 +1,7 @@
 
 import { Engine } from "@babylonjs/core/Engines/engine.js";
 
-import { InitHandler, WebSocketManager } from "../game/WebSocketManager.js";
+import { WebSocketManager } from "../game/WebSocketManager.js";
 import { GameField } from "../game/GameField.js";
 import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
@@ -31,11 +31,11 @@ class PongGameManager {
 		lastCheck: number | undefined;
 		ping: number | undefined;
 		sentPing: number | undefined;
-	} = {ping: undefined, sentPing: undefined, endTime: undefined};
+	} = {ping: undefined, sentPing: undefined, lastCheck: undefined};
 
 	public calculatePing() {
 		if (this.pingInterval.sentPing === undefined) {
-			if (!this.websocketManager || !this.websocketManager.socket)
+			if (!this.websocketManager || !this.websocketManager.socketInstance)
 				throw new Error("WebSocketManager or socket is not initialized.");
 			this.pingInterval.sentPing = Date.now();
 			this.websocketManager.socketInstance.send("ping!");
@@ -61,8 +61,8 @@ class PongGameManager {
 		if (this.started) {
 			this.started = false;
 			this.cleanupGame();
-			if (this.engine)
-				this.engine.dispose();
+			this.websocketManager?.close();
+			this.engine?.dispose();
 		}
 	}
 
@@ -102,8 +102,6 @@ class PongGameManager {
 		this.engine = new Engine(this.getFrontElements.canvas, true);
 		this.field = new GameField(this.engine);
 
-		if (this.websocketManager)
-			this.websocketManager.close();
 		this.websocketManager = new WebSocketManager(
 			(payload) => {
 				console.log("WebSocket payload received:", payload);
