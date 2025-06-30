@@ -84,7 +84,8 @@
         "passwordMismatch": "Les mots de passe ne correspondent pas.",
         "lengthError": "Le nom d'utilisateur doit contenir entre 3 et 20 caractères.",
         "charactersError": "Le nom d'utilisateur ne peut contenir que des lettres [a-z], des chiffres [0-9] et des tirets [-].",
-        "emailFormatError": "Veuillez saisir une adresse e-mail valide."
+        "emailFormatError": "Veuillez saisir une adresse e-mail valide.",
+        "emailIllegalCharacters": "L'adresse e-mail contient des caractères invalides."
       },
       "link": {
         "loginPanel": "Déjà un compte ? Se connecter"
@@ -109,16 +110,56 @@
       }
     },
     "updateProfile": {
+      "title": "Modifier le profil",
+      "fields": {
+        "usernameLabel": "Nom d'utilisateur",
+        "emailLabel": "Adresse e-mail",
+        "passwordLabel": "Nouveau mot de passe",
+        "confirmPasswordLabel": "Confirmer le nouveau mot de passe"
+      },
+      "buttons": {
+        "save": "Enregistrer les modifications",
+        "cancel": "Annuler",
+        "logout": "Se déconnecter"
+      },
+      "validation": {
+        "passwordRequiredForConfirm": "Veuillez entrer un nouveau mot de passe avant de le confirmer.",
+        "confirmPasswordRequired": "Veuillez confirmer votre nouveau mot de passe.",
+        "emailIllegalCharacters": "L'email contient des caractères invalides.",
+        "passwordMismatch": "Les mots de passe ne correspondent pas."
+      },
       "notification": {
+        "validationErrorTitle": "Erreur de validation",
+        "validationErrorMessage": "Veuillez corriger les erreurs dans le formulaire avant de soumettre.",
+        "updateSuccessTitle": "Profil mis à jour",
+        "updateSuccessMessage": "Votre profil a été mis à jour avec succès.",
         "updateErrorTitle": "Erreur de mise à jour du profil",
-        "updateErrorMessage": "Une erreur s'est produite lors de la mise à jour de votre profil.<br>Veuillez vérifier vos informations et réessayer."
+        "updateErrorMessage": "Une erreur s'est produite lors de la mise à jour de votre profil.<br>Veuillez vérifier vos informations et réessayer.",
+        "networkErrorTitle": "Erreur réseau",
+        "networkErrorMessage": "Impossible de se connecter au serveur. Veuillez réessayer.",
+        "noChangesTitle": "Aucune modification",
+        "noChangesMessage": "Aucune modification n'a été apportée à votre profil."
       }
     }
   },
+  "passwordStrength": {
+    "minLength": "Au moins 8 caractères",
+    "hasUppercase": "Au moins une majuscule",
+    "hasLowercase": "Au moins une minuscule",
+    "hasNumber": "Au moins un chiffre",
+    "hasSpecialChar": "Au moins un caractère spécial (!@#$%)"
+  },
   "notification": {
+    "generic": {
+      "errorTitle": "Erreur",
+      "errorMessage": "Une erreur s'est produite. Veuillez réessayer plus tard."
+    },
     "oauth2": {
       "callbackError": "Échec de la connexion",
       "noSession": "Aucune session trouvée. Réessayez plus tard."
+    },
+    "user": {
+      "notLogged": "Vous n'êtes pas connecté."
     }
   }
 }
