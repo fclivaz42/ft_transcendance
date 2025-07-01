@@ -8,12 +8,13 @@ export interface UserAvatarProps {
 }
 
 export default function createUserAvatar(props: UserAvatarProps = {
-	sizeClass: "w-10 h-10",
 	editable: false
 }): HTMLImageElement {
+	if (!props.sizeClass)
+		props.sizeClass = "w-10 h-10";
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<img ${props.src ? "" : "data-user=\"avatar\""} src="${props.src || UserHandler.avatarUrl}" alt="User Avatar" class="border-2 rounded-full object-cover ${props.sizeClass} bg-white">
+		<img ${!props.src || props.src !== UserHandler.avatarUrl ? "" : "data-user=\"avatar\""} src="${props.src || UserHandler.avatarUrl}" alt="User Avatar" class="border-2 rounded-full object-cover ${props.sizeClass} bg-white">
 	`;
 	const userAvatar = template.content.firstElementChild as HTMLImageElement;
 
