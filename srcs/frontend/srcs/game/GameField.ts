@@ -17,64 +17,102 @@ const BETA: number = Math.PI / 2;
 const RADIUS: number = -26;
 
 export class GameField {
-	public scene: Scene;
-	private ball: Ball | null = null;
-	private p1: Paddle | null = null;
-	private p2: Paddle | null = null;
-	private walls: Wall[] = [];
+    public scene: Scene;
+    private ball: Ball | null = null;
+    private p1: Paddle | null = null;
+    private p2: Paddle | null = null;
+    private walls: Wall[] = [];
+    private glowLayer: GlowLayer;
 
-	constructor(private engine: Engine) {
-		this.scene = new Scene(this.engine);
-		// const glow = new GlowLayer("glow", this.scene);
-		// glow.intensity = 0.8;
-	}
+    constructor(private engine: Engine) {
+        this.scene = new Scene(this.engine);
+        
+        // GLOW LAYER AVEC FORTE INTENSITÉ
+        this.glowLayer = new GlowLayer("glow", this.scene);
+        this.glowLayer.intensity = 2.0;
+        console.log("🔥 GLOW LAYER ACTIVÉ - Intensité 2.0");
+    }
 
-	public init(payload: InitPayload["payload"]) {
-		this.setupCameraAndLight(payload.camera, payload.light);
+    public init(payload: InitPayload["payload"]) {
+        console.log("🎮 DÉBUT INIT GAMEFIELD");
+        console.log("📦 Payload reçu:", payload);
+        
+        this.setupCameraAndLight(payload.camera, payload.light);
 
-		// FUCK YOU SKYBOX
-		// var skybox = MeshBuilder.CreateBox("skyBox", {size:1000.0}, this.scene);
-		// var skyboxMaterial = new StandardMaterial("skyBox", this.scene);
-		// skyboxMaterial.backFaceCulling = false;
-		// skyboxMaterial.reflectionTexture = new CubeTexture("assets/textures/corona.dds", this.scene);
-		// skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
-		// skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
-		// skyboxMaterial.specularColor = new Color3(0, 0, 0); 
-		// skybox.material = skyboxMaterial;
+        console.log("⚽ CRÉATION BALLE...");
+        console.log("📍 Position balle dans payload:", payload.ball.curr_position);
+        
+        this.ball = new Ball(this.scene, payload.ball);
+        console.log("⚽ BALLE CRÉÉE:", this.ball ? "✅ SUCCÈS" : "❌ ÉCHEC");
+        
+        this.p1 = new Paddle(this.scene, "p1", payload.p1);
+        this.p2 = new Paddle(this.scene, "p2", payload.p2);
 
+        for (const [name, wall] of Object.entries(payload.walls)) {
+            this.walls.push(new Wall(this.scene, name, wall));
+        }
+        
+        console.log("🎮 INIT GAMEFIELD TERMINÉ");
+    }
 
-		this.ball = new Ball(this.scene, payload.ball);
-		this.p1 = new Paddle(this.scene, "p1", payload.p1);
-		this.p2 = new Paddle(this.scene, "p2", payload.p2);
+    public update(payload: UpdatePayload["payload"]) {
+        console.log("🔄 UPDATE GAMEFIELD");
+        console.log("📍 Position balle reçue:", payload.ball.curr_position);
+        
+        if (this.ball) {
+            console.log("⚽ Mise à jour balle...");
+            this.ball.update(payload.ball);
+        } else {
+            console.log("❌ PAS DE BALLE À METTRE À JOUR");
+        }
+        
+        this.p1?.update(payload.p1);
+        this.p2?.update(payload.p2);
+    }
 
-		for (const [name, wall] of Object.entries(payload.walls)) {
-			this.walls.push(new Wall(this.scene, name, wall));
-		}
-	}
+    private setupCameraAndLight(cameraInfo: CameraInitInfo, lightInfo: LightInitInfo) {
+        const camera = new ArcRotateCamera(
+            "camera",
+            ALPHA,
+            BETA,
+            RADIUS,
+            Vector3.Zero(),
+            this.scene
+        );
+        camera.attachControl(this.engine.getRenderingCanvas(), false);
+        this.scene.activeCamera = camera;
+        console.log("📷 Camera position:", camera.position.asArray());
 
-	public update(payload: UpdatePayload["payload"]) {
-		this.ball?.update(payload.ball);
-		this.p1?.update(payload.p1);
-		this.p2?.update(payload.p2);
-	}
+        new HemisphericLight("light", new Vector3(...lightInfo.direction), this.scene);
+    }
 
-	private setupCameraAndLight(cameraInfo: CameraInitInfo, lightInfo: LightInitInfo) {
-		const camera = new ArcRotateCamera(
-			"camera",
-			// cameraInfo.position[0],
-			// cameraInfo.position[1],
-			// cameraInfo.position[2],
-			ALPHA,
-			BETA,
-			RADIUS,
-			// new Vector3(...cameraInfo.target),
-			Vector3.Zero(),
-			this.scene
-		);
-		camera.attachControl(this.engine.getRenderingCanvas(), false);
-		this.scene.activeCamera = camera;
-		console.log("Camera position: ", camera.position.asArray());
-
-		new HemisphericLight("light", new Vector3(...lightInfo.direction), this.scene);
-	}
+    public dispose(): void {
+        console.log("🧹 Nettoyage du GameField");
+        
+        if (this.ball) {
+            this.ball.dispose();
+            this.ball = null;
+        }
+        
+        if (this.p1) {
+            this.p1.dispose();
+            this.p1 = null;
+        }
+        
+        if (this.p2) {
+            this.p2.dispose();
+            this.p2 = null;
+        }
+        
+        this.walls.forEach(wall => wall.dispose());
+        this.walls = [];
+        
+        if (this.glowLayer) {
+            this.glowLayer.dispose();
+        }
+        
+        if (this.scene) {
+            this.scene.dispose();
+        }
+    }
 }
