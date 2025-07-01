@@ -1,7 +1,7 @@
 
 import { Engine } from "@babylonjs/core/Engines/engine.js";
 
-import { WebSocketManager } from "../game/WebSocketManager.js";
+import { InitHandler, WebSocketManager } from "../game/WebSocketManager.js";
 import { GameField } from "../game/GameField.js";
 import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
