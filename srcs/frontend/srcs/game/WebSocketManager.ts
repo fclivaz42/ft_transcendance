@@ -1,18 +1,22 @@
 import PongGameManager from "../managers/PongGameManager.js";
+import AudioManager from "../managers/audioManager.js";
 import { GameField } from "./GameField.js";
-import { ServerMessage, InitPayload, UpdatePayload } from "./types.js";
+import { ServerMessage, InitPayload, UpdatePayload, CollisionPayload } from "./types.js";
 
-type InitHandler = (payload: InitPayload["payload"]) => void;
-type UpdateHanlder = (payload: UpdatePayload["payload"]) => void;
+export type InitHandler = (payload: InitPayload["payload"]) => void;
+export type UpdateHanlder = (payload: UpdatePayload["payload"]) => void;
+export type CollisionHandler = (payload: CollisionPayload["payload"]) => void;
 
 export const PONG_HOST = `wss://${location.host}/api/game/`
 
 export class WebSocketManager {
 	private socket: WebSocket;
+	private audioManager: AudioManager | null = null;
 
 	constructor(
 		private onInit: InitHandler,
 		private onUpdate: UpdateHanlder,
+		private onCollision: CollisionHandler,
 		private addr: string
 	) {
 		this.socket = new WebSocket(this.addr);
@@ -72,6 +76,10 @@ export class WebSocketManager {
 			else if (msg.type === "update") {
 				this.onUpdate(msg.payload);
 			}
+			else if (msg.type === "collision") {
+				console.log("🎾 Collision détectée:", msg.payload.collider);
+				this.onCollision(msg.payload);
+			}
 			else if (msg.type === "score") {
 				PongGameManager.onScoreUpdate(msg.payload.score);
 			}
@@ -82,6 +90,10 @@ export class WebSocketManager {
 		}
 
 		this.socket.onerror = (e) => console.error("[WS] Error", e);
+	}
+
+	public setAudioManager(audioManager: AudioManager) {
+		this.audioManager = audioManager;
 	}
 
 	public close() {

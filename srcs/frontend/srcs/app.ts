@@ -10,6 +10,7 @@ import ElementsHandler from "./handlers/ElementsHandler.js";
 import UserHandler from "./handlers/UserHandler.js";
 import { mainManager } from "./managers/MainManager.js";
 import RoutingHandler from "./handlers/RoutingHandler.js";
+import { preloadAudio } from "./utils/audioPreloader.js";
 
 
 // some rework is needed to make the code more readable and maintainable
@@ -25,6 +26,9 @@ await UserHandler.initialize();
 
 // Initialize the routing handler
 RoutingHandler.initialize();
+
+// 🎵 Précharger les sons audio
+preloadAudio();
 
 // Initialize main container
 mainManager.initialize();
