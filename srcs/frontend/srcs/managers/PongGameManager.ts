@@ -188,15 +188,18 @@ class PongGameManager {
 		const testContainer = document.createElement('div');
 		testContainer.id = 'audio-test-container';
 		testContainer.style.cssText = `
-			position: fixed;
-			top: 10px;
-			right: 10px;
-			z-index: 9999;
-			display: flex;
-			flex-direction: column;
-			gap: 5px;
-			max-height: 90vh;
-			overflow-y: auto;
+	 		position: fixed;
+            top: 5px; /* Déplace un peu plus haut */
+            right: 5px; /* Déplace un peu plus à droite */
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 3px; /* Réduit l'espace entre les boutons */
+            max-height: 95vh; /* Peut être augmenté si besoin */
+            overflow-y: auto;
+            padding: 5px; /* Ajoute un petit padding autour du conteneur */
+            background-color: rgba(0, 0, 0, 0.5); /* Pour rendre le conteneur visible et ne pas masquer le contenu derrière */
+            border-radius: 5px;
 		`;
 
 		// Bouton de test général (beep) - celui qui fonctionne
@@ -205,7 +208,7 @@ class PongGameManager {
 		generalTestButton.style.cssText = this.getButtonStyle('#4CAF50');
 		generalTestButton.onclick = () => {
 			console.log("🧪 Test beep déclenché");
-			this.playTestBeep();
+			// this.playTestBeep();
 		};
 		testContainer.appendChild(generalTestButton);
 
@@ -242,34 +245,34 @@ class PongGameManager {
 		testContainer.appendChild(html5Title);
 
 		// Boutons pour tester les sons via AudioManager HTML5
-		const audioManagerSounds = [
-			{ name: 'paddleHit', emoji: '🏓', description: 'Paddle Hit' },
-			{ name: 'wallBounce', emoji: '🧱', description: 'Wall Bounce' },
-			{ name: 'gameStart', emoji: '🎮', description: 'Game Start' },
-			{ name: 'backgroundMusic', emoji: '🎶', description: 'Background' },
-			{ name: 'punch', emoji: '👊', description: 'Punch' },
-			{ name: 'trailer', emoji: '🎬', description: 'Trailer' },
-			{ name: 'cinematicBoom', emoji: '💥', description: 'Cinematic Boom' }
-		];
+		// const audioManagerSounds = [
+		// 	{ name: 'paddleHit', emoji: '🏓', description: 'Paddle Hit' },
+		// 	{ name: 'wallBounce', emoji: '🧱', description: 'Wall Bounce' },
+		// 	{ name: 'gameStart', emoji: '🎮', description: 'Game Start' },
+		// 	{ name: 'backgroundMusic', emoji: '🎶', description: 'Background' },
+		// 	{ name: 'punch', emoji: '👊', description: 'Punch' },
+		// 	{ name: 'trailer', emoji: '🎬', description: 'Trailer' },
+		// 	{ name: 'cinematicBoom', emoji: '💥', description: 'Cinematic Boom' }
+		// ];
 
-		audioManagerSounds.forEach(sound => {
-			const button = document.createElement('button');
-			button.innerHTML = `${sound.emoji} ${sound.description}`;
-			button.style.cssText = this.getButtonStyle('#4CAF50');
-			button.onclick = async () => {
-				console.log(`🧪 Test AudioManager HTML5: ${sound.name}`);
-				const result = await this.audioManager?.testHtml5Sound(sound.name);
-				console.log(`Résultat: ${result}`);
+		// audioManagerSounds.forEach(sound => {
+		// 	const button = document.createElement('button');
+		// 	button.innerHTML = `${sound.emoji} ${sound.description}`;
+		// 	button.style.cssText = this.getButtonStyle('#4CAF50');
+		// 	button.onclick = async () => {
+		// 		console.log(`🧪 Test AudioManager HTML5: ${sound.name}`);
+		// 		const result = await this.audioManager?.testHtml5Sound(sound.name);
+		// 		console.log(`Résultat: ${result}`);
 				
-				// Afficher le résultat temporairement sur le bouton
-				const originalText = button.innerHTML;
-				button.innerHTML = result?.includes('✅') ? '✅ OK' : '❌ Fail';
-				setTimeout(() => {
-					button.innerHTML = originalText;
-				}, 1500);
-			};
-			testContainer.appendChild(button);
-		});
+		// 		// Afficher le résultat temporairement sur le bouton
+		// 		const originalText = button.innerHTML;
+		// 		button.innerHTML = result?.includes('✅') ? '✅ OK' : '❌ Fail';
+		// 		setTimeout(() => {
+		// 			button.innerHTML = originalText;
+		// 		}, 1500);
+		// 	};
+		// 	testContainer.appendChild(button);
+		// });
 
 		// Bouton pour arrêter tous les sons
 		const stopButton = document.createElement('button');
@@ -379,29 +382,29 @@ class PongGameManager {
 
 	private getButtonStyle(color: string): string {
 		return `
-			padding: 6px 8px;
+			padding: 4px 6px;
 			background: ${color};
 			color: white;
 			border: none;
-			border-radius: 4px;
+			border-radius: 3px;
 			cursor: pointer;
-			font-size: 10px;
-			min-width: 80px;
+			font-size: 9px;
+			min-width: 30px;
 			text-align: center;
 		`;
 	}
 
 	private getWitnessButtonStyle(color: string, isActive: boolean): string {
 		return `
-			padding: 8px 10px;
+			padding: 5px 8px;
 			background: ${color};
 			color: white;
 			border: ${isActive ? '2px solid #fff' : '1px solid #444'};
-			border-radius: 6px;
+			border-radius: 4px;
 			cursor: pointer;
-			font-size: ${isActive ? '11px' : '10px'};
+			font-size: ${isActive ? '10px' : '9px'};
 			font-weight: ${isActive ? 'bold' : 'normal'};
-			min-width: 90px;
+			min-width: 40px;
 			text-align: center;
 			box-shadow: ${isActive ? '0 0 15px rgba(255,255,255,0.6), inset 0 0 8px rgba(255,255,255,0.2)' : '0 1px 2px rgba(0,0,0,0.3)'};
 			transition: all 0.2s ease;
@@ -497,30 +500,30 @@ class PongGameManager {
 		}
 	}
 
-	private playTestBeep() {
-		// Créer un son simple avec Web Audio API pour tester
-		try {
-			const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-			const oscillator = audioContext.createOscillator();
-			const gainNode = audioContext.createGain();
+	// private playTestBeep() {
+	// 	// Créer un son simple avec Web Audio API pour tester
+	// 	try {
+	// 		const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+	// 		const oscillator = audioContext.createOscillator();
+	// 		const gainNode = audioContext.createGain();
 			
-			oscillator.connect(gainNode);
-			gainNode.connect(audioContext.destination);
+	// 		oscillator.connect(gainNode);
+	// 		gainNode.connect(audioContext.destination);
 			
-			oscillator.frequency.value = 800; // 800 Hz
-			oscillator.type = 'sine';
+	// 		oscillator.frequency.value = 800; // 800 Hz
+	// 		oscillator.type = 'sine';
 			
-			gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-			gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+	// 		gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+	// 		gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
 			
-			oscillator.start(audioContext.currentTime);
-			oscillator.stop(audioContext.currentTime + 0.2);
+	// 		oscillator.start(audioContext.currentTime);
+	// 		oscillator.stop(audioContext.currentTime + 0.2);
 			
-			console.log("🎵 Beep généré programmatiquement");
-		} catch (error) {
-			console.error("❌ Erreur lors de la génération du beep:", error);
-		}
-	}
+	// 		console.log("🎵 Beep généré programmatiquement");
+	// 	} catch (error) {
+	// 		console.error("❌ Erreur lors de la génération du beep:", error);
+	// 	}
+	// }
 
 	private get getEngine(): Engine {
 		if (!this.engine)
