@@ -8,6 +8,7 @@ import { frameManager } from "./FrameManager.js";
 import { InitPayload } from "../game/types.js";
 import UserHandler from "../handlers/UserHandler.js";
 import { i18nHandler } from "../handlers/i18nHandler.js";
+import createUserAvatar from "../components/usermenu/userAvatar.js";
 
 function enforceDefined<T>(value: T | undefined, message: string): T {
 	if (!value)
@@ -31,11 +32,11 @@ class PongGameManager {
 		lastCheck: number | undefined;
 		ping: number | undefined;
 		sentPing: number | undefined;
-	} = {ping: undefined, sentPing: undefined, endTime: undefined};
+	} = {ping: undefined, sentPing: undefined, lastCheck: undefined};
 
 	public calculatePing() {
 		if (this.pingInterval.sentPing === undefined) {
-			if (!this.websocketManager || !this.websocketManager.socket)
+			if (!this.websocketManager || !this.websocketManager.socketInstance)
 				throw new Error("WebSocketManager or socket is not initialized.");
 			this.pingInterval.sentPing = Date.now();
 			this.websocketManager.socketInstance.send("ping!");
@@ -61,29 +62,27 @@ class PongGameManager {
 		if (this.started) {
 			this.started = false;
 			this.cleanupGame();
-			if (this.engine)
-				this.engine.dispose();
+			this.websocketManager?.close();
+			this.engine?.dispose();
 		}
 	}
 
 	private async initializeFrontElements(payload: InitPayload["payload"]) {
-		this.getFrontElements.canvasContainer.querySelectorAll("[data-pong-displayname]").forEach((element) => {
+		this.getFrontElements.canvasContainer.querySelectorAll("[data-pong-displayname]").forEach(async (element) => {
 			const identifier = element.getAttribute("data-pong-displayname");
 			if (!identifier || !(identifier in payload)) throw new Error(`Identifier ${identifier} not found in payload.`);
 			const playerData = identifier === "p1" ? payload.connectedPlayers.p1 : payload.connectedPlayers.p2;
 			const avatarElement = this.getFrontElements.canvasContainer.querySelector<HTMLImageElement>(`[data-pong-avatar="${identifier}"]`);
 			if (playerData === undefined) {
+				avatarElement?.replaceWith(await createUserAvatar({isComputer: true, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
 				element.textContent = i18nHandler.getValue("pong.computer") || "Computer";
-				if (avatarElement)
-					avatarElement.src = "/assets/images/computer-virus-1-svgrepo-com.svg";
 				return;
 			}
 			const user = UserHandler.fetchUser(playerData);
 			user.then(async (userData) => {
 				if (!userData) throw new Error(`User data for ${identifier} not found.`);
 				element.textContent = userData.DisplayName;
-				if (avatarElement)
-					avatarElement.src = await UserHandler.fetchUserPicture(userData.PlayerID, userData.DisplayName, userData.Avatar);
+				avatarElement?.replaceWith(await createUserAvatar({playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
 			}).catch((error) => {
 				console.error(`Error fetching user data for ${identifier}:`, error);
 				element.textContent = "Unknown User";
@@ -91,9 +90,9 @@ class PongGameManager {
 		});
 	}
 
-	public initialize(addr: string) {
+	public async initialize(addr: string) {
 		this.reset();
-		const canvasContainer = createPongCanvas(addr.includes("computer"));
+		const canvasContainer = await createPongCanvas(addr.includes("computer"));
 		this.frontElements = {
 			canvasContainer: canvasContainer,
 			canvas: enforceDefined(canvasContainer.querySelector<HTMLCanvasElement>("canvas"), "Canvas element not found in the container.") as HTMLCanvasElement,
@@ -102,8 +101,6 @@ class PongGameManager {
 		this.engine = new Engine(this.getFrontElements.canvas, true);
 		this.field = new GameField(this.engine);
 
-		if (this.websocketManager)
-			this.websocketManager.close();
 		this.websocketManager = new WebSocketManager(
 			(payload) => {
 				console.log("WebSocket payload received:", payload);

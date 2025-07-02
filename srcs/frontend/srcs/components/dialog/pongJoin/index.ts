@@ -7,6 +7,7 @@ import NotificationManager from "../../../managers/NotificationManager";
 import { i18nHandler } from "../../../handlers/i18nHandler";
 import RoutingHandler from "../../../handlers/RoutingHandler";
 import BackdropDialog from "../../../class/BackdropDialog";
+import { sanitizer } from "../../../helpers/sanitizer";
 
 function maskEmail(email: string): string {
 	const [user, domain] = email.split("@");
@@ -20,14 +21,11 @@ export function createPongJoinDialogContent(dialogRef: BackdropDialog): HTMLDivE
 	const template = document.createElement("template");
 	template.innerHTML = `
 		<div class="flex flex-col items-center p-4">
-			<h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">${i18nHandler.getValue("pong.join.title")}</h2>
-			<p class="text-sm text-gray-600 dark:text-gray-400 mb-4">${i18nHandler.getValue("pong.join.description")}</p>
+			<h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">${sanitizer(i18nHandler.getValue("pong.join.title"))}</h2>
+			<p class="text-sm text-gray-600 dark:text-gray-400 mb-4">${sanitizer(i18nHandler.getValue("pong.join.description"))}</p>
 			${createTextbox({
 				id: "pongRoomCode",
 				placeholder: i18nHandler.getValue("pong.join.placeholder"),
-				//className: "w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4",
-				//required: true,
-				//autofocus: true
 				type: "text",
 				name: "pongRoomCode",
 			}).outerHTML}

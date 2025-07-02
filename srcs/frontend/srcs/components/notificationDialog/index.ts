@@ -1,4 +1,5 @@
 import NotificationDialog from "../../class/NotificationDialog";
+import { sanitizer } from "../../helpers/sanitizer";
 
 export const NotificationDialogLevels = [
 	"info",
@@ -62,11 +63,11 @@ export function createNotification(props: NotificationProps) {
 	dialog.innerHTML = `
 		<img
 			src="/assets/ui/error-16-svgrepo-com.svg"
-			alt="${props.level} icon"
+			alt="${sanitizer(props.level)} icon"
 			class="w-8 h-8 dark:invert">
 		<div>
-			<h2 class="text-lg font-semibold">${props.title}</h2>
-			<p class="text-sm">${props.message || ""}</p>
+			<h2 class="text-lg font-semibold">${sanitizer(props.title)}</h2>
+			<p class="text-sm">${sanitizer(props.message) || ""}</p>
 		</div>
 		</div>
 	`;

@@ -10,6 +10,7 @@ export interface User {
 	FamilyName?: string,
 	Bappy?: number,
 	Private?: number,
+	LastAlive?: number,
 	Avatar?: string,
 };
 

@@ -1,3 +1,4 @@
+import { sanitizer } from "../../helpers/sanitizer.js";
 import { ButtonProps } from "../../interfaces/baseProps.js";
 
 export function createButton(props: ButtonProps): HTMLAnchorElement {
@@ -5,10 +6,10 @@ export function createButton(props: ButtonProps): HTMLAnchorElement {
 
   button.className = `${props.color || "bg-white"} ${props.darkColor || "dark:bg-black"} hover:animate-scale hover:animate-duration-100 cursor-pointer rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-3`;
   button.innerHTML = `
-    ${props.logo ? `<img class="select-none h-4 w-4 dark:invert" src="${props.logo}">` : ""}
+    ${props.logo ? `<img class="select-none h-4 w-4 dark:invert" src="${sanitizer(props.logo)}">` : ""}
   `;
 	if (props.title)
-		button.innerHTML += `<p${props.i18n ? " data-i18n=" + props.i18n: ""}>${props.title}</p>`;
+		button.innerHTML += `<p${props.i18n ? " data-i18n=" + sanitizer(props.i18n): ""}>${sanitizer(props.title)}</p>`;
 
   if (props.id)
     button.id = props.id;
@@ -20,7 +21,7 @@ export function createButton(props: ButtonProps): HTMLAnchorElement {
 		}
 	}
 	if (props.addClasses)
-		button.classList.add(props.addClasses);
+		button.classList += ` ${props.addClasses}`;
   return button;
 }
 

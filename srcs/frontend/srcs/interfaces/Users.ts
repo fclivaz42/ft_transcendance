@@ -8,5 +8,6 @@ export interface Users {
 	FamilyName?: string,
 	Bappy?: number,
 	Private?: number,
+	LastAlive?: number,
 	Avatar?: string,
 };

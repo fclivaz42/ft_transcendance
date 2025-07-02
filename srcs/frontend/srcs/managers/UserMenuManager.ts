@@ -10,14 +10,13 @@ class UserMenuManager {
   public initialize() {
 		this._uploadFile.type = "file";
 		this._uploadFile.accept = "image/*";
-		this.update();
-		headerManager.header.appendChild(this._userMenu);
+		this.update().then(() => headerManager.header.appendChild(this._userMenu));
   }
 
-	public update() {
+	public async update() {
 		this._userMenu.innerHTML = "";
 		if (UserHandler.isLogged)
-			this._userMenu.appendChild(createUserMenuSettings());
+			this._userMenu.appendChild(await createUserMenuSettings());
 		else
 			this._userMenu.appendChild(createLoginButton());
 		this._uploadFile.files = null;

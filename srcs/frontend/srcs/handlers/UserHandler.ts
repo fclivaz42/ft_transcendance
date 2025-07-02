@@ -1,5 +1,13 @@
 import { userMenuManager } from "../managers/UserMenuManager";
 import type { Users } from "../interfaces/Users";
+import NotificationManager from "../managers/NotificationManager";
+import { i18nHandler } from "./i18nHandler";
+
+export interface UserStats {
+	wonMatches: number;
+	lostMatches: number;
+	totalMatches: number;
+}
 
 class UserHandler {
 	private _clientId: string = "";
@@ -19,6 +27,28 @@ class UserHandler {
 
 	public async initialize() {
 		await this.fetchUser();
+		this.updateAliveStatus();
+	}
+
+	public async updateAliveStatus() {
+		while (true) {
+			if (!this.isLogged)
+				await new Promise(resolve => setTimeout(resolve, 30000));
+			try {
+				await fetch("/api/users/me/alive", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						PlayerId: this._clientId,
+					}),
+				});
+			} catch (error) {
+				console.error("Failed to update alive status:", error);
+			}
+			await new Promise(resolve => setTimeout(resolve, 30000));
+		}
 	}
 
 	public get clientId() {
@@ -74,7 +104,7 @@ class UserHandler {
 				console.warn("User data is incomplete or missing.", userData);
 				this._user = undefined;
 			} else {
-				this._user = {...userData};
+				this._user = {...userData} as Users;
 				if (!this._user)
 					throw new Error("User data is undefined or null");
 				const avatarFile = await fetch("/api/users/me/picture");
@@ -102,15 +132,13 @@ class UserHandler {
 		return this._user as Users;
 	}
 
-	public async fetchUserPicture(playerId: string, playerName?: string, playerAvatar?:string): Promise<string> {
-		if (playerId === this.userId)
+	public async fetchUserPicture(playerId?: string): Promise<string> {
+		if (!playerId)
 			return this.avatarUrl;
-		if (playerAvatar)
-			return playerAvatar;
-		const response = await fetch(`/api/users/${playerId}/picture`);
-		if (!response.ok)
-			return `https://placehold.co/100x100?text=${playerName?.substring(0,2) || "?"}&font=roboto&bg=cccccc`;
-		return response.url;
+		const user = await this.fetchUser(playerId);
+		if (!user)
+			return "/assets/images/default_avatar.svg";
+		return user.Avatar || `https://placehold.co/100x100?text=${user.DisplayName.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
 	}
 
 	private updateComponents() {
@@ -143,7 +171,11 @@ class UserHandler {
 			method: "DELETE",
 		});
 		if (!response.ok) {
-			console.error("Failed to remove friend:", response.statusText);
+			NotificationManager.notify({
+				level: "error",
+				title: i18nHandler.getValue("notification.generic.errorTitle"),
+				message: i18nHandler.getValue("user.notification.deleteError"),
+			});
 			throw new Error("Failed to remove friend");
 		}
 		this._friendList = this._friendList.filter(friend => friend.PlayerID !== playerId);
@@ -152,6 +184,67 @@ class UserHandler {
 
 	public get friendList() {
 		return this._friendList;
+	}
+
+	public async fetchUserStats(playerId?: string): Promise<UserStats> {
+		if (!playerId)
+			playerId === this.userId
+		const stats = await fetch(`/api/users/${playerId}/stats`);
+		if (!stats.ok)
+			throw new Error(`Failed to fetch user stats for playerId ${playerId}: ${stats.statusText}`);
+		return await stats.json() as UserStats;
+	}
+
+	public async addFriend(PlayerID: string): Promise<Response> {
+		const res = await fetch(`/api/users/me/friends`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ PlayerID }),
+		});
+		if (!res.ok) {
+			console.error("Failed to add friend:", res.statusText);
+			if (res.status === 409) {
+				NotificationManager.notify({
+					level: "warning",
+					title: i18nHandler.getValue("notification.generic.warningTitle"),
+					message: i18nHandler.getValue("user.notification.alreadyExists")
+				});
+				throw new Error("You are already friends with this user.");
+			}
+			else if (res.status === 404) {
+				NotificationManager.notify({
+					level: "error",
+					title: i18nHandler.getValue("notification.generic.errorTitle"),
+					message: i18nHandler.getValue("user.notification.notFound"),
+				});
+				throw new Error("User not found.");
+			}
+			else {
+				NotificationManager.notify({
+					level: "error",
+					title: i18nHandler.getValue("notification.generic.errorTitle"),
+					message: i18nHandler.getValue("user.notification.add.error"),
+				});
+				throw new Error("Failed to add friend due to an unknown error.");
+			}
+		}
+		const friend = await this.fetchUser(PlayerID);
+		if (friend)
+			this._friendList.push(friend as Users);
+		this.updateComponents();
+		return res;
+	}
+
+	public async getAliveStatus(playerId: string): Promise<boolean> {
+		const response = await fetch(`/api/users/${playerId}/alive`);
+		if (!response.ok) {
+			console.error("Failed to fetch alive status:", response.statusText);
+			return false;
+		}
+		const data = await response.json() as { isAlive: boolean };
+		return data.isAlive || false;
 	}
 }
 

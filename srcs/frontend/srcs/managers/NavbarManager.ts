@@ -52,6 +52,15 @@ class NavbarManager {
 					}
 				},
 				{
+					id: "btnProfile",
+					title: i18nHandler.getValue("navbar.profile.label"),
+					logo: "/assets/ui/profile-round-1342-svgrepo-com.svg",
+					i18n: "navbar.profile.label",
+					f: () => {
+						RoutingHandler.setRoute("/user");
+					}
+				},
+				{
 					id: "btnSettings",
 					title: i18nHandler.getValue("navbar.settings.label"),
 					logo: "/assets/ui/settings-svgrepo-com.svg",
@@ -59,7 +68,7 @@ class NavbarManager {
 					bottom: true,
 					animation: "group-hover:animate-rotate-180 group-hover:animate-duration-[500ms]",
 					i18n: "navbar.settings.label"
-				}
+				},
 			]
 		});
 		mainManager.main.appendChild(this._navbar);

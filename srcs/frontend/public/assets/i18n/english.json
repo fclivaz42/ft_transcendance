@@ -34,6 +34,23 @@
       }
     }
   },
+  "user": {
+    "friend": {
+      "addFriend": "Add Friend",
+      "removeFriend": "Remove Friend"
+    },
+    "matches": {
+      "total": "Total Matches",
+      "won": "Matches Won",
+      "lost": "Matches Lost",
+      "viewHistory": "View History"
+    },
+    "notification": {
+      "alreadyExists": "You already are friends.",
+      "notFound": "User not found.",
+      "deleteError": "Failed to delete friend."
+    }
+  },
   "header": {
     "usermenu": {
       "login": "Login",
@@ -63,6 +80,9 @@
     "history": {
       "label": "History",
       "title": "History"
+    },
+    "profile": {
+      "label": "Profile"
     },
     "settings": {
       "label": "Settings",
@@ -180,6 +200,7 @@
     "generic": {
       "infoTitle": "Login Information",
       "errorTitle": "Error",
+      "warningTitle": "Warning",
       "errorMessage": "An error occurred. Please try again later."
     },
     "oauth2": {
@@ -187,7 +208,8 @@
       "noSession": "No session found. Please try again."
     },
     "user": {
-      "notLogged": "You are not logged in."
+      "notLogged": "You are not logged in.",
+      "notFound": "User not found."
     }
   },
   "errors": {

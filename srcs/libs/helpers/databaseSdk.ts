@@ -116,7 +116,7 @@ export default class DatabaseSDK {
 	* @param user The user you want to update. The PlayerID Field is mandatory!
 	* @returns An AxiosResponse Promise containing the created User's complete data. Throws in case the user was not found.
 	*/
-	public async update_user(user: User): Promise<AxiosResponse<User>> {
+	public async update_user(user: Partial<User>): Promise<AxiosResponse<User>> {
 		if (!user.PlayerID)
 			throw "error.missing.playerid"
 		return await this.api_request<User>("PUT", "Players", `/PlayerID/${this.param_str}`, { body: user, params: user.PlayerID })
