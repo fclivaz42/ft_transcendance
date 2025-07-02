@@ -33,6 +33,28 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		return reply.code(user.status).send(user.data);
 	});
 
+	app.post("/:uuid/alive", async (request, reply) => {
+		const authorization = checkRequestAuthorization(request, reply);
+		if (authorization)
+			return authorization;
+		const user: Partial<User> = request.body as Partial<User>;
+		user.LastAlive = Date.now();
+		const res = await db_sdk.update_user(user);
+		reply.code(200).send({LastAlive: res.data.LastAlive});
+	});
+
+	app.get("/:uuid/alive", async (request, reply) => {
+		const authorization = checkRequestAuthorization(request, reply);
+		if (authorization)
+			return authorization;
+		const params = request.params as { uuid: string };
+		const user = await db_sdk.get_user(params.uuid, "PlayerID");
+		const isAlive = user.data.LastAlive && (Date.now() - user.data.LastAlive < 30000);
+		return reply.code(200).send({
+			isAlive,
+		})
+	});
+
 	app.get("/:uuid/picture", async (request, reply) => {
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)

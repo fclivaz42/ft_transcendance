@@ -30,6 +30,9 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 
 		const currentUser = await usersSdk.getUser(authorization.data.sub);
+
+		await usersSdk.postUserAlive(authorization.data.sub).catch(err => { Logger.error(`Failed to update user alive status: ${err.message}`); });
+
 		return reply.code(currentUser.status).send(usersSdk.filterUserData(currentUser.data));
 	});
 
@@ -68,6 +71,42 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		return reply.code(userMatches.status).send(userMatches.data);
 	});
 
+	fastify.all('/me/alive', async (request, reply) => {
+		if (request.method !== 'POST' && request.method !== 'GET')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only POST method is allowed for user alive status.' });
+		
+		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		const userId = authorization.data.sub;
+
+		if (request.method === 'GET') {
+			const userAliveStatus = await usersSdk.getUserAlive(userId)
+				.catch(err => {
+					if (!axios.isAxiosError(err))
+						throw err;	
+					return reply.code(err.response?.status || 500).send(
+						err.response?.data || {
+							detail: err.response?.data?.detail || 'Failed to fetch user alive status',
+							status: err.response?.status || 500,
+							module: 'usermanager'
+						});
+				});
+			return reply.code(userAliveStatus.status).send(userAliveStatus.data);
+		}
+
+		const userAliveStatus = await usersSdk.postUserAlive(userId)
+			.catch(err => {
+				if (!axios.isAxiosError(err))
+					throw err;	
+				return reply.code(err.response?.status || 500).send(
+					err.response?.data || {
+						detail: err.response?.data?.detail || 'Failed to update user alive status',
+						status: err.response?.status || 500,
+						module: 'usermanager'
+					});
+			});
+		return reply.code(userAliveStatus.status).send(userAliveStatus.data);
+	});
+
 	fastify.all('/me/friends', async (request, reply) => {
 		if (request.method !== 'GET' && request.method !== 'POST')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user friends.' });
@@ -78,7 +117,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			const body = request.body as { PlayerID: string };
 			if (!body.PlayerID)
 				return httpReply({
-					detail: 'PlayerId is required',
+					detail: 'PlayerID is required',
 					status: 400,
 					module: 'usermanager',
 				}, reply, request);
@@ -225,6 +264,37 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (userData.status !== 200)
 			return reply.code(userData.status).send(userData.data);
 		return reply.code(userData.status).send(usersSdk.filterPublicUserData(userData.data));
+	});
+
+	fastify.all('/:uuid/alive', async (request, reply) => {
+		if (request.method !== 'GET')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only POST or GET method is allowed for user alive status.' });
+
+		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		const userId = authorization.data.sub;
+
+		const targetUser = request.params as { uuid: string };
+		const userFriends = await usersSdk.getUserFriends(userId);
+		if (targetUser.uuid === userId || userFriends.data.some(friend => friend.PlayerID === targetUser.uuid)) {
+			const userAliveStatus = await usersSdk.getUserAlive(targetUser.uuid)
+				.catch(err => {
+					if (!axios.isAxiosError(err))
+						throw err;	
+					return reply.code(err.response?.status || 500).send(
+						err.response?.data || {
+							detail: err.response?.data?.detail || 'Failed to fetch user alive status',
+							status: err.response?.status || 500,
+							module: 'usermanager'
+						});
+				});
+			return reply.code(userAliveStatus.status).send(userAliveStatus.data);
+		}
+
+		return httpReply({
+			detail: 'You are not allowed to access this user\'s alive status.',
+			status: 403,
+			module: 'usermanager',
+		}, reply, request);
 	});
 
 	fastify.all('/:uuid/picture', async (request, reply) => {

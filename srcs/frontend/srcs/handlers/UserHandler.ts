@@ -27,6 +27,28 @@ class UserHandler {
 
 	public async initialize() {
 		await this.fetchUser();
+		this.updateAliveStatus();
+	}
+
+	public async updateAliveStatus() {
+		while (true) {
+			if (!this.isLogged)
+				await new Promise(resolve => setTimeout(resolve, 30000));
+			try {
+				await fetch("/api/users/me/alive", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						PlayerId: this._clientId,
+					}),
+				});
+			} catch (error) {
+				console.error("Failed to update alive status:", error);
+			}
+			await new Promise(resolve => setTimeout(resolve, 30000));
+		}
 	}
 
 	public get clientId() {
@@ -151,8 +173,8 @@ class UserHandler {
 		if (!response.ok) {
 			NotificationManager.notify({
 				level: "error",
-				title: i18nHandler.getValue("notification.error.title"),
-				message: i18nHandler.getValue("user.notification.delete.error"),
+				title: i18nHandler.getValue("notification.generic.errorTitle"),
+				message: i18nHandler.getValue("user.notification.deleteError"),
 			});
 			throw new Error("Failed to remove friend");
 		}
@@ -212,7 +234,17 @@ class UserHandler {
 		if (friend)
 			this._friendList.push(friend as Users);
 		this.updateComponents();
-		return;
+		return res;
+	}
+
+	public async getAliveStatus(playerId: string): Promise<boolean> {
+		const response = await fetch(`/api/users/${playerId}/alive`);
+		if (!response.ok) {
+			console.error("Failed to fetch alive status:", response.statusText);
+			return false;
+		}
+		const data = await response.json() as { isAlive: boolean };
+		return data.isAlive || false;
 	}
 }
 

@@ -47,7 +47,8 @@
     },
     "notification": {
       "alreadyExists": "You already are friends.",
-      "notFound": "User not found."
+      "notFound": "User not found.",
+      "deleteError": "Failed to delete friend."
     }
   },
   "header": {

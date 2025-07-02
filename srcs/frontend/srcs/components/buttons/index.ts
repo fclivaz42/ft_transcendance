@@ -21,7 +21,7 @@ export function createButton(props: ButtonProps): HTMLAnchorElement {
 		}
 	}
 	if (props.addClasses)
-		button.classList.add(props.addClasses);
+		button.classList += ` ${props.addClasses}`;
   return button;
 }
 

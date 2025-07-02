@@ -16,22 +16,22 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	}
 	const userStats = await UserHandler.fetchUserStats(user.PlayerID);
 	template.innerHTML = `
-		<div class="w-fit mx-auto flex flex-col gap-8">
+		<div class="min-w-[500px] max-w-fit mx-auto flex flex-col gap-8 p-8 rounded-xl bg-panel dark:bg-panel_dark shadow-md">
 			<div class="flex flex-col items-center justify-center gap-4">
 				${(await createUserAvatar({ disableClick: true, playerId: user.PlayerID, sizeClass: "w-40 h-40 mx-auto"})).outerHTML}
 				<h2 ${user.PlayerID === UserHandler.userId ? "data-user=\"username\"" : ""} class="text-center text-2xl font-bold"'>${sanitizer(user.DisplayName) || "User Name"}</h2>
 			</div>
 			<div class="flex flex-col items-center">
-				<h3 data-i18n="user.matches.total">${sanitizer(i18nHandler.getValue("user.matches.total"))}</h3>
+				<h3 class="text-sm" data-i18n="user.matches.total">${sanitizer(i18nHandler.getValue("user.matches.total"))}</h3>
 				<p data-user="matchesTotal" class="text-center text-xl font-semibold">${userStats.totalMatches}</p>
 			</div>
-			<div class="flex gap-8">
+			<div class="flex gap-8 justify-center">
 				<div>
-					<h3 data-i18n="user.matches.won">${sanitizer(i18nHandler.getValue("user.matches.won"))}</h3>
+					<h3 class="text-sm" data-i18n="user.matches.won">${sanitizer(i18nHandler.getValue("user.matches.won"))}</h3>
 					<p data-user="matchesWon" class="text-center text-xl font-semibold">${userStats.wonMatches}</p>
 				</div>
 				<div>
-					<h3 data-i18n="user.matches.lost">${sanitizer(i18nHandler.getValue("user.matches.lost"))}</h3>
+					<h3 class="text-sm" data-i18n="user.matches.lost">${sanitizer(i18nHandler.getValue("user.matches.lost"))}</h3>
 					<p data-user="matchesLost" class="text-center text-xl font-semibold">${userStats.lostMatches}</p>
 				</div>
 			</div>
@@ -41,6 +41,8 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	const viewHistoryButton = createButton({
 		i18n: "user.matches.viewHistory",
 		title: i18nHandler.getValue("user.matches.viewHistory"),
+		addClasses: "w-fit mx-auto",
+		color: "bg-background",
 		f: () => {
 			if (user.PlayerID === UserHandler.userId)
 				RoutingHandler.setRoute("/history");
@@ -53,11 +55,19 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	const addFriendButton = createButton({
 		i18n: "user.friend.addFriend",
 		title: i18nHandler.getValue("user.friend.addFriend"),
+		addClasses: "w-fit mx-auto",
+		color: "bg-blue-200",
+		darkColor: "dark:bg-blue-600",
+		logo: "/assets/ui/profile-plus-round-1343-svgrepo-com.svg",
 	});
 
 	const removeFriendButton = createButton({
 		i18n: "user.friend.removeFriend",
 		title: i18nHandler.getValue("user.friend.removeFriend"),
+		addClasses: "w-fit mx-auto",
+		color: "bg-red-200",
+		darkColor: "dark:bg-red-600",
+		logo: "/assets/ui/profile-close-round-1344-svgrepo-com.svg"
 	});
 
 	removeFriendButton.onclick = async () => {
