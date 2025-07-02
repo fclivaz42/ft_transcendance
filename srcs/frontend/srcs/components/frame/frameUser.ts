@@ -9,13 +9,16 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	const searchParams = RoutingHandler.searchParams;
 	const template = document.createElement("template");
 	const user = await UserHandler.fetchUser(searchParams.get("playerId") || UserHandler.userId);
-	if (!user)
+	if (!user) {
+		if (!UserHandler.isLogged)
+			throw new Error("notification.user.notLogged");
 		throw new Error("notification.user.notFound");
+	}
 	const userStats = await UserHandler.fetchUserStats(user.PlayerID);
 	template.innerHTML = `
 		<div class="w-fit mx-auto flex flex-col gap-8">
 			<div class="flex flex-col items-center justify-center gap-4">
-				${createUserAvatar({ src: await UserHandler.fetchUserPicture(user?.PlayerID, user?.DisplayName, user?.Avatar), sizeClass: "w-40 h-40 mx-auto"}).outerHTML}
+				${(await createUserAvatar({ disableClick: true, playerId: user.PlayerID, sizeClass: "w-40 h-40 mx-auto"})).outerHTML}
 				<h2 ${user.PlayerID === UserHandler.userId ? "data-user=\"username\"" : ""} class="text-center text-2xl font-bold"'>${sanitizer(user.DisplayName) || "User Name"}</h2>
 			</div>
 			<div class="flex flex-col items-center">
@@ -38,30 +41,40 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	const viewHistoryButton = createButton({
 		i18n: "user.matches.viewHistory",
 		title: i18nHandler.getValue("user.matches.viewHistory"),
+		f: () => {
+			if (user.PlayerID === UserHandler.userId)
+				RoutingHandler.setRoute("/history");
+			else
+				RoutingHandler.setRoute(`/history?playerId=${user.PlayerID}`);
+		}
 	});
 	userFrame.appendChild(viewHistoryButton);
+
+	const addFriendButton = createButton({
+		i18n: "user.friend.addFriend",
+		title: i18nHandler.getValue("user.friend.addFriend"),
+	});
+
+	const removeFriendButton = createButton({
+		i18n: "user.friend.removeFriend",
+		title: i18nHandler.getValue("user.friend.removeFriend"),
+	});
+
+	removeFriendButton.onclick = async () => {
+		await UserHandler.removeFriend(user.PlayerID);
+		RoutingHandler.setRoute(`/user?playerId=${user.PlayerID}`, false);
+	}
+
+	addFriendButton.onclick = async () => {
+		await UserHandler.addFriend(user.PlayerID);
+		RoutingHandler.setRoute(`/user?playerId=${user.PlayerID}`, false);
+	}
+
 	if (user.PlayerID !== UserHandler.userId) {
 		if (!UserHandler.friendList.some(friend => friend.PlayerID === user.PlayerID)) {
-			const addFriendButton = createButton({
-				i18n: "user.addFriend",
-				f: async () => {
-				},
-				title: i18nHandler.getValue("user.addFriend"),
-			});
 			userFrame.insertBefore(addFriendButton, userFrame.childNodes[2]);
 		} else {
-			const removeFriendButton = createButton({
-				i18n: "user.removeFriend",
-				f: async () => {
-					try {
-						await UserHandler.removeFriend(user.PlayerID);
-						RoutingHandler.setRoute("/user");
-					} catch (error) {
-						console.error("Failed to remove friend:", error);
-					}
-				},
-				title: i18nHandler.getValue("user.removeFriend"),
-			});
+
 			userFrame.insertBefore(removeFriendButton, userFrame.childNodes[2]);
 		}
 	}

@@ -85,7 +85,7 @@ async function createHistoryElement(match: Matches): Promise<HTMLDivElement | nu
 					<div class="relative">
 						<p data-i18n="history.winner" class="lg:text-xl text-sm absolute -bottom-4 left-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${i18nHandler.getValue("history.winner")}</p>
 						<p class="text-2xl font-bold lg:bottom-0 -bottom-4 lg:-right-16 -right-20 absolute">${sanitizer(match.WScore)}</p>
-						${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[0].PlayerID, oponents[0].DisplayName, oponents[0].Avatar), sizeClass: "lg:w-24 lg:h-24 w-12 h-12"}).outerHTML}
+						${(await createUserAvatar({playerId: oponents[0].PlayerID, sizeClass: "lg:w-24 lg:h-24 w-12 h12"})).outerHTML}
 					</div>
 					<p class="truncate lg:max-w-32 max-w-24 lg:text-lg text-xs font-semibold">${sanitizer(oponents[0].DisplayName)}</p>
 				</div>
@@ -97,7 +97,7 @@ async function createHistoryElement(match: Matches): Promise<HTMLDivElement | nu
 					<div class="relative">
 						<p data-i18n="history.loser" class="lg:text-xl text-sm absolute -bottom-4 right-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.loser"))}</p>
 						<p class="text-2xl font-bold lg:bottom-0 -bottom-4 lg:-left-16 -left-20 absolute">${sanitizer(match.LScore)}</p>
-						${createUserAvatar({src: await UserHandler.fetchUserPicture(oponents[1].PlayerID, oponents[1].DisplayName, oponents[1].Avatar), sizeClass: "lg:w-24 lg:h-24 w-12 h-12"}).outerHTML}
+						${(await createUserAvatar({playerId: oponents[1].PlayerID, sizeClass: "lg:w-24 lg:h-24 w-12 h12"})).outerHTML}
 					</div>
 				</div>
 			</div>
@@ -140,7 +140,7 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 			title: i18nHandler.getValue("notification.generic.errorTitle"),
 			message: i18nHandler.getValue("notification.generic.errorMessage"),
 		});
-		RoutingHandler.setRoute("/");
+		RoutingHandler.setRoute("/", false);
 		return document.createElement("div");
 	} else if (player.Private) {
 		NotificationManager.notify({
@@ -148,7 +148,7 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 			title: i18nHandler.getValue("history.notification.private.title"),
 			message: i18nHandler.getValue("history.notification.private.message"),
 		});
-		RoutingHandler.setRoute("/");
+		RoutingHandler.setRoute("/", false);
 		return document.createElement("div");
 	}
 	let page = Number(RoutingHandler.searchParams.get("p")) || 1;
@@ -209,7 +209,7 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 	return template.content.firstElementChild as HTMLDivElement;
 }
 
-async function updatePage(page: number, matches: Matches[], matchElements: string[], elemPerPage: number): void {
+async function updatePage(page: number, matches: Matches[], matchElements: string[], elemPerPage: number) {
 	RoutingHandler.searchParams.set("p", String(page));
 	RoutingHandler.updateUrl();
 	const historyContainer = document.querySelector("#history-elements") as HTMLDivElement;

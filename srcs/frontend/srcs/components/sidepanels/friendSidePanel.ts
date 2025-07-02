@@ -26,10 +26,10 @@ async function createFriendItem(user: Users) {
 				<p>✕</p>
 			</button>
 			<p>${sanitizer(user.DisplayName)}</p>
-			${createUserAvatar({
-		src: sanitizer(await UserHandler.fetchUserPicture(user.PlayerID, user.Avatar)),
-		sizeClass: "w-8 h-8",
-	}).outerHTML}
+			${(await createUserAvatar({
+				playerId: user.PlayerID,
+				sizeClass: "w-8 h-8",
+			})).outerHTML}
 		</div>
 	`
 	const friendItem = template.content.firstElementChild as HTMLElement;

@@ -6,12 +6,12 @@ import UserHandler from "../../handlers/UserHandler";
 import { sanitizer } from "../../helpers/sanitizer";
 import createUserAvatar from "../usermenu/userAvatar";
 
-export function createPongCanvas(isComputer: boolean): HTMLDivElement {
+export async function createPongCanvas(isComputer: boolean): Promise<HTMLDivElement> {
 	const template = document.createElement("template");
 
 	const playerAvatar: HTMLImageElement[] = [];
-	playerAvatar.push(createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14", src:"/assets/images/default_avatar.svg"}));
-	playerAvatar.push(createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14", src:"/assets/images/default_avatar.svg"}));
+	playerAvatar.push(await createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
+	playerAvatar.push(await createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
 	playerAvatar[0].setAttribute("data-pong-avatar", "p1");
 	playerAvatar[1].setAttribute("data-pong-avatar", "p2");
 

@@ -1,3 +1,4 @@
+import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler from "../../handlers/UserHandler";
 import { sanitizer } from "../../helpers/sanitizer";
 import { userMenuManager } from "../../managers/UserMenuManager";
@@ -5,23 +6,52 @@ import { userMenuManager } from "../../managers/UserMenuManager";
 export interface UserAvatarProps {
 	sizeClass?: string;
 	editable?: boolean;
-	src?: string;
+	playerId?: string;
+	isComputer?: boolean;
+	disableClick?: boolean;
 }
 
-export default function createUserAvatar(props: UserAvatarProps = {
+export default async function createUserAvatar(props: UserAvatarProps = {
 	editable: false
-}): HTMLImageElement {
+}): Promise<HTMLImageElement> {
 	if (!props.sizeClass)
 		props.sizeClass = "w-10 h-10";
+
+	let src: string;
+	if (!props.isComputer && (!props.playerId || props.playerId === UserHandler.userId))
+		src = UserHandler.avatarUrl;
+	else if (props.isComputer)
+		src = "/assets/images/computer-virus-1-svgrepo-com.svg";
+	else
+		src = await UserHandler.fetchUserPicture(props.playerId);
+
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<img ${!props.src || props.src !== UserHandler.avatarUrl ? "" : "data-user=\"avatar\""} src="${sanitizer(props.src || UserHandler.avatarUrl)}" alt="User Avatar" class="select-none border-2 rounded-full object-cover ${sanitizer(props.sizeClass)} bg-white">
+		<img src="${sanitizer(src)}" ${src === UserHandler.avatarUrl ? "data-user=\"avatar\"": ""} alt="User Avatar" class="select-none border-2 rounded-full object-cover ${sanitizer(props.sizeClass)} bg-white">
 	`;
 	const userAvatar = template.content.firstElementChild as HTMLImageElement;
 
 	userAvatar.onerror = () => {
 		userAvatar.src = "/assets/images/default_avatar.svg";
 	};
+
+	if (!props.disableClick && !props.isComputer) {
+		userAvatar.classList.add("cursor-pointer");
+		userAvatar.onclick = () => {
+			if (props.playerId && props.playerId !== UserHandler.userId) {
+				RoutingHandler.setRoute(`/user?playerId=${props.playerId}`);
+			} else {
+				RoutingHandler.setRoute("/user");
+			}
+		};
+		userAvatar.onauxclick = () => {
+			if (props.playerId && props.playerId !== UserHandler.userId) {
+				window.open(`/user?playerId=${props.playerId}`, "_blank");
+			} else {
+				window.open("/user", "_blank");
+			}
+		}
+	}
 
 	if (props.editable) {
 		userAvatar.onload = () => {

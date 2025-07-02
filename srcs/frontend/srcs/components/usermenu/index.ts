@@ -24,11 +24,11 @@ function maskEmail(email: string): string {
 }
 
 
-export function createUserDialog(): HTMLDialogElement {
+export async function createUserDialog(): Promise<HTMLDialogElement> {
     const dialog = createDialog({ allowClose: true });
     dialog.className += " w-[500px] max-w-[90vw]";
 
-    const profilePicture = createUserAvatar({
+    const profilePicture = await createUserAvatar({
         sizeClass: "w-32 h-32 mb-2",
         editable: true,
     });
@@ -378,7 +378,7 @@ export function createUserDialog(): HTMLDialogElement {
 }
 
 
-export function createUserMenuSettings(): HTMLDivElement {
+export async function createUserMenuSettings(): Promise<HTMLDivElement> {
     const template = document.createElement("template");
     template.innerHTML = `
         <div id="userMenuSettings" class="flex gap-x-2 items-center justify-center cursor-pointer">
@@ -386,8 +386,8 @@ export function createUserMenuSettings(): HTMLDivElement {
         </div>
     `;
     const userMenuSettings = template.content.firstElementChild as HTMLDivElement;
-    userMenuSettings.appendChild(createUserAvatar());
-    userMenuSettings.onclick = () => createUserDialog().showModal();
+    userMenuSettings.appendChild(await createUserAvatar());
+    userMenuSettings.onclick = async () => (await createUserDialog()).showModal();
     return userMenuSettings;
 }
 
