@@ -266,4 +266,24 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			});
 		return reply.code(userMatches.status).send(userMatches.data);
 	});
+
+	fastify.all('/:uuid/stats', async (request, reply) => {
+	if (request.method !== 'GET')
+		return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user stats.' });
+	const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+	const params = request.params as { uuid: string };
+	const userStats = await usersSdk.getUserStats(params.uuid)
+		.then(response => response)
+		.catch((err: any) => {
+			if (!axios.isAxiosError(err))
+				throw err;	
+			return reply.code(err.response?.status || 500).send(
+				err.response?.data || {
+					detail: 'Failed to fetch user stats',
+					status: err.response?.status || 500,
+					module: 'usermanager'
+				});
+		});
+		return reply.code(userStats.status).send(userStats.data);
+	});
 }

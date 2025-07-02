@@ -12,6 +12,7 @@ import Logger from "../../../libs/helpers/loggers.ts";
 import axios from "axios";
 import UsersSdk from "../../../libs/helpers/usersSdk.ts";
 import type { MultipartFile } from "@fastify/multipart";
+import type { Match } from "../../../libs/interfaces/Match.ts";
 
 export default async function initializeRoute(app: FastifyInstance, opts: FastifyPluginOptions) {
 
@@ -170,6 +171,20 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 					});
 			});
 		return reply.code(deleteFriends.status).send(deleteFriends.data);
+	});
+
+	app.get("/:uuid/stats", async (request, reply) => {
+		const authorization = checkRequestAuthorization(request, reply);
+		if (authorization)
+			return authorization;
+		const params = request.params as { uuid: string };
+		const matches = await db_sdk.get_player_matchlist(params.uuid);
+		const wonMatches = matches.data.filter((match: Match) => match.WPlayerID === params.uuid);
+		return reply.code(200).send({
+			"wonMatches": wonMatches.length,
+			"lostMatches": matches.data.length - wonMatches.length,
+			"totalMatches": matches.data.length,
+		});
 	});
 
 	app.delete("/:uuid", async (request, reply) => {

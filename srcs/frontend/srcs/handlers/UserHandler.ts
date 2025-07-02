@@ -1,5 +1,12 @@
 import { userMenuManager } from "../managers/UserMenuManager";
 import type { Users } from "../interfaces/Users";
+import { sanitizer } from "../helpers/sanitizer";
+
+export interface UserStats {
+	wonMatches: number;
+	lostMatches: number;
+	totalMatches: number;
+}
 
 class UserHandler {
 	private _clientId: string = "";
@@ -74,7 +81,7 @@ class UserHandler {
 				console.warn("User data is incomplete or missing.", userData);
 				this._user = undefined;
 			} else {
-				this._user = {...userData};
+				this._user = {...userData} as Users;
 				if (!this._user)
 					throw new Error("User data is undefined or null");
 				const avatarFile = await fetch("/api/users/me/picture");
@@ -152,6 +159,15 @@ class UserHandler {
 
 	public get friendList() {
 		return this._friendList;
+	}
+
+	public async fetchUserStats(playerId?: string): Promise<UserStats> {
+		if (!playerId)
+			playerId === this.userId
+		const stats = await fetch(`/api/users/${playerId}/stats`);
+		if (!stats.ok)
+			throw new Error(`Failed to fetch user stats for playerId ${playerId}: ${stats.statusText}`);
+		return await stats.json() as UserStats;
 	}
 }
 

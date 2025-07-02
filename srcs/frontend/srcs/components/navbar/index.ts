@@ -1,3 +1,4 @@
+import { sanitizer } from "../../helpers/sanitizer.js";
 import { BaseProps } from "../../interfaces/baseProps.js";
 
 interface NavbarButtonProps extends BaseProps {
@@ -41,9 +42,9 @@ export function createNavbar(props: NavbarProps): HTMLElement {
 	for (const button of props.buttons) {
 		const template = document.createElement("template");
 		template.innerHTML = `
-			<a class="group aspect-square overflow-visible flex flex-col items-center justify-center gap-y-1 cursor-pointer${button.bottom ? " mt-auto" : ""}" id="${button.id}">
-				${button.logo ? `<img class="select-none h-8 w-8 dark:invert ${button.animation || " group-hover:animate-squeeze group-hover:animate-duration-300"}" src="${button.logo}">` : ""}
-				<p class="text-nowrap" ${button.i18n ? ` data-i18n="${button.i18n}"` : ""}>${button.title}</p>
+			<a class="group aspect-square overflow-visible flex flex-col items-center justify-center gap-y-1 cursor-pointer${button.bottom ? " mt-auto" : ""}" id="${sanitizer(button.id)}">
+				${button.logo ? `<img class="select-none h-8 w-8 dark:invert ${sanitizer(button.animation) || " group-hover:animate-squeeze group-hover:animate-duration-300"}" src="${sanitizer(button.logo)}">` : ""}
+				<p class="text-nowrap" ${button.i18n ? ` data-i18n="${sanitizer(button.i18n)}"` : ""}>${sanitizer(button.title)}</p>
 			</a>
 		`;
 		const buttonElement = template.content.firstElementChild as HTMLElement;

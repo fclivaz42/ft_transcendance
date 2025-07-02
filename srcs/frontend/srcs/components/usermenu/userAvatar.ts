@@ -1,4 +1,5 @@
 import UserHandler from "../../handlers/UserHandler";
+import { sanitizer } from "../../helpers/sanitizer";
 import { userMenuManager } from "../../managers/UserMenuManager";
 
 export interface UserAvatarProps {
@@ -14,7 +15,7 @@ export default function createUserAvatar(props: UserAvatarProps = {
 		props.sizeClass = "w-10 h-10";
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<img ${!props.src || props.src !== UserHandler.avatarUrl ? "" : "data-user=\"avatar\""} src="${props.src || UserHandler.avatarUrl}" alt="User Avatar" class="border-2 rounded-full object-cover ${props.sizeClass} bg-white">
+		<img ${!props.src || props.src !== UserHandler.avatarUrl ? "" : "data-user=\"avatar\""} src="${sanitizer(props.src || UserHandler.avatarUrl)}" alt="User Avatar" class="select-none border-2 rounded-full object-cover ${sanitizer(props.sizeClass)} bg-white">
 	`;
 	const userAvatar = template.content.firstElementChild as HTMLImageElement;
 
@@ -32,7 +33,7 @@ export default function createUserAvatar(props: UserAvatarProps = {
 			userAvatar.parentElement.replaceChild(newContainer, userAvatar);
 			newContainer.appendChild(userAvatar);
 			const editContainer = document.createElement("div");
-			editContainer.className = `${props.sizeClass} p-8 bg-black/50 opacity-0 absolute bottom-0 right-0 rounded-full border-2 cursor-pointer`;
+			editContainer.className = `${props.sizeClass} p-8 bg-black/50 opacity-0 absolute bottom-0 right-0 rounded-full border-2 cursor-pointer select-none`;
 			const editIcon = document.createElement("img");
 			editIcon.src = "/assets/ui/photo-upload-svgrepo-com.svg";
 			editIcon.className = `w-full h-full invert`;

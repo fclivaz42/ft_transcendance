@@ -1,3 +1,4 @@
+import { sanitizer } from "../../helpers/sanitizer.js";
 import { ButtonProps, TitleProps } from "../../interfaces/baseProps.js";
 import { createButton } from "../buttons/index.js";
 import { createFriendSidePanel } from "./friendSidePanel.js";
@@ -12,7 +13,7 @@ export function createSidePanel(props: TitleProps): HTMLElement {
 
 	container.className = `${defaultPanelSize} overflow-hidden bg-panel dark:bg-panel_dark h-[80%] rounded-xl p-8`;
 	container.innerHTML = `
-		<h3 class="text-lg text-center font-bold duration-0 text-black dark:text-white"${props.i18n ? " data-i18n=\"" + props.i18n + "\"" : ""}>${props.title}</h3>
+		<h3 class="text-lg text-center font-bold duration-0 text-black dark:text-white"${props.i18n ? " data-i18n=\"" + sanitizer(props.i18n) + "\"" : ""}>${sanitizer(props.title)}</h3>
         <hr class="my-4">
 	`;
 	return container;
@@ -51,7 +52,7 @@ export function createSidePanelToggleSlider(props: TitleProps): HTMLElement {
 	slider.className = "flex items-center justify-between w-full py-2";
 
 	slider.innerHTML = `
-		<span class="text-sm font-medium text-gray-700 dark:text-gray-100"${props.i18n ? " data-i18n=\"" + props.i18n + "\"" : ""}>${props.title}</span>
+		<span class="text-sm font-medium text-gray-700 dark:text-gray-100"${props.i18n ? " data-i18n=\"" + sanitizer(props.i18n) + "\"" : ""}>${sanitizer(props.title)}</span>
 		<label class="hover:animate-scale hover:animate-duration-100 cursor-pointer relative inline-block w-11 h-6">
 			<input type="checkbox" class="sr-only peer cursor-pointer">
 			<div class="w-full h-full bg-gray-300 rounded-full peer-checked:bg-indigo-600 transition-colors duration-300"></div>
@@ -71,9 +72,9 @@ export function createSidePanelSelector(props: SidePanelSelectorProps): HTMLElem
 	selector.className = "flex flex-col gap-2";
 	selector.innerHTML = `
 		<div class="flex items-center justify-between w-full gap-x-32">
-			<span class="text-sm font-medium text-gray-700 dark:text-gray-100"${props.i18n ? " data-i18n=\"" + props.i18n + "\"" : ""}>${props.title}</span>
+			<span class="text-sm font-medium text-gray-700 dark:text-gray-100"${props.i18n ? " data-i18n=\"" + sanitizer(props.i18n) + "\"" : ""}>${sanitizer(props.title)}</span>
 			<select class="w-full p-2 border border-gray-300 rounded-md dark:bg-background_dark dark:border-gray-600 dark:text-gray-200">
-				${props.options.map((option) => `<option value="${option}">${option}</option>`).join("")}
+				${props.options.map((option) => `<option value="${sanitizer(option)}">${sanitizer(option)}</option>`).join("")}
 			</select>
 		</div>
 	`;

@@ -41,6 +41,12 @@ export interface UsersSdkToken extends UsersSdkAuthorizeResponse {
 	token: string;
 }
 
+export interface UsersSdkStats {
+	wonMatches: number;
+	lostMatches: number;
+	totalMatches: number
+}
+
 export interface UsersSdkOptions {
 	/**
 	 * Base URL for the API endpoint.
@@ -369,6 +375,10 @@ class UsersSdk {
 
 	public async deleteUserFriend(uuid: string, friendUuid: string): Promise<AxiosResponse<void>> {
 		return this.apiRequest<void>("delete", `${uuid}/friends/${friendUuid}`);
+	}
+
+	public async getUserStats(uuid: string): Promise<AxiosResponse<UsersSdkStats>> {
+		return this.apiRequest<UsersSdkStats>("get", `${uuid}/stats`);
 	}
 }
 

@@ -34,6 +34,14 @@
       }
     }
   },
+  "user": {
+      "matches": {
+        "total": "Total Matches",
+        "won": "Matches Won",
+        "lost": "Matches Lost",
+        "viewHistory": "View History"
+      }
+  },
   "header": {
     "usermenu": {
       "login": "Login",
@@ -63,6 +71,9 @@
     "history": {
       "label": "History",
       "title": "History"
+    },
+    "profile": {
+      "label": "Profile"
     },
     "settings": {
       "label": "Settings",
