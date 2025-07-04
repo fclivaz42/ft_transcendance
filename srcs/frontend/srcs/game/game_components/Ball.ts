@@ -4,7 +4,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh.js";
 import { BallInit, BallUpdate } from "../types.js"; // Assurez-vous que le chemin est correct
 import { MeshBuilder, StandardMaterial, Color3} from "@babylonjs/core";
 
-import { BallEffects } from "./BallFx.js";
+import { BallEffects } from "./BallEffects.js";
 
 export class Ball {
     private mesh: Mesh;

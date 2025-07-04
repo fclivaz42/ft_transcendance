@@ -210,7 +210,7 @@ class PongGameManager {
 			console.log("🧪 Test beep déclenché");
 			// this.playTestBeep();
 		};
-		testContainer.appendChild(generalTestButton);
+		// testContainer.appendChild(generalTestButton);
 
 		// Boutons pour tester chaque fichier MP3 individuellement FONCTIONNE
 		const audioFiles = [
@@ -230,19 +230,19 @@ class PongGameManager {
 				console.log(`🧪 Test direct du fichier: ${audio.file}`);
 				this.playDirectAudioFile(`/assets/sounds/${audio.file}`, audio.name);
 			};
-			testContainer.appendChild(button);
+			// testContainer.appendChild(button);
 		});
 
 		// Séparateur
 		const separator = document.createElement('div');
 		separator.style.cssText = 'height: 1px; background: #666; margin: 10px 0; width: 100%;';
-		testContainer.appendChild(separator);
+		// testContainer.appendChild(separator);
 
 		// Titre pour les tests HTML5 Audio via AudioManager
 		const html5Title = document.createElement('div');
 		html5Title.innerHTML = '� Tests AudioManager HTML5';
 		html5Title.style.cssText = 'color: white; font-weight: bold; text-align: center; margin: 5px 0;';
-		testContainer.appendChild(html5Title);
+		// testContainer.appendChild(html5Title);
 
 		// Boutons pour tester les sons via AudioManager HTML5
 		// const audioManagerSounds = [
@@ -287,7 +287,7 @@ class PongGameManager {
 				audio.remove();
 			});
 		};
-		testContainer.appendChild(stopButton);
+		// testContainer.appendChild(stopButton);
 
 		// Bouton pour afficher les infos des pools
 		const infoButton = document.createElement('button');
@@ -298,24 +298,24 @@ class PongGameManager {
 			const info = this.audioManager?.getPoolInfo();
 			console.log(info);
 		};
-		testContainer.appendChild(infoButton);
+		// testContainer.appendChild(infoButton);
 
 		// Séparateur pour les boutons témoins
 		const witnessSeperator = document.createElement('div');
 		witnessSeperator.style.cssText = 'height: 1px; background: #666; margin: 10px 0; width: 100%;';
-		testContainer.appendChild(witnessSeperator);
+		// testContainer.appendChild(witnessSeperator);
 
 		// Titre pour les boutons témoins
 		const witnessTitle = document.createElement('div');
 		witnessTitle.innerHTML = '👁️ Témoins Collisions';
 		witnessTitle.style.cssText = 'color: white; font-weight: bold; text-align: center; margin: 5px 0;';
-		testContainer.appendChild(witnessTitle);
+		// testContainer.appendChild(witnessTitle);
 
 		// Explication des témoins
 		const witnessExplanation = document.createElement('div');
 		witnessExplanation.innerHTML = 'Ces boutons s\'activent automatiquement lors des collisions WebSocket et jouent le son correspondant. Vous pouvez aussi les cliquer pour tester.';
 		witnessExplanation.style.cssText = 'color: #ccc; font-size: 11px; text-align: center; margin: 5px 0; padding: 0 10px; line-height: 1.3;';
-		testContainer.appendChild(witnessExplanation);
+		// testContainer.appendChild(witnessExplanation);
 
 		// Bouton témoin pour collisions paddle
 		const paddleWitnessButton = document.createElement('button');
@@ -326,7 +326,7 @@ class PongGameManager {
 			// Test manuel pour voir l'effet visuel ET auditif
 			this.triggerPaddleWitness();
 		};
-		testContainer.appendChild(paddleWitnessButton);
+		// testContainer.appendChild(paddleWitnessButton);
 
 		// Bouton témoin pour collisions mur
 		const wallWitnessButton = document.createElement('button');
@@ -337,7 +337,7 @@ class PongGameManager {
 			// Test manuel pour voir l'effet visuel ET auditif
 			this.triggerWallWitness();
 		};
-		testContainer.appendChild(wallWitnessButton);
+		// testContainer.appendChild(wallWitnessButton);
 		
 		document.body.appendChild(testContainer);
 	}
