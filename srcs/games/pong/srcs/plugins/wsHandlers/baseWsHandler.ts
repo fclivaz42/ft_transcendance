@@ -6,6 +6,7 @@ import PlayerSession from "../game/classes/PlayerSession.ts";
 import Ball from "../game/classes/Ball.ts";
 import Game from "../game/classes/GameClass.ts";
 import GameRoom from "../game/classes/GameRoom.ts";
+import TournamentManager from "../game/classes/TournamentManager.ts";
 
 interface GameWsQuery {
 	userId: string;
@@ -22,8 +23,8 @@ interface ClientMessage {
 }
 
 interface CreateWsHandlerParams {
-	mode: "remote" | "friend_host" | "friend_join" | "local" | "computer";
-	manager: RoomManager;
+	mode: "remote" | "friend_host" | "friend_join" | "local" | "computer" | "tournament";
+	manager: RoomManager | TournamentManager;
 }
 
 export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
@@ -65,6 +66,9 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 				userId: query.userId,
 				mode: 'computer'
 			});
+		} else if (mode === 'tournament') {
+			session = new PlayerSession(socket, query.userId);
+			(manager as TournamentManager).assignTournamentPlayer(session);
 		} else {
 			session = manager.assignPlayer(socket, {
 				userId: query.userId,

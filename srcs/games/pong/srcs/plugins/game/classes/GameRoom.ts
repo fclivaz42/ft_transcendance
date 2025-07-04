@@ -3,6 +3,7 @@ import Paddle from "./Paddle.ts";
 import PlayerSession from "./PlayerSession.ts";
 import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
 import { DEFAULT_FPS } from "./Playfield.ts";
+import { type LobbyBroadcastPayload } from "./TournamentLobby.ts";
 
 interface BallUpdate {
 	curr_speed: number,
@@ -221,7 +222,7 @@ export default class GameRoom {
 		}
 	}
 
-	public broadcast(message: GameMessage): void {
+	public broadcast(message: GameMessage | LobbyBroadcastPayload): void {
 		if (message.type !== 'update') {
 			console.log(JSON.stringify(message, null, 2));
 		}
@@ -234,7 +235,7 @@ export default class GameRoom {
 		}
 	}
 
-	public floodlessBroadcast(message: GameMessage): void {
+	public floodlessBroadcast(message: GameMessage | LobbyBroadcastPayload): void {
 		
 		if (message.type === 'collision') {
 			const payload = message.payload;
@@ -321,7 +322,7 @@ export default class GameRoom {
 		return updatePayload;
 	}
 
-	private buildPlayerConnectedPayload(sessions: PlayerSession): PlayerConnectedPayload {
+	protected buildPlayerConnectedPayload(sessions: PlayerSession): PlayerConnectedPayload {
 		const playerConnectedPayload: PlayerConnectedPayload = {
 			type: "connect",
 			payload: {
