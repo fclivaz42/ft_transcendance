@@ -173,12 +173,6 @@ export default class AudioManager {
 
     // Méthode principale pour jouer un son
     public playSound(soundName: string, volume?: number, playbackRate?: number): void {
-        if (!this._enabled) {
-            console.log(`🔇 Audio désactivé, ignorer: ${soundName}`);
-            return;
-        }
-
-        console.log(`🎵 Demande de lecture du son: ${soundName}`);
 
         // Utiliser HTML5 Audio uniquement
         this.playHtml5Sound(soundName, volume, playbackRate);

@@ -71,8 +71,33 @@ class PongGameManager {
 		}
 	}
 
+	// private async initializeFrontElements(payload: InitPayload["payload"]) {
+	// 	this.getFrontElements.canvasContainer.querySelectorAll("[data-pong-displayname]").forEach((element) => {
+	// 		const identifier = element.getAttribute("data-pong-displayname");
+	// 		if (!identifier || !(identifier in payload)) throw new Error(`Identifier ${identifier} not found in payload.`);
+	// 		const playerData = identifier === "p1" ? payload.connectedPlayers.p1 : payload.connectedPlayers.p2;
+	// 		const avatarElement = this.getFrontElements.canvasContainer.querySelector<HTMLImageElement>(`[data-pong-avatar="${identifier}"]`);
+	// 		if (playerData === undefined) {
+	// 			avatarElement?.replaceWith(await createUserAvatar({isComputer: true, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
+	// 			element.textContent = i18nHandler.getValue("pong.computer") || "Computer";
+	// 			return;
+	// 		}
+	// 		const user = UserHandler.fetchUser(playerData);
+	// 		user.then(async (userData) => {
+	// 			if (!userData) throw new Error(`User data for ${identifier} not found.`);
+	// 			element.textContent = userData.DisplayName;
+	// 			avatarElement?.replaceWith(await createUserAvatar({playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
+	// 		}).catch((error) => {
+	// 			console.error(`Error fetching user data for ${identifier}:`, error);
+	// 			element.textContent = "Unknown User";
+	// 		});
+	// 	});
+	// }
+
+
 	private async initializeFrontElements(payload: InitPayload["payload"]) {
-		this.getFrontElements.canvasContainer.querySelectorAll("[data-pong-displayname]").forEach((element) => {
+		const displaynameElements = this.getFrontElements.canvasContainer.querySelectorAll("[data-pong-displayname]");
+		for (const element of displaynameElements) {
 			const identifier = element.getAttribute("data-pong-displayname");
 			if (!identifier || !(identifier in payload)) throw new Error(`Identifier ${identifier} not found in payload.`);
 			const playerData = identifier === "p1" ? payload.connectedPlayers.p1 : payload.connectedPlayers.p2;
@@ -80,18 +105,22 @@ class PongGameManager {
 			if (playerData === undefined) {
 				avatarElement?.replaceWith(await createUserAvatar({isComputer: true, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
 				element.textContent = i18nHandler.getValue("pong.computer") || "Computer";
-				return;
+				continue; 
 			}
-			const user = UserHandler.fetchUser(playerData);
-			user.then(async (userData) => {
-				if (!userData) throw new Error(`User data for ${identifier} not found.`);
+			try {
+				const userData = await UserHandler.fetchUser(playerData);
+				if (!userData) {
+					// Si userData est null/undefined, lancez une erreur ou gérez-le gracieusement
+					throw new Error(`User data for ${identifier} not found.`);
+				}
 				element.textContent = userData.DisplayName;
 				avatarElement?.replaceWith(await createUserAvatar({playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
-			}).catch((error) => {
+			} catch (error) {
+				// Gestion des erreurs si la récupération des données utilisateur échoue
 				console.error(`Error fetching user data for ${identifier}:`, error);
 				element.textContent = "Unknown User";
-			});
-		});
+			}
+		}
 	}
 
 	public async initialize(addr: string) {
@@ -141,9 +170,9 @@ class PongGameManager {
 			(payload) => this.getField.update(payload),
 			(payload) => { 
                 if (payload.collider === "player1" || payload.collider === "player2" || payload.collider === "p1" || payload.collider === "p2") {
-                    this.audioManager?.playSound("punch"); // raquette
+                    this.playDirectAudioFile("/assets/sounds/punch.mp3", "punch");//raquette
                 } else { 
-                    this.audioManager?.playSound("bounce"); // un mur
+                    this.playDirectAudioFile("/assets/sounds/bounce.mp3", "bounce");// un mur
                 }
             },
 			 addr
@@ -171,6 +200,44 @@ class PongGameManager {
 			lastCheck: undefined
 		}
 	}
+
+	// Méthode pour jouer un fichier audio directement avec HTML5
+	private playDirectAudioFile(url: string, name: string): void {
+		try {
+			
+			// Supprimer l'ancien audio s'il existe
+			const existingAudio = document.getElementById(`direct-audio-${name}`) as HTMLAudioElement;
+			if (existingAudio) {
+				existingAudio.remove();
+			}
+
+			// Créer un nouvel élément audio HTML5
+			const audio = document.createElement('audio');
+			audio.id = `direct-audio-${name}`;
+			audio.src = url;
+			audio.volume = 0.7;
+			audio.preload = 'auto';
+
+			// Ajouter les listeners d'événements
+			audio.onloadstart = () => console.log(`📥 Début du chargement: ${name}`);
+			audio.onloadeddata = () => console.log(`✅ Données chargées: ${name}`);
+			audio.oncanplay = () => console.log(`▶️ Prêt à jouer: ${name}`);
+			audio.onplay = () => console.log(`🎵 Lecture démarrée: ${name}`);
+			audio.onended = () => console.log(`🏁 Lecture terminée: ${name}`);
+			audio.onerror = (e) => console.error(`❌ Erreur audio pour ${name}:`, e);
+
+			// Ajouter à la page et jouer
+			document.body.appendChild(audio);
+			
+			audio.play()
+				.then(() => console.log(`✅ Audio joué avec succès: ${name}`))
+				.catch(error => console.error(`❌ Erreur lors de la lecture de ${name}:`, error));
+
+		} catch (error) {
+			console.error(`❌ Erreur création audio ${name}:`, error);
+		}
+	}
+
 	
 
 	private get getEngine(): Engine {
