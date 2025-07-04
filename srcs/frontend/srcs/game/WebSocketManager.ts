@@ -1,3 +1,7 @@
+/*
+new! 4e arguments pour les collisions
+->PongGameManager -> audioManager
+*/
 import PongGameManager from "../managers/PongGameManager.js";
 import AudioManager from "../managers/audioManager.js";
 import { GameField } from "./GameField.js";

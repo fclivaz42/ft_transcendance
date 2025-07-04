@@ -1,17 +1,14 @@
-// WebSocketManager est configuré pour renvoyer les informations de collision à PongGameManager, qui, à son tour, utilise l'audioManager pour jouer le son approprié.
+
 import { Engine } from "@babylonjs/core/Engines/engine.js";
 
 import { InitHandler, WebSocketManager } from "../game/WebSocketManager.js";
 import { GameField } from "../game/GameField.js";
 import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
-import { InitPayload, CollisionPayload } from "../game/types.js";
+import { InitPayload } from "../game/types.js";
 import UserHandler from "../handlers/UserHandler.js";
 import { i18nHandler } from "../handlers/i18nHandler.js";
 import createUserAvatar from "../components/usermenu/userAvatar.js";
-
-import AudioManager from "./audioManager.js";
-import { WebSocketManager } from "../game/WebSocketManager.js";
 
 function enforceDefined<T>(value: T | undefined, message: string): T {
 	if (!value)
@@ -31,7 +28,6 @@ class PongGameManager {
 	private started: boolean = false;
 	private frontElements: frontElements | undefined;
 	private websocketManager: WebSocketManager | undefined;
-	private audioManager: AudioManager | undefined;
 	private pingInterval: {
 		lastCheck: number | undefined;
 		ping: number | undefined;
@@ -72,7 +68,7 @@ class PongGameManager {
 	}
 
 	private async initializeFrontElements(payload: InitPayload["payload"]) {
-		this.getFrontElements.canvasContainer.querySelectorAll("[data-pong-displayname]").forEach((element) => {
+		this.getFrontElements.canvasContainer.querySelectorAll("[data-pong-displayname]").forEach(async (element) => {
 			const identifier = element.getAttribute("data-pong-displayname");
 			if (!identifier || !(identifier in payload)) throw new Error(`Identifier ${identifier} not found in payload.`);
 			const playerData = identifier === "p1" ? payload.connectedPlayers.p1 : payload.connectedPlayers.p2;
@@ -104,19 +100,7 @@ class PongGameManager {
 		}
 		this.engine = new Engine(this.getFrontElements.canvas, true);
 		this.field = new GameField(this.engine);
-		
 
-		this.audioManager = AudioManager.getInstance() || new AudioManager();
-		// Active l'audio après première interaction utilisateur
-		const enableAudio = () => {
-			this.audioManager?.unmuteAll();
-			document.removeEventListener('click', enableAudio);
-			document.removeEventListener('keydown', enableAudio);
-		};
-		document.addEventListener('click', enableAudio, { once: true });
-		document.addEventListener('keydown', enableAudio, { once: true });
-
-		// ajouter un argument pour le audiomanager
 		this.websocketManager = new WebSocketManager(
 			(payload) => {
 				console.log("WebSocket payload received:", payload);
@@ -126,7 +110,6 @@ class PongGameManager {
 					frameManager.frameChild = this.getFrontElements.canvasContainer;
 					this.getEngine.resize();
 					this.started = true;
-					this.audioManager?.playSound("gamestart");//pas sur
 					this.getEngine.runRenderLoop(() => {
 						if (!this.pingInterval.sentPing && (!this.pingInterval.lastCheck || Date.now() - this.pingInterval.lastCheck > 3000)) {
 							this.calculatePing();
@@ -138,21 +121,8 @@ class PongGameManager {
 					});
 				}
 			},
-			(payload) => this.getField.update(payload),
-			(payload) => { 
-                if (payload.collider === "player1" || payload.collider === "player2" || payload.collider === "p1" || payload.collider === "p2") {
-                    this.audioManager?.playSound("punch"); // raquette
-                } else { 
-                    this.audioManager?.playSound("bounce"); // un mur
-                }
-            },
-			 addr
+			(payload) => this.getField.update(payload), addr
 		);
-		
-		// Passer l'AudioManager au WebSocketManager 
-		if (this.audioManager) {
-			this.websocketManager.setAudioManager(this.audioManager);
-		}
 
 		window.addEventListener("resize", () => {
 			this.getEngine.resize();
@@ -164,14 +134,12 @@ class PongGameManager {
 				for (const element of Object.values(this.frontElements))
 					if (element) element.remove();
 		this.frontElements = undefined;
-		// this.audioManager = undefined; c'est singleton-> arreter le son avec audiomanager
 		this.pingInterval = {
 			ping: undefined,
 			sentPing: undefined,
 			lastCheck: undefined
 		}
 	}
-	
 
 	private get getEngine(): Engine {
 		if (!this.engine)
