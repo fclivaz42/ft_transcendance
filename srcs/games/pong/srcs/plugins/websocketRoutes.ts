@@ -27,7 +27,7 @@ const websocketRoutes: FastifyPluginAsync = async (
 		wsHandlers.computer(manager)
 	);
 	fastify.get(
-		"/game/tournamnet",
+		"/game/tournament",
 		{ websocket: true },
 		wsHandlers.tournament(new TournamentManager())
 	);
