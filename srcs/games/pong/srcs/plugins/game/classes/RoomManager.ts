@@ -5,7 +5,7 @@ import fastifyWebsocket, { type WebSocket } from "@fastify/websocket";
 
 type GameMode = 'remote' | 'friend_host' | 'friend_join' | 'local' | 'computer';
 
-interface AssignPlayerOptions {
+export interface AssignPlayerOptions {
 	userId: string;
 	mode?: GameMode;
 	roomId?: string | null;
@@ -16,15 +16,15 @@ export default class RoomManager {
 	private _connectedSessions: Map<string, PlayerSession> = new Map();
 
 	/* ROOM ID GENERATION -------------------------------------------------------------------------- */
-	private _generateRandomLetter(): string {
+	protected _generateRandomLetter(): string {
 		return String.fromCharCode(65 + Math.floor(Math.random() * 26));
 	}
 
-	private _generateRandomNumber(): number {
+	protected _generateRandomNumber(): number {
 		return Math.floor(Math.random() * 10);
 	}
 
-	private _shuffle<T>(arr: T[]): T[] {
+	protected _shuffle<T>(arr: T[]): T[] {
 		const copy = [...arr];
 		let currentIndex: number = copy.length;
 
@@ -38,7 +38,7 @@ export default class RoomManager {
 		return copy;
 	}
 
-	private _generateRoomId(): string {
+	protected _generateRoomId(): string {
 		const letters = Array.from({ length: 2 }, () => this._generateRandomLetter());
 		const numbers = Array.from({ length: 2 }, () => this._generateRandomNumber().toString());
 		return this._shuffle(letters.concat(numbers)).join('');

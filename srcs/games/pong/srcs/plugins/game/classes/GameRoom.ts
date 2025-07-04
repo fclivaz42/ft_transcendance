@@ -146,19 +146,21 @@ export default class GameRoom {
 		return this.score;
 	}
 
-	public addPlayer(playerSession: PlayerSession): void {
+	public addPlayer(playerSession: PlayerSession, paddleIdOverride: boolean = false): void {
+
 		this.players.push(playerSession);
 		playerSession.setRoom(this);
 		this.broadcast(this.buildPlayerConnectedPayload(playerSession))
 
-		if (this.players.length === 1) {
+		if (paddleIdOverride) {
+			playerSession.setPaddleId('p2');
+		} else if (this.players.length === 1) {
 			playerSession.setPaddleId('p1');
-		} else if (this.players.length === 2) {
+		} else if (this.players.length === 2 ) {
 			playerSession.setPaddleId('p2');
 		}
 
 		if (this.isFull() || this.lock) {
-			// console.log(`Room ${this.id} full with players: [${this.players[0].getUserId()}, ${this.players[1].getUserId()}]`);
 			console.log("GAME READY TO BE STARTED.");
 			this.startGame();
 		}

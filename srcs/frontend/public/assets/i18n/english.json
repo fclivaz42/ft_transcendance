@@ -69,7 +69,8 @@
         "play": "Play now",
         "solo": "Solo mode",
         "join": "Join a Private Game",
-        "create": "Create a Private Game"
+        "create": "Create a Private Game",
+        "tournament": "Play in a Tournament"
       }
     },
     "friend": {

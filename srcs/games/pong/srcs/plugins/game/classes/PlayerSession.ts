@@ -8,21 +8,23 @@ export interface OutgoingMessage {
 }
 
 export default class PlayerSession {
-	private _socket: WebSocket;
+	private _socket: WebSocket | null;
 	private _userId: string; // remove | null ;
 	private _playerReady: boolean;
 	private _room: GameRoom | null;
 	private _paddleId: string | null;
+	public readonly isAI: boolean;
 
-	constructor(socket: WebSocket, userId: string) { // removed | null = null
+	constructor(socket: WebSocket | null, userId: string) { // removed | null = null
 		this._socket = socket;
 		this._userId = userId;
 		this._playerReady = false;
 		this._room = null;
 		this._paddleId = null;
+		this.isAI = this._socket ? false : true;
 	}
 
-	public getSocket(): WebSocket { return this._socket; }
+	public getSocket(): WebSocket | null { return this._socket; }
 	public getUserId(): string { return this._userId; } // removed | null
 	public isReady(): boolean { return this._playerReady; }
 	public getPaddleId(): string | null { return this._paddleId; }
@@ -46,7 +48,8 @@ export default class PlayerSession {
 
 	public send(message: OutgoingMessage): void {
 		try {
-			this._socket.send(JSON.stringify(message));
+			if (this._socket)
+				this._socket.send(JSON.stringify(message));
 		} catch (err) {
 			console.error("Failed to send message to client:", err);
 		}
