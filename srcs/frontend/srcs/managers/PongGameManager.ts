@@ -66,12 +66,10 @@ class PongGameManager {
 	}
 
 	public reset() {
-		if (this.started) {
-			this.started = false;
-			this.cleanupGame();
-			this.websocketManager?.close();
-			this.engine?.dispose();
-		}
+		this.started = false;
+		this.cleanupGame();
+		this.websocketManager?.close();
+		this.engine?.dispose();
 	}
 
 	private async initializeFrontElements(payload: InitPayload["payload"]) {

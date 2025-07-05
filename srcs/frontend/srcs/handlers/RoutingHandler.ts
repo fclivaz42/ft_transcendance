@@ -37,6 +37,7 @@ class RoutingHandler {
 	}
 
 	async displayRoute() {
+		PongGameManager.reset();
 		this._url = new URL(window.location.href);
 		for(const param of this._url.searchParams.keys()) {
 			if (NotificationDialogLevels.includes(param as NotificationDialogLevel)) {
@@ -94,7 +95,6 @@ class RoutingHandler {
 		else
 			window.history.replaceState({}, "", url);
 		this.displayRoute();
-		PongGameManager.reset();
 	}
 
 	get url(): URL {
