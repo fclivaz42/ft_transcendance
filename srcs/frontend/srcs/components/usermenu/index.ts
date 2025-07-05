@@ -13,6 +13,7 @@ import { validateDisplayName, validateEmail, validatePassword, validateConfirmPa
 import { simpleupdateFieldAppearance } from '../input/utils.js';
 import { createPasswordInput, CustomPasswordInputContainer, checkPasswordStrength } from '../input/createPasswordInput.js';
 import { createPasswordStrengthList } from "../input/passwordStrengh.js";
+import { sanitizer } from "../../helpers/sanitizer";
 
 function maskEmail(email: string): string {
     const [user, domain] = email.split("@");
@@ -23,15 +24,9 @@ function maskEmail(email: string): string {
 }
 
 
-export function createUserDialog(): HTMLDialogElement {
+export async function createUserDialog(): Promise<HTMLDialogElement> {
     const dialog = createDialog({ allowClose: true });
     dialog.className += " w-[500px] max-w-[90vw]";
-
-    const profilePicture = createUserAvatar({
-        sizeClass: "w-32 h-32 mb-2",
-        editable: true,
-    });
-
 
     const userIdentifier = document.createElement("div");
     userIdentifier.className = "flex flex-col items-center";
@@ -251,7 +246,10 @@ export function createUserDialog(): HTMLDialogElement {
     buttonsContainer.appendChild(cancelButton);
     buttonsContainer.appendChild(saveButton);
 
-    dialog.appendChild(profilePicture);
+    dialog.appendChild(await createUserAvatar({
+        sizeClass: "w-32 h-32 mb-2",
+        editable: true,
+    }));
     dialog.appendChild(userIdentifier);
     dialog.appendChild(logoutButton);
     dialog.appendChild(hr);
@@ -377,19 +375,16 @@ export function createUserDialog(): HTMLDialogElement {
 }
 
 
-export function createUserMenuSettings(): HTMLDivElement {
+export async function createUserMenuSettings(): Promise<HTMLDivElement> {
     const template = document.createElement("template");
     template.innerHTML = `
         <div id="userMenuSettings" class="flex gap-x-2 items-center justify-center cursor-pointer">
-            <span data-user="username" class="text-lg font-semibold text-gray-800 dark:text-gray-200">${UserHandler.displayName || "User Name"}</span>
+            <span data-user="username" class="text-lg font-semibold text-gray-800 dark:text-gray-200">${sanitizer(UserHandler.displayName || "User Name")}</span>
         </div>
     `;
     const userMenuSettings = template.content.firstElementChild as HTMLDivElement;
-    userMenuSettings.appendChild(createUserAvatar());
-    userMenuSettings.onclick = () => {
-        const dialog = createUserDialog();
-        dialog.showModal();
-    };
+    userMenuSettings.appendChild(await createUserAvatar({disableClick: true}));
+    userMenuSettings.onclick = async () => (await createUserDialog()).showModal();
     return userMenuSettings;
 }
 

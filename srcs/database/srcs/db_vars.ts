@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/30 18:24:58 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/05 22:05:38 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -65,6 +65,7 @@ const PlayersTable: db_table =
 		"OAuthID",
 		"FriendsList",
 		"Private",
+		"LastAlive",
 		"Admin"
 	],
 	"Arguments": [
@@ -74,6 +75,7 @@ const PlayersTable: db_table =
 		"TEXT NOT NULL",
 		"TEXT DEFAULT NULL",
 		"TEXT DEFAULT NULL",
+		"INTEGER DEFAULT 0",
 		"INTEGER DEFAULT 0",
 		"INTEGER DEFAULT 0"
 	],

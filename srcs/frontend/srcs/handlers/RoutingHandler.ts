@@ -37,6 +37,7 @@ class RoutingHandler {
 	}
 
 	async displayRoute() {
+		PongGameManager.reset();
 		this._url = new URL(window.location.href);
 		for(const param of this._url.searchParams.keys()) {
 			if (NotificationDialogLevels.includes(param as NotificationDialogLevel)) {
@@ -64,7 +65,7 @@ class RoutingHandler {
 					title: i18nHandler.getValue("notification.generic.errorTitle"),
 					message: i18nHandler.getValue(err.message || "notification.generic.errorMessage"),
 				});
-				this.setRoute("/");
+				this.setRoute("/", false);
 			}
 		} else {
 			console.warn(`No component found for route: ${currentRoute}`);
@@ -74,19 +75,26 @@ class RoutingHandler {
 		}
 	}
 
-	updateUrl(): void {
-		window.history.replaceState({}, "", this._url);
+	updateUrl(url?: string): void {
+		if (!url)
+			window.history.replaceState({}, "", this._url);
+		else
+			window.history.replaceState({}, "", new URL(url, window.location.origin).toString());
 	}
 
-	setRoute(route: string): void {
+	setRoute(route: string, save: boolean = true): void {
+		if (route === this._url.pathname)
+			save = false;
 		const url = new URL(route, window.location.origin);
 		if (!validRoutes[url.pathname]) {
 			console.warn(`Invalid route: ${url.pathname}`);
 			return;
 		}
-		window.history.pushState({}, "", url);
+		if (save)
+			window.history.pushState({}, "", url);
+		else
+			window.history.replaceState({}, "", url);
 		this.displayRoute();
-		PongGameManager.reset();
 	}
 
 	get url(): URL {

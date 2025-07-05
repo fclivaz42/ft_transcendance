@@ -1,5 +1,6 @@
 import { i18nHandler } from "../../handlers/i18nHandler";
 import RoutingHandler from "../../handlers/RoutingHandler";
+import { sanitizer } from "../../helpers/sanitizer";
 
 export default function createLoadingFrame(): HTMLDivElement {
 	const searchParams = RoutingHandler.searchParams;
@@ -14,7 +15,7 @@ export default function createLoadingFrame(): HTMLDivElement {
 				<span class="sr-only">Loading...</span>
 			</div>
 			<h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mt-4">
-				${i18nHandler.getValue("generic.loading") || "Loading..."}
+				${sanitizer(i18nHandler.getValue("generic.loading"))}
 		</div>
 	`;
 	const userFrame = template.content.firstElementChild as HTMLDivElement;

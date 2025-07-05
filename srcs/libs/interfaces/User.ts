@@ -6,6 +6,7 @@ export interface User {
 	OAuthID?: string,
 	FriendsList?: Array<string>,
 	Private?: number,
+	LastAlive?: number,
 	Avatar?: string,
 };
 
