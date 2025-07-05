@@ -1,4 +1,3 @@
-
 import Paddle from "./Paddle.ts";
 import Wall from "./Wall.ts";
 import Ball from "./Ball.ts";
@@ -54,78 +53,57 @@ export default class Game {
 
 		/* Building all Walls */
 		this._walls = {
-			"northWall": new Wall(
-				this._scene,
-				"northWall",
-				new Vector3(0, 8.05, 0), {
+			northWall: new Wall(this._scene, "northWall", new Vector3(0, 8.05, 0), {
 				color: Color3.White(),
 				width: WALL_WIDTH,
 				height: WALL_HEIGHT,
-				depth: WALL_DEPTH
+				depth: WALL_DEPTH,
 			}),
-			"southWall": new Wall(
-				this._scene,
-				"southWall",
-				new Vector3(0, -8.05, 0), {
+			southWall: new Wall(this._scene, "southWall", new Vector3(0, -8.05, 0), {
 				color: Color3.White(),
 				width: WALL_WIDTH,
 				height: WALL_HEIGHT,
-				depth: WALL_DEPTH
+				depth: WALL_DEPTH,
 			}),
-			"eastWall": new Wall(
-				this._scene,
-				"eastWall",
-				new Vector3(13.7, 0, 0), {
+			eastWall: new Wall(this._scene, "eastWall", new Vector3(13.7, 0, 0), {
 				color: Color3.White(),
 				width: GOAL_WIDTH,
 				height: GOAL_HEIGHT,
-				depth: GOAL_DEPTH
+				depth: GOAL_DEPTH,
 			}),
-			"westWall": new Wall(
-				this._scene,
-				"westWall",
-				new Vector3(-13.7, 0, 0), {
+			westWall: new Wall(this._scene, "westWall", new Vector3(-13.7, 0, 0), {
 				color: Color3.White(),
 				width: GOAL_WIDTH,
 				height: GOAL_HEIGHT,
-				depth: GOAL_DEPTH
+				depth: GOAL_DEPTH,
 			}),
-		}
-		const bounds: { minY: number, maxY: number } = this.getVerticalBounds();
+		};
+		const bounds: { minY: number; maxY: number } = this.getVerticalBounds();
 
 		/* Creating Player 1 Paddle */
-		this._p1 = new Paddle(
-			this._scene,
-			"player1",
-			new Vector3(-12.5, 0, 0), {
+		this._p1 = new Paddle(this._scene, "player1", new Vector3(-12.5, 0, 0), {
 			color: Color3.White(),
 			speed: PADDLE_SPEED,
 			height: PLAYER_HEIGHT,
-			width: PLAYER_WIDTH
+			width: PLAYER_WIDTH,
 		});
 		this._p1.getMesh().showBoundingBox = SHOW_BOXES;
 		this._p1.setVerticalBounds(bounds);
 
 		/* Creating Player 2 Paddle */
-		this._p2 = new Paddle(
-			this._scene,
-			"player2",
-			new Vector3(12.5, 0, 0), {
+		this._p2 = new Paddle(this._scene, "player2", new Vector3(12.5, 0, 0), {
 			color: Color3.White(),
 			speed: PADDLE_SPEED,
 			height: PLAYER_HEIGHT,
-			width: PLAYER_WIDTH
+			width: PLAYER_WIDTH,
 		});
 		this._p2.getMesh().showBoundingBox = SHOW_BOXES;
 		this._p2.setVerticalBounds(bounds);
 
 		/* Creating Ball */
-		this._ball = new Ball(
-			this._scene,
-			"ball",
-			new Vector3(0, 0, 0), {
+		this._ball = new Ball(this._scene, "ball", new Vector3(0, 0, 0), {
 			color: Color3.White(),
-			diameter: BALL_DIAMETER
+			diameter: BALL_DIAMETER,
 		});
 		this._ball.setBaseSpeed(BALL_SPEED);
 		this._ball.getMesh().showBoundingBox = SHOW_BOXES;
@@ -163,7 +141,7 @@ export default class Game {
 			this._p1,
 			this._p2,
 		]);
-	};
+	}
 
 	public setP1IA(isAI: boolean) {
 		this._p1.setAI(isAI);
@@ -198,11 +176,15 @@ export default class Game {
 			return { minY: -7.5, maxY: 7.5 }; // un-hardcode later // these are defaults in case something goes wrong
 		}
 
-		const northHalf = (north.scaling.y || 1) * (north.getBoundingInfo()?.boundingBox.extendSize.y ?? 0.25);
-		const maxY = (north.position.y - northHalf);
+		const northHalf =
+			(north.scaling.y || 1) *
+			(north.getBoundingInfo()?.boundingBox.extendSize.y ?? 0.25);
+		const maxY = north.position.y - northHalf;
 
-		const southHalf = (south.scaling.y || 1) * (south.getBoundingInfo()?.boundingBox.extendSize.y ?? 0.25);
-		const minY = (south.position.y - southHalf - (-0.5));
+		const southHalf =
+			(south.scaling.y || 1) *
+			(south.getBoundingInfo()?.boundingBox.extendSize.y ?? 0.25);
+		const minY = south.position.y - southHalf - -0.5;
 		return { minY, maxY };
 	}
 
@@ -210,7 +192,7 @@ export default class Game {
 		const retWalls: Record<string, ReturnType<Wall["getInitInfo"]>> = {};
 
 		for (const [name, wall] of Object.entries(this._walls)) {
-			retWalls[name] = wall.getInitInfo()
+			retWalls[name] = wall.getInitInfo();
 		}
 		return retWalls;
 	}

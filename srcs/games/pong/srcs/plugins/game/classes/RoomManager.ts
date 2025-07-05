@@ -1,9 +1,8 @@
-
 import GameRoom from "./GameRoom.ts";
 import PlayerSession from "./PlayerSession.ts";
 import fastifyWebsocket, { type WebSocket } from "@fastify/websocket";
 
-type GameMode = 'remote' | 'friend_host' | 'friend_join' | 'local' | 'computer';
+type GameMode = "remote" | "friend_host" | "friend_join" | "local" | "computer";
 
 export interface AssignPlayerOptions {
 	userId: string;
@@ -32,16 +31,21 @@ export default class RoomManager {
 			let randomIndex: number = Math.floor(Math.random() * currentIndex);
 			currentIndex--;
 			[copy[currentIndex], copy[randomIndex]] = [
-				copy[randomIndex], copy[currentIndex]
+				copy[randomIndex],
+				copy[currentIndex],
 			];
 		}
 		return copy;
 	}
 
 	protected _generateRoomId(): string {
-		const letters = Array.from({ length: 2 }, () => this._generateRandomLetter());
-		const numbers = Array.from({ length: 2 }, () => this._generateRandomNumber().toString());
-		return this._shuffle(letters.concat(numbers)).join('');
+		const letters = Array.from({ length: 2 }, () =>
+			this._generateRandomLetter()
+		);
+		const numbers = Array.from({ length: 2 }, () =>
+			this._generateRandomNumber().toString()
+		);
+		return this._shuffle(letters.concat(numbers)).join("");
 	}
 	/* --------------------------------------------------------------------------------------------- */
 
@@ -65,7 +69,10 @@ export default class RoomManager {
 		return null;
 	}
 
-	public assignPlayer(socket: WebSocket, options: AssignPlayerOptions): PlayerSession {
+	public assignPlayer(
+		socket: WebSocket,
+		options: AssignPlayerOptions
+	): PlayerSession {
 		const { userId, mode, roomId = null } = options;
 		const session = new PlayerSession(socket, userId);
 		this.addSession(session);
@@ -78,7 +85,7 @@ export default class RoomManager {
 				room.addPlayer(session);
 				break;
 			case "friend_host":
-				room = roomId && this._rooms.get(roomId) || this.createRoom();
+				room = (roomId && this._rooms.get(roomId)) || this.createRoom();
 				room.addPlayer(session);
 				break;
 			case "friend_join":
@@ -86,7 +93,7 @@ export default class RoomManager {
 					room = this._rooms.get(roomId);
 					room?.addPlayer(session);
 				} else {
-					console.log(`Room: ${roomId} not found.`)
+					console.log(`Room: ${roomId} not found.`);
 					socket.close();
 				}
 				break;
@@ -128,7 +135,6 @@ export default class RoomManager {
 	}
 	/* --------------------------------------------------------------------------------------------- */
 }
-
 
 // TODO: make so that the update payload is broadcasted to all connected player in the given session
 //       work in GameClass.js
