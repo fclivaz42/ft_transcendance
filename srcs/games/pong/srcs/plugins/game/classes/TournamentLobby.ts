@@ -1,17 +1,6 @@
 import GameRoom from "./GameRoom.ts";
 import PlayerSession from "./PlayerSession.ts";
 
-export type LobbyBroadcastPayload =
-	| { type: "timer"; payload: { secondsRemaining: number } }
-	| {
-			type: "match_result";
-			payload: {
-				roomID: string;
-				winner: string;
-				score: { p1: number; p2: number };
-			};
-	  };
-
 export default class TournamentLobby extends GameRoom {
 	constructor(id: string = "TOURNAMENT_LOBBY") {
 		super(id, false);

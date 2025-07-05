@@ -16,8 +16,8 @@ export default class TournamentManager extends RoomManager {
 	private _launchCountdown: NodeJS.Timeout | null = null;
 
 	private readonly MAX_PLAYERS = 8;
-	private readonly WAIT_TIME_MS = 60000;
-	private readonly LAUNCH_COUNTDOWN_MS = 5000;
+	private readonly WAIT_TIME_MS = 10_000;
+	private readonly LAUNCH_COUNTDOWN_MS = 5_000;
 
 	public assignTournamentPlayer(session: PlayerSession) {
 		// this._assignToAvailableTournament
@@ -53,6 +53,7 @@ export default class TournamentManager extends RoomManager {
 		p2: PlayerSession
 	) {
 		room.setOnGameOver((roomId: string) => {
+			console.log(`Game over in room ${roomId}`);
 			const score = room.getScore();
 			const winner = score.p1 > score.p2 ? p1 : p2;
 			const loser = winner === p1 ? p2 : p1;
@@ -62,17 +63,18 @@ export default class TournamentManager extends RoomManager {
 			if (this._bracket?.isFinished) {
 				console.log("Tournament finished!");
 			} else if (this._bracket?.isRoundComplete()) {
+				console.log("Attempting to start next round!");
 				this._startNextRound();
 			}
 		});
 	}
 
 	private _fillAI(count: number = 0) {
-		if (count === this.MAX_PLAYERS) return;
-
-		const aiSession = new PlayerSession(null, `AI_${count}`);
-		this._lobby.addPlayer(aiSession);
-		this._fillAI(count + 1);
+		const aiNeeded: number = this.MAX_PLAYERS - this._lobby.players.length;
+		for (let i = 0; i < aiNeeded; i++) {
+			const aiSession = new PlayerSession(null, `AI_${i}`);
+			this._lobby.addPlayer(aiSession);
+		}
 	}
 
 	private _startWaitTimer() {
@@ -97,25 +99,15 @@ export default class TournamentManager extends RoomManager {
 		}, this.LAUNCH_COUNTDOWN_MS);
 	}
 
-	private _simulate(p1: PlayerSession, p2: PlayerSession) {
-		if (!(p1.isAI && p2.isAI)) return;
-
-		// pick random winner, set score 6 to winner
-		// set score 1 - 5 for loser
-		// return JSON with score
-	}
-
 	private _handleAIRoom(p1: PlayerSession, p2: PlayerSession) {
-		const room = this.createRoom(true);
-		room.lock = true;
-
-		if (!p1.isAI) {
-			room.addPlayer(p1);
-		} else if (!p2.isAI) {
-			room.addPlayer(p2, true);
-		} else {
-			console.warn("Unexpected: both players are AI in _handleAIRoom");
+		if (p1.isAI && p2.isAI) {
+			console.warn("Skipping AI vs AI in _handleAIRoom");
+			return;
 		}
+		const room = this.createRoom(true);
+		room.addPlayer(p1);
+		room.addPlayer(p2, true);
+		room.lock = true;
 		this._attachGameOverCallback(room, p1, p2);
 	}
 
@@ -124,6 +116,9 @@ export default class TournamentManager extends RoomManager {
 		this._clearLaunchCountdown();
 
 		const shuffled = this._shuffle([...this._lobby.players]);
+		console.log(
+			`Length of players just before starting bracket: ${shuffled.length}.`
+		);
 		this._bracket = new TournamentBracket(shuffled, this.MAX_PLAYERS);
 
 		this._startNextRound();
@@ -149,10 +144,15 @@ export default class TournamentManager extends RoomManager {
 					p1: winner === p1 ? winnerScore : loserScore,
 					p2: winner === p2 ? winnerScore : loserScore,
 				});
+				console.log(
+					`Match between ${p1.getUserId()} and ${p2.getUserId()} has concluded successfully!`
+				);
 			} else if (p1.isAI || p2.isAI) {
 				this._handleAIRoom(p1, p2);
 			} else {
 				const room = this.createRoom();
+				room.addPlayer(p1);
+				room.addPlayer(p2, true);
 				room.lock = true;
 				this._attachGameOverCallback(room, p1, p2);
 			}

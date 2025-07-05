@@ -104,8 +104,10 @@ export default class RoomManager {
 				return session;
 			case "computer":
 				room = this.createRoom(true);
-				room.lock = true;
+				const aiSession = new PlayerSession(null, "AI_opponent");
 				room.addPlayer(session);
+				room.addPlayer(aiSession, true);
+				room.lock = true;
 				break;
 			default:
 				throw new Error(`Unknown mode: ${mode}`);

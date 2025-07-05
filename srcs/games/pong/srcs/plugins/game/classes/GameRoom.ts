@@ -1,116 +1,126 @@
-import Game from "./GameClass.ts"
+import Game from "./GameClass.ts";
 import Paddle from "./Paddle.ts";
 import PlayerSession from "./PlayerSession.ts";
 import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
 import { DEFAULT_FPS } from "./Playfield.ts";
-import { type LobbyBroadcastPayload } from "./TournamentLobby.ts";
+// import { type LobbyBroadcastPayload } from "./TournamentLobby.ts";
 
 interface BallUpdate {
-	curr_speed: number,
-	curr_position: number[]
-};
+	curr_speed: number;
+	curr_position: number[];
+}
 
 interface PaddleUpdate {
-	max_speed: number,
-	position: number[]
-};
+	max_speed: number;
+	position: number[];
+}
 
 interface RoomScore {
-	p1: number,
-	p2: number
-};
-
+	p1: number;
+	p2: number;
+}
 
 interface BallInit extends BallUpdate {
-	size: number[],
-};
+	size: number[];
+}
 
-interface PaddleInit extends PaddleUpdate { }
+interface PaddleInit extends PaddleUpdate {}
 
 interface WallsInit {
 	[key: string]: {
-		position: number[],
-		size: number[],
-		passThrough?: boolean
-	}
-};
+		position: number[];
+		size: number[];
+		passThrough?: boolean;
+	};
+}
 
 interface UpdatePayload {
-	type: "update",
+	type: "update";
 	payload: {
-		ball: BallUpdate,
-		p1: PaddleUpdate,
-		p2: PaddleUpdate
-	}
-};
+		ball: BallUpdate;
+		p1: PaddleUpdate;
+		p2: PaddleUpdate;
+	};
+}
 
 interface InitPayload {
-	type: "init",
+	type: "init";
 	payload: {
-		ball: BallInit,
-		p1: PaddleInit,
-		p2: PaddleInit,
-		walls: WallsInit,
-		camera: CameraInitInfo,
-		light: LightInitInfo,
-		roomID: string,
-		connectedPlayers: ConnectedPlayers
-	}
-};
+		ball: BallInit;
+		p1: PaddleInit;
+		p2: PaddleInit;
+		walls: WallsInit;
+		camera: CameraInitInfo;
+		light: LightInitInfo;
+		roomID: string;
+		connectedPlayers: ConnectedPlayers;
+	};
+}
 
 interface PlayerConnectedPayload {
-	type: "connect",
+	type: "connect";
 	payload: {
-		playerID: string,
-		roomID: string
-	}
-};
+		playerID: string;
+		roomID: string;
+	};
+}
 
 interface PlayerDisconnectedPayload {
-	type: "disconnect",
+	type: "disconnect";
 	payload: {
-		playerID: string
-	}
-};
+		playerID: string;
+	};
+}
 
 interface CollisionPayload {
-	type: "collision",
+	type: "collision";
 	payload: {
-		collider: string
-	}
-};
+		collider: string;
+	};
+}
 
 interface ScoreUpdatePayload {
-	type: "score",
+	type: "score";
 	payload: {
-		score: RoomScore
-	}
+		score: RoomScore;
+	};
 }
 
 interface GameOverPayload {
-	type: "gameover",
+	type: "gameover";
 	payload: {
-		winner: string,
-		loser: string,
-		final_score: RoomScore
-	}
+		winner: string;
+		loser: string;
+		final_score: RoomScore;
+	};
 }
 
 interface ConnectedPlayers {
-	p1: string | undefined,
-	p2: string | undefined
+	p1: string | undefined;
+	p2: string | undefined;
 }
 
-type GameMessage = InitPayload 
-				| UpdatePayload
-				| PlayerConnectedPayload
-				| PlayerDisconnectedPayload
-				| CollisionPayload
-				| ScoreUpdatePayload
-				| GameOverPayload;
+type LobbyBroadcastPayload =
+	| { type: "timer"; payload: { secondsRemaining: number } }
+	| {
+			type: "match_result";
+			payload: {
+				roomID: string;
+				winner: string;
+				score: { p1: number; p2: number };
+			};
+	  };
+
+type GameMessage =
+	| InitPayload
+	| UpdatePayload
+	| PlayerConnectedPayload
+	| PlayerDisconnectedPayload
+	| CollisionPayload
+	| ScoreUpdatePayload
+	| GameOverPayload;
 
 export default class GameRoom {
-
 	public id: string;
 	public players: PlayerSession[] = [];
 	public game: Game;
@@ -121,7 +131,11 @@ export default class GameRoom {
 
 	private _onGameOver?: (roomId: string) => void;
 
-	constructor(id: string, vsAI: boolean = false, onGameOver?: (roomId: string) => void) {
+	constructor(
+		id: string,
+		vsAI: boolean = false,
+		onGameOver?: (roomId: string) => void
+	) {
 		this.id = id;
 		this.game = new Game(vsAI);
 		const paddles: Paddle[] = this.game.getPaddles();
@@ -132,7 +146,7 @@ export default class GameRoom {
 	}
 
 	public isFull(): boolean {
-		console.log(`current players in room: ${this.players.length}`)
+		console.log(`current players in room: ${this.players.length}`);
 		return this.players.length >= 2;
 	}
 
@@ -144,7 +158,7 @@ export default class GameRoom {
 		return this.game;
 	}
 
-	public getScore(): { p1: number, p2: number } {
+	public getScore(): { p1: number; p2: number } {
 		return this.score;
 	}
 
@@ -152,18 +166,31 @@ export default class GameRoom {
 		this._onGameOver = callback;
 	}
 
-	public addPlayer(playerSession: PlayerSession, paddleIdOverride: boolean = false): void {
-
+	public addPlayer(
+		playerSession: PlayerSession,
+		paddleIdOverride: boolean = false
+	): void {
 		this.players.push(playerSession);
-		playerSession.setRoom(this);
-		this.broadcast(this.buildPlayerConnectedPayload(playerSession))
+
+		if (!playerSession.isAI) {
+			playerSession.setRoom(this);
+			this.broadcast(this.buildPlayerConnectedPayload(playerSession));
+		}
 
 		if (paddleIdOverride) {
-			playerSession.setPaddleId('p2');
+			playerSession.setPaddleId("p2");
 		} else if (this.players.length === 1) {
-			playerSession.setPaddleId('p1');
-		} else if (this.players.length === 2 ) {
-			playerSession.setPaddleId('p2');
+			playerSession.setPaddleId("p1");
+		} else if (this.players.length === 2) {
+			playerSession.setPaddleId("p2");
+		}
+
+		if (playerSession.isAI) {
+			if (playerSession.getPaddleId() === "p1") {
+				this.game.setP1IA(true);
+			} else {
+				this.game.setP2IA(true);
+			}
 		}
 
 		if (this.isFull() || this.lock) {
@@ -173,8 +200,10 @@ export default class GameRoom {
 	}
 
 	public removePlayer(playerSession: PlayerSession): void {
-		this.players = this.players.filter(p => p !== playerSession);
-		console.log(`Removed player ${playerSession.getUserId()} from room ${this.id}`);
+		this.players = this.players.filter((p) => p !== playerSession);
+		console.log(
+			`Removed player ${playerSession.getUserId()} from room ${this.id}`
+		);
 
 		this.broadcast(this.buildPlayerDisconnectedPayload(playerSession));
 
@@ -183,9 +212,11 @@ export default class GameRoom {
 			if (this._onGameOver) {
 				this._onGameOver(this.id);
 			}
-			return ;
+			return;
 		}
-		playerSession.getPaddleId() === "p1" ? this.game.setP1IA(true) : this.game.setP2IA(true);
+		playerSession.getPaddleId() === "p1"
+			? this.game.setP1IA(true)
+			: this.game.setP2IA(true);
 		// on a player disconnect sets AI to missing player and locks the room
 		this.lock = true;
 	}
@@ -203,7 +234,6 @@ export default class GameRoom {
 	}
 
 	public startGame() {
-
 		this.game.setBroadcastFunction(() => {
 			this.floodlessBroadcast(this.buildUpdatePayload());
 		});
@@ -213,7 +243,7 @@ export default class GameRoom {
 		const ball = this.game.getBall();
 		ball.setOnCollision((collisionInfo) => {
 			this.floodlessBroadcast(this.buildCollisionPayload(collisionInfo));
-		})
+		});
 
 		this.broadcast(this.buildInitPayload());
 		this.game.gameStart(DEFAULT_FPS);
@@ -228,21 +258,22 @@ export default class GameRoom {
 	}
 
 	public broadcast(message: GameMessage | LobbyBroadcastPayload): void {
-		if (message.type !== 'update') {
+		if (message.type !== "update") {
 			console.log(JSON.stringify(message, null, 2));
 		}
 		for (const p of this.players) {
 			try {
-				p.send(message)
+				p.send(message);
 			} catch (err) {
 				console.error(`Failed to send to player: ${this.id}: ${err}`);
 			}
 		}
 	}
 
-	public floodlessBroadcast(message: GameMessage | LobbyBroadcastPayload): void {
-		
-		if (message.type === 'collision') {
+	public floodlessBroadcast(
+		message: GameMessage | LobbyBroadcastPayload
+	): void {
+		if (message.type === "collision") {
 			const payload = message.payload;
 			if (
 				this._lastCollision &&
@@ -251,40 +282,37 @@ export default class GameRoom {
 				return;
 			}
 			this._lastCollision = message;
-
-		} else if (message.type === 'update') {
+		} else if (message.type === "update") {
 			const current = JSON.stringify(message);
-			if (this._lastMessage === current)
-				return;
+			if (this._lastMessage === current) return;
 			this._lastMessage = current;
 		}
 
 		// debug
-		if (message.type !== 'update') {
+		if (message.type !== "update") {
 			console.log(JSON.stringify(message, null, 2));
 		}
 		// enddebug
 
 		for (const p of this.players) {
 			try {
-				p.send(message)
+				p.send(message);
 			} catch (err) {
 				console.error(`Failed to send to player: ${this.id}: ${err}`);
 			}
 		}
 	}
 
-
 	/* BUILDING PAYLOADS ---------------------------------------------------------------------------- */
 	private buildInitPayload(): InitPayload {
 		const game = this.game;
 		const ball = game.getBall();
 		const [p1, p2] = game.getPaddles();
-		const walls = game.getWallsForWs()
+		const walls = game.getWallsForWs();
 		const lightsCamera = game.getField();
 
 		const initPayload: InitPayload = {
-			type: 'init',
+			type: "init",
 			payload: {
 				ball: ball.getBallInitInfo(),
 				p1: p1.getInitInfo(),
@@ -295,10 +323,10 @@ export default class GameRoom {
 				roomID: this.id,
 				connectedPlayers: {
 					p1: this.players.at(0)?.getUserId(),
-					p2: this.players.at(1)?.getUserId()
-				}
-			}
-		}
+					p2: this.players.at(1)?.getUserId(),
+				},
+			},
+		};
 		return initPayload;
 	}
 
@@ -308,7 +336,7 @@ export default class GameRoom {
 		const [p1, p2] = game.getPaddles();
 
 		const updatePayload: UpdatePayload = {
-			type: 'update',
+			type: "update",
 			payload: {
 				ball: {
 					curr_speed: ball.getCurrSpeed(),
@@ -316,35 +344,39 @@ export default class GameRoom {
 				},
 				p1: {
 					max_speed: p1.getSpeed(),
-					position: p1.getPosition().asArray()
+					position: p1.getPosition().asArray(),
 				},
 				p2: {
 					max_speed: p2.getSpeed(),
-					position: p2.getPosition().asArray()
-				}
-			}
-		}
+					position: p2.getPosition().asArray(),
+				},
+			},
+		};
 		return updatePayload;
 	}
 
-	protected buildPlayerConnectedPayload(sessions: PlayerSession): PlayerConnectedPayload {
+	protected buildPlayerConnectedPayload(
+		sessions: PlayerSession
+	): PlayerConnectedPayload {
 		const playerConnectedPayload: PlayerConnectedPayload = {
 			type: "connect",
 			payload: {
 				playerID: sessions.getUserId(),
-				roomID: this.id
-			}
-		}
+				roomID: this.id,
+			},
+		};
 		return playerConnectedPayload;
 	}
 
-	private buildPlayerDisconnectedPayload(sessions: PlayerSession): PlayerDisconnectedPayload {
+	private buildPlayerDisconnectedPayload(
+		sessions: PlayerSession
+	): PlayerDisconnectedPayload {
 		const playerDisconnectedPayload: PlayerDisconnectedPayload = {
 			type: "disconnect",
 			payload: {
-				playerID: sessions.getUserId()
-			}
-		}
+				playerID: sessions.getUserId(),
+			},
+		};
 		return playerDisconnectedPayload;
 	}
 
@@ -354,10 +386,10 @@ export default class GameRoom {
 			payload: {
 				score: {
 					p1: this.score.p1,
-					p2: this.score.p2
-				}
-			}
-		}
+					p2: this.score.p2,
+				},
+			},
+		};
 		return scoreUpdate;
 	}
 
@@ -365,9 +397,9 @@ export default class GameRoom {
 		const collisionPayload: CollisionPayload = {
 			type: "collision",
 			payload: {
-				collider: collisionInfo
-			}
-		}
+				collider: collisionInfo,
+			},
+		};
 		return collisionPayload;
 	}
 
@@ -377,9 +409,9 @@ export default class GameRoom {
 			payload: {
 				winner: winner === 1 ? "p1" : "p2",
 				loser: winner === 1 ? "p2" : "p1",
-				final_score: this.score
-			}
-		}
+				final_score: this.score,
+			},
+		};
 		return gameOver;
 	}
 }

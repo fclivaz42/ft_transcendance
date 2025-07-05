@@ -77,6 +77,9 @@ export function createPongLoading(message: string): HTMLDivElement {
 			case "computer":
 				url = new URL("computer", PONG_HOST);
 				break;
+			case "tournament":
+				url = new URL("tournament", PONG_HOST);
+				break;
 			default:
 				if (!room)
 					url = new URL("remote", PONG_HOST);

@@ -125,10 +125,10 @@ export default class Game {
 		this._p2.setBall(this._ball);
 		this._p2.setWalls(this._walls);
 
-		if (vsAI) {
-			if (this._room?.players.at(0)?.isAI) this.setP1IA(true);
-			else if (this._room?.players.at(1)?.isAI) this.setP2IA(true);
-		}
+		// if (vsAI) {
+		// 	if (this._room?.players.at(0)?.isAI) this.setP1IA(true);
+		// 	else if (this._room?.players.at(1)?.isAI) this.setP2IA(true);
+		// }
 
 		/* Setting colliders for the paddles and the ball */
 		this._p1.setColliders([this._walls.northWall, this._walls.southWall]);
