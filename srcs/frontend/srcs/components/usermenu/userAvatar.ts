@@ -26,8 +26,15 @@ export default async function createUserAvatar(props: UserAvatarProps = {
 		src = await UserHandler.fetchUserPicture(props.playerId);
 
 	const template = document.createElement("template");
+	let href: string | undefined;
+	if (!props.disableClick && !props.isComputer) {
+		if (props.playerId && props.playerId !== UserHandler.userId)
+			href = `/user?playerId=${props.playerId}`;
+		else
+			href = "/user";
+	}
 	template.innerHTML = `
-		<img src="${sanitizer(src)}" ${src === UserHandler.avatarUrl ? "data-user=\"avatar\"": ""} alt="User Avatar" class="select-none border-2 rounded-full object-cover ${sanitizer(props.sizeClass)} bg-white">
+		<a ${href ? `href="${sanitizer(href)}" target="_blank"` : ""}><img src="${sanitizer(src)}" ${src === UserHandler.avatarUrl ? "data-user=\"avatar\"": ""} alt="User Avatar" class="select-none border-2 rounded-full object-cover ${sanitizer(props.sizeClass)} bg-white"></a>
 	`;
 
 	const userAvatar = template.content.firstElementChild as HTMLImageElement;
@@ -38,24 +45,6 @@ export default async function createUserAvatar(props: UserAvatarProps = {
 			throw new Error(`Failed to fetch user avatar: ${fetched.status} ${fetched.statusText}`);
 	} catch (error) {
 		userAvatar.src = "/assets/images/default_avatar.svg";
-	}
-
-	if (!props.disableClick && !props.isComputer) {
-		userAvatar.classList.add("cursor-pointer");
-		userAvatar.onclick = () => {
-			if (props.playerId && props.playerId !== UserHandler.userId) {
-				RoutingHandler.setRoute(`/user?playerId=${props.playerId}`);
-			} else {
-				RoutingHandler.setRoute("/user");
-			}
-		};
-		userAvatar.onauxclick = () => {
-			if (props.playerId && props.playerId !== UserHandler.userId) {
-				window.open(`/user?playerId=${props.playerId}`, "_blank");
-			} else {
-				window.open("/user", "_blank");
-			}
-		}
 	}
 
 	if (props.editable) {

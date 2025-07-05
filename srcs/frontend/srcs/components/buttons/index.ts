@@ -1,3 +1,4 @@
+import { i18nHandler } from "../../handlers/i18nHandler.js";
 import { sanitizer } from "../../helpers/sanitizer.js";
 import { ButtonProps } from "../../interfaces/baseProps.js";
 
@@ -8,8 +9,8 @@ export function createButton(props: ButtonProps): HTMLAnchorElement {
   button.innerHTML = `
     ${props.logo ? `<img class="select-none h-4 w-4 dark:invert" src="${sanitizer(props.logo)}">` : ""}
   `;
-	if (props.title)
-		button.innerHTML += `<p${props.i18n ? " data-i18n=" + sanitizer(props.i18n): ""}>${sanitizer(props.title)}</p>`;
+	if (props.i18n)
+		button.innerHTML += `<p data-i18n=${sanitizer(props.i18n)}>${sanitizer(i18nHandler.getValue(props.i18n))}</p>`;
 
   if (props.id)
     button.id = props.id;

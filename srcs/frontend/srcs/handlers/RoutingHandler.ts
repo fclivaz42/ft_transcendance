@@ -74,8 +74,11 @@ class RoutingHandler {
 		}
 	}
 
-	updateUrl(): void {
-		window.history.replaceState({}, "", this._url);
+	updateUrl(url?: string): void {
+		if (!url)
+			window.history.replaceState({}, "", this._url);
+		else
+			window.history.replaceState({}, "", new URL(url, window.location.origin).toString());
 	}
 
 	setRoute(route: string, save: boolean = true): void {

@@ -7,7 +7,7 @@ export interface TitleProps extends BaseProps {
   title: string;
 }
 
-export interface ButtonProps extends Partial<TitleProps> {
+export interface ButtonProps extends BaseProps {
   logo?: string;
 	f?: () => void;
 	color?: string;

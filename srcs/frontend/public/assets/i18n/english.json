@@ -13,12 +13,27 @@
   },
   "pong": {
     "waitingPlayer": "Waiting for another player to join...",
+    "waitingFriend": "Waiting for your friend to join...",
     "computer": "IA",
     "join": {
+      "error": {
+        "emptyRoomCode": "Please enter a room code."
+      },
       "title": "Join a private game",
       "description": "Enter the room code to join a private game.",
       "placeholder": "Room Code",
       "button": "Join Game"
+    },
+    "gameover": {
+      "title": "Game Over",
+      "loser": "Loser",
+      "winner": "Winner",
+      "playagain": "Play Again",
+      "leave": "Leave Game"
+    },
+    "privateJoin": {
+      "roomCode": "Room Code",
+      "copyUrl": "Copy URL"
     }
   },
   "history": {

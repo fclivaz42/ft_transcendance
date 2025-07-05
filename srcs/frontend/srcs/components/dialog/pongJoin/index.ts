@@ -42,7 +42,7 @@ export function createPongJoinDialogContent(dialogRef: BackdropDialog): HTMLDivE
 			return NotificationManager.notify({
 				level: "error",
 				message: i18nHandler.getValue("pong.join.error.emptyRoomCode"),
-				title: i18nHandler.getValue("pong.join.error.title"),
+				title: i18nHandler.getValue("notification.generic.errorTitle"),
 			});
 		RoutingHandler.setRoute(`/pong?room=${roomCode}`);
 		dialogRef.remove();

@@ -386,7 +386,7 @@ export async function createUserMenuSettings(): Promise<HTMLDivElement> {
         </div>
     `;
     const userMenuSettings = template.content.firstElementChild as HTMLDivElement;
-    userMenuSettings.appendChild(await createUserAvatar());
+    userMenuSettings.appendChild(await createUserAvatar({disableClick: true}));
     userMenuSettings.onclick = async () => (await createUserDialog()).showModal();
     return userMenuSettings;
 }
