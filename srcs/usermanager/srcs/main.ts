@@ -13,7 +13,11 @@ const server = fastify({
 	}
 });
 
-await server.register(fastifyMultipart)
+await server.register(fastifyMultipart, {
+	limits: {
+		fileSize: 8 * 1024 * 1024
+	}
+})
 await server.register(initializeRoute, { prefix: "/users" });
 await server.register(initializeMatchesRoute, { prefix: "/matches" });
 

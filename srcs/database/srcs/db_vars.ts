@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/07/02 18:55:35 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/05 23:00:11 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -77,7 +77,6 @@ const PlayersTable: db_table =
 		"TEXT DEFAULT NULL",
 		"INTEGER DEFAULT 0",
 		"INTEGER DEFAULT 0",
-		"INTEGER DEFAULT 0",
 		"INTEGER DEFAULT 0"
 	],
 	"Methods": {
@@ -115,8 +114,8 @@ const MatchesTable: db_table =
 		"LPlayerID",
 		"WScore",
 		"LScore",
-		"WGuestName",
-		"LGuestName",
+		// "WGuestName",
+		// "LGuestName",
 		"StartTime",
 		"EndTime",
 		"MatchIndex",
@@ -128,8 +127,8 @@ const MatchesTable: db_table =
 		`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET NULL`,
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL",
-		"TEXT DEFAULT NULL",
-		"TEXT DEFAULT NULL",
+		// "TEXT DEFAULT NULL",
+		// "TEXT DEFAULT NULL",
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL",

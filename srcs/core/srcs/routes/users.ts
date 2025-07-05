@@ -74,7 +74,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 	fastify.all('/me/alive', async (request, reply) => {
 		if (request.method !== 'POST' && request.method !== 'GET')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only POST method is allowed for user alive status.' });
-		
+
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 		const userId = authorization.data.sub;
 
@@ -82,7 +82,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			const userAliveStatus = await usersSdk.getUserAlive(userId)
 				.catch(err => {
 					if (!axios.isAxiosError(err))
-						throw err;	
+						throw err;
 					return reply.code(err.response?.status || 500).send(
 						err.response?.data || {
 							detail: err.response?.data?.detail || 'Failed to fetch user alive status',
@@ -96,7 +96,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const userAliveStatus = await usersSdk.postUserAlive(userId)
 			.catch(err => {
 				if (!axios.isAxiosError(err))
-					throw err;	
+					throw err;
 				return reply.code(err.response?.status || 500).send(
 					err.response?.data || {
 						detail: err.response?.data?.detail || 'Failed to update user alive status',
@@ -279,7 +279,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			const userAliveStatus = await usersSdk.getUserAlive(targetUser.uuid)
 				.catch(err => {
 					if (!axios.isAxiosError(err))
-						throw err;	
+						throw err;
 					return reply.code(err.response?.status || 500).send(
 						err.response?.data || {
 							detail: err.response?.data?.detail || 'Failed to fetch user alive status',
@@ -338,22 +338,22 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 	});
 
 	fastify.all('/:uuid/stats', async (request, reply) => {
-	if (request.method !== 'GET')
-		return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user stats.' });
-	const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
-	const params = request.params as { uuid: string };
-	const userStats = await usersSdk.getUserStats(params.uuid)
-		.then(response => response)
-		.catch((err: any) => {
-			if (!axios.isAxiosError(err))
-				throw err;	
-			return reply.code(err.response?.status || 500).send(
-				err.response?.data || {
-					detail: 'Failed to fetch user stats',
-					status: err.response?.status || 500,
-					module: 'usermanager'
-				});
-		});
+		if (request.method !== 'GET')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user stats.' });
+		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		const params = request.params as { uuid: string };
+		const userStats = await usersSdk.getUserStats(params.uuid)
+			.then(response => response)
+			.catch((err: any) => {
+				if (!axios.isAxiosError(err))
+					throw err;
+				return reply.code(err.response?.status || 500).send(
+					err.response?.data || {
+						detail: 'Failed to fetch user stats',
+						status: err.response?.status || 500,
+						module: 'usermanager'
+					});
+			});
 		return reply.code(userStats.status).send(userStats.data);
 	});
 }
