@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/30 18:23:33 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/05 23:31:15 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -64,7 +64,11 @@ const fastify = Fastify({
 	logger: false
 })
 
-fastify.register(multipart)
+fastify.register(multipart, {
+	limits: {
+		fileSize: 8 * 1024 * 1024
+	}
+})
 fastify.register(fastifyStatic, {
 	root: process.env.FILELOCATION
 });
