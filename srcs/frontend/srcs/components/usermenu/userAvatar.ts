@@ -29,11 +29,16 @@ export default async function createUserAvatar(props: UserAvatarProps = {
 	template.innerHTML = `
 		<img src="${sanitizer(src)}" ${src === UserHandler.avatarUrl ? "data-user=\"avatar\"": ""} alt="User Avatar" class="select-none border-2 rounded-full object-cover ${sanitizer(props.sizeClass)} bg-white">
 	`;
+
 	const userAvatar = template.content.firstElementChild as HTMLImageElement;
 
-	userAvatar.onerror = () => {
+	try {
+		const fetched = await fetch(userAvatar.src, { cache: "force-cache" });
+		if (!fetched.ok)
+			throw new Error(`Failed to fetch user avatar: ${fetched.status} ${fetched.statusText}`);
+	} catch (error) {
 		userAvatar.src = "/assets/images/default_avatar.svg";
-	};
+	}
 
 	if (!props.disableClick && !props.isComputer) {
 		userAvatar.classList.add("cursor-pointer");
