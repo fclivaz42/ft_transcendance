@@ -20,18 +20,17 @@ export class BallEffects {
 
     updateEffects() {
         const currentPos = this.ballMesh.position;
-        
-        // 🏟️ VRAIES DIMENSIONS DU TERRAIN (extraites du backend)
+ 
         const FIELD_WIDTH = 27.4;   // 13.7 * 2 = distance entre les deux goals 
         const FIELD_HEIGHT = 16.6;  // Hauteur des goals = hauteur du terrain
         
-        // 🚨 DÉTECTER SORTIE DE TERRAIN (les goals sont à ±13.7)
+
         if (Math.abs(currentPos.x) > 13.7) {
             console.log("🎯 BALLE SORTIE ! Position:", currentPos.x);
             console.log("🧹 Nettoyage traînée...");
             this.clearTrail();
             
-            // 🔊 Son de score côté frontend
+            // son?
             // AudioManager.getInstance()?.playSound("score");
         }
         
