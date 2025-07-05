@@ -24,19 +24,22 @@ interface Html5SoundPool {
 }
 
 export default class AudioManager {
+    // 🏊‍♂️ POOLS DE SONS - Stockage des sons préchargés pour éviter les latences
     private _html5SoundPools: Map<string, Html5SoundPool> = new Map();
-    private _enabled: boolean = true;
-    private _masterVolume: number = 1.0;
-    private _isLoading: boolean = false;
+    
+    // 🔊 CONTRÔLES GLOBAUX
+    private _enabled: boolean = true;           // Activer/désactiver tous les sons
+    private _masterVolume: number = 1.0;       // Volume principal (0.0 à 1.0)
+    
+    // 🎯 SINGLETON - Une seule instance pour toute l'app
     private static _globalInstance: AudioManager | null = null;
 
-    constructor() {
-        AudioManager._globalInstance = this;
-        this.loadSounds();
-    }
-
-    // Méthode statique pour charger les sons avant même d'avoir une scène
-    public static preloadSounds(): void {
+    /**
+     * 🚀 PRÉCHARGEMENT - À appeler au démarrage de l'app
+     * Charge tous les sons en mémoire pour éviter les latences pendant le jeu
+     */
+    public static async preloadSounds(): Promise<void> {
+        // Crée l'instance singleton et charge tous les sons
         console.log("🎵 Préchargement des sons au lancement du site...");
         
         if (!AudioManager._globalInstance) {
@@ -44,10 +47,19 @@ export default class AudioManager {
         }
     }
 
+    /**
+     * 🎯 SINGLETON GETTER - Récupère l'instance unique
+     * Utilisez ceci dans PongGameManager pour accéder aux sons
+     */
     public static getInstance(): AudioManager | null {
+        // Retourne l'instance unique (null si pas encore préchargée)
         return AudioManager._globalInstance;
     }
 
+    /**
+     * 🔧 CHARGEMENT INTERNE - Charge physiquement les fichiers audio
+     * Appelée automatiquement par preloadSounds()
+     */
     private async loadSounds(): Promise<void> {
         this._isLoading = true;
 
@@ -171,14 +183,18 @@ export default class AudioManager {
         });
     }
 
-    // Méthode principale pour jouer un son
-    public playSound(soundName: string, volume?: number, playbackRate?: number): void {
+    /**
+     * 🎵 LECTURE GÉNÉRIQUE - Joue n'importe quel son préchargé
+     * @param soundName - Nom du son ("paddleHit", "wallBounce", "gamestart")
+     * @param volume - Volume spécifique (optionnel, utilise masterVolume par défaut)
+     */
+    public playSound(soundName: string, volume?: number): void {
 
         // Utiliser HTML5 Audio uniquement
-        this.playHtml5Sound(soundName, volume, playbackRate);
+        this.playHtml5Sound(soundName, volume);
     }
 
-    private playHtml5Sound(soundName: string, volume?: number, playbackRate?: number): void {
+    private playHtml5Sound(soundName: string, volume?: number): void {
         const pool = this._html5SoundPools.get(soundName);
         if (!pool) {
             console.warn(`⚠️ Pool HTML5 introuvable pour: ${soundName}`);
@@ -199,11 +215,6 @@ export default class AudioManager {
             // Appliquer le volume si spécifié
             if (volume !== undefined) {
                 audio.volume = Math.max(0, Math.min(1, volume * this._masterVolume));
-            }
-
-            // Appliquer le playback rate si spécifié (HTML5 Audio support)
-            if (playbackRate !== undefined && audio.playbackRate !== undefined) {
-                audio.playbackRate = playbackRate;
             }
 
             // Jouer le son
@@ -245,21 +256,99 @@ export default class AudioManager {
         return audio;
     }
 
-    // Méthodes spécialisées pour le jeu
+    /**
+     * 🏓 RAQUETTE - Son spécialisé pour les collisions avec les paddles
+     * @param intensity - Intensité de la collision (0.0 à 1.0) pour ajuster le volume
+     */
     public playPaddleHit(intensity: number = 1): void {
-        // Varier légèrement le volume et la vitesse selon l'intensité
+        // Joue "paddleHit" avec volume basé sur l'intensité
         const volume = 0.6 + (intensity * 0.2);
         const playbackRate = 0.9 + (intensity * 0.2);
         this.playSound("paddleHit", volume, playbackRate);
     }
 
+    /**
+     * 🧱 MUR - Son spécialisé pour les collisions avec les murs
+     * @param velocity - Vitesse de la balle pour ajuster le volume
+     */
     public playWallBounce(velocity: number = 1): void {
-        // Volume basé sur la vélocité de la balle
+        // Joue "wallBounce" avec volume basé sur la vélocité
         const volume = Math.min(0.8, 0.3 + (velocity * 0.3));
         this.playSound("wallBounce", volume);
     }
 
-    // Méthodes pour les tests depuis l'interface
+    /**
+     * 🔇 ARRÊT - Stop tous les sons en cours
+     * Utile lors du reset du jeu ou changement de page
+     */
+    public stopAllSounds(): void {
+        // Parcourt tous les pools et arrête les sons actifs
+        console.log("🛑 Arrêt de tous les sons...");
+        
+        this._html5SoundPools.forEach(pool => {
+            pool.instances.forEach(audio => {
+                audio.pause();
+                audio.currentTime = 0;
+            });
+        });
+    }
+
+    /**
+     * 🔊 ACTIVATION/DÉSACTIVATION - Contrôle global des sons
+     * @param enabled - true pour activer, false pour désactiver
+     */
+    public setEnabled(enabled: boolean): void {
+        // Active/désactive globalement les sons
+        this._enabled = enabled;
+        if (!enabled) {
+            this.stopAllSounds();
+        }
+        console.log(`🔊 Audio ${enabled ? 'activé' : 'désactivé'}`);
+    }
+
+    /**
+     * 🔊 VOLUME PRINCIPAL - Ajuste le volume de tous les sons
+     * @param volume - Volume de 0.0 (muet) à 1.0 (maximum)
+     */
+    public setMasterVolume(volume: number): void {
+        // Change le volume global
+        this._masterVolume = Math.max(0, Math.min(1, volume));
+        
+        // Appliquer le nouveau volume à tous les sons HTML5
+        this._html5SoundPools.forEach(pool => {
+            pool.instances.forEach(audio => {
+                audio.volume = audio.volume * this._masterVolume;
+            });
+        });
+        
+        console.log(`🔊 Volume global défini à: ${this._masterVolume}`);
+    }
+
+    /**
+     * 🔓 DÉBLOQUAGE AUDIO - Contourne les restrictions navigateur
+     * Les navigateurs bloquent l'audio jusqu'à interaction utilisateur
+     */
+    public unmuteAll(): void {
+        // Active l'audio après un clic/touche utilisateur
+        document.addEventListener('click', () => {
+            this.setEnabled(true);
+            console.log("🔊 Audio débloqué par interaction utilisateur");
+        }, { once: true });
+    }
+
+    /**
+     * 🧹 NETTOYAGE - Libère toutes les ressources audio
+     * À appeler lors de la fermeture de l'app
+     */
+    public dispose(): void {
+        // Détruit tous les pools et libère la mémoire
+        this.stopAllSounds();
+        this._html5SoundPools.clear();
+        AudioManager._globalInstance = null;
+        console.log("🗑️ AudioManager nettoyé");
+    }
+
+    // 🔍 MÉTHODES DE DEBUG (à garder pour le développement)
     public testHtml5Sound(soundName: string): Promise<string> {
         return new Promise((resolve) => {
             const pool = this._html5SoundPools.get(soundName);
@@ -340,69 +429,6 @@ export default class AudioManager {
                 resolve(`⏰ Timeout pour ${fileName}`);
             }, 5000);
         });
-    }
-
-    // Arrêter tous les sons
-    public stopAllSounds(): void {
-        console.log("🛑 Arrêt de tous les sons...");
-        
-        this._html5SoundPools.forEach(pool => {
-            pool.instances.forEach(audio => {
-                audio.pause();
-                audio.currentTime = 0;
-            });
-        });
-    }
-
-    // Arrêter un son spécifique
-    public stopSound(soundName: string): void {
-        const pool = this._html5SoundPools.get(soundName);
-        if (pool) {
-            pool.instances.forEach(audio => {
-                audio.pause();
-                audio.currentTime = 0;
-            });
-        }
-    }
-
-    // Activer/désactiver l'audio
-    public setEnabled(enabled: boolean): void {
-        this._enabled = enabled;
-        if (!enabled) {
-            this.stopAllSounds();
-        }
-        console.log(`🔊 Audio ${enabled ? 'activé' : 'désactivé'}`);
-    }
-
-    // Changer le volume global
-    public setMasterVolume(volume: number): void {
-        this._masterVolume = Math.max(0, Math.min(1, volume));
-        
-        // Appliquer le nouveau volume à tous les sons HTML5
-        this._html5SoundPools.forEach(pool => {
-            pool.instances.forEach(audio => {
-                audio.volume = audio.volume * this._masterVolume;
-            });
-        });
-        
-        console.log(`🔊 Volume global défini à: ${this._masterVolume}`);
-    }
-
-    // Obtenir des informations sur les pools
-    public getPoolInfo(): string {
-        const html5Info = Array.from(this._html5SoundPools.entries()).map(([name, pool]) => {
-            return `${name}: ${pool.instances.length} instances HTML5`;
-        });
-
-        return `Pools chargés:\n${html5Info.join('\n')}`;
-    }
-
-    // Nettoyer les ressources
-    public dispose(): void {
-        this.stopAllSounds();
-        this._html5SoundPools.clear();
-        AudioManager._globalInstance = null;
-        console.log("🗑️ AudioManager nettoyé");
     }
 
     // Getters
