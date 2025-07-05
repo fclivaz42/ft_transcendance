@@ -2,7 +2,7 @@
 import { Scene } from "@babylonjs/core/scene.js";
 import { Mesh } from "@babylonjs/core/Meshes/mesh.js";
 import { MeshBuilder, StandardMaterial, Color3, Vector3} from "@babylonjs/core";
-
+import AudioManager from "../../../managers/audioManager.js";
 export class BallEffects {
     private scene: Scene;
     private ballMesh: Mesh;
@@ -18,8 +18,23 @@ export class BallEffects {
         this.ballMesh = ballMesh;
     }
 
-    updateEffects()
-    {
+    updateEffects() {
+        const currentPos = this.ballMesh.position;
+        
+        // 🏟️ VRAIES DIMENSIONS DU TERRAIN (extraites du backend)
+        const FIELD_WIDTH = 27.4;   // 13.7 * 2 = distance entre les deux goals 
+        const FIELD_HEIGHT = 16.6;  // Hauteur des goals = hauteur du terrain
+        
+        // 🚨 DÉTECTER SORTIE DE TERRAIN (les goals sont à ±13.7)
+        if (Math.abs(currentPos.x) > 13.7) {
+            console.log("🎯 BALLE SORTIE ! Position:", currentPos.x);
+            console.log("🧹 Nettoyage traînée...");
+            this.clearTrail();
+            
+            // 🔊 Son de score côté frontend
+            // AudioManager.getInstance()?.playSound("score");
+        }
+        
          this.updateCounter++;
         //position actuel de la balle -> traine
         this.trailPositions.push(this.ballMesh.position.clone());
@@ -85,6 +100,15 @@ export class BallEffects {
 
     public dispose(): void {
         this.trailMeshes.forEach(mesh => {
+            if (mesh.material) (mesh.material as StandardMaterial).dispose();
+            mesh.dispose();
+        });
+        this.trailMeshes = [];
+        this.trailPositions = [];
+    }
+
+    private clearTrail() {
+        this.trailMeshes.forEach((mesh) => {
             if (mesh.material) (mesh.material as StandardMaterial).dispose();
             mesh.dispose();
         });
