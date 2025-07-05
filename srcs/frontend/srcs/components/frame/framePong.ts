@@ -10,9 +10,10 @@ import createUserAvatar from "../usermenu/userAvatar";
 export async function createPongCanvas(isComputer: boolean): Promise<HTMLDivElement> {
 	const template = document.createElement("template");
 
-	const playerAvatar: HTMLImageElement[] = [];
-	playerAvatar.push(await createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
-	playerAvatar.push(await createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
+	const playerAvatar: (HTMLDivElement & { firstChild: HTMLImageElement })[] = [
+		await createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}),
+		await createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"})
+	];
 	playerAvatar[0].setAttribute("data-pong-avatar", "p1");
 	playerAvatar[1].setAttribute("data-pong-avatar", "p2");
 

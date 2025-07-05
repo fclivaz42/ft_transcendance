@@ -28,12 +28,6 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
     const dialog = createDialog({ allowClose: true });
     dialog.className += " w-[500px] max-w-[90vw]";
 
-    const profilePicture = await createUserAvatar({
-        sizeClass: "w-32 h-32 mb-2",
-        editable: true,
-    });
-
-
     const userIdentifier = document.createElement("div");
     userIdentifier.className = "flex flex-col items-center";
     const userNameElement = document.createElement("p");
@@ -252,7 +246,10 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
     buttonsContainer.appendChild(cancelButton);
     buttonsContainer.appendChild(saveButton);
 
-    dialog.appendChild(profilePicture);
+    dialog.appendChild(await createUserAvatar({
+        sizeClass: "w-32 h-32 mb-2",
+        editable: true,
+    }));
     dialog.appendChild(userIdentifier);
     dialog.appendChild(logoutButton);
     dialog.appendChild(hr);

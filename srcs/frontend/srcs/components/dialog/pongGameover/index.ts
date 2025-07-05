@@ -34,7 +34,7 @@ async function createPongGameoverDialogContent(dialogRef: BackdropDialog, users:
 	`;
 
 	const template = document.createElement("template");
-	const userAvatar: HTMLImageElement[] = [];
+	const userAvatar: HTMLDivElement[] = [];
 	for (const user of Object.values(users)) {
 		if (!user || user.PlayerID === "bot")
 			userAvatar.push(await createUserAvatar({isComputer: true, sizeClass: "w-16 h-16"}));
