@@ -64,10 +64,6 @@ const PlayersTable: db_table =
 		"Password",
 		"OAuthID",
 		"FriendsList",
-		"PhoneNumber",
-		"FirstName",
-		"FamilyName",
-		"Bappy",
 		"Private",
 		"LastAlive",
 		"Admin"
@@ -77,9 +73,6 @@ const PlayersTable: db_table =
 		"TEXT UNIQUE NOT NULL",
 		"TEXT UNIQUE NOT NULL",
 		"TEXT NOT NULL",
-		"TEXT DEFAULT NULL",
-		"TEXT DEFAULT NULL",
-		"TEXT DEFAULT NULL",
 		"TEXT DEFAULT NULL",
 		"TEXT DEFAULT NULL",
 		"INTEGER DEFAULT 0",
@@ -126,7 +119,8 @@ const MatchesTable: db_table =
 		"LGuestName",
 		"StartTime",
 		"EndTime",
-		"MatchIndex"
+		"MatchIndex",
+		"HashAddress",
 	],
 	"Arguments": [
 		"TEXT NOT NULL PRIMARY KEY",
@@ -138,7 +132,8 @@ const MatchesTable: db_table =
 		"TEXT DEFAULT NULL",
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL",
-		"INTEGER NOT NULL"
+		"INTEGER NOT NULL",
+		"TEXT DEFAULT NULL"
 	],
 	"Methods": {
 		"GET": [
@@ -149,6 +144,9 @@ const MatchesTable: db_table =
 		"POST": [
 			""
 		],
+		"PUT": [
+			"/MatchID/:MatchID",
+		]
 	},
 	"Identification": {
 		"HasID": true,
