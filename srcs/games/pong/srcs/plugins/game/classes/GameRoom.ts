@@ -126,10 +126,10 @@ export default class GameRoom {
 	public game: Game;
 	public score: { p1: number; p2: number };
 	public lock: boolean = false;
-	private _lastMessage?: string;
-	private _lastCollision?: CollisionPayload;
+	protected _lastMessage?: string;
+	protected _lastCollision?: CollisionPayload;
 
-	private _onGameOver?: (roomId: string) => void;
+	protected _onGameOver?: (roomId: string) => void;
 
 	constructor(
 		id: string,
@@ -415,3 +415,6 @@ export default class GameRoom {
 		return gameOver;
 	}
 }
+
+
+// TODO: close socket on gameover for single games

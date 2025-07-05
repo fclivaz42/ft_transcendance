@@ -52,7 +52,7 @@ export default class TournamentBracket {
 		this._winners[this._currentRound].push(winner);
 
 		this._results.push({
-			round: this._currentRound,
+			round: this._currentRound, //0 quarter-final 1 semi-final 2 final
 			match: [winner, loser],
 			winner,
 			score,

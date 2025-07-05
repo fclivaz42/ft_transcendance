@@ -23,7 +23,7 @@ export default class TournamentManager extends RoomManager {
 		// this._assignToAvailableTournament
 		if (this._tournamentStarted) {
 			session.getSocket()?.close();
-			// set up full Tournament logic, I guess it's ok if it's like a live event?
+			// TODO: set up full Tournament logic, I guess it's ok if it's like a live event?
 			// Maybe a message in front end Tournament started by a player X let's goo!
 			return;
 		}
