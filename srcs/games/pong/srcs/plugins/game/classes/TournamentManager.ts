@@ -1,12 +1,16 @@
+import { match } from "node:assert";
 import GameRoom from "./GameRoom.ts";
 import PlayerSession from "./PlayerSession.ts";
 import RoomManager from "./RoomManager.ts";
+import TournamentBracket from "./TournamentBracket.ts";
 import TournamentLobby from "./TournamentLobby.ts";
 
 type GameMode = "tournament";
 
 export default class TournamentManager extends RoomManager {
 	private _lobby: TournamentLobby = new TournamentLobby("TOURNAMENT_LOBBY");
+	// private _tournaments: Map<number, TournamentLobby> = new Map();
+	private _bracket?: TournamentBracket;
 	private _tournamentStarted: boolean = false;
 	private _tournamentTimer: NodeJS.Timeout | null = null;
 	private _launchCountdown: NodeJS.Timeout | null = null;
@@ -16,6 +20,7 @@ export default class TournamentManager extends RoomManager {
 	private readonly LAUNCH_COUNTDOWN_MS = 5000;
 
 	public assignTournamentPlayer(session: PlayerSession) {
+		// this._assignToAvailableTournament
 		if (this._tournamentStarted) {
 			session.getSocket()?.close();
 			// set up full Tournament logic, I guess it's ok if it's like a live event?
@@ -40,6 +45,26 @@ export default class TournamentManager extends RoomManager {
 			this._clearWaitTimer();
 			this._startCountdownToLaunch();
 		}
+	}
+
+	private _attachGameOverCallback(
+		room: GameRoom,
+		p1: PlayerSession,
+		p2: PlayerSession
+	) {
+		room.setOnGameOver((roomId: string) => {
+			const score = room.getScore();
+			const winner = score.p1 > score.p2 ? p1 : p2;
+			const loser = winner === p1 ? p2 : p1;
+
+			this._bracket?.markMatchResult(winner, loser, score);
+
+			if (this._bracket?.isFinished) {
+				console.log("Tournament finished!");
+			} else if (this._bracket?.isRoundComplete()) {
+				this._startNextRound();
+			}
+		});
 	}
 
 	private _fillAI(count: number = 0) {
@@ -82,6 +107,7 @@ export default class TournamentManager extends RoomManager {
 
 	private _handleAIRoom(p1: PlayerSession, p2: PlayerSession) {
 		const room = this.createRoom(true);
+		room.lock = true;
 
 		if (!p1.isAI) {
 			room.addPlayer(p1);
@@ -90,31 +116,45 @@ export default class TournamentManager extends RoomManager {
 		} else {
 			console.warn("Unexpected: both players are AI in _handleAIRoom");
 		}
+		this._attachGameOverCallback(room, p1, p2);
 	}
 
 	private _launchTournament() {
-        // change logic
 		this._tournamentStarted = true;
 		this._clearLaunchCountdown();
 
-		console.log(
-			"Launching tournament with players:",
-			this._lobby.players.map((s) => s.getUserId())
-		);
-		const shuffled = this._shuffle(this._lobby.players);
+		const shuffled = this._shuffle([...this._lobby.players]);
+		this._bracket = new TournamentBracket(shuffled, this.MAX_PLAYERS);
 
-		for (let i = 0; i < shuffled.length; i += 2) {
-			const player1 = shuffled[i];
-			const player2 = shuffled[i + 1];
+		this._startNextRound();
+	}
 
-			if (player1.isAI && player2.isAI) this._simulate(player1, player2);
-			else if (player1.isAI || player2.isAI)
-				this._handleAIRoom(player1, player2);
-			else {
+	private _startNextRound(): void {
+		if (!this._bracket) return;
+
+		const matches = this._bracket.getCurrentMatches();
+		if (matches.length === 0) return;
+
+		console.log(`Starting round ${this._bracket.getCurrentRound() + 1}`);
+
+		for (const [p1, p2] of matches) {
+			if (p1.isAI && p2.isAI) {
+				const winner = Math.random() < 0.5 ? p1 : p2;
+				const loser = winner === p1 ? p2 : p1;
+
+				const winnerScore = 6;
+				const loserScore = Math.floor(Math.random() * 5);
+
+				this._bracket.markMatchResult(winner, loser, {
+					p1: winner === p1 ? winnerScore : loserScore,
+					p2: winner === p2 ? winnerScore : loserScore,
+				});
+			} else if (p1.isAI || p2.isAI) {
+				this._handleAIRoom(p1, p2);
+			} else {
 				const room = this.createRoom();
 				room.lock = true;
-				room.addPlayer(player1);
-				room.addPlayer(player2);
+				this._attachGameOverCallback(room, p1, p2);
 			}
 		}
 	}

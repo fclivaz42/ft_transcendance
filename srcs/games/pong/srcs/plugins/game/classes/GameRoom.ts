@@ -148,6 +148,10 @@ export default class GameRoom {
 		return this.score;
 	}
 
+	public setOnGameOver(callback: (roomId: string) => void): void {
+		this._onGameOver = callback;
+	}
+
 	public addPlayer(playerSession: PlayerSession, paddleIdOverride: boolean = false): void {
 
 		this.players.push(playerSession);
