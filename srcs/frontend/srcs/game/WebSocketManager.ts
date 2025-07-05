@@ -1,3 +1,6 @@
+import { i18nHandler } from "../handlers/i18nHandler.js";
+import RoutingHandler from "../handlers/RoutingHandler.js";
+import NotificationManager from "../managers/NotificationManager.js";
 import PongGameManager from "../managers/PongGameManager.js";
 import { GameField } from "./GameField.js";
 import { ServerMessage, InitPayload, UpdatePayload } from "./types.js";
@@ -75,13 +78,29 @@ export class WebSocketManager {
 			else if (msg.type === "score") {
 				PongGameManager.onScoreUpdate(msg.payload.score);
 			}
+			else if (msg.type === "gameover") {
+				PongGameManager.onGameOver(msg.payload);
+			}
+			else if (msg.type === "connect") {
+				PongGameManager.onConnect(msg.payload);
+			}
 		};
 
 		this.socket.onopen = () => {
 			console.log("[WS] Connected", this.socket.readyState);
 		}
 
-		this.socket.onerror = (e) => console.error("[WS] Error", e);
+		this.socket.onerror = (e) => {
+			console.error("[WS] Error:", e);
+			if (this.socket.readyState === WebSocket.CLOSED) {
+				RoutingHandler.setRoute("/");
+				NotificationManager.notify({
+					level: "error",
+					title: i18nHandler.getValue("notification.generic.errorTitle"),
+					message: i18nHandler.getValue("notification.generic.errorMessage"),
+				});
+			}
+		}
 	}
 
 	public close() {

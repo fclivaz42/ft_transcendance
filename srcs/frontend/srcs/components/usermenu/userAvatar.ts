@@ -11,9 +11,11 @@ export interface UserAvatarProps {
 	disableClick?: boolean;
 }
 
+export type UserAvatarType = HTMLDivElement & { firstChild: HTMLImageElement };
+
 export default async function createUserAvatar(props: UserAvatarProps = {
 	editable: false
-}): Promise<HTMLImageElement> {
+}): Promise<UserAvatarType> {
 	if (!props.sizeClass)
 		props.sizeClass = "w-10 h-10";
 
@@ -26,35 +28,31 @@ export default async function createUserAvatar(props: UserAvatarProps = {
 		src = await UserHandler.fetchUserPicture(props.playerId);
 
 	const template = document.createElement("template");
+	let href: string | undefined;
+	if (!props.editable && !props.disableClick && !props.isComputer) {
+		if (props.playerId)
+			href = `/user?playerId=${props.playerId}`;
+		else
+			href = "/user";
+	}
 	template.innerHTML = `
-		<img src="${sanitizer(src)}" ${src === UserHandler.avatarUrl ? "data-user=\"avatar\"": ""} alt="User Avatar" class="select-none border-2 rounded-full object-cover ${sanitizer(props.sizeClass)} bg-white">
+		<a ${href ? `href="${sanitizer(href)}" target="_blank"` : ""}><img src="${sanitizer(src)}" ${src === UserHandler.avatarUrl ? "data-user=\"avatar\"": ""} alt="User Avatar" class="select-none border-2 rounded-full object-cover ${sanitizer(props.sizeClass)} bg-white"></a>
 	`;
-	const userAvatar = template.content.firstElementChild as HTMLImageElement;
 
-	userAvatar.onerror = () => {
-		userAvatar.src = "/assets/images/default_avatar.svg";
-	};
+	const userAvatar = template.content.firstElementChild as UserAvatarType;
 
-	if (!props.disableClick && !props.isComputer) {
-		userAvatar.classList.add("cursor-pointer");
-		userAvatar.onclick = () => {
-			if (props.playerId && props.playerId !== UserHandler.userId) {
-				RoutingHandler.setRoute(`/user?playerId=${props.playerId}`);
-			} else {
-				RoutingHandler.setRoute("/user");
-			}
-		};
-		userAvatar.onauxclick = () => {
-			if (props.playerId && props.playerId !== UserHandler.userId) {
-				window.open(`/user?playerId=${props.playerId}`, "_blank");
-			} else {
-				window.open("/user", "_blank");
-			}
-		}
+	try {
+		const fetched = await fetch(userAvatar.firstChild.src, { cache: "force-cache" });
+		if (!fetched.ok)
+			throw new Error(`Failed to fetch user avatar: ${fetched.status} ${fetched.statusText}`);
+	} catch (error) {
+		userAvatar.firstChild.src = "/assets/images/default_avatar.svg";
 	}
 
 	if (props.editable) {
-		userAvatar.onload = () => {
+		console.log("User avatar is editable, setting up upload functionality.");
+		userAvatar.firstChild.onload = () => {
+			console.log("User avatar loaded successfully.");
 			const newContainer = document.createElement("div");
 			newContainer.className = "relative rounded-full overflow-hidden";
 			userAvatar.classList.add("cursor-pointer");
@@ -83,10 +81,10 @@ export default async function createUserAvatar(props: UserAvatarProps = {
 			userMenuManager.uploadFile.onchange = async () => {
 				const file = userMenuManager.uploadFile.files?.[0];
 				if (!file) {
-					userAvatar.src = UserHandler.avatarUrl;
+					userAvatar.firstChild.src = UserHandler.avatarUrl;
 					return;
 				}
-				userAvatar.src = URL.createObjectURL(file);
+				userAvatar.firstChild.src = URL.createObjectURL(file);
 			};
 			newContainer.appendChild(editContainer);
 		}

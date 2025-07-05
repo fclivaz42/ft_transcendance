@@ -13,28 +13,24 @@ export function createPongSidePanel() {
 	const buttonLogo = "/assets/ui/login-door-1-svgrepo-com.svg";
 
 	sidePanel.appendChild(createSidePanelButton({
-		title: i18nHandler.getValue("navbar.pong.submenu.play"),
 		i18n: "navbar.pong.submenu.play",
 		logo: buttonLogo,
 		f: () => RoutingHandler.setRoute("/pong"),
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
-		title: i18nHandler.getValue("navbar.pong.submenu.solo"),
 		i18n: "navbar.pong.submenu.solo",
 		logo: buttonLogo,
 		f: () => RoutingHandler.setRoute("/pong?room=computer"),
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
-		title: i18nHandler.getValue("navbar.pong.submenu.join"),
 		i18n: "navbar.pong.submenu.join",
 		logo: buttonLogo,
 		f: () => createPongJoinDialog(),
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
-		title: i18nHandler.getValue("navbar.pong.submenu.create"),
 		i18n: "navbar.pong.submenu.create",
 		logo: buttonLogo,
 		f: () => RoutingHandler.setRoute("/pong?room=host"),
