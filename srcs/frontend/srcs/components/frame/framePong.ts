@@ -4,14 +4,16 @@ import { i18nHandler } from "../../handlers/i18nHandler";
 import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler from "../../handlers/UserHandler";
 import { sanitizer } from "../../helpers/sanitizer";
+import { createButton } from "../buttons";
 import createUserAvatar from "../usermenu/userAvatar";
 
 export async function createPongCanvas(isComputer: boolean): Promise<HTMLDivElement> {
 	const template = document.createElement("template");
 
-	const playerAvatar: HTMLImageElement[] = [];
-	playerAvatar.push(await createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
-	playerAvatar.push(await createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
+	const playerAvatar: (HTMLDivElement & { firstChild: HTMLImageElement })[] = [
+		await createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}),
+		await createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"})
+	];
 	playerAvatar[0].setAttribute("data-pong-avatar", "p1");
 	playerAvatar[1].setAttribute("data-pong-avatar", "p2");
 
@@ -63,6 +65,16 @@ export function createPongLoading(message: string): HTMLDivElement {
 					</svg>
 					<span class="sr-only">Loading...</span>
 				</div>
+				<div id="pong-room-code" class="hidden justify-center items-center gap-2 mt-12">
+					<p class="text-lg text-gray-700 dark:text-gray-300" data-i18n="pong.roomCode">${sanitizer(i18nHandler.getValue("pong.privateJoin.roomCode"))}</p>
+					<input type="text" id="pong-room-code-input" class="w-16 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" readonly>
+					${createButton({
+						id: "pong-room-code-copy",
+						i18n: "pong.privateJoin.copyUrl",
+						color: "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded",
+						darkColor: "dark:bg-blue-700 dark:hover:bg-blue-800",
+					}).outerHTML}
+				</div>
 			</div>
 		</div>
 	`;
@@ -101,9 +113,22 @@ export default function createPongFrame() {
 	const searchParams = RoutingHandler.searchParams;
 	let pongFrame: HTMLDivElement;
 	const room = searchParams.get("room");
-	if (room !== "computer")
-		pongFrame = createPongLoading("pong.waitingPlayer");
-	else
+	if (room === "host")
+		pongFrame = createPongLoading("pong.waitingFriend");
+	else if (room === "computer")
 		pongFrame = createPongLoading("generic.loading");
+	else
+		pongFrame = createPongLoading("pong.waitingPlayer");
+	const button = pongFrame.querySelector("#pong-room-code-copy");
+	const input = pongFrame.querySelector<HTMLInputElement>("#pong-room-code-input");
+	button?.addEventListener("click", () => {
+		if (!input)
+			return;
+		const url = new URL(window.location.origin);
+		url.pathname = "/pong";
+		url.searchParams.set("room", "join");
+		url.searchParams.set("room", input.value);
+		window.navigator.clipboard.writeText(url.toString());
+	});
 	return pongFrame;
 }

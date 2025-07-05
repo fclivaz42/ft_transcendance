@@ -1,14 +1,17 @@
 
 import { Engine } from "@babylonjs/core/Engines/engine.js";
 
-import { InitHandler, WebSocketManager } from "../game/WebSocketManager.js";
+import { WebSocketManager } from "../game/WebSocketManager.js";
 import { GameField } from "../game/GameField.js";
 import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
-import { InitPayload } from "../game/types.js";
+import { GameOverPayload, InitPayload, PlayerConnectedPayload } from "../game/types.js";
 import UserHandler from "../handlers/UserHandler.js";
 import { i18nHandler } from "../handlers/i18nHandler.js";
 import createUserAvatar from "../components/usermenu/userAvatar.js";
+import { Users } from "../interfaces/Users.js";
+import { createPongGameoverDialog } from "../components/dialog/pongGameover/index.js";
+import RoutingHandler from "../handlers/RoutingHandler.js";
 
 function enforceDefined<T>(value: T | undefined, message: string): T {
 	if (!value)
@@ -33,6 +36,10 @@ class PongGameManager {
 		ping: number | undefined;
 		sentPing: number | undefined;
 	} = {ping: undefined, sentPing: undefined, lastCheck: undefined};
+	private users: Record<"p1" | "p2", Users | undefined> = {
+		p1: undefined,
+		p2: undefined
+	}
 
 	public calculatePing() {
 		if (this.pingInterval.sentPing === undefined) {
@@ -59,12 +66,10 @@ class PongGameManager {
 	}
 
 	public reset() {
-		if (this.started) {
-			this.started = false;
-			this.cleanupGame();
-			this.websocketManager?.close();
-			this.engine?.dispose();
-		}
+		this.started = false;
+		this.cleanupGame();
+		this.websocketManager?.close();
+		this.engine?.dispose();
 	}
 
 	private async initializeFrontElements(payload: InitPayload["payload"]) {
@@ -74,12 +79,18 @@ class PongGameManager {
 			const playerData = identifier === "p1" ? payload.connectedPlayers.p1 : payload.connectedPlayers.p2;
 			const avatarElement = this.getFrontElements.canvasContainer.querySelector<HTMLImageElement>(`[data-pong-avatar="${identifier}"]`);
 			if (playerData === undefined) {
+				const botUser: Users = {
+					DisplayName: i18nHandler.getValue("pong.computer") || "Computer",
+					PlayerID: "bot"
+				}
+				this.users[identifier as "p1" | "p2"] = botUser;
 				avatarElement?.replaceWith(await createUserAvatar({isComputer: true, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
 				element.textContent = i18nHandler.getValue("pong.computer") || "Computer";
 				return;
 			}
 			const user = UserHandler.fetchUser(playerData);
 			user.then(async (userData) => {
+				this.users[identifier as "p1" | "p2"] = userData;
 				if (!userData) throw new Error(`User data for ${identifier} not found.`);
 				element.textContent = userData.DisplayName;
 				avatarElement?.replaceWith(await createUserAvatar({playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
@@ -173,6 +184,37 @@ class PongGameManager {
 					}, 1000);
 			});
 		}
+	}
+
+	public getPlayers(): Record<"p1" | "p2", Users | undefined> {
+		return this.users;
+	}
+
+	public onGameOver(payload: GameOverPayload["payload"]) {
+		console.log("Game Over payload received:", payload);
+		const winner = this.users[payload.winner as "p1" | "p2"];
+		if (!winner) {
+			console.error("Winner not found in users:", payload.winner);
+			return;
+		}
+		const finalScore = payload.final_score as {p1: number, p2: number};
+		console.log(`Game Over! Winner: ${winner.DisplayName}, Final Score: P1 - ${finalScore.p1}, P2 - ${finalScore.p2}`);
+		createPongGameoverDialog(payload, this.users);
+	}
+
+	public onConnect(payload: PlayerConnectedPayload["payload"]) {
+		if (RoutingHandler.searchParams.get("room") !== "host")
+			return;
+		RoutingHandler.url.searchParams.set("room", payload.roomID);
+		RoutingHandler.updateUrl();
+		const pongRoomCode = document.querySelector<HTMLInputElement>("#pong-room-code");
+		if (!pongRoomCode)
+			throw new Error("Pong room code input not found.");
+		const input = pongRoomCode.querySelector("#pong-room-code-input") as HTMLInputElement;
+		if (!input)
+			throw new Error("Pong room code input element not found.");
+		input.value = payload.roomID;
+		pongRoomCode.classList.replace("hidden", "flex");
 	}
 }
 
