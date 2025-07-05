@@ -7,7 +7,7 @@ import { config } from "../managers/ConfigManager.ts";
 import { stateManager } from "../managers/StateManager.ts";
 import { GoogleJwtManager } from "../managers/GoogleJwtManager.ts";
 import { Logger } from "../../../libs/helpers/loggers.ts";
-import type { UserRegisterOauthProps } from "../../../libs/interfaces/User.ts";
+import type { User, UserRegisterOauthProps } from "../../../libs/interfaces/User.ts";
 import UsersSdk from "../../../libs/helpers/usersSdk.ts";
 import DatabaseSDK from "../../../libs/helpers/databaseSdk.ts";
 import crypto from "crypto";
