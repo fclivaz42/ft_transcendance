@@ -91,6 +91,7 @@ interface GameOverPayload {
 	type: "gameover",
 	payload: {
 		winner: string,
+		loser: string,
 		final_score: RoomScore
 	}
 }
@@ -366,11 +367,12 @@ export default class GameRoom {
 		return collisionPayload;
 	}
 
-	private buildGameOverPayload(winner: number): GameOverPayload {
+	public buildGameOverPayload(winner: number): GameOverPayload {
 		const gameOver: GameOverPayload = {
 			type: "gameover",
 			payload: {
 				winner: winner === 1 ? "p1" : "p2",
+				loser: winner === 1 ? "p2" : "p1",
 				final_score: this.score
 			}
 		}
