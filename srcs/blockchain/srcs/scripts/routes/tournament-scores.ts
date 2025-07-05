@@ -25,7 +25,11 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (!currentContract)
 			return reply.code(400).send("No contract has been set");
 		const { id } = request.params;
-		const result: TournamentScore[] = await getTournamentScore(currentContract, id);
-		return reply.code(200).send(`\nTournament: ${result}\n`);
+		try {
+			const result: TournamentScore[] = await getTournamentScore(currentContract, id);
+			return reply.code(200).send(result);
+		} catch (exception) {
+			return reply.code(400).send("error.bad.tournamentid")
+		}
 	})
 }

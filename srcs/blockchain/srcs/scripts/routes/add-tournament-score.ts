@@ -16,7 +16,6 @@ const scoreSchema = z.object({
 
 export default async function module_routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
 	fastify.post('/', async function handler(request, reply) {
-
 		if (request.headers["content-type"] !== "application/json")
 			return reply.code(400).send("Need application/json header");
 		if (!request.headers["authorization"])

@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/05 19:04:37 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/26 18:49:21 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/30 18:23:33 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -128,7 +128,7 @@ else
 	Logger.error("Could not create user!")
 
 // WARN: UNCOMMENT ONCE WORKING WITH BLOCKCHAIN
-// check_contract()
+check_contract()
 
 //
 // Aaaand start!

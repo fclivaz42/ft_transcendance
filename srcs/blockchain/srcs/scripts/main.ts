@@ -10,7 +10,7 @@ const subfolder = path.join(import.meta.dirname, "routes")
 const folder = fs.readdirSync(subfolder)
 
 const ts_files = folder.filter(file => file.endsWith('.ts'));
-
+;
 async function load_modules() {
 	for (const file of ts_files) {
 		const file_path = path.join(subfolder, file)

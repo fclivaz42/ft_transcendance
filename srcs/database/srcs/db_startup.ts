@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/23 22:29:28 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/30 18:24:51 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -18,6 +18,7 @@ import { tables } from "./db_vars.ts"
 import { hash_password } from "./db_helpers.ts"
 import DatabaseWorker from "./db_methods.ts"
 import Logger from "../../libs/helpers/loggers.ts"
+import BlockchainSDK from "../../libs/helpers/blockchainSdk.ts"
 
 //
 // Automatically check if any column has been changed in db_vars.ts
@@ -135,21 +136,20 @@ export async function add_default_user() {
 //
 
 export async function check_contract() {
+	const block = new BlockchainSDK();
 	const resp: object | undefined = DatabaseWorker.get_contract(tables.CurrentContract.Name);
 	if (resp !== undefined) {
+		await block.deploy(resp[tables.CurrentContract.Fields[0]])
+			.then(function(response: at.AxiosResponse) {
+				Logger.info(`Sent ${resp[tables.CurrentContract.Fields[0]]} successfully.`)
+			})
+			.catch(function(error: at.AxiosError) {
+				Logger.info(`Failed to send ${resp[tables.CurrentContract.Fields[0]]}\n ${error}`)
+			})
 		Logger.info(`Blockchain already there: ${resp[tables.CurrentContract.Fields[0]]}`)
 		return;
 	}
-	const ask_blockchain: at.AxiosInstance = Axios.create({
-		method: "post",
-		timeout: 15000,
-		baseURL: "http://blockchain:8080",
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': process.env.API_KEY,
-		}
-	});
-	await ask_blockchain.post("/deploy", "")
+	block.deploy(undefined)
 		.then(function(response: at.AxiosResponse) {
 			const obj = {};
 			obj[tables.CurrentContract.Fields[0]] = response.data;
