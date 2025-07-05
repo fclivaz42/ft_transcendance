@@ -78,14 +78,13 @@ async function createHistoryElement(match: Matches): Promise<HTMLDivElement | nu
 	}
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<a ${match.HashAddress ? sanitizer(`href="https://subnets-test.avax.network/c-chain/tx/${sanitizer(match.HashAddress)}" target="_blank"`) : ""} class="relative cursor-pointer select-none w-fit bg-panel dark:bg-panel_dark p-4 mb-4 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center hover:animate-scale hover:animate-duration-100">
-
+		<a ${match.HashAddress ? `href="${sanitizer(`https://subnets-test.avax.network/c-chain/tx/${sanitizer(match.HashAddress)}`)}" target="_blank"` : ""} class="relative cursor-pointer select-none w-fit bg-panel dark:bg-panel_dark p-4 mb-4 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center hover:animate-scale hover:animate-duration-100">
 			<div class="flex items-center justify-between gap-4">
 				<div class="flex items-center justify-start gap-2 lg:w-[250px] w-[160px]">
 					<div class="relative">
 						<p data-i18n="history.winner" class="lg:text-xl text-sm absolute -bottom-4 left-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${i18nHandler.getValue("history.winner")}</p>
 						<p class="text-2xl font-bold lg:bottom-0 -bottom-4 lg:-right-16 -right-20 absolute">${sanitizer(match.WScore)}</p>
-						${(await createUserAvatar({playerId: oponents[0].PlayerID, sizeClass: "lg:w-24 lg:h-24 w-12 h12"})).outerHTML}
+						${(await createUserAvatar({playerId: oponents[0].PlayerID, sizeClass: "lg:w-24 lg:h-24 w-12 h-12"})).innerHTML}
 					</div>
 					<p class="truncate lg:max-w-32 max-w-24 lg:text-lg text-xs font-semibold">${sanitizer(oponents[0].DisplayName)}</p>
 				</div>
@@ -97,7 +96,7 @@ async function createHistoryElement(match: Matches): Promise<HTMLDivElement | nu
 					<div class="relative">
 						<p data-i18n="history.loser" class="lg:text-xl text-sm absolute -bottom-4 right-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.loser"))}</p>
 						<p class="text-2xl font-bold lg:bottom-0 -bottom-4 lg:-left-16 -left-20 absolute">${sanitizer(match.LScore)}</p>
-						${(await createUserAvatar({playerId: oponents[1].PlayerID, sizeClass: "lg:w-24 lg:h-24 w-12 h12"})).outerHTML}
+						${(await createUserAvatar({playerId: oponents[1].PlayerID, sizeClass: "lg:w-24 lg:h-24 w-12 h-12"})).innerHTML}
 					</div>
 				</div>
 			</div>
@@ -107,13 +106,14 @@ async function createHistoryElement(match: Matches): Promise<HTMLDivElement | nu
 					return `<p class="absolute -top-4 mx-auto text-xs  bg-red-100 dark:bg-red-900 rounded-md p-2">
 						! ${sanitizer(i18nHandler.getValue("history.notchain"))}
 						</p>`;
+				return "";
 			})()}
 		</a>
 	`;
 	return template.content.firstElementChild as HTMLDivElement;
 }
 
-async function loadHistory(matchElements: string[], page: number, elemPerPage: number): Promise<HTMLTemplateElement> {
+async function loadHistory(matchElements: string[], page: number, elemPerPage: number): Promise<HTMLDivElement> {
 	const template = document.createElement("template");
 	if (matchElements.length <= 0) {
 		template.innerHTML = `
@@ -123,12 +123,14 @@ async function loadHistory(matchElements: string[], page: number, elemPerPage: n
 				</p>
 			</div>
 		`;
-		return template;	
+		return template.content.firstElementChild as HTMLDivElement;
 	}
-	template.innerHTML = sanitizer(`
-		${matchElements.slice((page === 1 ? 0 : (page - 1) * elemPerPage), page * elemPerPage).join("")}
-	`);
-	return template;
+	template.innerHTML = `
+		<div>
+			${matchElements.slice((page === 1 ? 0 : (page - 1) * elemPerPage), page * elemPerPage).join("")}
+		</div>
+	`;
+	return template.content.firstElementChild as HTMLDivElement;
 }
 
 export default async function createHistoryFrame(): Promise<HTMLDivElement> {
@@ -175,12 +177,11 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 				History of ${sanitizer(player.DisplayName)}
 			</h3>
 			<div id="history-elements" class="mx-auto flex flex-col items-center gap-4 w-fit">
-				${(await loadHistory(matchElements, page, elemPerPage)).outerHTML}
+				${(await loadHistory(matchElements, page, elemPerPage)).innerHTML}
 			</div>
 			<div class="flex items-center justify-center gap-4 mt-4">
 				${createButton({
 					id: "history-back",
-					title: "",
 					logo: "/assets/ui/previous-svgrepo-com.svg",
 				}).outerHTML}
 				<p id="history-page" class="text-sm text-gray-500 dark:text-gray-400 select-none text-center w-10">
@@ -188,7 +189,6 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 				</p>
 				${createButton({
 					id: "history-next",
-					title: "",
 					logo: "/assets/ui/next-svgrepo-com.svg",
 				}).outerHTML}
 			</div>
