@@ -394,6 +394,15 @@ class UsersSdk {
 	public async getUserAlive(uuid: string): Promise<AxiosResponse<UsersSdkAliveResponse>> {
 		return this.apiRequest<UsersSdkAliveResponse>("get", `${uuid}/alive`);
 	}
+
+	public async post2FA(ClientId: string, Code: string): Promise<AxiosResponse<any>> {
+		return this.apiRequest<any>("post", "2fa", {
+			data: {
+				Code,
+				ClientId
+			}
+		})
+	}
 }
 
 export default UsersSdk;

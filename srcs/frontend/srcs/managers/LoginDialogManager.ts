@@ -7,6 +7,7 @@
 // gere le contenu de la fenetre de connexion
 import SarifDialog from "../class/BackdropDialog";
 import { createLoginDialog } from "../components/backdropDialog/loginDialog"; // Importe la fonction modifiée
+import { createLogin2fa } from "../components/dialog/login2fa";
 import { i18nHandler } from "../handlers/i18nHandler.js";
 import UserHandler from "../handlers/UserHandler.js";
 import NotificationManager from "./NotificationManager.js";
@@ -14,6 +15,11 @@ import NotificationManager from "./NotificationManager.js";
 class LoginDialogManager {
   private dialog: SarifDialog | null = null;
   private currentDialogMode: 'login' | 'register'  | 'forgotPassword' = 'register';; // Suivre le mode actuel
+
+	private async init2fa() {
+		const dialog = createLogin2fa();
+		dialog.show();
+	}
 
   public initialize() {
     const handleSwitchMode = (newMode: 'login' | 'register' | 'forgotPassword') => {
@@ -33,7 +39,8 @@ class LoginDialogManager {
 			let user = {
 				DisplayName: data.displayName,
 				EmailAddress: data.email,
-				Password: data.password
+				Password: data.password,
+				ClientId: UserHandler.clientId,
 			}
       if (mode === 'login') {
 				// le login peut se faire avec un displayName ou un email
@@ -41,6 +48,8 @@ class LoginDialogManager {
 					user.EmailAddress = data.displayName;
 					user.DisplayName = "";
 				}
+				if (!UserHandler.clientId)
+					throw new Error("error.missingClientId");
 				await fetch("/api/users/login", {
 					method: "POST",
 					headers: {
@@ -48,23 +57,9 @@ class LoginDialogManager {
 					},
 					body: JSON.stringify(user),
 				}).then(response => {
-					if (response.ok) {
-						UserHandler.fetchUser();
-						dialog.remove();
-					} else {
-						if (response.status === 401)
-							NotificationManager.notify({
-								level: "error",
-								title: i18nHandler.getValue("panel.loginPanel.notification.loginErrorTitle"),
-								message: i18nHandler.getValue("panel.loginPanel.notification.loginBadCredentials")
-							});
-						else
-							NotificationManager.notify({
-								level: "error",
-								title: i18nHandler.getValue("panel.loginPanel.notification.loginErrorTitle"),
-								message: i18nHandler.getValue("panel.loginPanel.notification.loginErrorMessage")
-							});
-					}
+					if (!response.ok)
+						throw new Error(`login.error.notvalid`);
+					this.init2fa();
 				});
       } else if (mode === 'register') {
 				if (data.password !== data.confirmPassword) {
