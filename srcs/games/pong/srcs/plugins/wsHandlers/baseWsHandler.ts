@@ -83,7 +83,8 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 				const { type, payload }: ClientMessage = JSON.parse(msg.toString());
 				if (type === 'ball' && payload?.direction && payload.direction == "launch") {
 					let ball = session.getRoom()?.getGame().getBall();
-					ball?.launch();
+					if (!session.getRoom()?.getGame().getBall().getIsLaunched())
+						ball?.launch();
 				}
 				else if (type === 'move' && payload?.direction) {
 					const paddle = session.getPaddle();

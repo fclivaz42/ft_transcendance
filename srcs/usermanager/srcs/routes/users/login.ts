@@ -93,7 +93,7 @@ const send2faVerification = async (email: string, id: string, user: string): Pro
 			setTimeout(() => {
 				codeUser.delete(id);
 				resolve(true);
-			}, 300000); // 5 minutes
+			}, 300000);
 		});
 	}
 	catch (err) {
