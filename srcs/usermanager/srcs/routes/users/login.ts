@@ -11,6 +11,7 @@ import Logger from '../../../../libs/helpers/loggers.ts';
 import DatabaseSDK from '../../../../libs/helpers/databaseSdk.ts';
 import nodemailer from "nodemailer";
 import { codeUser } from './2FAreceipt.ts';
+import type { TwoFaLogUser } from './2FAreceipt.ts';
 
 export default async function usersLoginEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.post("/login", async (request, reply) => {
@@ -56,8 +57,7 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 			throw new Error("Missing PlayerID in user data");
 
 		try {
-			await send2faVerification(loggedUser.EmailAddress);
-			console.log(codeUser.get(loggedUser.EmailAddress));
+			await send2faVerification(loggedUser.EmailAddress, userLogin.ClientID, loggedUser.PlayerID);
 		}
 		catch (err) {
 			return reply.status(503).send(`Error during 2FA :", ${err}`);
@@ -70,7 +70,7 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 	});
 }
 
-const send2faVerification = async (email: string): Promise<void> => {
+const send2faVerification = async (email: string, id: string, user: string): Promise<void> => {
 	try {
 		const transporter = nodemailer.createTransport({
 			service: process.env.TWOFA_SERVICE,
@@ -82,7 +82,12 @@ const send2faVerification = async (email: string): Promise<void> => {
 			}
 		});
 
-		const code: string = randomNumericString(6);
+		let code: string;
+		while (true) {
+			code = randomNumericString(6);
+			if (!codeUser[code])
+				break;
+		}
 		const mailOptions = {
 			from: `"Sarif " <${process.env.AUTH_EMAIL}>`,
 			to: email,
@@ -91,7 +96,7 @@ const send2faVerification = async (email: string): Promise<void> => {
 		};
 		await transporter.sendMail(mailOptions);
 		console.log(`2FA email sent to ${email}`);
-		codeUser.set(email, code);
+		codeUser.set(id, { Code: code, PlayerID: user } as TwoFaLogUser);
 	}
 	catch (err) {
 		console.error("Error during 2FA :", err);

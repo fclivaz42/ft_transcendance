@@ -14,6 +14,7 @@ export interface UserLoginProps {
 	DisplayName?: string;
 	EmailAddress?: string;
 	Password: string;
+	ClientID: string;
 }
 
 export interface UserRegisterProps extends UserLoginProps {

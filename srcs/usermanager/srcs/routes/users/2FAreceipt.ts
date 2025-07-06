@@ -7,34 +7,46 @@ import https from 'https';
 import DatabaseSDK from '../../../../libs/helpers/databaseSdk.ts';
 import FixedSizeMap from '../../../../libs/interfaces/FixedSizeMap.ts'
 
-export var codeUser = new FixedSizeMap<string, string>(500);
+interface TwoFaProps {
+	Code: string;
+	ClientID: string;
+}
 
-interface Email {
-	email: string,
-};
+export interface TwoFaLogUser {
+	Code: string;
+	PlayerID: string;
+}
+
+export var codeUser = new FixedSizeMap<string, TwoFaLogUser>(500);
 
 export default async function twoFaReceiptEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
-	app.post<{ Params: Email }>('/2fa/email/:email', async function handler(request, reply) {
+	app.post('/2fa', async function handler(request, reply) {
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
 			return authorization;
-		const email = request.params.email;
-		if (!request.headers['code'])
-			return reply.code(400).send("Missing 2fa code");
 
-		const code = request.headers['code'];
-		if (!codeUser.get(email))
-			return reply.code(404).send("No 2fa code associated with this email");
-		if (codeUser.get(email) !== code)
+		const body = request.body as TwoFaProps;
+
+		if (!codeUser.get(body.ClientID))
+			return reply.code(404).send("No 2fa code associated with this ClientID");
+		if (codeUser.get(body.ClientID)?.Code !== body.Code)
 			return httpReply({
 				detail: "Invalid 2fa code",
 				status: 401,
 				module: "usermanager",
 			}, reply, request);
+
+		const user: string | undefined = codeUser.get(body.ClientID)?.PlayerID;
+		if (user === undefined)
+			return httpReply({
+				detail: `Invalid undefiend PlayerId with '${body.ClientID}' client id`,
+				status: 401,
+				module: "usermanager",
+			}, reply, request);
+
 		const db_sdk = new DatabaseSDK();
-		let loggedUser = (await db_sdk.get_user(email, "EmailAddress")).data;
-		if (!loggedUser.PlayerID)
-			return reply.code(404).send("No user logged at this email address");
+
+		let loggedUser = (await db_sdk.get_user(user, "PlayerID")).data;
 		const jwtToken = jwt.createJwtToken({
 			sub: loggedUser.PlayerID,
 			data: {
