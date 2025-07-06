@@ -9,9 +9,10 @@ import axios from 'axios';
 import https from 'https';
 import Logger from '../../../../libs/helpers/loggers.ts';
 import DatabaseSDK from '../../../../libs/helpers/databaseSdk.ts';
-import nodemailer from "nodemailer";
 import { codeUser } from './2FAreceipt.ts';
 import type { TwoFaLogUser } from './2FAreceipt.ts';
+import { config } from '../../managers/ConfigManager.ts';
+import EmailManager from '../../managers/EmailManager.ts';
 
 export default async function usersLoginEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.post("/login", async (request, reply) => {
@@ -72,16 +73,6 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 
 const send2faVerification = async (email: string, id: string, user: string): Promise<void> => {
 	try {
-		const transporter = nodemailer.createTransport({
-			service: process.env.TWOFA_SERVICE,
-			port: process.env.TWOFA_PORT,
-			secure: false,
-			auth: {
-				user: process.env.AUTH_EMAIL,
-				pass: process.env.AUTH_EMAIL_PASSW,
-			}
-		});
-
 		let code: string;
 		while (true) {
 			code = randomNumericString(6);
@@ -89,13 +80,21 @@ const send2faVerification = async (email: string, id: string, user: string): Pro
 				break;
 		}
 		const mailOptions = {
-			from: `"Sarif " <${process.env.AUTH_EMAIL}>`,
+			from: config.SmtpConfig.from,
 			to: email,
 			subject: 'Your code 2FA',
 			text: `Your verification code is : ${code}`,
 		};
-		await transporter.sendMail(mailOptions);
+		EmailManager.sendMail(mailOptions).catch((err) => {
+			Logger.error(`Error sending 2FA email to ${email}: ${err}`);
+		});
 		codeUser.set(id, { Code: code, PlayerID: user } as TwoFaLogUser);
+		new Promise((resolve) => {
+			setTimeout(() => {
+				codeUser.delete(id);
+				resolve(true);
+			}, 300000); // 5 minutes
+		});
 	}
 	catch (err) {
 		console.error("Error during 2FA :", err);
