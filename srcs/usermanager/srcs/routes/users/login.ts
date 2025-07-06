@@ -57,7 +57,7 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 			throw new Error("Missing PlayerID in user data");
 
 		try {
-			await send2faVerification(loggedUser.EmailAddress, userLogin.ClientID, loggedUser.PlayerID);
+			await send2faVerification(loggedUser.EmailAddress, userLogin.ClientId, loggedUser.PlayerID);
 		}
 		catch (err) {
 			return reply.status(503).send(`Error during 2FA :", ${err}`);
