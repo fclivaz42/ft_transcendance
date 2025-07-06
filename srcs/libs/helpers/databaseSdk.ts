@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/30 19:32:22 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/06 17:15:28 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -195,7 +195,6 @@ export default class DatabaseSDK {
 	*/
 	public async get_tournament(tournament_id: UUIDv4): Promise<AxiosResponse<Tournament_full>> {
 		return await this.api_request<Tournament_full>("GET", "Tournaments", `/TournamentID/${this.param_str}`, { params: tournament_id })
-
 	}
 
 	/**
@@ -247,7 +246,11 @@ export default class DatabaseSDK {
 		return await this.get_player_matchlist_from_user(user)
 	}
 
-	// WARN: DOUBLE-CHECK THIS
+	/**
+	* Create a new user on the database and, additionnally, store it on the Blockchain.
+	* @param match the Match object with its data.
+	* @returns the created match with the input data. Throws if anything fails.
+	*/
 	public async create_match(match: Match): Promise<AxiosResponse<Match>> {
 		const finished_match: Match = await this.api_request<Match>("POST", "Matches", undefined, { body: match })
 			.then(response => response.data)

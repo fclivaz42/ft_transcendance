@@ -1,12 +1,14 @@
 import axios from 'axios';
-import type { AxiosResponse } from "axios";
+import type { AxiosError, AxiosResponse } from "axios";
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import UsersSdk from '../../../libs/helpers/usersSdk.ts';
+import DatabaseSDK from '../../../libs/helpers/databaseSdk.ts';
 import type { UserLoginProps, UserRegisterProps, User } from '../../../libs/interfaces/User.ts';
 import Logger from "../../../libs/helpers/loggers.ts";
 import { httpReply } from "../../../libs/helpers/httpResponse.ts";
 
 const usersSdk = new UsersSdk();
+const db_sdk = new DatabaseSDK();
 
 // usersEnforceAuthorize will throw and send http error if the user is not authorized,
 
@@ -197,15 +199,26 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 	});
 
 	// The route that DELETES current user.
-	/*fastify.all('/delete', async (request, reply) => {
+	fastify.all('/delete', async (request, reply) => {
 		if (request.method !== 'DELETE')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only DELETE method is allowed for user deletion.' });
+		if (!request.headers.password)
+			return reply.code(401).send({ error: 'Unauthorized', message: 'Missing password.' });
+		if (typeof request.headers.password !== "string")
+			return reply.code(401).send({ error: 'Unauthorized', message: 'Password is not a string.' });
 
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
-
+		try {
+			const test = await db_sdk.log_user(authorization.data.sub, "PlayerID", request.headers.password as string)
+				.then(response => response.data)
+		} catch (exception) {
+			if (exception.status === 403)
+				return reply.code(403).send({ error: "Unauthorized", message: "No password is set due to 2FA." })
+			return reply.code(401).send({ error: "Unauthorized", message: "Wrong password." })
+		}
 		const deleteUser = await usersSdk.deleteUser(authorization.data.sub);
 		return reply.code(deleteUser.status).send(deleteUser.data);
-	});*/
+	});
 
 	// The route that allows a user to update their data (eg. password, address, etc).
 	fastify.all('/update', async (request, reply) => {
@@ -215,6 +228,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 		const userId = authorization.data.sub;
 		const formdata = new FormData();
+		// @ts-expect-error
 		for await (const part of request.parts()) {
 			if (part.type === "file") {
 				if (formdata.keys.length !== 0)
