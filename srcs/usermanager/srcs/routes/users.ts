@@ -40,7 +40,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		const user: Partial<User> = request.body as Partial<User>;
 		user.LastAlive = Date.now();
 		const res = await db_sdk.update_user(user);
-		reply.code(200).send({LastAlive: res.data.LastAlive});
+		reply.code(200).send({ LastAlive: res.data.LastAlive });
 	});
 
 	app.get("/:uuid/alive", async (request, reply) => {
@@ -64,7 +64,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 			.catch((error) => {
 				if (axios.isAxiosError(error) && error.response) {
 					Logger.debug(`Error getting user picture for ${params.uuid}`);
-					return httpReply({module: "usermanager", detail: error.response.statusText, status: error.response.status}, reply, request);
+					return httpReply({ module: "usermanager", detail: error.response.statusText, status: error.response.status }, reply, request);
 				}
 				throw error;
 			});
@@ -96,7 +96,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		let filteredFriends: any = friends.data.filter((friend: Partial<User>) => friend);
 
 		// Filter users to remove any personal data
-		filteredFriends =  filteredFriends.map((friend: User) => UsersSdk.filterPublicUserData(friend as User));
+		filteredFriends = filteredFriends.map((friend: User) => UsersSdk.filterPublicUserData(friend as User));
 
 		// Filter out any friends that are not in the database and delete them
 		filteredFriends = await filteredFriends.filter(async (friend: Partial<User>) => {
@@ -125,7 +125,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 			if (!a.DisplayName || !b.DisplayName) return 0;
 			return a.DisplayName.localeCompare(b.DisplayName);
 		});
-	
+
 		// Return the filtered friends list
 		return reply.code(friends.status).send(filteredFriends);
 	});
@@ -244,7 +244,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		const userValidation = UsersValidation.enforceUserValidation(reply, request, user);
 		if (userValidation)
 			return userValidation;
-		
+
 		if (formdata.has("file"))
 			await db_sdk.set_user_picture(params.uuid, formdata);
 		if (Object.keys(user).length >= 1) {
