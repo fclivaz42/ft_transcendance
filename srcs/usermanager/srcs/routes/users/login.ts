@@ -62,7 +62,11 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 		catch (err) {
 			return reply.status(503).send(`Error during 2FA :", ${err}`);
 		}
-		return reply.status(200).send("2fa send");
+		return httpReply({
+			detail: "2fa sent",
+			status: 200,
+			module: "usermanager",
+		}, reply, request);
 	});
 }
 

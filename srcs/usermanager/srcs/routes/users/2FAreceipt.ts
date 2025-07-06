@@ -25,18 +25,21 @@ export default async function twoFaReceiptEndpoint(app: FastifyInstance, opts: F
 		const code = request.headers['code'];
 		if (!codeUser.get(email))
 			return reply.code(404).send("No 2fa code associated with this email");
-		if (codeUser.get(email) === code)
-			return reply.code(200).send("Authorization");
+		if (codeUser.get(email) !== code)
+			return httpReply({
+				detail: "Invalid 2fa code",
+				status: 401,
+				module: "usermanager",
+			}, reply, request);
 		const db_sdk = new DatabaseSDK();
-		let loggedUser = await db_sdk.get_user(email, "EmailAddress");
-		if (!loggedUser)
+		let loggedUser = (await db_sdk.get_user(email, "EmailAddress")).data;
+		if (!loggedUser.PlayerID)
 			return reply.code(404).send("No user logged at this email address");
 		const jwtToken = jwt.createJwtToken({
 			sub: loggedUser.PlayerID,
 			data: {
 				DisplayName: loggedUser.DisplayName,
 				EmailAddress: loggedUser.EmailAddress,
-				// AvatarURL: loggedUser.AvatarURL,
 			},
 		});
 		return reply.status(200).send({ token: jwtToken.token, ...jwtToken.payload });
