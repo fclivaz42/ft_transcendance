@@ -20,7 +20,7 @@ export interface TwoFaLogUser {
 export var codeUser = new FixedSizeMap<string, TwoFaLogUser>(500);
 
 export default async function twoFaReceiptEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
-	app.post('/2fa', async function handler(request, reply) {
+	app.post('/2fa', async (request, reply) => {
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
 			return authorization;
@@ -55,5 +55,5 @@ export default async function twoFaReceiptEndpoint(app: FastifyInstance, opts: F
 			},
 		});
 		return reply.status(200).send({ token: jwtToken.token, ...jwtToken.payload });
-	})
+	});
 }

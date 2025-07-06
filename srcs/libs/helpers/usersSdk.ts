@@ -395,13 +395,10 @@ class UsersSdk {
 		return this.apiRequest<UsersSdkAliveResponse>("get", `${uuid}/alive`);
 	}
 
-	public async post2FA(ClientId: string, Code: string): Promise<AxiosResponse<any>> {
+	public async post2FA(data: {Code: string, ClientId: string}): Promise<AxiosResponse<any>> {
 		return this.apiRequest<any>("post", "2fa", {
-			data: {
-				Code,
-				ClientId
-			}
-		})
+			data
+		});
 	}
 }
 

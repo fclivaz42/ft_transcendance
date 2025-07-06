@@ -272,7 +272,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (request.method !== 'POST')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only POST method is allowed for 2FA.' });
 		const body = request.body as { ClientId: string, Code: string };
-		const resp = await usersSdk.post2FA(body.ClientId, body.Code);
+		const resp = await usersSdk.post2FA(body);
 		if (resp.status !== 200)
 			return reply.code(resp.status).send(resp.data);
 		UsersSdk.showerCookie(reply, resp.data.token, resp.data.exp);

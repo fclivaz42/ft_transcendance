@@ -50,6 +50,9 @@ function createLogin2faContent(dialogRef: BackdropDialog): HTMLDivElement {
 				throw new Error("error.missingClientId");
 			const response = await fetch("/api/users/2fa", {
 				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
 				body: JSON.stringify({
 					ClientId: UserHandler.clientId,
 					Code
@@ -58,6 +61,7 @@ function createLogin2faContent(dialogRef: BackdropDialog): HTMLDivElement {
 			if (!response.ok)
 				throw new Error("error.invalidCode");
 			dialogRef.remove(); 
+			UserHandler.fetchUser();
 		} catch (error) {
 			console.error(error);
 			NotificationManager.notify({
@@ -67,19 +71,6 @@ function createLogin2faContent(dialogRef: BackdropDialog): HTMLDivElement {
 			});
 		}
 	};
-	/*const joinButton = template.content.querySelector("#joinPongRoom") as HTMLButtonElement;
-	joinButton.onclick = () => {
-		console.log("Join Pong Room button clicked");
-		const roomCode = (document.querySelector("#pongRoomCode") as HTMLInputElement).value.trim();
-		if (!roomCode)
-			return NotificationManager.notify({
-				level: "error",
-				message: i18nHandler.getValue("pong.join.error.emptyRoomCode"),
-				title: i18nHandler.getValue("notification.generic.errorTitle"),
-			});
-		RoutingHandler.setRoute(`/pong?room=${roomCode}`);
-		dialogRef.remove();
-	}*/
 	return template.content.firstElementChild as HTMLDivElement;
 }
 

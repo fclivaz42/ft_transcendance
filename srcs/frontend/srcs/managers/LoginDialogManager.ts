@@ -50,17 +50,32 @@ class LoginDialogManager {
 				}
 				if (!UserHandler.clientId)
 					throw new Error("error.missingClientId");
-				await fetch("/api/users/login", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json"
-					},
-					body: JSON.stringify(user),
-				}).then(response => {
-					if (!response.ok)
-						throw new Error(`login.error.notvalid`);
-					this.init2fa();
-				});
+				try {
+					const res = await fetch("/api/users/login", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify(user),
+					});
+					if (res.status === 401)
+						NotificationManager.notify({
+							level: "error",
+							title: i18nHandler.getValue("panel.loginPanel.notification.loginErrorTitle"),
+							message: i18nHandler.getValue("panel.loginPanel.notification.loginBadCredentials")
+						});
+					else if (!res.ok)
+						throw new Error("error.loginFailed");
+					else
+						this.init2fa();
+				} catch (error) {
+					console.error(error);
+					NotificationManager.notify({
+						level: "error",
+						title: i18nHandler.getValue("generic.errorTitle"),
+						message: i18nHandler.getValue("generic.errorMessage")
+					});
+				}
       } else if (mode === 'register') {
 				if (data.password !== data.confirmPassword) {
 					NotificationManager.notify({
