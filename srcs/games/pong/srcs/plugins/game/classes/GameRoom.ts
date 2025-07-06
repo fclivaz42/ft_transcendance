@@ -4,6 +4,7 @@ import PlayerSession from "./PlayerSession.ts";
 import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
 import { DEFAULT_FPS } from "./Playfield.ts";
 // import { type LobbyBroadcastPayload } from "./TournamentLobby.ts";
+import DatabaseSDK from "../../../../../../libs/helpers/databaseSdk.ts";
 
 interface BallUpdate {
 	curr_speed: number;
@@ -24,7 +25,7 @@ interface BallInit extends BallUpdate {
 	size: number[];
 }
 
-interface PaddleInit extends PaddleUpdate {}
+interface PaddleInit extends PaddleUpdate { }
 
 interface WallsInit {
 	[key: string]: {
@@ -103,13 +104,13 @@ interface ConnectedPlayers {
 type LobbyBroadcastPayload =
 	| { type: "timer"; payload: { secondsRemaining: number } }
 	| {
-			type: "match_result";
-			payload: {
-				roomID: string;
-				winner: string;
-				score: { p1: number; p2: number };
-			};
-	  };
+		type: "match_result";
+		payload: {
+			roomID: string;
+			winner: string;
+			score: { p1: number; p2: number };
+		};
+	};
 
 type GameMessage =
 	| InitPayload
@@ -128,6 +129,7 @@ export default class GameRoom {
 	public lock: boolean = false;
 	protected _lastMessage?: string;
 	protected _lastCollision?: CollisionPayload;
+	protected _start_time: number = Date.now();
 
 	protected _onGameOver?: (roomId: string) => void;
 
@@ -246,20 +248,50 @@ export default class GameRoom {
 		});
 
 		this.broadcast(this.buildInitPayload());
+		this._start_time = Date.now();
 		this.game.gameStart(DEFAULT_FPS);
 	}
 
-	private _killGame(winner: number) {
+	private _send_to_db(p1: string, p2: string, winner: number) {
+		let winner_id: string = winner === 1 ? p1 : p2;
+		let loser_id: string = winner === 1 ? p2 : p1;
+		if (winner_id.startsWith("AI_"))
+			winner_id = "P-0"
+		if (loser_id.startsWith("AI_"))
+			loser_id = "P-0"
+		const db_sdk = new DatabaseSDK();
+		return db_sdk.create_match({
+			WPlayerID: winner_id,
+			LPlayerID: loser_id,
+			WScore: this.score.p1 > this.score.p2 ? this.score.p1 : this.score.p2,
+			LScore: this.score.p1 < this.score.p2 ? this.score.p1 : this.score.p2,
+			StartTime: this._start_time,
+			EndTime: Date.now(),
+			// WARN: MUST BE CHANGED FOR TOURNAMENT
+			MatchIndex: 0,
+		})
+	}
+
+	private async _killGame(winner: number) {
+		let res = this._send_to_db(this.players[0] ? this.players[0].getUserId() : "P-0", this.players[1] ? this.players[1].getUserId() : "P-0", winner)
 		this.broadcast(this.buildGameOverPayload(winner));
 		this.game.gameStop();
 		if (this._onGameOver) {
 			this._onGameOver(this.id);
 		}
+		res.then(function(response) {
+			console.log(`Match successfully created:`)
+			console.dir(response.data)
+		})
+			.catch(function(error) {
+				console.error(`WARN: match could not be sent to db!`)
+				console.dir(error)
+			})
 	}
 
 	public broadcast(message: GameMessage | LobbyBroadcastPayload): void {
 		if (message.type !== "update") {
-			console.log(JSON.stringify(message, null, 2));
+			// console.log(JSON.stringify(message, null, 2));
 		}
 		for (const p of this.players) {
 			try {
@@ -290,7 +322,7 @@ export default class GameRoom {
 
 		// debug
 		if (message.type !== "update") {
-			console.log(JSON.stringify(message, null, 2));
+			// console.log(JSON.stringify(message, null, 2));
 		}
 		// enddebug
 
