@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/07/02 18:55:35 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/05 23:00:11 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -64,10 +64,6 @@ const PlayersTable: db_table =
 		"Password",
 		"OAuthID",
 		"FriendsList",
-		"PhoneNumber",
-		"FirstName",
-		"FamilyName",
-		"Bappy",
 		"Private",
 		"LastAlive",
 		"Admin"
@@ -79,10 +75,6 @@ const PlayersTable: db_table =
 		"TEXT NOT NULL",
 		"TEXT DEFAULT NULL",
 		"TEXT DEFAULT NULL",
-		"TEXT DEFAULT NULL",
-		"TEXT DEFAULT NULL",
-		"TEXT DEFAULT NULL",
-		"INTEGER DEFAULT 0",
 		"INTEGER DEFAULT 0",
 		"INTEGER DEFAULT 0",
 		"INTEGER DEFAULT 0"
@@ -122,11 +114,12 @@ const MatchesTable: db_table =
 		"LPlayerID",
 		"WScore",
 		"LScore",
-		"WGuestName",
-		"LGuestName",
+		// "WGuestName",
+		// "LGuestName",
 		"StartTime",
 		"EndTime",
-		"MatchIndex"
+		"MatchIndex",
+		"HashAddress",
 	],
 	"Arguments": [
 		"TEXT NOT NULL PRIMARY KEY",
@@ -134,11 +127,12 @@ const MatchesTable: db_table =
 		`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET NULL`,
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL",
-		"TEXT DEFAULT NULL",
-		"TEXT DEFAULT NULL",
+		// "TEXT DEFAULT NULL",
+		// "TEXT DEFAULT NULL",
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL",
-		"INTEGER NOT NULL"
+		"INTEGER NOT NULL",
+		"TEXT DEFAULT NULL"
 	],
 	"Methods": {
 		"GET": [
@@ -149,6 +143,9 @@ const MatchesTable: db_table =
 		"POST": [
 			""
 		],
+		"PUT": [
+			"/MatchID/:MatchID",
+		]
 	},
 	"Identification": {
 		"HasID": true,

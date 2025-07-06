@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/25 14:08:41 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/06/30 18:23:43 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -178,8 +178,11 @@ export default class DatabaseWorker {
 			else {
 				const uarray = JSON.parse(array)
 				response = []
-				for (const item of uarray)
-					response.push(db.prepare(`SELECT * FROM ${table} WHERE ${field} = ?`).get(item) as object)
+				for (const item of uarray) {
+					const ret = db.prepare(`SELECT * FROM ${table} WHERE ${field} = ?`).get(item) as object
+					if (ret)
+						response.push(ret)
+				}
 			}
 			if (response === undefined)
 				throw { code: 404, string: "error.values.notfound" }
