@@ -62,23 +62,15 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 		catch (err) {
 			return reply.status(503).send(`Error during 2FA :", ${err}`);
 		}
-		const jwtToken = jwt.createJwtToken({
-			sub: loggedUser.PlayerID,
-			data: {
-				DisplayName: loggedUser.DisplayName,
-				EmailAddress: loggedUser.EmailAddress,
-				//AvatarURL: loggedUser.AvatarURL,
-			},
-		});
-		return reply.status(200).send({ token: jwtToken.token, ...jwtToken.payload });
+		return reply.status(200).send("2fa send");
 	});
 }
 
 const send2faVerification = async (email: string): Promise<void> => {
 	try {
 		const transporter = nodemailer.createTransport({
-			service: 'gmail',
-			port: 587,
+			service: process.env.TWOFA_SERVICE,
+			port: process.env.TWOFA_PORT,
 			secure: false,
 			auth: {
 				user: process.env.AUTH_EMAIL,

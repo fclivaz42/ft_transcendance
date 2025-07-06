@@ -5,8 +5,9 @@ import checkRequestAuthorization from '../../managers/AuthorizationManager.ts';
 import axios from 'axios';
 import https from 'https';
 import DatabaseSDK from '../../../../libs/helpers/databaseSdk.ts';
+import FixedSizeMap from '../../../../libs/interfaces/FixedSizeMap.ts'
 
-export var codeUser = new Map<string, string>();
+export var codeUser = new FixedSizeMap<string, string>(500);
 
 interface Email {
 	email: string,
@@ -26,6 +27,18 @@ export default async function twoFaReceiptEndpoint(app: FastifyInstance, opts: F
 			return reply.code(404).send("No 2fa code associated with this email");
 		if (codeUser.get(email) === code)
 			return reply.code(200).send("Authorization");
-		return reply.code(401).send("Verification code is incorrect");
+		const db_sdk = new DatabaseSDK();
+		let loggedUser = await db_sdk.get_user(email, "EmailAddress");
+		if (!loggedUser)
+			return reply.code(404).send("No user logged at this email address");
+		const jwtToken = jwt.createJwtToken({
+			sub: loggedUser.PlayerID,
+			data: {
+				DisplayName: loggedUser.DisplayName,
+				EmailAddress: loggedUser.EmailAddress,
+				// AvatarURL: loggedUser.AvatarURL,
+			},
+		});
+		return reply.status(200).send({ token: jwtToken.token, ...jwtToken.payload });
 	})
 }
