@@ -6,17 +6,19 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/26 19:38:33 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/06 17:15:28 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import axios from "axios";
 import https from "https";
-import type { AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import type * as fft from "fastify";
 import type { User } from "../interfaces/User.ts";
 import type { Match, Match_complete } from "../interfaces/Match.ts";
 import type { Tournament_full, Tournament_lite, Tournament_metadata } from "../interfaces/Tournament.ts";
+import BlockchainSDK from "./blockchainSdk.ts";
+import type { TXHash } from "./blockchainSdk.ts";
 
 export type UUIDv4 = string
 
@@ -81,15 +83,19 @@ export default class DatabaseSDK {
 		return await this.api_request<Array<Match>>("GET", "Matches", `/PlayerID/${this.param_str}`, { params: user })
 	}
 
-	private async get_player_matchlist_from_user(user: User): Promise<AxiosResponse<Array<Match>>> {
+	private async get_player_matchlist_from_user(user: Partial<User>): Promise<AxiosResponse<Array<Match>>> {
 		if (!user.PlayerID)
-			throw "error.empty.playerid"
+			throw "error.missing.playerid"
 		return await this.get_player_matchlist_from_uuid(user.PlayerID)
 	}
 
 	private async get_friends_from_uuid(user: UUIDv4): Promise<AxiosResponse<Array<User>>> {
 		const req_user: User = (await this.get_user(user, "PlayerID")).data
 		return await this.get_friends_from_user(req_user)
+	}
+
+	public async get_current_contract(): Promise<AxiosResponse<string>> {
+		return await this.api_request("GET", "CurrentContract", undefined)
 	}
 
 	/**
@@ -189,15 +195,44 @@ export default class DatabaseSDK {
 	*/
 	public async get_tournament(tournament_id: UUIDv4): Promise<AxiosResponse<Tournament_full>> {
 		return await this.api_request<Tournament_full>("GET", "Tournaments", `/TournamentID/${this.param_str}`, { params: tournament_id })
-
 	}
 
 	/**
 	* Get the complete list of matches present in the database.
 	* @returns An AxiosResponse Promise containing an array of every single Match.
 	*/
-	public async get_matchlist(): Promise<AxiosResponse<Array<Match>>> {
-		return await this.api_request<Array<Match>>("GET", "Matches", "/multiget")
+	public async get_matchlist(): Promise<Array<Match>> {
+		const matchlist: Array<Match> = await this.api_request<Array<Match>>("GET", "Matches", "/multiget")
+			.then(response => response.data)
+		for (const item of matchlist) {
+			let merged: Match | undefined = undefined;
+			if (item.HashAddress) {
+				const bc_sdk = new BlockchainSDK();
+				await bc_sdk.get_match_score(item.MatchID as string)
+					.then(function(response) {
+						merged = { ...item, ...response }
+					})
+					.catch(function() { item.HashAddress = undefined })
+			}
+			if (merged) {
+				if (!item.WPlayerID)
+					(merged as Partial<Match>).WPlayerID = undefined
+				if (!item.LPlayerID)
+					(merged as Partial<Match>).LPlayerID = undefined
+			}
+			else
+				merged = item
+			const u_array: Array<User> = await this.api_request<Array<User>>("GET", "Players", "/multiget", {
+				headers: {
+					Field: "PlayerID",
+					Array: JSON.stringify([merged.WPlayerID, merged.LPlayerID])
+				}
+			}).then(response => response.data)
+			Object.assign(item, merged)
+			item.WPlayerID = u_array[0]
+			item.LPlayerID = u_array[1]
+		}
+		return matchlist
 	}
 
 	/**
@@ -211,9 +246,18 @@ export default class DatabaseSDK {
 		return await this.get_player_matchlist_from_user(user)
 	}
 
-	// WARN: DOUBLE-CHECK THIS
-	public async create_match(match: Match) {
-		return await this.api_request<Match>("POST", "Matches", undefined, { body: match })
+	/**
+	* Create a new user on the database and, additionnally, store it on the Blockchain.
+	* @param match the Match object with its data.
+	* @returns the created match with the input data. Throws if anything fails.
+	*/
+	public async create_match(match: Match): Promise<AxiosResponse<Match>> {
+		const finished_match: Match = await this.api_request<Match>("POST", "Matches", undefined, { body: match })
+			.then(response => response.data)
+		const bc_sdk = new BlockchainSDK();
+		const match_tx: TXHash = await bc_sdk.add_match_score(finished_match)
+			.then(response => response.data)
+		return await this.api_request<Match>("PUT", "Matches", `/MatchID/${this.param_str}`, { body: { HashAddress: match_tx }, params: finished_match.MatchID })
 	}
 
 	/**
@@ -221,7 +265,36 @@ export default class DatabaseSDK {
 	* @param match_id The UUIDv4 string of the match you are trying to get.
 	* @returns An AxiosResponse Promise containing the complete Match data.
 	*/
-	public async get_match(match_id: UUIDv4): Promise<AxiosResponse<Match_complete>> {
-		return await this.api_request<Match_complete>("GET", "Matches", `/MatchID/${this.param_str}`, { params: match_id })
+	public async get_match(match_id: UUIDv4): Promise<Match_complete> {
+		const match: Match = await this.api_request<Match>("GET", "Matches", `/MatchID/${this.param_str}`, { params: match_id })
+			.then(response => response.data)
+		let merged: Match | undefined = undefined;
+		if (match.HashAddress) {
+			const bc_sdk = new BlockchainSDK();
+			await bc_sdk.get_match_score(match.MatchID as string)
+				.then(function(response) {
+					merged = { ...match, ...response }
+				})
+				.catch(function() { match.HashAddress = undefined })
+		}
+		if (merged) {
+			if (!match.WPlayerID)
+				(merged as Partial<Match>).WPlayerID = undefined
+			if (!match.LPlayerID)
+				(merged as Partial<Match>).LPlayerID = undefined
+		}
+		else
+			merged = match
+		const u_array: Array<User> = await this.api_request<Array<User>>("GET", "Players", "/multiget", {
+			headers: {
+				Field: "PlayerID",
+				Array: JSON.stringify([merged.WPlayerID, merged.LPlayerID])
+			}
+		}).then(response => response.data)
+		return {
+			...merged,
+			WPlayerID: u_array[0],
+			LPlayerID: u_array[1]
+		}
 	}
 }

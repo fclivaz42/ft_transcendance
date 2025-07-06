@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/18 20:58:12 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/26 17:12:39 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/05 23:31:28 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -77,7 +77,7 @@ async function upload_picture(request: fft.FastifyRequest, reply: fft.FastifyRep
 			throw { code: 401, string: "error.invalid.authorization" }
 		if (!file)
 			throw { code: 400, string: "error.invalid.file" }
-		if (file.mimetype !== "image/png" && file.mimetype !== "image/jpeg" && file.mimetype !== "image/webp")
+		if (!file.mimetype.startsWith('image/'))
 			throw { code: 400, string: "error.invalid.content-type" }
 		if (JSON.stringify(params) === "{}")
 			return;
@@ -91,7 +91,7 @@ async function upload_picture(request: fft.FastifyRequest, reply: fft.FastifyRep
 		const pump = util.promisify(pipeline);
 		await pump(file.file, fs.createWriteStream(path.join(process.env.FILELOCATION as string, filename)));
 		const ftype = await fileTypeFromFile(path.join(process.env.FILELOCATION as string, filename))
-		if (ftype && ftype.mime !== 'image/png' && ftype.mime !== 'image/jpeg' && ftype.mime !== 'image/webp') {
+		if (ftype && !ftype.mime.startsWith('image/')) {
 			if (process.env.RUNMODE === "debug")
 				console.dir(ftype)
 			fs.rmSync(path.join(process.env.FILELOCATION as string, filename))
@@ -138,7 +138,7 @@ export async function extra_routes(fastify: fft.FastifyInstance, options: fft.Fa
 	})
 
 	fastify.post<{ Params: db_params }>(`/${tables.Players.Name}/PlayerID/:PlayerID/picture`, async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {
-		return upload_picture(request, reply, request.params as db_params, await request.file({ limits: { fileSize: 2 * 1024 * 1024 } }) as MultipartFile)
+		return upload_picture(request, reply, request.params as db_params, await request.file() as MultipartFile)
 	})
 
 	fastify.get<{ Params: db_params }>(`/${tables.Players.Name}/PlayerID/:PlayerID/picture`, async function handler(request: fft.FastifyRequest, reply: fft.FastifyReply) {

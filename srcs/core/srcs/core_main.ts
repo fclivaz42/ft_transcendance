@@ -37,7 +37,11 @@ async function load_modules() {
 	}
 }
 
-await fastify.register(fastifyMultipart)
+await fastify.register(fastifyMultipart, {
+	limits: {
+		fileSize: 8 * 1024 * 1024
+	}
+})
 await fastify.register(websocketPlugin);
 await load_modules()
 await fastify.register(frontendRoutes);
