@@ -9,7 +9,7 @@ import FixedSizeMap from '../../../../libs/interfaces/FixedSizeMap.ts'
 
 interface TwoFaProps {
 	Code: string;
-	ClientID: string;
+	ClientId: string;
 }
 
 export interface TwoFaLogUser {
@@ -27,19 +27,19 @@ export default async function twoFaReceiptEndpoint(app: FastifyInstance, opts: F
 
 		const body = request.body as TwoFaProps;
 
-		if (!codeUser.get(body.ClientID))
+		if (!codeUser.get(body.ClientId))
 			return reply.code(404).send("No 2fa code associated with this ClientID");
-		if (codeUser.get(body.ClientID)?.Code !== body.Code)
+		if (codeUser.get(body.ClientId)?.Code !== body.Code)
 			return httpReply({
 				detail: "Invalid 2fa code",
 				status: 401,
 				module: "usermanager",
 			}, reply, request);
 
-		const user: string | undefined = codeUser.get(body.ClientID)?.PlayerID;
+		const user: string | undefined = codeUser.get(body.ClientId)?.PlayerID;
 		if (user === undefined)
 			return httpReply({
-				detail: `Invalid undefiend PlayerId with '${body.ClientID}' client id`,
+				detail: `Invalid undefiend PlayerId with '${body.ClientId}' client id`,
 				status: 401,
 				module: "usermanager",
 			}, reply, request);

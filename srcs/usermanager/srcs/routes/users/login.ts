@@ -95,7 +95,6 @@ const send2faVerification = async (email: string, id: string, user: string): Pro
 			text: `Your verification code is : ${code}`,
 		};
 		await transporter.sendMail(mailOptions);
-		console.log(`2FA email sent to ${email}`);
 		codeUser.set(id, { Code: code, PlayerID: user } as TwoFaLogUser);
 	}
 	catch (err) {
