@@ -40,7 +40,6 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	const userFrame = template.content.firstElementChild as HTMLDivElement;
 	const viewHistoryButton = createButton({
 		i18n: "user.matches.viewHistory",
-		title: i18nHandler.getValue("user.matches.viewHistory"),
 		addClasses: "w-fit mx-auto",
 		color: "bg-background",
 		f: () => {
@@ -54,7 +53,6 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 
 	const addFriendButton = createButton({
 		i18n: "user.friend.addFriend",
-		title: i18nHandler.getValue("user.friend.addFriend"),
 		addClasses: "w-fit mx-auto",
 		color: "bg-blue-200",
 		darkColor: "dark:bg-blue-600",
@@ -63,7 +61,6 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 
 	const removeFriendButton = createButton({
 		i18n: "user.friend.removeFriend",
-		title: i18nHandler.getValue("user.friend.removeFriend"),
 		addClasses: "w-fit mx-auto",
 		color: "bg-red-200",
 		darkColor: "dark:bg-red-600",

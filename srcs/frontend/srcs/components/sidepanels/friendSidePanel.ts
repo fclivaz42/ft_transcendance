@@ -1,7 +1,7 @@
 import { createSidePanel, createSidePanelButton } from "./index.js";
 
 import { i18nHandler } from "../../handlers/i18nHandler.js";
-import { Users } from "../../interfaces/Users.js";
+import { Friends } from "../../interfaces/Users.js";
 import createUserAvatar from "../usermenu/userAvatar.js";
 import UserHandler from "../../handlers/UserHandler.js";
 import NotificationManager from "../../managers/NotificationManager.js";
@@ -19,9 +19,8 @@ function createFriendContainer() {
 	return template.content.firstElementChild as HTMLElement;
 }
 
-async function createFriendItem(user: Users) {
+async function createFriendItem(user: Friends) {
 	const template = document.createElement("template");
-	const isAlive = await UserHandler.getAliveStatus(user.PlayerID);
 	template.innerHTML = `
 		<div class="hover:animate-duration-100 hover:animate-scale cursor-pointer relative group select-none w-64 mx-auto flex items-center justify-between p-2 bg-background dark:bg-background_dark rounded-xl">
 			${(await createUserAvatar({
@@ -29,7 +28,7 @@ async function createFriendItem(user: Users) {
 				sizeClass: "w-8 h-8",
 			})).outerHTML}	
 			<p class="truncate max-w-42 left-12 absolute">${sanitizer(user.DisplayName)}</p>
-			<div class="absolute -right-1 -top-1 h-4 w-4 rounded-full ${isAlive ? "bg-green-500" : "bg-gray-400"}"></div>
+			<div class="absolute -right-1 -top-1 h-4 w-4 rounded-full ${user.isAlive ? "bg-green-500" : "bg-gray-400"}"></div>
 						<button data-delfriend="${sanitizer(user.PlayerID)}" class="absolute top-0 bottom-0 right-1 bg-panel dark:bg-panel_dark rounded-full w-8 h-8 my-auto dark:hover:text-red-400 hover:text-red-600 group-hover:opacity-100 opacity-0 transition-opacity duration-100 hover:animate-scale hover:animate-duration-100 cursor-pointer text-sm font-semibold">
 				<p>✕</p>
 			</button>
@@ -66,7 +65,7 @@ export function createFriendSidePanel() {
 	const friendList = UserHandler.friendList;
 
 	const containerReady = new Promise<void>(async (resolve) => {
-		if (friendList.length === 0) {
+		if (!friendList.length) {
 			const emptyContainer = createFriendEmpty();
 			friendContainer.appendChild(emptyContainer);
 			resolve();

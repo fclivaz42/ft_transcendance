@@ -1,5 +1,5 @@
 import { userMenuManager } from "../managers/UserMenuManager";
-import type { Users } from "../interfaces/Users";
+import type { Users, Friends } from "../interfaces/Users";
 import NotificationManager from "../managers/NotificationManager";
 import { i18nHandler } from "./i18nHandler";
 
@@ -12,7 +12,9 @@ export interface UserStats {
 class UserHandler {
 	private _clientId: string = "";
 	private _user: Users | undefined;
-	private _friendList: Users[] = [];
+	private _friendList: Friends[] = [];
+	private _updatingAliveStatus: boolean = false;
+	private _updatingFriendList: boolean = false;
 
 	constructor() {
 		let clientId = localStorage.getItem("clientId");
@@ -27,13 +29,29 @@ class UserHandler {
 
 	public async initialize() {
 		await this.fetchUser();
-		this.updateAliveStatus();
+	}
+
+	public async updateFriendList() {
+		while (this.isLogged && !this._updatingFriendList) {
+			this._updatingFriendList = true;
+			const friendListResp: Response | undefined = await fetch("/api/users/me/friends").catch(error => {console.error(error); return undefined;});
+			if (!friendListResp || !friendListResp.ok) {
+				console.warn("Failed to fetch friend list:", friendListResp?.statusText);
+				this._friendList = [];
+				return;
+			}
+			this._friendList = await friendListResp.json() as Friends[];
+			for (const friend of this._friendList)
+				friend.isAlive = await this.getAliveStatus(friend.PlayerID);
+			console.debug("Friend list updated:", this._friendList);
+			await new Promise(resolve => setTimeout(resolve, 30000));
+			this._updatingFriendList = false;
+		}
 	}
 
 	public async updateAliveStatus() {
-		while (true) {
-			if (!this.isLogged)
-				await new Promise(resolve => setTimeout(resolve, 30000));
+		while (this.isLogged && !this._updatingAliveStatus) {
+			this._updatingAliveStatus = true;
 			try {
 				await fetch("/api/users/me/alive", {
 					method: "POST",
@@ -47,7 +65,8 @@ class UserHandler {
 			} catch (error) {
 				console.error("Failed to update alive status:", error);
 			}
-			await new Promise(resolve => setTimeout(resolve, 30000));
+			await new Promise(resolve => setTimeout(resolve, 25000));
+			this._updatingAliveStatus = false;
 		}
 	}
 
@@ -107,6 +126,8 @@ class UserHandler {
 				this._user = {...userData} as Users;
 				if (!this._user)
 					throw new Error("User data is undefined or null");
+				this.updateAliveStatus();
+				this.updateFriendList();
 				const avatarFile = await fetch("/api/users/me/picture");
 				if (avatarFile.ok) {
 					if (avatarFile.status === 200)
@@ -115,18 +136,6 @@ class UserHandler {
 					console.warn("Failed to fetch user avatar:", avatarFile.statusText);
 				}
 			}
-		}
-		try {
-			const friendListResp = await fetch("/api/users/me/friends");
-			if (!friendListResp.ok) {
-				console.warn("Failed to fetch friend list:", friendListResp.statusText);
-				this._friendList = [];
-			} else {
-				this._friendList = await friendListResp.json() as Users[];
-			}
-		} catch (error) {
-			console.error("Error fetching friend list:", error);
-			this._friendList = [];
 		}
 		this.updateComponents();
 		return this._user as Users;
