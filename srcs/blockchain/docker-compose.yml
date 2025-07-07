@@ -3,7 +3,7 @@ services:
     container_name: blockchain
     image: sarif_blockchain
     networks:
-      - sarifntw
+      - reverse-proxy
     build:
       context: ./
       args:

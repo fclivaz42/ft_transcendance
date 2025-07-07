@@ -14,7 +14,7 @@ services:
   database:
     container_name: database
     networks:
-      - sarifntw
+      - reverse-proxy
     volumes:
       - data:/data
       - sarif-libs:/libs/

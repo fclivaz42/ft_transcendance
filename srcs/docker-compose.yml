@@ -13,9 +13,8 @@ include:
   - ./games/pong/docker-compose.yml
 
 networks:
-  sarifntw:
-    name: "SARIF Bridge"
-    driver: bridge
+  reverse-proxy:
+    external: true
 
 volumes:
   data:

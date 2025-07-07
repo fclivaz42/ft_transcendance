@@ -7,7 +7,7 @@ services:
     volumes:
       - sarif-frontend:/var/www/sarif-frontend
     networks:
-      - sarifntw
+      - reverse-proxy
     restart: on-failure
 
 volumes:
@@ -16,6 +16,6 @@ volumes:
     driver: local
 
 # networks:
-#   sarifntw:
+#   reverse-proxy:
 #     name: "SARIF Bridge"
 #     driver: bridge

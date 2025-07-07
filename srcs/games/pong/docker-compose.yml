@@ -2,7 +2,7 @@ services:
   pong:
     container_name: pong
     networks:
-      - sarifntw
+      - reverse-proxy
     build: ./
     env_file: ../../.env
     environment:

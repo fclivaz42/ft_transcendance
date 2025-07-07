@@ -12,15 +12,19 @@
 
 services:
   core:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sarif.rule=Host(`sarif.ruinformatique.ch`)"
+      - "traefik.http.routers.sarif.tls=true"
+      - "traefik.http.services.sarif.loadbalancer.server.scheme=https"
+
     container_name: core
     networks:
-      - sarifntw
+      - reverse-proxy
     volumes:
       - data:/data
       - sarif-libs:/libs
       - sarif-frontend:/var/www/sarif-frontend
-    ports:
-      - "443:443"
     build:
       context: .
       args:
