@@ -82,17 +82,79 @@ class UsermanagerConfig {
 	public get ttl(): number { return this._ttl; }
 }
 
+class SmtpConfig {
+	private _from: string;
+	private _host: string | undefined;
+	private _service: string | undefined;
+	private _port: number;
+	private _secure: boolean;
+	private _auth: {
+		user: string;
+		pass: string;
+	}
+
+	constructor() {
+		if (!process.env.SMTP_HOST && !process.env.SMTP_SERVICE) {
+			Logger.error("Missing SMTP_HOST and SMTP_SERVICE env. One of them is required.");
+			throw new Error("SMTP_HOST or SMTP_SERVICE must be defined");
+		}
+		this._host = process.env.SMTP_HOST;
+		this._service = process.env.SMTP_SERVICE;
+		if (!process.env.SMTP_PORT) {
+			Logger.warn("Missing SMTP_PORT env, using default port 465");
+			process.env.SMTP_PORT = "465";
+		}
+		this._port = parseInt(process.env.SMTP_PORT);
+		if (isNaN(this._port) || this._port <= 0) {
+			throw new Error("SMTP_PORT must be a positive integer");
+		}
+		if (!process.env.SMTP_TLS) {
+			Logger.warn("Missing SMTP_TLS env, using default true");
+			process.env.SMTP_TLS = "true";
+		}
+		this._secure = process.env.SMTP_TLS.toLowerCase() === "true";
+		if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+			Logger.error("Missing SMTP_USER or SMTP_PASS env. Both are required.");
+			throw new Error("SMTP_USER and SMTP_PASS must be defined");
+		}
+		this._auth = {
+			user: process.env.SMTP_USER,
+			pass: process.env.SMTP_PASS,
+		};
+		if (!process.env.SMTP_FROM) {
+			Logger.warn("Missing SMTP_FROM env, using SMTP_USER as default sender");
+			process.env.SMTP_FROM = this._auth.user;
+		}
+		this._from = process.env.SMTP_FROM;
+	}
+
+	public get host(): string | undefined { return this._host; }
+	public get service(): string | undefined { return this._service; }
+	public get port(): number { return this._port; }
+	public get secure(): boolean { return this._secure; }
+	public get auth(): { user: string; pass: string } {
+		return {
+			user: this._auth.user,
+			pass: this._auth.pass
+		};
+	}
+	public get from(): string { return this._from; }
+}
+
 class ConfigManager {
 	private _serverconfig: ServerConfig;
 	private _oauthconfig: UsermanagerConfig;
+	private _smtpconfig: SmtpConfig;
 
 	public get ServerConfig(): ServerConfig { return this._serverconfig; }
 	public get UsermanagerConfig(): UsermanagerConfig { return this._oauthconfig; }
+	public get SmtpConfig(): SmtpConfig { return this._smtpconfig; }
 
 	constructor() {
 		dotenv.config();
 		this._serverconfig = new ServerConfig();
 		this._oauthconfig = new UsermanagerConfig();
+		this._smtpconfig = new SmtpConfig();
 	}
 }
 
