@@ -49,7 +49,7 @@ export async function createPongCanvas(isComputer: boolean): Promise<HTMLDivElem
 	const playerContainers = template.content.querySelectorAll("[data-pong-player]");
 	for (const container of playerContainers) {
 		const idx = container.getAttribute("data-pong-player") === "p1" ? 0 : 1;
-		container.insertAdjacentElement("beforebegin", playerAvatar[idx]);
+		container.insertAdjacentElement("afterbegin", playerAvatar[idx]);
 	}
 
 	const pongCanvasContainer = template.content.firstElementChild as HTMLDivElement;

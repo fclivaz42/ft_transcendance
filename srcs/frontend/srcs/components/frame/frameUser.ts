@@ -40,7 +40,7 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 
 	const userStatsProfile = userFrame.querySelector("#userstats-profile");
 	if (userStatsProfile)
-		userStatsProfile.insertAdjacentElement("beforebegin", createUserAvatar({ disableClick: true, playerId: user.PlayerID, sizeClass: "w-40 h-40 mx-auto"}));
+		userStatsProfile.insertAdjacentElement("afterbegin", createUserAvatar({ disableClick: true, playerId: user.PlayerID, sizeClass: "w-40 h-40 mx-auto"}));
 
 	const viewHistoryButton = createButton({
 		i18n: "user.matches.viewHistory",
