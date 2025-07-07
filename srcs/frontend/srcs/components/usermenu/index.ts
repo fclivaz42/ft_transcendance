@@ -247,7 +247,7 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
     buttonsContainer.appendChild(cancelButton);
     buttonsContainer.appendChild(saveButton);
 
-    dialog.appendChild(await createUserAvatar({
+    dialog.appendChild(createUserAvatar({
         sizeClass: "w-32 h-32 mb-2",
         editable: true,
     }));
@@ -384,7 +384,7 @@ export async function createUserMenuSettings(): Promise<HTMLDivElement> {
         </div>
     `;
     const userMenuSettings = template.content.firstElementChild as HTMLDivElement;
-    userMenuSettings.appendChild(await createUserAvatar({disableClick: true}));
+    userMenuSettings.appendChild(createUserAvatar({disableClick: true}));
     userMenuSettings.onclick = async () => (await createUserDialog()).showModal();
     return userMenuSettings;
 }

@@ -5,14 +5,14 @@ import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler from "../../handlers/UserHandler";
 import { sanitizer } from "../../helpers/sanitizer";
 import { createButton } from "../buttons";
-import createUserAvatar from "../usermenu/userAvatar";
+import createUserAvatar, { UserAvatarType } from "../usermenu/userAvatar";
 
 export async function createPongCanvas(isComputer: boolean): Promise<HTMLDivElement> {
 	const template = document.createElement("template");
 
-	const playerAvatar: (HTMLDivElement & { firstChild: HTMLImageElement })[] = [
-		await createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}),
-		await createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"})
+	const playerAvatar: (UserAvatarType)[] = [
+		createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}),
+		createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"})
 	];
 	playerAvatar[0].setAttribute("data-pong-avatar", "p1");
 	playerAvatar[1].setAttribute("data-pong-avatar", "p2");
@@ -22,8 +22,7 @@ export async function createPongCanvas(isComputer: boolean): Promise<HTMLDivElem
 				<div class="aspect-[3/2] min-w-[606px] w-full max-h-full">
 					<div class="aspect-[3/2] max-w-full h-full mx-auto flex flex-col min-h-0 gap-8">
 						<div class="flex justify-between items-center min-h-0">
-							<div class="flex items-center justify-center gap-4">
-								${playerAvatar[0].outerHTML}
+							<div data-pong-player="p1" class="flex items-center justify-center gap-4">
 								<div class="flex flex-col items-start justify-center w-0">
 									<p data-pong-displayname="p1" class="text-xl lg:text-3xl font-bold text-center select-text">Username</p>
 									<p data-pong-ping="p1" class="text-base lg:text-lg">calculating...</p>
@@ -34,8 +33,7 @@ export async function createPongCanvas(isComputer: boolean): Promise<HTMLDivElem
 								<span>:</span>
 								<p data-score="p2" class="text-left w-16 lg:w-32">0</p>
 							</div>
-							<div class="flex flex-row-reverse items-center justify-center gap-4">
-								${playerAvatar[1].outerHTML}
+							<div data-pong-player="p2" class="flex flex-row-reverse items-center justify-center gap-4">
 								<div class="flex flex-col items-end justify-center w-0">
 									<p data-pong-displayname="p2" class="text-xl lg:text-3xl font-bold text-center select-text">Username</p>
 									<p data-pong-ping="p2" class="text-base lg:text-lg">calculating...</p>
@@ -47,6 +45,13 @@ export async function createPongCanvas(isComputer: boolean): Promise<HTMLDivElem
 				</div>
 		</div>
 	`;
+
+	const playerContainers = template.content.querySelectorAll("[data-pong-player]");
+	for (const container of playerContainers) {
+		const idx = container.getAttribute("data-pong-player") === "p1" ? 0 : 1;
+		container.insertAdjacentElement("beforebegin", playerAvatar[idx]);
+	}
+
 	const pongCanvasContainer = template.content.firstElementChild as HTMLDivElement;
 	return pongCanvasContainer;
 }

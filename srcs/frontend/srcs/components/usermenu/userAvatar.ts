@@ -1,6 +1,4 @@
-import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler from "../../handlers/UserHandler";
-import { sanitizer } from "../../helpers/sanitizer";
 import { userMenuManager } from "../../managers/UserMenuManager";
 
 export interface UserAvatarProps {
@@ -11,23 +9,14 @@ export interface UserAvatarProps {
 	disableClick?: boolean;
 }
 
-export type UserAvatarType = HTMLDivElement & { firstChild: HTMLImageElement };
+export type UserAvatarType = HTMLDivElement & { firstChild: HTMLImageElement } | HTMLAnchorElement & { firstChild: HTMLImageElement };
 
-export default async function createUserAvatar(props: UserAvatarProps = {
+export default function createUserAvatar(props: UserAvatarProps = {
 	editable: false
-}): Promise<UserAvatarType> {
+}): UserAvatarType {
 	if (!props.sizeClass)
 		props.sizeClass = "w-10 h-10";
 
-	let src: string;
-	if (!props.isComputer && (!props.playerId || props.playerId === UserHandler.userId))
-		src = UserHandler.avatarUrl;
-	else if (props.isComputer)
-		src = "/assets/images/computer-virus-1-svgrepo-com.svg";
-	else
-		src = await UserHandler.fetchUserPicture(props.playerId);
-
-	const template = document.createElement("template");
 	let href: string | undefined;
 	if (!props.editable && !props.disableClick && !props.isComputer) {
 		if (props.playerId)
@@ -35,24 +24,36 @@ export default async function createUserAvatar(props: UserAvatarProps = {
 		else
 			href = "/user";
 	}
-	template.innerHTML = `
-		<a ${href ? `href="${sanitizer(href)}" target="_blank"` : ""}><img src="${sanitizer(src)}" ${src === UserHandler.avatarUrl ? "data-user=\"avatar\"": ""} alt="User Avatar" class="select-none border-2 rounded-full object-cover ${sanitizer(props.sizeClass)} bg-white"></a>
-	`;
 
-	const userAvatar = template.content.firstElementChild as UserAvatarType;
-
-	try {
-		const fetched = await fetch(userAvatar.firstChild.src, { cache: "force-cache" });
-		if (!fetched.ok)
-			throw new Error(`Failed to fetch user avatar: ${fetched.status} ${fetched.statusText}`);
-	} catch (error) {
-		userAvatar.firstChild.src = "/assets/images/default_avatar.svg";
+	const anchor = document.createElement("a");
+	if (href) {
+		anchor.href = href;
+		anchor.target = "_blank";
 	}
 
+	const img = document.createElement("img");
+	img.onerror = () => img.src = "/assets/images/default_avatar.svg";
+	img.alt = "User Avatar";
+	img.className = `select-none border-2 rounded-full object-cover ${props.sizeClass} bg-white`;
+
+	img.src = "/assets/images/default_avatar.svg";
+	if (!props.isComputer && (!props.playerId || props.playerId === UserHandler.userId))
+		img.src = UserHandler.avatarUrl;
+	else if (props.isComputer)
+		img.src = "/assets/images/computer-virus-1-svgrepo-com.svg";
+	else
+		UserHandler.fetchUserPicture(props.playerId).then((url) => {
+			img.src = url;
+			if (img.src === UserHandler.avatarUrl)
+				img.dataset.user = "avatar";
+		});
+
+	anchor.appendChild(img);
+
+	const userAvatar = anchor as UserAvatarType;
+
 	if (props.editable) {
-		console.log("User avatar is editable, setting up upload functionality.");
 		userAvatar.firstChild.onload = () => {
-			console.log("User avatar loaded successfully.");
 			const newContainer = document.createElement("div");
 			newContainer.className = "relative rounded-full overflow-hidden";
 			userAvatar.classList.add("cursor-pointer");
@@ -90,5 +91,5 @@ export default async function createUserAvatar(props: UserAvatarProps = {
 		}
 	}
 
-	return userAvatar;	
+	return userAvatar;
 }

@@ -144,6 +144,9 @@ class UserHandler {
 	public async fetchUserPicture(playerId?: string): Promise<string> {
 		if (!playerId)
 			return this.avatarUrl;
+		const checkFriend = this._friendList.find(friend => friend.PlayerID === playerId);
+		if (checkFriend && checkFriend.Avatar)
+			return checkFriend.Avatar;
 		const user = await this.fetchUser(playerId);
 		if (!user)
 			return "/assets/images/default_avatar.svg";

@@ -17,8 +17,7 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	const userStats = await UserHandler.fetchUserStats(user.PlayerID);
 	template.innerHTML = `
 		<div class="min-w-[500px] max-w-fit mx-auto flex flex-col gap-8 p-8 rounded-xl bg-panel dark:bg-panel_dark shadow-md">
-			<div class="flex flex-col items-center justify-center gap-4">
-				${(await createUserAvatar({ disableClick: true, playerId: user.PlayerID, sizeClass: "w-40 h-40 mx-auto"})).outerHTML}
+			<div id="userstats-profile" class="flex flex-col items-center justify-center gap-4">
 				<h2 ${user.PlayerID === UserHandler.userId ? "data-user=\"username\"" : ""} class="text-center text-2xl font-bold"'>${sanitizer(user.DisplayName) || "User Name"}</h2>
 			</div>
 			<div class="flex flex-col items-center">
@@ -38,6 +37,11 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 		</div>
 	`;
 	const userFrame = template.content.firstElementChild as HTMLDivElement;
+
+	const userStatsProfile = userFrame.querySelector("#userstats-profile");
+	if (userStatsProfile)
+		userStatsProfile.insertAdjacentElement("beforebegin", createUserAvatar({ disableClick: true, playerId: user.PlayerID, sizeClass: "w-40 h-40 mx-auto"}));
+
 	const viewHistoryButton = createButton({
 		i18n: "user.matches.viewHistory",
 		addClasses: "w-fit mx-auto",

@@ -9,7 +9,7 @@ import RoutingHandler from "../../../handlers/RoutingHandler";
 import BackdropDialog from "../../../class/BackdropDialog";
 import { sanitizer } from "../../../helpers/sanitizer";
 import { Users } from "../../../interfaces/Users";
-import createUserAvatar from "../../usermenu/userAvatar";
+import createUserAvatar, { UserAvatarType } from "../../usermenu/userAvatar";
 import { GameOverPayload } from "../../../game/types";
 
 function maskEmail(email: string): string {
@@ -34,21 +34,20 @@ async function createPongGameoverDialogContent(dialogRef: BackdropDialog, users:
 	`;
 
 	const template = document.createElement("template");
-	const userAvatar: HTMLDivElement[] = [];
+	const userAvatar: UserAvatarType[] = [];
 	for (const user of Object.values(users)) {
 		if (!user || user.PlayerID === "bot")
-			userAvatar.push(await createUserAvatar({isComputer: true, sizeClass: "w-16 h-16"}));
+			userAvatar.push(createUserAvatar({isComputer: true, sizeClass: "w-16 h-16"}));
 		else
-			userAvatar.push(await createUserAvatar({playerId: user.PlayerID, sizeClass: "w-16 h-16"}));
+			userAvatar.push(createUserAvatar({playerId: user.PlayerID, sizeClass: "w-16 h-16"}));
 	}
 	template.innerHTML = `
 		<div class="flex flex-col items-center p-4">
 			<h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">${sanitizer(i18nHandler.getValue("pong.gameover.title"))}</h2>
 			<br>
 			<div class="flex items-center gap-8 mb-4">
-				<div class="flex items-center gap-4 relative justify-center">
+				<div data-pong-player="p1" class="flex items-center gap-4 relative justify-center">
 					${payload.winner === "p1" ? winnerLabel : loserLabel}
-					${userAvatar[0].outerHTML}
 					<span class="text-left w-32 truncate text-lg text-gray-800 dark:text-gray-200">${sanitizer(users.p1?.DisplayName || i18nHandler.getValue("pong.gameover.player1"))}</span>
 				</div>
 				<div class="text-3xl font-bold text-center flex items-center justify-center flex-nowrap gap-x-2 lg:gap-x-4">
@@ -56,9 +55,8 @@ async function createPongGameoverDialogContent(dialogRef: BackdropDialog, users:
 					<span>:</span>
 					<p>${payload.final_score.p2}</p>
 				</div>
-				<div class="flex flex-row-reverse items-center gap-4 relative justify-center">
+				<div data-pong-player="p2" class="flex flex-row-reverse items-center gap-4 relative justify-center">
 					${payload.winner === "p2" ? winnerLabel : loserLabel}
-					${userAvatar[1].outerHTML}
 					<span class="text-right w-32 truncate text-lg text-gray-800 dark:text-gray-200">${sanitizer(users.p2?.DisplayName || i18nHandler.getValue("pong.gameover.player2"))}</span>
 				</div>
 			</div>
@@ -78,6 +76,11 @@ async function createPongGameoverDialogContent(dialogRef: BackdropDialog, users:
 			</div>
 		</div>
 	`;
+	const playerContainers = template.content.querySelectorAll("[data-pong-player]");
+	for (const container of playerContainers) {
+		const idx = container.getAttribute("data-pong-player") === "p1" ? 0 : 1;
+		container.insertAdjacentElement("afterbegin", userAvatar[idx]);
+	}
 	return template.content.firstElementChild as HTMLDivElement;
 }
 
