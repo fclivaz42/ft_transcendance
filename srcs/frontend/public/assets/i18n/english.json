@@ -84,7 +84,8 @@
         "play": "Play now",
         "solo": "Solo mode",
         "join": "Join a Private Game",
-        "create": "Create a Private Game"
+        "create": "Create a Private Game",
+        "local": "Local Game"
       }
     },
     "friend": {

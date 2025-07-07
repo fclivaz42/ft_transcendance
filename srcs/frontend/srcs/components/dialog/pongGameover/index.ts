@@ -108,6 +108,9 @@ export function createPongGameoverDialog(payload: GameOverPayload["payload"], pl
 				case "tournament":
 					route = "/pong?room=tournament";
 					break;
+				case "local":
+					route = "/pong?room=local";
+					break;
 				default:
 					route = `/pong?room=${currentRoute.searchParams.get("room")}`;
 					break;

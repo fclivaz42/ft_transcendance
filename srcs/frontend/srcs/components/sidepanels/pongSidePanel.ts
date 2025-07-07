@@ -36,5 +36,11 @@ export function createPongSidePanel() {
 		f: () => RoutingHandler.setRoute("/pong?room=host"),
 	}));
 
+	sidePanel.appendChild(createSidePanelButton({
+		i18n: "navbar.pong.submenu.local",
+		logo: buttonLogo,
+		f: () => RoutingHandler.setRoute("/pong?room=local"),
+	}));
+
 	return sidePanel;
 }
