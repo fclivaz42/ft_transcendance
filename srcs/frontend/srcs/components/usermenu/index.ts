@@ -52,6 +52,7 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
         }).then(() => {
             UserHandler.fetchUser();
             dialog.remove();
+			RoutingHandler.setRoute("/");
         });
     };
 
