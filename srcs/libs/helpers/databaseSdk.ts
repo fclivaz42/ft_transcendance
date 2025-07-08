@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/07/08 22:44:07 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/08 22:59:53 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -70,23 +70,6 @@ export default class DatabaseSDK {
 		})
 	}
 
-	private async get_friends_from_user(user: User): Promise<AxiosResponse<Array<User>>> {
-		if (!user.FriendsList)
-			return {
-				data: [],
-				status: 200,
-				statusText: "OK",
-				headers: {},
-				config: {} as InternalAxiosRequestConfig
-			}
-		return await this.api_request<Array<User>>("GET", "Players", "/multiget", {
-			headers: {
-				Field: "PlayerID",
-				Array: JSON.stringify(user.FriendsList)
-			}
-		})
-	}
-
 	private async validate_match(val_match: Match): Promise<comb> {
 		let merged: Match | undefined = undefined;
 		if (val_match.HashAddress) {
@@ -118,7 +101,7 @@ export default class DatabaseSDK {
 		}
 	}
 
-	private async get_player_matchlist_from_uuid(user: UUIDv4): Promise<Array<Match>> {
+	private async get_player_matchlist_from_uuid(user: UUIDv4): Promise<Array<Match_complete>> {
 		const matchlist: Array<Match> = await this.api_request<Array<Match>>("GET", "Matches", `/PlayerID/${this.param_str}`, { params: user })
 			.then(response => response.data)
 		for (const item of matchlist) {
@@ -130,13 +113,27 @@ export default class DatabaseSDK {
 		return matchlist as Array<Match_complete>
 	}
 
-	private async get_player_matchlist_from_user(user: Partial<User>): Promise<Array<Match>> {
+	private async get_player_matchlist_from_user(user: Partial<User>): Promise<Array<Match_complete>> {
 		if (!user.PlayerID)
 			throw "error.missing.playerid"
-		return await this.get_player_matchlist_from_uuid(user.PlayerID)
+		return await this.get_player_matchlist_from_uuid(user.PlayerID) as Array<Match_complete>
 	}
 
-	private async get_friends_from_uuid(user: UUIDv4): Promise<AxiosResponse<Array<User>>> {
+	private async get_friends_from_user(user: User): Promise<Array<User>> {
+		if (!user.FriendsList)
+			return []
+		const ret: Array<User> = await this.api_request<Array<User>>("GET", "Players", "/multiget", {
+			headers: {
+				Field: "PlayerID",
+				Array: JSON.stringify(user.FriendsList)
+			}
+		}).then(response => response.data)
+		for (const item in ret)
+			ret[item] = this.usr_sdk.filterPublicUserData(ret[item]) as User
+		return ret;
+	}
+
+	private async get_friends_from_uuid(user: UUIDv4): Promise<Array<User>> {
 		const req_user: User = (await this.get_user(user, "PlayerID")).data
 		return await this.get_friends_from_user(req_user)
 	}
@@ -189,7 +186,7 @@ export default class DatabaseSDK {
 	* @param user Either an UUIDv4 string or User object.
 	* @returns An AxiosResponse Promise containing an array of Users, those being the friends.
 	*/
-	public async get_user_friends(user: UUIDv4 | User): Promise<AxiosResponse<Array<User>>> {
+	public async get_user_friends(user: UUIDv4 | User): Promise<Array<User>> {
 		if (typeof user === "string")
 			return await this.get_friends_from_uuid(user)
 		return await this.get_friends_from_user(user)
