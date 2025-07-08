@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/07/08 09:04:28 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/08 19:24:39 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -14,10 +14,11 @@ import axios from "axios";
 import https from "https";
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import type * as fft from "fastify";
-import type { User } from "../interfaces/User.ts";
+import { default_users, type User } from "../interfaces/User.ts";
 import type { Match, Match_complete } from "../interfaces/Match.ts";
 import type { Tournament_full, Tournament_lite, Tournament_metadata } from "../interfaces/Tournament.ts";
 import BlockchainSDK from "./blockchainSdk.ts";
+import UsersSdk from "./usersSdk.ts";
 import type { TXHash } from "./blockchainSdk.ts";
 
 export type UUIDv4 = string
@@ -34,6 +35,8 @@ export default class DatabaseSDK {
 	private api_key = process.env.API_KEY
 	private server_url = "http://database:3000"
 	private param_str = "{?PARAMS}"
+	private bc_sdk = new BlockchainSDK();
+	private usr_sdk = new UsersSdk();
 
 	constructor() { }
 
@@ -80,7 +83,36 @@ export default class DatabaseSDK {
 	}
 
 	private async get_player_matchlist_from_uuid(user: UUIDv4): Promise<AxiosResponse<Array<Match>>> {
-		return await this.api_request<Array<Match>>("GET", "Matches", `/PlayerID/${this.param_str}`, { params: user })
+		const matchlist: Array<Match> = await this.api_request<Array<Match>>("GET", "Matches", `/PlayerID/${this.param_str}`, { params: user })
+			.then(response => response.data)
+		for (const item of matchlist) {
+			let merged: Match | undefined = undefined;
+			if (item.HashAddress) {
+				await this.bc_sdk.get_match_score(item.MatchID as string)
+					.then(function(response) {
+						merged = { ...item, ...response }
+					})
+					.catch(function() { item.HashAddress = undefined })
+			}
+			if (merged) {
+				if (item.WPlayerID === default_users.Deleted.PlayerID)
+					(merged as Partial<Match>).WPlayerID = default_users.Deleted.PlayerID
+				if (item.LPlayerID === default_users.Deleted.PlayerID)
+					(merged as Partial<Match>).LPlayerID = default_users.Deleted.PlayerID
+			}
+			else
+				merged = item
+			const u_array: Array<User> = await this.api_request<Array<User>>("GET", "Players", "/multiget", {
+				headers: {
+					Field: "PlayerID",
+					Array: JSON.stringify([merged.WPlayerID, merged.LPlayerID])
+				}
+			}).then(response => response.data)
+			Object.assign(item, merged)
+			item.WPlayerID = u_array[0]
+			item.LPlayerID = u_array[1]
+		}
+		return matchlist as Array<Match_complete>
 	}
 
 	private async get_player_matchlist_from_user(user: Partial<User>): Promise<AxiosResponse<Array<Match>>> {
@@ -207,18 +239,17 @@ export default class DatabaseSDK {
 		for (const item of matchlist) {
 			let merged: Match | undefined = undefined;
 			if (item.HashAddress) {
-				const bc_sdk = new BlockchainSDK();
-				await bc_sdk.get_match_score(item.MatchID as string)
+				await this.bc_sdk.get_match_score(item.MatchID as string)
 					.then(function(response) {
 						merged = { ...item, ...response }
 					})
 					.catch(function() { item.HashAddress = undefined })
 			}
 			if (merged) {
-				if (!item.WPlayerID)
-					(merged as Partial<Match>).WPlayerID = undefined
-				if (!item.LPlayerID)
-					(merged as Partial<Match>).LPlayerID = undefined
+				if (item.WPlayerID === default_users.Deleted.PlayerID)
+					(merged as Partial<Match>).WPlayerID = default_users.Deleted.PlayerID
+				if (item.LPlayerID === default_users.Deleted.PlayerID)
+					(merged as Partial<Match>).LPlayerID = default_users.Deleted.PlayerID
 			}
 			else
 				merged = item
@@ -254,8 +285,7 @@ export default class DatabaseSDK {
 	public async create_match(match: Match): Promise<AxiosResponse<Match>> {
 		const finished_match: Match = await this.api_request<Match>("POST", "Matches", undefined, { body: match })
 			.then(response => response.data)
-		const bc_sdk = new BlockchainSDK();
-		const match_tx: TXHash = await bc_sdk.add_match_score(finished_match)
+		const match_tx: TXHash = await this.bc_sdk.add_match_score(finished_match)
 			.then(response => response.data)
 		return await this.api_request<Match>("PUT", "Matches", `/MatchID/${this.param_str}`, { body: { HashAddress: match_tx }, params: finished_match.MatchID })
 	}
@@ -270,18 +300,17 @@ export default class DatabaseSDK {
 			.then(response => response.data)
 		let merged: Match | undefined = undefined;
 		if (match.HashAddress) {
-			const bc_sdk = new BlockchainSDK();
-			await bc_sdk.get_match_score(match.MatchID as string)
+			await this.bc_sdk.get_match_score(match.MatchID as string)
 				.then(function(response) {
 					merged = { ...match, ...response }
 				})
 				.catch(function() { match.HashAddress = undefined })
 		}
 		if (merged) {
-			if (!match.WPlayerID)
-				(merged as Partial<Match>).WPlayerID = undefined
-			if (!match.LPlayerID)
-				(merged as Partial<Match>).LPlayerID = undefined
+			if (match.WPlayerID === default_users.Deleted.PlayerID)
+				(merged as Partial<Match>).WPlayerID = default_users.Deleted.PlayerID
+			if (match.LPlayerID === default_users.Deleted.PlayerID)
+				(merged as Partial<Match>).LPlayerID = default_users.Deleted.PlayerID
 		}
 		else
 			merged = match
