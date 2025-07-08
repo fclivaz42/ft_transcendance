@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/30 18:24:51 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/07 19:28:42 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -14,7 +14,7 @@ import Database from "better-sqlite3"
 import type * as sqlt from "better-sqlite3"
 import Axios from "axios"
 import type * as at from "axios"
-import { tables } from "./db_vars.ts"
+import { default_users, tables } from "./db_vars.ts"
 import { hash_password } from "./db_helpers.ts"
 import DatabaseWorker from "./db_methods.ts"
 import Logger from "../../libs/helpers/loggers.ts"
@@ -75,21 +75,17 @@ export async function init_db() {
 				else
 					check_db_columns(db, tables[item].Name);
 			}
-			if (db.prepare(`SELECT * FROM ${tables.Players.Name} WHERE ${tables.Players.Fields[0]} = ?`).get("P-0") === undefined) {
-				let sql = `INSERT INTO ${tables.Players.Name} VALUES (`;
-				const body = {
-					PlayerID: "P-0",
-					DisplayName: "Guest",
-					EmailAddress: "null",
-					Password: "0"
+			for (const item of default_users) {
+				if (db.prepare(`SELECT * FROM ${tables.Players.Name} WHERE ${tables.Players.Fields[0]} = ?`).get(item.PlayerID) === undefined) {
+					let sql = `INSERT INTO ${tables.Players.Name} VALUES (`;
+					for (const key of tables.Players.Fields) {
+						if (key !== "")
+							sql += ` @${key},`
+						if (item[key] === undefined)
+							item[key] = null
+					}
+					db.prepare(sql.replace(/.$/, ")")).run(item)
 				}
-				for (const key of tables.Players.Fields) {
-					if (key !== "")
-						sql += ` @${key},`
-					if (body[key] === undefined)
-						body[key] = null
-				}
-				db.prepare(sql.replace(/.$/, ")")).run(body)
 			}
 		} catch (error) {
 			console.error(error);

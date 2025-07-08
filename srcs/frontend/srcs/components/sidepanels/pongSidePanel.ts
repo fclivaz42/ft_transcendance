@@ -36,5 +36,12 @@ export function createPongSidePanel() {
 		f: () => RoutingHandler.setRoute("/pong?room=host"),
 	}));
 
+	sidePanel.appendChild(createSidePanelButton({
+		title: i18nHandler.getValue("navbar.pong.submenu.tournament"),
+		i18n: "navbar.pong.submenu.create",
+		logo: buttonLogo,
+		f: () => RoutingHandler.setRoute("/pong?room=tournament"),
+	}));
+
 	return sidePanel;
 }

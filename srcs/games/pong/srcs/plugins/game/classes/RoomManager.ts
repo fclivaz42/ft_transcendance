@@ -1,11 +1,10 @@
-
 import GameRoom from "./GameRoom.ts";
 import PlayerSession from "./PlayerSession.ts";
 import fastifyWebsocket, { type WebSocket } from "@fastify/websocket";
 
-type GameMode = 'remote' | 'friend_host' | 'friend_join' | 'local' | 'computer';
+type GameMode = "remote" | "friend_host" | "friend_join" | "local" | "computer";
 
-interface AssignPlayerOptions {
+export interface AssignPlayerOptions {
 	userId: string;
 	mode?: GameMode;
 	roomId?: string | null;
@@ -16,15 +15,15 @@ export default class RoomManager {
 	private _connectedSessions: Map<string, PlayerSession> = new Map();
 
 	/* ROOM ID GENERATION -------------------------------------------------------------------------- */
-	private _generateRandomLetter(): string {
+	protected _generateRandomLetter(): string {
 		return String.fromCharCode(65 + Math.floor(Math.random() * 26));
 	}
 
-	private _generateRandomNumber(): number {
+	protected _generateRandomNumber(): number {
 		return Math.floor(Math.random() * 10);
 	}
 
-	private _shuffle<T>(arr: T[]): T[] {
+	protected _shuffle<T>(arr: T[]): T[] {
 		const copy = [...arr];
 		let currentIndex: number = copy.length;
 
@@ -32,16 +31,21 @@ export default class RoomManager {
 			let randomIndex: number = Math.floor(Math.random() * currentIndex);
 			currentIndex--;
 			[copy[currentIndex], copy[randomIndex]] = [
-				copy[randomIndex], copy[currentIndex]
+				copy[randomIndex],
+				copy[currentIndex],
 			];
 		}
 		return copy;
 	}
 
-	private _generateRoomId(): string {
-		const letters = Array.from({ length: 2 }, () => this._generateRandomLetter());
-		const numbers = Array.from({ length: 2 }, () => this._generateRandomNumber().toString());
-		return this._shuffle(letters.concat(numbers)).join('');
+	protected _generateRoomId(): string {
+		const letters = Array.from({ length: 2 }, () =>
+			this._generateRandomLetter()
+		);
+		const numbers = Array.from({ length: 2 }, () =>
+			this._generateRandomNumber().toString()
+		);
+		return this._shuffle(letters.concat(numbers)).join("");
 	}
 	/* --------------------------------------------------------------------------------------------- */
 
@@ -65,7 +69,10 @@ export default class RoomManager {
 		return null;
 	}
 
-	public assignPlayer(socket: WebSocket, options: AssignPlayerOptions): PlayerSession {
+	public assignPlayer(
+		socket: WebSocket,
+		options: AssignPlayerOptions
+	): PlayerSession {
 		const { userId, mode, roomId = null } = options;
 		const session = new PlayerSession(socket, userId);
 		this.addSession(session);
@@ -78,7 +85,7 @@ export default class RoomManager {
 				room.addPlayer(session);
 				break;
 			case "friend_host":
-				room = roomId && this._rooms.get(roomId) || this.createRoom();
+				room = (roomId && this._rooms.get(roomId)) || this.createRoom();
 				room.addPlayer(session);
 				break;
 			case "friend_join":
@@ -86,7 +93,7 @@ export default class RoomManager {
 					room = this._rooms.get(roomId);
 					room?.addPlayer(session);
 				} else {
-					console.log(`Room: ${roomId} not found.`)
+					console.log(`Room: ${roomId} not found.`);
 					socket.close();
 				}
 				break;
@@ -97,8 +104,10 @@ export default class RoomManager {
 				return session;
 			case "computer":
 				room = this.createRoom(true);
-				room.lock = true;
+				const aiSession = new PlayerSession(null, "AI_opponent");
 				room.addPlayer(session);
+				room.addPlayer(aiSession, true);
+				room.lock = true;
 				break;
 			default:
 				throw new Error(`Unknown mode: ${mode}`);
@@ -128,7 +137,6 @@ export default class RoomManager {
 	}
 	/* --------------------------------------------------------------------------------------------- */
 }
-
 
 // TODO: make so that the update payload is broadcasted to all connected player in the given session
 //       work in GameClass.js

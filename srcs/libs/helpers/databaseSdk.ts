@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/07/06 17:15:28 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/08 08:05:50 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -201,7 +201,7 @@ export default class DatabaseSDK {
 	* Get the complete list of matches present in the database.
 	* @returns An AxiosResponse Promise containing an array of every single Match.
 	*/
-	public async get_matchlist(): Promise<Array<Match>> {
+	public async get_matchlist(): Promise<Array<Match_complete>> {
 		const matchlist: Array<Match> = await this.api_request<Array<Match>>("GET", "Matches", "/multiget")
 			.then(response => response.data)
 		for (const item of matchlist) {
@@ -232,7 +232,7 @@ export default class DatabaseSDK {
 			item.WPlayerID = u_array[0]
 			item.LPlayerID = u_array[1]
 		}
-		return matchlist
+		return matchlist as Array<Match_complete>
 	}
 
 	/**

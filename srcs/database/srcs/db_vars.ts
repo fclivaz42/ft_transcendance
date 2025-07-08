@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/07/05 23:00:11 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/07 19:29:07 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -123,8 +123,8 @@ const MatchesTable: db_table =
 	],
 	"Arguments": [
 		"TEXT NOT NULL PRIMARY KEY",
-		`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET NULL`,
-		`TEXT REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET NULL`,
+		`TEXT DEFAULT 'P-D' REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET DEFAULT`,
+		`TEXT DEFAULT 'P-D' REFERENCES ${PlayersTable.Name}(${PlayersTable.Fields[0]}) ON DELETE SET DEFAULT`,
 		"INTEGER NOT NULL",
 		"INTEGER NOT NULL",
 		// "TEXT DEFAULT NULL",
@@ -220,3 +220,25 @@ export const tables: db_definition =
 	"UIDTable": UIDTable,
 	"CurrentContract": CurrentContract
 }
+
+interface def_user {
+	PlayerID: string,
+	DisplayName: string,
+	EmailAddress: string,
+	Password: string
+}
+
+export const default_users: Array<def_user> = [
+	{
+		PlayerID: "P-0",
+		DisplayName: "Guest",
+		EmailAddress: "null1",
+		Password: "0"
+	},
+	{
+		PlayerID: "P-D",
+		DisplayName: "Deleted",
+		EmailAddress: "null2",
+		Password: "0"
+	}
+]
