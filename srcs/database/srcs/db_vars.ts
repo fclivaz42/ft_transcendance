@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/24 01:10:34 by fclivaz           #+#    #+#             //
-//   Updated: 2025/07/07 19:29:07 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/08 08:10:08 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -220,25 +220,3 @@ export const tables: db_definition =
 	"UIDTable": UIDTable,
 	"CurrentContract": CurrentContract
 }
-
-interface def_user {
-	PlayerID: string,
-	DisplayName: string,
-	EmailAddress: string,
-	Password: string
-}
-
-export const default_users: Array<def_user> = [
-	{
-		PlayerID: "P-0",
-		DisplayName: "Guest",
-		EmailAddress: "null1",
-		Password: "0"
-	},
-	{
-		PlayerID: "P-D",
-		DisplayName: "Deleted",
-		EmailAddress: "null2",
-		Password: "0"
-	}
-]

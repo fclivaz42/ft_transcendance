@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/07/07 19:28:42 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/08 08:13:32 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -14,11 +14,12 @@ import Database from "better-sqlite3"
 import type * as sqlt from "better-sqlite3"
 import Axios from "axios"
 import type * as at from "axios"
-import { default_users, tables } from "./db_vars.ts"
+import { tables } from "./db_vars.ts"
 import { hash_password } from "./db_helpers.ts"
 import DatabaseWorker from "./db_methods.ts"
 import Logger from "../../libs/helpers/loggers.ts"
 import BlockchainSDK from "../../libs/helpers/blockchainSdk.ts"
+import { default_users } from "../../libs/interfaces/User.ts"
 
 //
 // Automatically check if any column has been changed in db_vars.ts
@@ -75,16 +76,16 @@ export async function init_db() {
 				else
 					check_db_columns(db, tables[item].Name);
 			}
-			for (const item of default_users) {
-				if (db.prepare(`SELECT * FROM ${tables.Players.Name} WHERE ${tables.Players.Fields[0]} = ?`).get(item.PlayerID) === undefined) {
+			for (const item in default_users) {
+				if (db.prepare(`SELECT * FROM ${tables.Players.Name} WHERE ${tables.Players.Fields[0]} = ?`).get(default_users[item].PlayerID) === undefined) {
 					let sql = `INSERT INTO ${tables.Players.Name} VALUES (`;
 					for (const key of tables.Players.Fields) {
 						if (key !== "")
 							sql += ` @${key},`
-						if (item[key] === undefined)
-							item[key] = null
+						if (default_users[item][key] === undefined)
+							default_users[item][key] = null
 					}
-					db.prepare(sql.replace(/.$/, ")")).run(item)
+					db.prepare(sql.replace(/.$/, ")")).run(default_users[item])
 				}
 			}
 		} catch (error) {

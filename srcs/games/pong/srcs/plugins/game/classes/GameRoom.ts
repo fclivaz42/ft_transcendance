@@ -5,6 +5,7 @@ import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
 import { DEFAULT_FPS } from "./Playfield.ts";
 // import { type LobbyBroadcastPayload } from "./TournamentLobby.ts";
 import DatabaseSDK from "../../../../../../libs/helpers/databaseSdk.ts";
+import { default_users } from "../../../../../../libs/interfaces/User.ts";
 
 interface BallUpdate {
 	curr_speed: number;
@@ -257,12 +258,16 @@ export default class GameRoom {
 		let winner_id: string = winner === 1 ? p1 : p2;
 		let loser_id: string = winner === 1 ? p2 : p1;
 		if (winner_id.startsWith("AI_"))
-			winner_id = "P-0"
+			winner_id = default_users.Guest.PlayerID
 		if (loser_id.startsWith("AI_"))
-			loser_id = "P-0"
+			loser_id = default_users.Guest.PlayerID
 		return db_sdk.create_match({
-			WPlayerID: await db_sdk.get_user(winner_id, "PlayerID").then(response => response.data.PlayerID).catch(error => "P-D"),
-			LPlayerID: await db_sdk.get_user(loser_id, "PlayerID").then(response => response.data.PlayerID).catch(error => "P-D"),
+			WPlayerID: await db_sdk.get_user(winner_id, "PlayerID")
+				.then(response => response.data.PlayerID)
+				.catch(error => default_users.Deleted.PlayerID),
+			LPlayerID: await db_sdk.get_user(loser_id, "PlayerID")
+				.then(response => response.data.PlayerID)
+				.catch(error => default_users.Deleted.PlayerID),
 			WScore: this.score.p1 > this.score.p2 ? this.score.p1 : this.score.p2,
 			LScore: this.score.p1 < this.score.p2 ? this.score.p1 : this.score.p2,
 			StartTime: this._start_time,
@@ -273,7 +278,8 @@ export default class GameRoom {
 	}
 
 	private async _killGame(winner: number) {
-		let res = this._send_to_db(this.players[0] ? this.players[0].getUserId() : "P-0", this.players[1] ? this.players[1].getUserId() : "P-0", winner)
+		let res = this._send_to_db(this.players[0] ? this.players[0].getUserId() : default_users.Guest.PlayerID,
+			this.players[1] ? this.players[1].getUserId() : default_users.Guest.PlayerID, winner)
 		this.broadcast(this.buildGameOverPayload(winner));
 		this.game.gameStop();
 		if (this._onGameOver) {
