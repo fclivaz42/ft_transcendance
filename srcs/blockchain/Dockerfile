@@ -11,6 +11,7 @@ COPY package.json /sarif
 RUN npm i
 
 COPY hardhat.config.cjs /sarif
+COPY docker-entrypoint.sh /sarif
 
 COPY srcs/ ./srcs
 
@@ -19,8 +20,4 @@ ARG PRIVATE_KEY
 ENV PROVIDER=${PROVIDER}
 ENV PRIVATE_KEY=${PRIVATE_KEY}
 
-RUN npx hardhat compile
-
-WORKDIR /sarif
-
-ENTRYPOINT ["npm", "run", "main"]
+ENTRYPOINT ["/bin/sh", "./docker-entrypoint.sh"]
