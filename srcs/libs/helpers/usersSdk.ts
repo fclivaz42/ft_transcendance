@@ -208,7 +208,7 @@ class UsersSdk {
 	public static filterPublicUserData(user: User) {
 		const filteredUser = this.filterUserData(user);
 
-		const { Bappy, EmailAddress, FamilyName, FirstName, FriendsList, PhoneNumber, ...publicUser } = filteredUser;
+		const { EmailAddress, FriendsList, ...publicUser } = filteredUser;
 		return publicUser;
 	}
 
