@@ -203,6 +203,11 @@
         "confirmPasswordRequired": "Please confirm your new password."
 
       }
+    },
+    "2faPanel": {
+      "title": "Two-Factor Authentication",
+      "info": "A mail as been sent to your email with the 2FA code.\nPlease enter it below to verify your identity.",
+      "verify": "Verify"
     }
   },
   "passwordStrength": {

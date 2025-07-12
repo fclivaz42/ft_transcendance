@@ -5,6 +5,9 @@ import { config } from "./managers/ConfigManager.ts";
 import { betterFastify } from "../../libs/helpers/fastifyHelper.ts";
 import fastifyMultipart from "@fastify/multipart";
 import initializeMatchesRoute from "./routes/matches.ts";
+import EmailManager from "./managers/EmailManager.ts";
+
+EmailManager.initialize();
 
 const server = fastify({
 	https: {

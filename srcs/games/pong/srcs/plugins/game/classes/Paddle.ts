@@ -257,7 +257,7 @@ export default class Paddle {
 			const maxY = this._bounds.maxY - halfHeight;
 			const minY = this._bounds.minY + halfHeight;
 
-			if (fps === 1) {
+			if (fps === 1 && this._ball.getIsLaunched()) {
 				const vel: Vector3 = this._ballDirection.clone();
 				const pad: number = this.getPosition().x;
 				const dir: boolean =
@@ -286,6 +286,15 @@ export default class Paddle {
 					// this.printIAInfo(1);
 					// this.printIAInfo(2);
 				}
+			}
+			else if (Paddle._ballPos.x === 0
+				&& !this._ball.getIsLaunched()
+				&& this.getIsIA()
+				&& (this._downMoove === 0 && this._upMoove === 0)) {
+				if (currentPaddle < -this.getSpeed())
+					this._upMoove = 1;
+				else if (currentPaddle > this.getSpeed())
+					this._downMoove = 1;
 			}
 
 			if (this._upMoove) {

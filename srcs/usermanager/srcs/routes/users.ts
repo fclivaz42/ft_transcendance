@@ -13,6 +13,7 @@ import axios from "axios";
 import UsersSdk from "../../../libs/helpers/usersSdk.ts";
 import type { MultipartFile } from "@fastify/multipart";
 import type { Match } from "../../../libs/interfaces/Match.ts";
+import twoFaReceiptEndpoint from "./users/2FAreceipt.ts";
 
 export default async function initializeRoute(app: FastifyInstance, opts: FastifyPluginOptions) {
 
@@ -286,4 +287,5 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 	usersLoginEndpoint(app, opts);
 	usersRegisterEndpoint(app, opts);
 	usersOauthLoginEndpoint(app, opts);
+	twoFaReceiptEndpoint(app, opts);
 }

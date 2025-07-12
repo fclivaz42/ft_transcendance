@@ -9,8 +9,10 @@ import axios from 'axios';
 import https from 'https';
 import Logger from '../../../../libs/helpers/loggers.ts';
 import DatabaseSDK from '../../../../libs/helpers/databaseSdk.ts';
-import nodemailer from "nodemailer";
 import { codeUser } from './2FAreceipt.ts';
+import type { TwoFaLogUser } from './2FAreceipt.ts';
+import { config } from '../../managers/ConfigManager.ts';
+import EmailManager from '../../managers/EmailManager.ts';
 
 export default async function usersLoginEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.post("/login", async (request, reply) => {
@@ -55,47 +57,44 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 		if (!loggedUser.PlayerID)
 			throw new Error("Missing PlayerID in user data");
 
-		// try {
-		// 	await send2faVerification(loggedUser.EmailAddress);
-		// 	console.log(codeUser.get(loggedUser.EmailAddress));
-		// }
-		// catch (err) {
-		// 	return reply.status(503).send(`Error during 2FA :", ${err}`);
-		// }
-		const jwtToken = jwt.createJwtToken({
-			sub: loggedUser.PlayerID,
-			data: {
-				DisplayName: loggedUser.DisplayName,
-				EmailAddress: loggedUser.EmailAddress,
-				//AvatarURL: loggedUser.AvatarURL,
-			},
-		});
-		return reply.status(200).send({ token: jwtToken.token, ...jwtToken.payload });
+		try {
+			await send2faVerification(loggedUser.EmailAddress, userLogin.ClientId, loggedUser.PlayerID);
+		}
+		catch (err) {
+			return reply.status(503).send(`Error during 2FA :", ${err}`);
+		}
+		return httpReply({
+			detail: "2fa sent",
+			status: 200,
+			module: "usermanager",
+		}, reply, request);
 	});
 }
 
-const send2faVerification = async (email: string): Promise<void> => {
+const send2faVerification = async (email: string, id: string, user: string): Promise<void> => {
 	try {
-		const transporter = nodemailer.createTransport({
-			service: 'gmail',
-			port: 587,
-			secure: false,
-			auth: {
-				user: process.env.AUTH_EMAIL,
-				pass: process.env.AUTH_EMAIL_PASSW,
-			}
-		});
-
-		const code: string = randomNumericString(6);
+		let code: string;
+		while (true) {
+			code = randomNumericString(6);
+			if (!codeUser[code])
+				break;
+		}
 		const mailOptions = {
-			from: `"Sarif " <${process.env.AUTH_EMAIL}>`,
+			from: config.SmtpConfig.from,
 			to: email,
 			subject: 'Your code 2FA',
 			text: `Your verification code is : ${code}`,
 		};
-		await transporter.sendMail(mailOptions);
-		console.log(`2FA email sent to ${email}`);
-		codeUser.set(email, code);
+		EmailManager.sendMail(mailOptions).catch((err) => {
+			Logger.error(`Error sending 2FA email to ${email}: ${err}`);
+		});
+		codeUser.set(id, { Code: code, PlayerID: user } as TwoFaLogUser);
+		new Promise((resolve) => {
+			setTimeout(() => {
+				codeUser.delete(id);
+				resolve(true);
+			}, 300000);
+		});
 	}
 	catch (err) {
 		console.error("Error during 2FA :", err);
