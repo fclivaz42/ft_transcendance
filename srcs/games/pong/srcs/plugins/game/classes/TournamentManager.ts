@@ -4,6 +4,7 @@ import PlayerSession from "./PlayerSession.ts";
 import RoomManager from "./RoomManager.ts";
 import TournamentBracket from "./TournamentBracket.ts";
 import TournamentLobby from "./TournamentLobby.ts";
+import TournamentRoom from "./TournamentRoom.ts";
 
 type GameMode = "tournament";
 
@@ -97,6 +98,17 @@ export default class TournamentManager extends RoomManager {
 		this._launchCountdown = setTimeout(() => {
 			this._launchTournament();
 		}, this.LAUNCH_COUNTDOWN_MS);
+	}
+
+	public createRoom(vsAI: boolean = false) : TournamentRoom {
+		const roomId = this._generateRoomId();
+		const room = new TournamentRoom(roomId, vsAI, (id) => {
+			this._rooms.delete(id);
+			console.log(`TournamentRoom ${id} deleted (empty or game over).`);
+		});
+		this._rooms.set(roomId, room);
+		console.log(`Created Room with ID: ${roomId}`);
+		return room;
 	}
 
 	private _handleAIRoom(p1: PlayerSession, p2: PlayerSession) {

@@ -11,8 +11,8 @@ export interface AssignPlayerOptions {
 }
 
 export default class RoomManager {
-	private _rooms: Map<string, GameRoom> = new Map();
-	private _connectedSessions: Map<string, PlayerSession> = new Map();
+	protected _rooms: Map<string, GameRoom> = new Map();
+	protected _connectedSessions: Map<string, PlayerSession> = new Map();
 
 	/* ROOM ID GENERATION -------------------------------------------------------------------------- */
 	protected _generateRandomLetter(): string {
