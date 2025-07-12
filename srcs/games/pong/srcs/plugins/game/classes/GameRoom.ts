@@ -7,28 +7,28 @@ import { DEFAULT_FPS } from "./Playfield.ts";
 import DatabaseSDK from "../../../../../../libs/helpers/databaseSdk.ts";
 import { default_users } from "../../../../../../libs/interfaces/User.ts";
 
-interface BallUpdate {
+export interface BallUpdate {
 	curr_speed: number;
 	curr_position: number[];
 }
 
-interface PaddleUpdate {
+export interface PaddleUpdate {
 	max_speed: number;
 	position: number[];
 }
 
-interface RoomScore {
+export interface RoomScore {
 	p1: number;
 	p2: number;
 }
 
-interface BallInit extends BallUpdate {
+export interface BallInit extends BallUpdate {
 	size: number[];
 }
 
-interface PaddleInit extends PaddleUpdate { }
+export interface PaddleInit extends PaddleUpdate { }
 
-interface WallsInit {
+export interface WallsInit {
 	[key: string]: {
 		position: number[];
 		size: number[];
@@ -36,7 +36,7 @@ interface WallsInit {
 	};
 }
 
-interface UpdatePayload {
+export interface UpdatePayload {
 	type: "update";
 	payload: {
 		ball: BallUpdate;
@@ -45,7 +45,7 @@ interface UpdatePayload {
 	};
 }
 
-interface InitPayload {
+export interface InitPayload {
 	type: "init";
 	payload: {
 		ball: BallInit;
@@ -59,7 +59,7 @@ interface InitPayload {
 	};
 }
 
-interface PlayerConnectedPayload {
+export interface PlayerConnectedPayload {
 	type: "connect";
 	payload: {
 		playerID: string;
@@ -67,28 +67,28 @@ interface PlayerConnectedPayload {
 	};
 }
 
-interface PlayerDisconnectedPayload {
+export interface PlayerDisconnectedPayload {
 	type: "disconnect";
 	payload: {
 		playerID: string;
 	};
 }
 
-interface CollisionPayload {
+export interface CollisionPayload {
 	type: "collision";
 	payload: {
 		collider: string;
 	};
 }
 
-interface ScoreUpdatePayload {
+export interface ScoreUpdatePayload {
 	type: "score";
 	payload: {
 		score: RoomScore;
 	};
 }
 
-interface GameOverPayload {
+export interface GameOverPayload {
 	type: "gameover";
 	payload: {
 		winner: string;
@@ -97,7 +97,7 @@ interface GameOverPayload {
 	};
 }
 
-interface ConnectedPlayers {
+export interface ConnectedPlayers {
 	p1: string | undefined;
 	p2: string | undefined;
 }
