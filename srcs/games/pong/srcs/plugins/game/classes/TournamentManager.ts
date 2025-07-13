@@ -1,10 +1,9 @@
-import { match } from "node:assert";
 import GameRoom from "./GameRoom.ts";
 import PlayerSession from "./PlayerSession.ts";
 import RoomManager from "./RoomManager.ts";
 import TournamentBracket from "./TournamentBracket.ts";
 import TournamentLobby from "./TournamentLobby.ts";
-import TournamentRoom from "./TournamentRoom.ts";
+import TournamentRoom from "./TournamentRoom.ts"
 
 type GameMode = "tournament";
 

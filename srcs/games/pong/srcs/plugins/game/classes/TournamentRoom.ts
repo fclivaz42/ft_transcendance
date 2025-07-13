@@ -1,9 +1,9 @@
 import GameRoom from "./GameRoom.ts";
 import PlayerSession from "./PlayerSession.ts";
+import TournamentLobby from "./TournamentLobby.ts";
 import {
 	BallUpdate,
 	PaddleUpdate,
-	BallInit,
 	PaddleInit,
 	UpdatePayload,
 	InitPayload,
@@ -70,11 +70,18 @@ type TournamentMessage =
 	| TournamentOverPayload;
 
 export default class TournamentRoom extends GameRoom {
+	private lobby: TournamentLobby;
 	constructor(
 		id: string,
+		lobby: TournamentLobby,
 		vsAI: boolean = false,
 		onGameOver?: (roomId: string) => void
 	) {
 		super(id, vsAI, onGameOver);
+		this.lobby = lobby;
 	}
+
+	public getScore
 }
+
+
