@@ -88,7 +88,7 @@ const send2faVerification = async (email: string, id: string, user: string): Pro
 		EmailManager.sendMail(mailOptions).catch((err) => {
 			Logger.error(`Error sending 2FA email to ${email}: ${err}`);
 		});
-		codeUser.set(id, { Code: code, PlayerID: user } as TwoFaLogUser);
+		codeUser.set(id, { Code: code, PlayerID: user, nbrOfTry: 0 } as TwoFaLogUser);
 		new Promise((resolve) => {
 			setTimeout(() => {
 				codeUser.delete(id);
