@@ -1,87 +1,85 @@
-import GameRoom from "./GameRoom.ts";
 import PlayerSession from "./PlayerSession.ts";
 import TournamentLobby from "./TournamentLobby.ts";
+import TournamentBracket from "./TournamentBracket.ts";
+
 import {
-	BallUpdate,
-	PaddleUpdate,
-	PaddleInit,
-	UpdatePayload,
-	InitPayload,
-	CollisionPayload,
-	ConnectedPlayers,
-} from "./GameRoom.ts";
-
-interface TournamentScore {
-	p1: number;
-	p2: number;
-	round: number;
-}
-// TournamentPlayerConnected
-interface TournamentPlayerConnected {
-	type: "tournament-connect";
-	payload: {
-		playerID: string;
-		roomID: string;
-		lobbyID: string;
-	};
-}
-
-interface TournamentPlayerDisconnected {
-	type: "tournament-disconnect";
-	payload: {
-		playerID: string;
-		lobbyID: string;
-	};
-}
-
-// TournamentScoreUpdatePayload
-interface TournamentScoreUpdatePayload {
-	type: "tournament-score";
-	payload: {
-		score: TournamentScore;
-	};
-}
-
-interface TournamentMatchOverPayload {
-	type: "tournament-match-over";
-	payload: {
-		winner: string;
-		loser: string;
-		final_score: TournamentScore;
-	};
-}
-
-interface TournamentOverPayload {
-	type: "tournament-over";
-	payload: {
-		winner: string;
-		lobbyID: string;
-	};
-}
-
-type TournamentMessage =
-	| InitPayload
-	| UpdatePayload
-	| TournamentPlayerConnected
-	| TournamentPlayerDisconnected
-	| CollisionPayload
-	| TournamentScoreUpdatePayload
-	| TournamentMatchOverPayload
-	| TournamentOverPayload;
+	TournamentScore,
+	TournamentInitPayload,
+	TournamentPlayerConnected,
+	TournamentPlayerDisconnected,
+	TournamentScoreUpdatePayload,
+	TournamentMatchOverPayload,
+	TournamentOverPayload,
+	type TournamentMessage,
+	type LobbyBroadcastPayload,
+} from "./types.ts";
 
 export default class TournamentRoom extends GameRoom {
-	private lobby: TournamentLobby;
+	//inherits id: string
+	//inherits player: PlayerSession[] = [];
+	//inherits game: Game;
+	//inherits lock: boolean;
+	// inherits _lastMessage?: string as PRIVATE;
+	// inherits _lastCollision?: CollisionPayload as PRIVATE;
+	// inherits _start_time: number = Date.now(): as PRIVATE;
+	public override score: TournamentScore;
+	private _lobby: TournamentLobby;
+	private _bracket: TournamentBracket;
 	constructor(
 		id: string,
-		lobby: TournamentLobby,
 		vsAI: boolean = false,
+		lobby: TournamentLobby,
+		bracket: TournamentBracket,
 		onGameOver?: (roomId: string) => void
 	) {
 		super(id, vsAI, onGameOver);
 		this.lobby = lobby;
+		this.score = { p1: 0, p2: 0, lobby: this._lobby.getCurrentRound() };
 	}
 
-	public getScore
+	// public isFull(): boolean inherited
+	// public isEmpty(): boolean inherited
+	// public getGame(): Game inherited
+
+	public override getScore(): TournamentScore {
+		return this.score;
+	}
+
+	public override addScore(): void {
+		player === 1 ? this.score.p1++ : this.score.p2++;
+		this.score.round = _bracket.getCurrentRound();
+		this.broadcast(this.buildScoreUpdatePayload());
+		if (this.score.p1 === 6) {
+			console.log("GAME OVER!, P1 Won!");
+			this._killGame(1);
+		} else if (this.score.p2 === 6) {
+			console.log("GAME OVER! P2 Won");
+			this._killGame(2);
+		}
+	}
+
+	// TODO: Please adjust to Tournament! @fclivaz 
+	private async override _send_to_db(p1: string, p2: string, winner: number) {
+		const db_sdk = new DatabaseSDK();
+		let winner_id: string = winner === 1 ? p1 : p2;
+		let loser_id: string = winner === 1 ? p2 : p1;
+		if (winner_id.startsWith("AI_")) winner_id = default_users.Guest.PlayerID;
+		if (loser_id.startsWith("AI_")) loser_id = default_users.Guest.PlayerID;
+		return db_sdk.create_match({
+			WPlayerID: await db_sdk
+				.get_user(winner_id, "PlayerID")
+				.then((response) => response.data.PlayerID)
+				.catch((error) => default_users.Deleted.PlayerID),
+			LPlayerID: await db_sdk
+				.get_user(loser_id, "PlayerID")
+				.then((response) => response.data.PlayerID)
+				.catch((error) => default_users.Deleted.PlayerID),
+			WScore: this.score.p1 > this.score.p2 ? this.score.p1 : this.score.p2,
+			LScore: this.score.p1 < this.score.p2 ? this.score.p1 : this.score.p2,
+			StartTime: this._start_time,
+			EndTime: Date.now(),
+			// WARN: MUST BE CHANGED FOR TOURNAMENT
+			MatchIndex: 0,
+		});
+	}
 }
-
-

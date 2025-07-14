@@ -11,7 +11,6 @@ import {
 import Ball from "./Ball.ts";
 import { Session } from "inspector/promises";
 import Game, { PADDLE_SPEED } from "./GameClass.ts";
-import { match } from "assert";
 import type { WallMap } from "./GameClass.ts";
 import GameRoom from "./GameRoom.ts";
 

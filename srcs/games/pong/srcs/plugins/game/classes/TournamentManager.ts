@@ -1,4 +1,3 @@
-import GameRoom from "./GameRoom.ts";
 import PlayerSession from "./PlayerSession.ts";
 import RoomManager from "./RoomManager.ts";
 import TournamentBracket from "./TournamentBracket.ts";
@@ -48,7 +47,7 @@ export default class TournamentManager extends RoomManager {
 	}
 
 	private _attachGameOverCallback(
-		room: GameRoom,
+		room: TournamentRoom,
 		p1: PlayerSession,
 		p2: PlayerSession
 	) {

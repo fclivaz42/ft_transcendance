@@ -3,124 +3,20 @@ import Paddle from "./Paddle.ts";
 import PlayerSession from "./PlayerSession.ts";
 import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
 import { DEFAULT_FPS } from "./Playfield.ts";
-// import { type LobbyBroadcastPayload } from "./TournamentLobby.ts";
 import DatabaseSDK from "../../../../../../libs/helpers/databaseSdk.ts";
 import { default_users } from "../../../../../../libs/interfaces/User.ts";
 
-export interface BallUpdate {
-	curr_speed: number;
-	curr_position: number[];
-}
-
-export interface PaddleUpdate {
-	max_speed: number;
-	position: number[];
-}
-
-export interface RoomScore {
-	p1: number;
-	p2: number;
-}
-
-export interface BallInit extends BallUpdate {
-	size: number[];
-}
-
-export interface PaddleInit extends PaddleUpdate { }
-
-export interface WallsInit {
-	[key: string]: {
-		position: number[];
-		size: number[];
-		passThrough?: boolean;
-	};
-}
-
-export interface UpdatePayload {
-	type: "update";
-	payload: {
-		ball: BallUpdate;
-		p1: PaddleUpdate;
-		p2: PaddleUpdate;
-	};
-}
-
-export interface InitPayload {
-	type: "init";
-	payload: {
-		ball: BallInit;
-		p1: PaddleInit;
-		p2: PaddleInit;
-		walls: WallsInit;
-		camera: CameraInitInfo;
-		light: LightInitInfo;
-		roomID: string;
-		connectedPlayers: ConnectedPlayers;
-	};
-}
-
-export interface PlayerConnectedPayload {
-	type: "connect";
-	payload: {
-		playerID: string;
-		roomID: string;
-	};
-}
-
-export interface PlayerDisconnectedPayload {
-	type: "disconnect";
-	payload: {
-		playerID: string;
-	};
-}
-
-export interface CollisionPayload {
-	type: "collision";
-	payload: {
-		collider: string;
-	};
-}
-
-export interface ScoreUpdatePayload {
-	type: "score";
-	payload: {
-		score: RoomScore;
-	};
-}
-
-export interface GameOverPayload {
-	type: "gameover";
-	payload: {
-		winner: string;
-		loser: string;
-		final_score: RoomScore;
-	};
-}
-
-export interface ConnectedPlayers {
-	p1: string | undefined;
-	p2: string | undefined;
-}
-
-type LobbyBroadcastPayload =
-	| { type: "timer"; payload: { secondsRemaining: number } }
-	| {
-		type: "match_result";
-		payload: {
-			roomID: string;
-			winner: string;
-			score: { p1: number; p2: number };
-		};
-	};
-
-type GameMessage =
-	| InitPayload
-	| UpdatePayload
-	| PlayerConnectedPayload
-	| PlayerDisconnectedPayload
-	| CollisionPayload
-	| ScoreUpdatePayload
-	| GameOverPayload;
+import {
+	UpdatePayload,
+	InitPayload,
+	PlayerConnectedPayload,
+	PlayerDisconnectedPayload,
+	CollisionPayload,
+	ScoreUpdatePayload,
+	GameOverPayload,
+	type GameMessage,
+	type LobbyBroadcastPayload,
+} from "./types.ts";
 
 export default class GameRoom {
 	public id: string;
@@ -253,46 +149,54 @@ export default class GameRoom {
 		this.game.gameStart(DEFAULT_FPS);
 	}
 
-	private async _send_to_db(p1: string, p2: string, winner: number) {
+	protected async _send_to_db(p1: string, p2: string, winner: number) {
 		const db_sdk = new DatabaseSDK();
 		let winner_id: string = winner === 1 ? p1 : p2;
 		let loser_id: string = winner === 1 ? p2 : p1;
-		if (winner_id.startsWith("AI_"))
-			winner_id = default_users.Guest.PlayerID
-		if (loser_id.startsWith("AI_"))
-			loser_id = default_users.Guest.PlayerID
+		if (winner_id.startsWith("AI_")) winner_id = default_users.Guest.PlayerID;
+		if (loser_id.startsWith("AI_")) loser_id = default_users.Guest.PlayerID;
 		return db_sdk.create_match({
-			WPlayerID: await db_sdk.get_user(winner_id, "PlayerID")
-				.then(response => response.data.PlayerID)
-				.catch(error => default_users.Deleted.PlayerID),
-			LPlayerID: await db_sdk.get_user(loser_id, "PlayerID")
-				.then(response => response.data.PlayerID)
-				.catch(error => default_users.Deleted.PlayerID),
+			WPlayerID: await db_sdk
+				.get_user(winner_id, "PlayerID")
+				.then((response) => response.data.PlayerID)
+				.catch((error) => default_users.Deleted.PlayerID),
+			LPlayerID: await db_sdk
+				.get_user(loser_id, "PlayerID")
+				.then((response) => response.data.PlayerID)
+				.catch((error) => default_users.Deleted.PlayerID),
 			WScore: this.score.p1 > this.score.p2 ? this.score.p1 : this.score.p2,
 			LScore: this.score.p1 < this.score.p2 ? this.score.p1 : this.score.p2,
 			StartTime: this._start_time,
 			EndTime: Date.now(),
 			// WARN: MUST BE CHANGED FOR TOURNAMENT
 			MatchIndex: 0,
-		})
+		});
 	}
 
-	private async _killGame(winner: number) {
-		let res = this._send_to_db(this.players[0] ? this.players[0].getUserId() : default_users.Guest.PlayerID,
-			this.players[1] ? this.players[1].getUserId() : default_users.Guest.PlayerID, winner)
+	protected async _killGame(winner: number) {
+		let res = this._send_to_db(
+			this.players[0]
+				? this.players[0].getUserId()
+				: default_users.Guest.PlayerID,
+			this.players[1]
+				? this.players[1].getUserId()
+				: default_users.Guest.PlayerID,
+			winner
+		);
 		this.broadcast(this.buildGameOverPayload(winner));
 		this.game.gameStop();
 		if (this._onGameOver) {
 			this._onGameOver(this.id);
 		}
-		res.then(function(response) {
-			console.log(`Match successfully created:`)
-			console.dir(response.data)
-		})
-			.catch(function(error) {
-				console.error(`WARN: match could not be sent to db!`)
-				console.dir(error)
+		res
+			.then(function (response) {
+				console.log(`Match successfully created:`);
+				console.dir(response.data);
 			})
+			.catch(function (error) {
+				console.error(`WARN: match could not be sent to db!`);
+				console.dir(error);
+			});
 	}
 
 	public broadcast(message: GameMessage | LobbyBroadcastPayload): void {
@@ -342,7 +246,7 @@ export default class GameRoom {
 	}
 
 	/* BUILDING PAYLOADS ---------------------------------------------------------------------------- */
-	private buildInitPayload(): InitPayload {
+	protected buildInitPayload(): InitPayload {
 		const game = this.game;
 		const ball = game.getBall();
 		const [p1, p2] = game.getPaddles();
@@ -368,7 +272,7 @@ export default class GameRoom {
 		return initPayload;
 	}
 
-	private buildUpdatePayload(): UpdatePayload {
+	protected buildUpdatePayload(): UpdatePayload {
 		const game = this.game;
 		const ball = game.getBall();
 		const [p1, p2] = game.getPaddles();
@@ -406,7 +310,7 @@ export default class GameRoom {
 		return playerConnectedPayload;
 	}
 
-	private buildPlayerDisconnectedPayload(
+	protected buildPlayerDisconnectedPayload(
 		sessions: PlayerSession
 	): PlayerDisconnectedPayload {
 		const playerDisconnectedPayload: PlayerDisconnectedPayload = {
@@ -418,7 +322,7 @@ export default class GameRoom {
 		return playerDisconnectedPayload;
 	}
 
-	private buildScoreUpdatePayload(): ScoreUpdatePayload {
+	protected buildScoreUpdatePayload(): ScoreUpdatePayload {
 		const scoreUpdate: ScoreUpdatePayload = {
 			type: "score",
 			payload: {
@@ -431,7 +335,7 @@ export default class GameRoom {
 		return scoreUpdate;
 	}
 
-	private buildCollisionPayload(collisionInfo: string): CollisionPayload {
+	protected buildCollisionPayload(collisionInfo: string): CollisionPayload {
 		const collisionPayload: CollisionPayload = {
 			type: "collision",
 			payload: {
@@ -441,7 +345,7 @@ export default class GameRoom {
 		return collisionPayload;
 	}
 
-	public buildGameOverPayload(winner: number): GameOverPayload {
+	protected buildGameOverPayload(winner: number): GameOverPayload {
 		const gameOver: GameOverPayload = {
 			type: "gameover",
 			payload: {
@@ -453,6 +357,5 @@ export default class GameRoom {
 		return gameOver;
 	}
 }
-
 
 // TODO: close socket on gameover for single games
