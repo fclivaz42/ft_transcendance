@@ -30,7 +30,7 @@ export function createDialog(props?: DialogProps): BackdropDialog {
     dialog.appendChild(props.child);
   }
 
-  dialog.className = "outline-none flex flex-col max-h-[85vh] fixed scale-90 duration-300 left-0 right-0 top-0 bottom-0 bg-background dark:bg-background_dark border-0 rounded-lg shadow-lg text-black dark:text-white overflow-visible";
+  dialog.className = "outline-none flex flex-col max-h-[85vh] max-w-[90vw] fixed scale-90 duration-300 left-0 right-0 top-0 bottom-0 bg-background dark:bg-background_dark border-0 rounded-lg shadow-lg text-black dark:text-white overflow-visible";
 
 	backdrop.appendChild(dialog);
 	document.body.appendChild(backdrop);

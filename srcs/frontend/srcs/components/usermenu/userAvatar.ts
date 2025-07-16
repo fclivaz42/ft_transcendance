@@ -15,7 +15,7 @@ export default function createUserAvatar(props: UserAvatarProps = {
 	editable: false
 }): UserAvatarType {
 	if (!props.sizeClass)
-		props.sizeClass = "w-10 h-10";
+		props.sizeClass = "min-w-10 min-h-10 w-10 h-10";
 
 	let href: string | undefined;
 	if (!props.editable && !props.disableClick && !props.isComputer) {
