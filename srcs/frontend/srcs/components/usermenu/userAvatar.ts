@@ -55,7 +55,7 @@ export default function createUserAvatar(props: UserAvatarProps = {
 	if (props.editable) {
 		userAvatar.firstChild.onload = () => {
 			const newContainer = document.createElement("div");
-			newContainer.className = "relative rounded-full overflow-hidden";
+			newContainer.className = `relative rounded-full overflow-hidden ${props.sizeClass}`;
 			userAvatar.classList.add("cursor-pointer");
 			if (!userAvatar.parentElement)
 				throw new Error("User avatar must have a parent element to replace it.");

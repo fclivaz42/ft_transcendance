@@ -5,7 +5,7 @@ import type { Matches } from "../../interfaces/Matches";
 import UserHandler from "../../handlers/UserHandler";
 import { Users } from "../../interfaces/Users";
 import createUserAvatar from "../usermenu/userAvatar";
-import { createButton } from "../buttons";
+import { createButtonIcon } from "../buttons";
 import NotificationManager from "../../managers/NotificationManager";
 import { sanitizer } from "../../helpers/sanitizer";
 
@@ -194,14 +194,14 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 			<div id="history-elements" class="mx-auto flex flex-col items-center gap-4 w-fit">
 			</div>
 			<div class="flex items-center justify-center gap-4 mt-4">
-				${createButton({
+				${createButtonIcon({
 					id: "history-back",
 					logo: "/assets/ui/previous-svgrepo-com.svg",
 				}).outerHTML}
 				<p id="history-page" class="text-sm text-gray-500 dark:text-gray-400 select-none text-center w-10">
 					${sanitizer(`${page} / ${Math.max(Math.ceil(matches.length / elemPerPage), 1)}`)}
 				</p>
-				${createButton({
+				${createButtonIcon({
 					id: "history-next",
 					logo: "/assets/ui/next-svgrepo-com.svg",
 				}).outerHTML}

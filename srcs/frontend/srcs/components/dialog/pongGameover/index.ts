@@ -1,6 +1,6 @@
 import UserHandler from "../../../handlers/UserHandler";
 import { userMenuManager } from "../../../managers/UserMenuManager";
-import { createButton, createLogoutButton } from "../../buttons";
+import { createButtonIcon } from "../../buttons";
 import { createDialog } from "../../backdropDialog";
 import createTextbox from "../../input/textbox";
 import NotificationManager from "../../../managers/NotificationManager";
@@ -61,13 +61,13 @@ async function createPongGameoverDialogContent(dialogRef: BackdropDialog, users:
 				</div>
 			</div>
 			<div class="flex gap-16">
-				${createButton({
+				${createButtonIcon({
 					id: "pong-gameover-play-again",
 					i18n: "pong.gameover.playagain",
 					color: "text-white bg-blue-500 hover:bg-blue-600",
 					darkColor: "dark:bg-blue-700 dark:hover:bg-blue-800",
 				}).outerHTML}
-				${createButton({
+				${createButtonIcon({
 					id: "pong-gameover-leave",
 					i18n: "pong.gameover.leave",
 					color: "text-white bg-red-500 hover:bg-red-600",

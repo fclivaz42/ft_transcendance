@@ -1,6 +1,6 @@
 import UserHandler from "../../../handlers/UserHandler";
 import { userMenuManager } from "../../../managers/UserMenuManager";
-import { createButton, createLogoutButton } from "../../buttons";
+import { createButtonIcon } from "../../buttons";
 import { createDialog } from "../../backdropDialog";
 import createTextbox from "../../input/textbox";
 import NotificationManager from "../../../managers/NotificationManager";
@@ -24,7 +24,7 @@ function createLogin2faContent(dialogRef: BackdropDialog): HTMLDivElement {
 				type: "text",
 				placeholder: "XXXXXX"
 			}).outerHTML}
-			${createButton({
+			${createButtonIcon({
 				id: "login-2fa-button",
 				i18n: "panel.2faPanel.verify",
 				addClasses: "w-full text-center justify-center",

@@ -1,8 +1,7 @@
-import { createButton } from "./index.js";
+import { createButtonIcon } from "./index.js";
 
 export function createRegisterButton(): HTMLElement {
-  return createButton({
-    title: "Register",
+  return createButtonIcon({
     logo: "/assets/ui/login-door-1-svgrepo-com.svg",
     color: "bg-white",
     darkColor: "dark:bg-background_dark",

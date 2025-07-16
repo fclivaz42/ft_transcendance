@@ -27,6 +27,18 @@ class UserHandler {
 		this._clientId = clientId;
 	}
 
+	public static maskEmail(email: string): string {
+		const [user, domain] = email.split("@");
+		const maskedUser = user.slice(0, 3) + "*".repeat(Math.max(1, user.length - 3));
+		const [domainName, domainExt] = domain.split(".");
+		const maskedDomain = "*".repeat(domainName.length) + "." + domainExt;
+		return `${maskedUser}@${maskedDomain}`;
+	}
+
+	public maskEmail(email?: string): string {
+		return email ? UserHandler.maskEmail(email) : UserHandler.maskEmail(this._user?.EmailAddress || "");
+	}
+
 	public async initialize() {
 		await this.fetchUser();
 	}
@@ -171,7 +183,7 @@ class UserHandler {
 		const userEmailElements = document.querySelectorAll("[data-user='email']");
 		userEmailElements.forEach(element => {
 			if (element instanceof HTMLElement) {
-				element.textContent = this.emailAddress || "Email Address";
+				element.textContent = this.maskEmail(this.emailAddress);
 			}
 		});
 
@@ -257,6 +269,12 @@ class UserHandler {
 		}
 		const data = await response.json() as { isAlive: boolean };
 		return data.isAlive || false;
+	}
+
+	public get isPrivate(): Boolean {
+		if (!this._user?.Private)
+			return false;
+		return true;
 	}
 }
 

@@ -2,7 +2,7 @@ import { i18nHandler } from "../../handlers/i18nHandler";
 import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler from "../../handlers/UserHandler";
 import { sanitizer } from "../../helpers/sanitizer";
-import { createButton } from "../buttons";
+import { createButtonIcon } from "../buttons";
 import createUserAvatar from "../usermenu/userAvatar";
 
 export default async function createUserFrame(): Promise<HTMLDivElement> {
@@ -42,7 +42,7 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	if (userStatsProfile)
 		userStatsProfile.insertAdjacentElement("afterbegin", createUserAvatar({ disableClick: true, playerId: user.PlayerID, sizeClass: "w-40 h-40 mx-auto"}));
 
-	const viewHistoryButton = createButton({
+	const viewHistoryButton = createButtonIcon({
 		i18n: "user.matches.viewHistory",
 		addClasses: "w-fit mx-auto",
 		color: "bg-background",
@@ -55,7 +55,7 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	});
 	userFrame.appendChild(viewHistoryButton);
 
-	const addFriendButton = createButton({
+	const addFriendButton = createButtonIcon({
 		i18n: "user.friend.addFriend",
 		addClasses: "w-fit mx-auto",
 		color: "bg-blue-200",
@@ -63,7 +63,7 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 		logo: "/assets/ui/profile-plus-round-1343-svgrepo-com.svg",
 	});
 
-	const removeFriendButton = createButton({
+	const removeFriendButton = createButtonIcon({
 		i18n: "user.friend.removeFriend",
 		addClasses: "w-fit mx-auto",
 		color: "bg-red-200",

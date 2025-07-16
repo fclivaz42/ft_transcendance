@@ -140,7 +140,6 @@ const dialog = createLoginDialog({
       position: "relative",
       height: "auto", //s'adapte à la taille du contenu ,
       overflow: "visible",     // <-- permet au contenu de dépasser si besoin
-      padding: "2.5rem",       
     });
 
     document.body.style.overflow = "hidden";

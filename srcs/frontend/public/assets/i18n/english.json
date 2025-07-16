@@ -184,7 +184,10 @@
       "buttons": {
         "save": "Save Changes",
         "cancel": "Cancel",
-        "logout": "Logout"
+        "logout": "Logout",
+        "public": "Make Profile Public",
+        "private": "Make Profile Private",
+        "delete": "Delete Account"
       },
       "notification": {
         "validationErrorTitle": "Validation Error",
