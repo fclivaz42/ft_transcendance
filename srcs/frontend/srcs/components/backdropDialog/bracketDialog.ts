@@ -28,7 +28,7 @@ function createBracketRoundComponent(round: Round): HTMLDivElement {
 	const template = document.createElement("template");
 
 	template.innerHTML = `
-		<div class="mb-4 rounded-md dark:bg-panel_dark dark:text-white">
+		<div class="mb-4 rounded-md dark:bg-panel_dark dark:text-white shadow-lg">
 			<div class="flex flex-row items-center justify-between py-2 px-4 gap-x-4">
 				<div class="flex items-center justify-start gap-x-2 w-48">
 					${createUserAvatar({
@@ -36,7 +36,7 @@ function createBracketRoundComponent(round: Round): HTMLDivElement {
 					}).outerHTML}
 					<p data-bracket-round="${sanitizer(round.Round.toString())}" data-bracket-username="${sanitizer(round.P1)}" class="font-semibold truncate">Player 1</p>
 				</div>
-				<p data-bracket-round="${sanitizer(round.Round.toString())}" data-bracket-score="${sanitizer(round.P1)}" class="text-right">2</p>
+				<p data-bracket-round="${sanitizer(round.Round.toString())}" data-bracket-score="${sanitizer(round.P1)}" class="font-bold text-lg text-right ${round.P1Score < round.P2Score ? "text-red-500" : "text-green-500"}">2</p>
 			</div>
 			<div class="flex flex-row items-center justify-between py-2 px-4 gap-x-4">
 				<div class="flex items-center justify-start gap-x-2 w-48">
@@ -45,7 +45,7 @@ function createBracketRoundComponent(round: Round): HTMLDivElement {
 					}).outerHTML}
 					<p data-bracket-round="${sanitizer(round.Round.toString())}" data-bracket-username="${sanitizer(round.P2)}" class="font-semibold truncate">Player 2</p>
 				</div>
-				<p data-bracket-round="${sanitizer(round.Round.toString())}" data-bracket-score="${sanitizer(round.P2)}" class="text-right">1</p>
+				<p data-bracket-round="${sanitizer(round.Round.toString())}" data-bracket-score="${sanitizer(round.P2)}" class="font-bold text-lg text-right ${round.P1Score > round.P2Score ? "text-red-500" : "text-green-500"}">1</p>
 			</div>
 		</div>
 	`
@@ -82,14 +82,14 @@ function createBracketComponent(bracket: TournamentBracket): HTMLDivElement {
 				<div>Semifinals</div>
 				<div>Finals</div>
 			</div>
-			<div class="grid grid-flow-col grid-cols-3 items-center gap-x-2">
-				<div class="grid grid-flow-row grid-rows-3">
+			<div class="flex flex-row gap-x-4 justify-center">
+				<div class="flex-grow flex flex-col items-center justify-evenly">
 					${bracket.Rounds.filter((round) => round.Round === 0).map(round => createBracketRoundComponent(round).outerHTML).join("")}
 				</div>
-				<div class="mx-2 grid h-1/2 grid-flow-row grid-rows-2">
+				<div class="flex-grow flex flex-col items-center justify-evenly mx-2">
 					${bracket.Rounds.filter((round) => round.Round === 1).map(round => createBracketRoundComponent(round).outerHTML).join("")}
 				</div>
-				<div class="mx-2 grid h-1/4 grid-flow-row grid-rows-1">
+				<div class="flex-grow flex flex-col items-center justify-evenly ml-2">
 					${bracket.Rounds.filter((round) => round.Round === 2).map(round => createBracketRoundComponent(round).outerHTML).join("")}
 				</div>
 			</div>
