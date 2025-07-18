@@ -59,7 +59,7 @@ export default class TournamentRoom extends GameRoom {
 		}
 	}
 
-	// TODO: Please adjust to Tournament! @fclivaz 
+	// TODO: Please adjust to Tournament! @fclivaz
 	override async _send_to_db(p1: string, p2: string, winner: number) {
 		const db_sdk = new DatabaseSDK();
 		let winner_id: string = winner === 1 ? p1 : p2;
