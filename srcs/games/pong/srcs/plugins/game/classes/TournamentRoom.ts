@@ -1,6 +1,7 @@
 import PlayerSession from "./PlayerSession.ts";
 import TournamentLobby from "./TournamentLobby.ts";
 import TournamentBracket from "./TournamentBracket.ts";
+import GameRoom from "./GameRoom.ts";
 
 import {
 	TournamentScore,
@@ -33,8 +34,8 @@ export default class TournamentRoom extends GameRoom {
 		onGameOver?: (roomId: string) => void
 	) {
 		super(id, vsAI, onGameOver);
-		this.lobby = lobby;
-		this.score = { p1: 0, p2: 0, lobby: this._lobby.getCurrentRound() };
+		this._lobby = lobby;
+		this.score = { p1: 0, p2: 0, round: this._bracket.getCurrentRound() };
 	}
 
 	// public isFull(): boolean inherited
@@ -45,9 +46,9 @@ export default class TournamentRoom extends GameRoom {
 		return this.score;
 	}
 
-	public override addScore(): void {
+	public override addScore(player: number): void {
 		player === 1 ? this.score.p1++ : this.score.p2++;
-		this.score.round = _bracket.getCurrentRound();
+		this.score.round = this._bracket.getCurrentRound();
 		this.broadcast(this.buildScoreUpdatePayload());
 		if (this.score.p1 === 6) {
 			console.log("GAME OVER!, P1 Won!");
@@ -59,7 +60,7 @@ export default class TournamentRoom extends GameRoom {
 	}
 
 	// TODO: Please adjust to Tournament! @fclivaz 
-	private async override _send_to_db(p1: string, p2: string, winner: number) {
+	override async _send_to_db(p1: string, p2: string, winner: number) {
 		const db_sdk = new DatabaseSDK();
 		let winner_id: string = winner === 1 ? p1 : p2;
 		let loser_id: string = winner === 1 ? p2 : p1;
