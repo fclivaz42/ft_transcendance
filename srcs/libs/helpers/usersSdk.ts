@@ -187,8 +187,14 @@ class UsersSdk {
 	 * @returns Filtered user object without sensitive information.
 	 */
 	static filterUserData(user: User) {
-		const { Password, OAuthID, ...filteredUser } = user;
-		return filteredUser;
+		if (user.Password) {
+			const { Password, OAuthID, ...filteredUser } = user;
+			return filteredUser;
+		}
+		else {
+			const { OAuthID, ...filteredUser } = user;
+			return filteredUser;
+		}
 	}
 
 	/**
