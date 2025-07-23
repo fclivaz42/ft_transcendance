@@ -50,19 +50,15 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 		}
 
 		if (manager.getSession(query.userId)) {
-			socket.send(
-				JSON.stringify({
-					type: "ignored",
-					message: "Already in an active session",
-				})
-			);
+			socket.send(JSON.stringify({ type: 'ignored', message: 'Already in an active session' }));
 			socket.close();
 			return;
 		}
 
 		let session: PlayerSession;
 
-		if (mode === "friend_join") {
+
+		if (mode === 'friend_join') {
 			if (!query.roomId) {
 				socket.send(JSON.stringify({ type: "400", message: "Missing roomId" }));
 				socket.close();
@@ -89,26 +85,21 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 			});
 		}
 
-		console.log(
-			`Player connected to room ${session.getRoom()?.id} as ${query.userId}`
-		);
+		console.log(`Player connected to room ${session.getRoom()?.id} as ${query.userId}`);
 
-		socket.on("message", (msg) => {
-			if (msg.toString() === "ping!") {
-				socket.send("pong!");
+		socket.on('message', (msg) => {
+			if (msg.toString() === 'ping!') {
+				socket.send('pong!');
 				return;
 			}
 			try {
 				const { type, payload }: ClientMessage = JSON.parse(msg.toString());
-				if (
-					type === "ball" &&
-					payload?.direction &&
-					payload.direction == "launch"
-				) {
-					let ball: Ball | undefined = session.getRoom()?.getGame().getBall();
-					ball?.launch();
-					ball?.setCurrSpeed(0.25); // ball.getBaseSpeed() instead of hardcode?
-				} else if (type === "move" && payload?.direction) {
+				if (type === 'ball' && payload?.direction && payload.direction == "launch") {
+					let ball = session.getRoom()?.getGame().getBall();
+					if (!session.getRoom()?.getGame().getBall().getIsLaunched())
+						ball?.launch();
+				}
+				else if (type === 'move' && payload?.direction) {
 					const paddle = session.getPaddle();
 
 					if (paddle) {

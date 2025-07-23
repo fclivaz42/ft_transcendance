@@ -400,6 +400,12 @@ class UsersSdk {
 	public async getUserAlive(uuid: string): Promise<AxiosResponse<UsersSdkAliveResponse>> {
 		return this.apiRequest<UsersSdkAliveResponse>("get", `${uuid}/alive`);
 	}
+
+	public async post2FA(data: {Code: string, ClientId: string}): Promise<AxiosResponse<any>> {
+		return this.apiRequest<any>("post", "2fa", {
+			data
+		});
+	}
 }
 
 export default UsersSdk;

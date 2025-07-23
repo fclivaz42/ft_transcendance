@@ -12,7 +12,8 @@ import Logger from "../../../libs/helpers/loggers.ts";
 import axios from "axios";
 import UsersSdk from "../../../libs/helpers/usersSdk.ts";
 import type { MultipartFile } from "@fastify/multipart";
-import type { Match, Match_complete } from "../../../libs/interfaces/Match.ts";
+import type { Match_complete } from "../../../libs/interfaces/Match.ts";
+import twoFaReceiptEndpoint from "./users/2FAreceipt.ts";
 
 export default async function initializeRoute(app: FastifyInstance, opts: FastifyPluginOptions) {
 
@@ -201,7 +202,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 			return authorization;
 		const params = request.params as { uuid: string };
 		const matches = await db_sdk.get_player_matchlist(params.uuid);
-		const wonMatches = matches.filter((match: Match) => match.WPlayerID === params.uuid);
+		const wonMatches = matches.filter((match: Match_complete) => match.WPlayerID.PlayerID === params.uuid);
 		return reply.code(200).send({
 			"wonMatches": wonMatches.length,
 			"lostMatches": matches.length - wonMatches.length,
@@ -291,4 +292,5 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 	usersLoginEndpoint(app, opts);
 	usersRegisterEndpoint(app, opts);
 	usersOauthLoginEndpoint(app, opts);
+	twoFaReceiptEndpoint(app, opts);
 }

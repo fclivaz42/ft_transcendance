@@ -175,7 +175,6 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (request.method !== 'POST')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only POST method is allowed for login.' });
 		const login = await usersSdk.postLogin(request.body as UserLoginProps);
-		UsersSdk.showerCookie(reply, login.data.token, login.data.exp);
 		return reply.code(login.status).send(login.data);
 	});
 
@@ -228,7 +227,6 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 		const userId = authorization.data.sub;
 		const formdata = new FormData();
-		// @ts-expect-error
 		for await (const part of request.parts()) {
 			if (part.type === "file") {
 				if (formdata.keys.length !== 0)
@@ -267,6 +265,17 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			throw err;
 		}
 		reply.code(resp.status).send(usersSdk.filterUserData(resp.data));
+	});
+
+	fastify.all('/2fa', async (request, reply) => {
+		if (request.method !== 'POST')
+			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only POST method is allowed for 2FA.' });
+		const body = request.body as { ClientId: string, Code: string };
+		const resp = await usersSdk.post2FA(body);
+		if (resp.status !== 200)
+			return reply.code(resp.status).send(resp.data);
+		UsersSdk.showerCookie(reply, resp.data.token, resp.data.exp);
+		return reply.code(resp.status).send(resp.data);
 	});
 
 	// Get public user data by UUID

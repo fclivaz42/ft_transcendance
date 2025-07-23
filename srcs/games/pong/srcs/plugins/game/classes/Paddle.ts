@@ -257,15 +257,13 @@ export default class Paddle {
 			const maxY = this._bounds.maxY - halfHeight;
 			const minY = this._bounds.minY + halfHeight;
 
-			if (fps === 1) {
+			if (fps === 1 && this._ball.getIsLaunched()) {
 				const vel: Vector3 = this._ballDirection.clone();
 				const pad: number = this.getPosition().x;
-				const dir: boolean =
-					(vel.x < 0 && pad < 0) || (vel.x > 0 && pad > 0) ? true : false;
-				if (Paddle._ballPos.x === 0) {
-					// console.log("Ball doesn't moove");
-				} else {
-					// else if (twoAI && dir) {
+				const dir: boolean = ((vel.x < 0 && pad < 0) || vel.x > 0 && pad > 0) ? true : false;
+				const paddles: Paddle[] = this._gameRoom.getGame().getPaddles();
+				const twoIA: boolean = (paddles[0].getIsIA() && paddles[1].getIsIA()) ? true : false;
+				if ((twoIA && dir) || (!twoIA)) {
 					const predictY = this.predictBall();
 					const diff = Math.abs(
 						Math.max(predictY, currentPaddle) -
@@ -286,6 +284,15 @@ export default class Paddle {
 					// this.printIAInfo(1);
 					// this.printIAInfo(2);
 				}
+			}
+			else if (Paddle._ballPos.x === 0
+				&& !this._ball.getIsLaunched()
+				&& this.getIsIA()
+				&& (this._downMoove === 0 && this._upMoove === 0)) {
+				if (currentPaddle < -this.getSpeed())
+					this._upMoove = 1;
+				else if (currentPaddle > this.getSpeed())
+					this._downMoove = 1;
 			}
 
 			if (this._upMoove) {
@@ -324,9 +331,8 @@ export default class Paddle {
 			// 	}`
 			// );
 		}
-		DIFF_SCORE_PLAYER - diff < 0
-			? this.randMoove(fps, DIFF_SCORE_PLAYER)
-			: this.randMoove(fps, diff);
+		if (this._ball.getIsLaunched())
+			DIFF_SCORE_PLAYER - diff < 0 ? this.randMoove(fps, DIFF_SCORE_PLAYER) : this.randMoove(fps, diff);
 		this.iaAlgo(fps);
 	}
 
@@ -334,9 +340,25 @@ export default class Paddle {
 		const coef = DIFF_SCORE_PLAYER - diff;
 		const refresh = 30;
 		const ran = Math.floor((Math.random() * 10000) % coef);
-		if (fps === refresh && this._downMoove === 0 && this._upMoove === 0) {
-			if (ran > coef / 2) this._upMoove += ran;
-			else if (ran < coef / 2) this._downMoove += ran;
+		const paddles: Paddle[] = this._gameRoom.getGame().getPaddles();
+		const twoIA: boolean = (paddles[0].getIsIA() && paddles[1].getIsIA()) ? true : false;
+		if (twoIA) {
+			if ((this.getName() === "player1" && fps === refresh) ||
+				(this.getName() === "player2" && fps === refresh + 10) &&
+				this._downMoove === 0 && this._upMoove === 0) {
+				if (ran > coef / 2)
+					this._upMoove += ran;
+				else if (ran < coef / 2)
+					this._downMoove += ran;
+				else if (ran === coef / 2)
+					Math.random() < 0.5 ? this._upMoove = coef * 1.5 : this._downMoove = coef * 1.5;
+			}
+		}
+		else if (fps === refresh && this._downMoove === 0 && this._upMoove === 0) {
+			if (ran > coef / 2)
+				this._upMoove += ran;
+			else if (ran < coef / 2)
+				this._downMoove += ran;
 			else if (ran === coef / 2)
 				Math.random() < 0.5
 					? (this._upMoove = coef * 1.5)

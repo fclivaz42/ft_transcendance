@@ -257,7 +257,7 @@ export default class DatabaseSDK {
 	* @param user The UUIDv4 of the User or the User object.
 	* @returns An AxiosResponse Promise containing an array of every single Match.
 	*/
-	public async get_player_matchlist(user: UUIDv4 | User): Promise<Array<Match>> {
+	public async get_player_matchlist(user: UUIDv4 | User): Promise<Array<Match_complete>> {
 		if (typeof user === "string")
 			return await this.get_player_matchlist_from_uuid(user)
 		return await this.get_player_matchlist_from_user(user)
