@@ -37,8 +37,7 @@ export function createPongSidePanel() {
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
-		title: i18nHandler.getValue("navbar.pong.submenu.tournament"),
-		i18n: "navbar.pong.submenu.create",
+		i18n: "navbar.pong.submenu.tournament",
 		logo: buttonLogo,
 		f: () => RoutingHandler.setRoute("/pong?room=tournament"),
 	}));

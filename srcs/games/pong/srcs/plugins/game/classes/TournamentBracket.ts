@@ -1,4 +1,8 @@
 import PlayerSession from "./PlayerSession.ts";
+import type {
+	TournamentBracketStatus,
+	TournamentMatchStatus,
+} from "./types.ts";
 
 type Match = [PlayerSession, PlayerSession];
 
@@ -90,5 +94,38 @@ export default class TournamentBracket {
 		this._currentRound++;
 		this._rounds[this._currentRound] = this._createMatches(nextPlayers);
 		this._winners[this._currentRound] = [];
+	}
+
+	public getTournamentStatus(): TournamentMatchStatus[][] {
+		return this._rounds.map((matches, roundIndex) =>
+			matches.map((match, matchIndex) => ({
+				round: roundIndex,
+				matchIndex: matchIndex,
+				p1: match[0].getUserId(),
+				p2: match[1].getUserId(),
+				scoreP1: this._getScore(match, match[0]),
+				scoreP2: this._getScore(match, match[1]),
+			}))
+		);
+	}
+
+	private _getScore(match: Match, player: PlayerSession): number {
+		const result = this._results.find(
+			(res) =>
+				(res.match[0] === match[0] && res.match[1] === match[1]) ||
+				(res.match[0] === match[1] && res.match[1] === match[0])
+		);
+		if (!result) return 0;
+		return result.match[0] === player ? result.score.p1 : result.score.p2;
+	}
+
+	public broadcastBracket(lobby: {
+		broadcast: (msg: TournamentBracketStatus) => void;
+	}): void {
+		const payload: TournamentBracketStatus = {
+			type: "tournament-status",
+			data: this.getTournamentStatus(),
+		};
+		lobby.broadcast(payload);
 	}
 }

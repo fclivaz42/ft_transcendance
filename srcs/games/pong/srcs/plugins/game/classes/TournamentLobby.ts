@@ -6,6 +6,8 @@ import type {
 	TournamentPlayerDisconnected,
 } from "./types.ts";
 
+
+
 export default class TournamentLobby extends GameRoom {
 	constructor(id: string = "TOURNAMENT_LOBBY") {
 		super(id, false);

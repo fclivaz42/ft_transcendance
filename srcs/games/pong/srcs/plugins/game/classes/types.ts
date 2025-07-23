@@ -190,6 +190,20 @@ export interface TournamentOverPayload {
 	};
 }
 
+export interface TournamentMatchStatus {
+	round: number;
+	matchIndex: number;
+	p1: string; //replace by sdk object
+	p2: string; //replace by sdk object
+	scoreP1: number;
+	scoreP2: number;
+}
+
+export interface TournamentBracketStatus {
+	type: "tournament-status";
+	data: TournamentMatchStatus[][];
+}
+
 export type TournamentMessage = // used for tournament
 
 		| TournamentInitPayload
@@ -199,7 +213,8 @@ export type TournamentMessage = // used for tournament
 		| CollisionPayload
 		| TournamentScoreUpdatePayload
 		| TournamentMatchOverPayload
-		| TournamentOverPayload;
+		| TournamentOverPayload
+		| TournamentBracketStatus;
 
 export type LobbyBroadcastPayload =
 	| { type: "timer"; payload: { secondsRemaining: number } }

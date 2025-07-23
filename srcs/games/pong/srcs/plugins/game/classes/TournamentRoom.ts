@@ -143,27 +143,30 @@ export default class TournamentRoom extends GameRoom {
 		});
 	}
 
-	// TODO: Please adjust Tournament! @fclivaz
-	// this._brackets.getCurrentRound() will help for round 0 quarter, 1 semi, 2 final
-	// this.matchIndex will help for match index: 0 1 2 3 -> round 0, 4 5 -> round 1, 6 -> round 2
-
+	
 	public override startGame() {
 		this.game.setBroadcastFunction(() => {
 			this.floodlessBroadcast(this.buildUpdatePayload());
 		});
-
+		
 		this.game.setRoom(this);
-
+		
 		const ball = this.game.getBall();
 		ball.setOnCollision((collisionInfo) => {
 			this.floodlessBroadcast(this.buildCollisionPayload(collisionInfo));
 		});
-
+		
 		this.broadcast(this.buildTournamentInitPayload());
 		this._start_time = Date.now();
+		console.log("Made it to startGame... Starting game with:")
+		console.log(`${this.players[0].getUserId()} and ${this.players[1].getUserId()}`);
 		this.game.gameStart(DEFAULT_FPS);
 	}
-
+	
+	// TODO: Please adjust Tournament! @fclivaz
+	// this._brackets.getCurrentRound() will help for round 0 quarter, 1 semi, 2 final
+	// this.matchIndex will help for match index: 0 1 2 3 -> round 0, 4 5 -> round 1, 6 -> round 2
+	
 	override async _killGame(winner: number) {
 		let res = this._send_to_db(
 			this.players[0]
