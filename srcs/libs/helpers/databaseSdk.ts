@@ -87,14 +87,9 @@ export default class DatabaseSDK {
 		}
 		else
 			merged = val_match
-		const uarray: Array<User> = await this.api_request<Array<User>>("GET", "Players", "/multiget", {
-			headers: {
-				Field: "PlayerID",
-				Array: JSON.stringify([merged.WPlayerID, merged.LPlayerID])
-			}
-		}).then(response => response.data)
-		uarray[0] = this.usr_sdk.filterPublicUserData(uarray[0]) as User
-		uarray[1] = this.usr_sdk.filterPublicUserData(uarray[1]) as User
+		const uarray: User[] = [];
+		uarray[0] = this.usr_sdk.filterPublicUserData((await this.usr_sdk.getUser(merged.WPlayerID as string)).data) as User;
+		uarray[1] = this.usr_sdk.filterPublicUserData((await this.usr_sdk.getUser(merged.LPlayerID as string)).data) as User;
 		return {
 			merged,
 			uarray
@@ -113,7 +108,7 @@ export default class DatabaseSDK {
 		return matchlist as Array<Match_complete>
 	}
 
-	private async get_player_matchlist_from_user(user: Partial<User>): Promise<Array<Match_complete>> {
+	private async get_player_matchlist_from_user(user: User): Promise<Array<Match_complete>> {
 		if (!user.PlayerID)
 			throw "error.missing.playerid"
 		return await this.get_player_matchlist_from_uuid(user.PlayerID) as Array<Match_complete>

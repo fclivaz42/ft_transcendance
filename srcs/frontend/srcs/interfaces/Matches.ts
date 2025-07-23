@@ -14,7 +14,7 @@ export interface Matches {
 	"HashAddress": string,
 };
 
-export interface Match_complete {
+export interface MatchComplete {
 	"MatchID": string,
 	"WPlayerID": Users,
 	"LPlayerID": Users,

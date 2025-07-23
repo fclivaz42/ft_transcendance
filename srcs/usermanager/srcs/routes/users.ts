@@ -93,7 +93,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 			});
 
 		// Filter out any undefined or null friends
-		let filteredFriends: any = friends.data.filter((friend: Partial<User>) => friend);
+		let filteredFriends: any = friends.filter((friend: Partial<User>) => friend);
 
 		// Filter users to remove any personal data
 		filteredFriends = filteredFriends.map((friend: User) => UsersSdk.filterPublicUserData(friend as User));
@@ -127,7 +127,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		});
 
 		// Return the filtered friends list
-		return reply.code(friends.status).send(filteredFriends);
+		return reply.code(200).send(filteredFriends);
 	});
 
 	app.post("/:uuid/friends", async (request, reply) => {
