@@ -2,6 +2,7 @@ import { userMenuManager } from "../managers/UserMenuManager";
 import type { Users } from "../interfaces/Users";
 import NotificationManager from "../managers/NotificationManager";
 import { i18nHandler } from "./i18nHandler";
+import FixedSizeMap from "../class/FixedSizeMap";
 
 export interface UserStats {
 	wonMatches: number;
@@ -13,6 +14,7 @@ class UserHandler {
 	private _clientId: string = "";
 	private _user: Users | undefined;
 	private _friendList: Users[] = [];
+	private _publicUserCache = new FixedSizeMap<String, Users>(12);
 
 	constructor() {
 		let clientId = localStorage.getItem("clientId");
@@ -86,12 +88,19 @@ class UserHandler {
 					return this.fetchUser();
 				return this._user;
 			}
+			if (this._publicUserCache.has(playerId))
+				return this._publicUserCache.get(playerId);
 			const user = await fetch(`/api/users/${playerId}`);
 			if (!user.ok) {
 				console.warn("Failed to fetch user data:", user.statusText);
 				return undefined;
 			}
-			return await user.json() as Users;
+			const userData = await user.json();
+			this._publicUserCache.set(playerId, userData as Users);
+			setTimeout(() => {
+				this._publicUserCache.delete(playerId);
+			}, 60000);
+			return userData as Users;
 		}
 		const user = await fetch("/api/users/me");
 		if (!user.ok) {
@@ -135,7 +144,7 @@ class UserHandler {
 	public async fetchUserPicture(playerId?: string): Promise<string> {
 		if (!playerId)
 			return this.avatarUrl;
-		const user = await this.fetchUser(playerId);
+		const user = this._publicUserCache.get(playerId) || await this.fetchUser(playerId);
 		if (!user)
 			return "/assets/images/default_avatar.svg";
 		return user.Avatar || `https://placehold.co/100x100?text=${user.DisplayName.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
