@@ -2,7 +2,7 @@ import PlayerSession from "./PlayerSession.ts";
 import RoomManager from "./RoomManager.ts";
 import TournamentBracket from "./TournamentBracket.ts";
 import TournamentLobby from "./TournamentLobby.ts";
-import TournamentRoom from "./TournamentRoom.ts"
+import TournamentRoom from "./TournamentRoom.ts";
 
 type GameMode = "tournament";
 
@@ -27,6 +27,7 @@ export default class TournamentManager extends RoomManager {
 			return;
 		}
 
+		session.setRoom(this._lobby);
 		this._lobby.addPlayer(session);
 		this.addSession(session);
 
@@ -72,6 +73,7 @@ export default class TournamentManager extends RoomManager {
 		const aiNeeded: number = this.MAX_PLAYERS - this._lobby.players.length;
 		for (let i = 0; i < aiNeeded; i++) {
 			const aiSession = new PlayerSession(null, `AI_${i}`);
+			aiSession.isAI = true;
 			this._lobby.addPlayer(aiSession);
 		}
 	}
@@ -98,23 +100,37 @@ export default class TournamentManager extends RoomManager {
 		}, this.LAUNCH_COUNTDOWN_MS);
 	}
 
-	public createRoom(vsAI: boolean = false) : TournamentRoom {
-		const roomId = this._generateRoomId();
-		const room = new TournamentRoom(roomId, vsAI, (id) => {
-			this._rooms.delete(id);
-			console.log(`TournamentRoom ${id} deleted (empty or game over).`);
-		});
+	public createRoom(
+		vsAI: boolean = false,
+		matchIndex?: number
+	): TournamentRoom {
+		const roomId = "TOURNAMENT_" + this._generateRoomId();
+		const room = new TournamentRoom(
+			roomId,
+			vsAI,
+			this._lobby,
+			matchIndex,
+			this._bracket,
+			(id) => {
+				this._rooms.delete(id);
+				console.log(`TournamentRoom ${id} deleted (empty or game over).`);
+			}
+		);
 		this._rooms.set(roomId, room);
 		console.log(`Created Room with ID: ${roomId}`);
 		return room;
 	}
 
-	private _handleAIRoom(p1: PlayerSession, p2: PlayerSession) {
+	private _handleAIRoom(
+		p1: PlayerSession,
+		p2: PlayerSession,
+		matchIndex: number
+	) {
 		if (p1.isAI && p2.isAI) {
 			console.warn("Skipping AI vs AI in _handleAIRoom");
 			return;
 		}
-		const room = this.createRoom(true);
+		const room = this.createRoom(true, matchIndex);
 		room.addPlayer(p1);
 		room.addPlayer(p2, true);
 		room.lock = true;
@@ -142,6 +158,13 @@ export default class TournamentManager extends RoomManager {
 
 		console.log(`Starting round ${this._bracket.getCurrentRound() + 1}`);
 
+		let matchIndex =
+			this._bracket.getCurrentRound() === 0
+				? 0
+				: this._bracket.getCurrentRound() === 1
+				? 4
+				: 6;
+
 		for (const [p1, p2] of matches) {
 			if (p1.isAI && p2.isAI) {
 				const winner = Math.random() < 0.5 ? p1 : p2;
@@ -158,14 +181,15 @@ export default class TournamentManager extends RoomManager {
 					`Match between ${p1.getUserId()} and ${p2.getUserId()} has concluded successfully!`
 				);
 			} else if (p1.isAI || p2.isAI) {
-				this._handleAIRoom(p1, p2);
+				this._handleAIRoom(p1, p2, matchIndex);
 			} else {
-				const room = this.createRoom();
+				const room = this.createRoom(false, matchIndex);
 				room.addPlayer(p1);
 				room.addPlayer(p2, true);
 				room.lock = true;
 				this._attachGameOverCallback(room, p1, p2);
 			}
+			matchIndex++;
 		}
 	}
 

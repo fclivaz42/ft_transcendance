@@ -13,7 +13,7 @@ export default class PlayerSession {
 	private _playerReady: boolean;
 	private _room: GameRoom | null;
 	private _paddleId: string | null;
-	public readonly isAI: boolean;
+	public isAI: boolean;
 
 	constructor(socket: WebSocket | null, userId: string) {
 		// removed | null = null

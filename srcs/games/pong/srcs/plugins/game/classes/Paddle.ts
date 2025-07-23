@@ -9,7 +9,6 @@ import {
 	Vector2,
 } from "@babylonjs/core";
 import Ball from "./Ball.ts";
-import { Session } from "inspector/promises";
 import Game, { PADDLE_SPEED } from "./GameClass.ts";
 import type { WallMap } from "./GameClass.ts";
 import GameRoom from "./GameRoom.ts";

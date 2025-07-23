@@ -1,9 +1,14 @@
 import PlayerSession from "./PlayerSession.ts";
+import Game from "./GameClass.ts";
+import Paddle from "./Paddle.ts";
 import TournamentLobby from "./TournamentLobby.ts";
 import TournamentBracket from "./TournamentBracket.ts";
 import GameRoom from "./GameRoom.ts";
+import { DEFAULT_FPS } from "./Playfield.ts";
+import DatabaseSDK from "../../../../../../libs/helpers/databaseSdk.ts";
+import { default_users } from "../../../../../../libs/interfaces/User.ts";
 
-import {
+import type {
 	TournamentScore,
 	TournamentInitPayload,
 	TournamentPlayerConnected,
@@ -11,8 +16,6 @@ import {
 	TournamentScoreUpdatePayload,
 	TournamentMatchOverPayload,
 	TournamentOverPayload,
-	type TournamentMessage,
-	type LobbyBroadcastPayload,
 } from "./types.ts";
 
 export default class TournamentRoom extends GameRoom {
@@ -23,19 +26,65 @@ export default class TournamentRoom extends GameRoom {
 	// inherits _lastMessage?: string as PRIVATE;
 	// inherits _lastCollision?: CollisionPayload as PRIVATE;
 	// inherits _start_time: number = Date.now(): as PRIVATE;
+
 	public override score: TournamentScore;
+	private _matchIndex: number | undefined;
 	private _lobby: TournamentLobby;
 	private _bracket: TournamentBracket;
+
 	constructor(
 		id: string,
 		vsAI: boolean = false,
 		lobby: TournamentLobby,
-		bracket: TournamentBracket,
+		matchIndex?: number,
+		bracket?: TournamentBracket,
 		onGameOver?: (roomId: string) => void
 	) {
 		super(id, vsAI, onGameOver);
+		this.id = id;
 		this._lobby = lobby;
-		this.score = { p1: 0, p2: 0, round: this._bracket.getCurrentRound() };
+		this._matchIndex = matchIndex;
+		this.score = { p1: 0, p2: 0, round: 0 };
+		this._onGameOver = onGameOver;
+	}
+
+	public override addPlayer(
+		playerSession: PlayerSession,
+		paddleIdOverride: boolean = false
+	): void {
+		this.players.push(playerSession);
+
+		if (!playerSession.isAI) {
+			playerSession.setRoom(this);
+			this.broadcast(this._lobby.buildTournamentPlayerConnected(playerSession));
+		}
+
+		if (paddleIdOverride) {
+			playerSession.setPaddleId("p2");
+		} else if (this.players.length === 1) {
+			playerSession.setPaddleId("p1");
+		} else if (this.players.length === 2) {
+			playerSession.setPaddleId("p2");
+		}
+
+		if (playerSession.isAI) {
+			const paddles = this.game.getPaddles();
+			if (playerSession.getPaddleId() === "p1") {
+				this.game.setP1IA(true);
+				paddles[0].setBall(this.game.getBall());
+				paddles[0].setWalls(this.game.getWalls());
+				paddles[0].setGameRoom(this);
+			} else {
+				this.game.setP2IA(true);
+				paddles[1].setBall(this.game.getBall());
+				paddles[1].setWalls(this.game.getWalls());
+				paddles[1].setGameRoom(this);
+			}
+		}
+		if (this.isFull() || this.lock) {
+			console.log("GAME READY TO BE STARTED.");
+			this.startGame();
+		}
 	}
 
 	// public isFull(): boolean inherited
@@ -46,10 +95,14 @@ export default class TournamentRoom extends GameRoom {
 		return this.score;
 	}
 
+	// public setOnGameOver(callback) inherited
+	// public addPlayer() inherited
+	// public removePlayer() inherited
+
 	public override addScore(player: number): void {
 		player === 1 ? this.score.p1++ : this.score.p2++;
 		this.score.round = this._bracket.getCurrentRound();
-		this.broadcast(this.buildScoreUpdatePayload());
+		this.broadcast(this.buildTournamentScoreUpdatePayload());
 		if (this.score.p1 === 6) {
 			console.log("GAME OVER!, P1 Won!");
 			this._killGame(1);
@@ -59,7 +112,13 @@ export default class TournamentRoom extends GameRoom {
 		}
 	}
 
+	// public startGame() inherited
+
 	// TODO: Please adjust to Tournament! @fclivaz
+
+	// this._brackets.getCurrentRound() will help for round 0 quarter, 1 semi, 2 final
+	// this.matchIndex will help for match index: 0 1 2 3 -> round 0, 4 5 -> round 1, 6 -> round 2
+
 	override async _send_to_db(p1: string, p2: string, winner: number) {
 		const db_sdk = new DatabaseSDK();
 		let winner_id: string = winner === 1 ? p1 : p2;
@@ -82,5 +141,106 @@ export default class TournamentRoom extends GameRoom {
 			// WARN: MUST BE CHANGED FOR TOURNAMENT
 			MatchIndex: 0,
 		});
+	}
+
+	// TODO: Please adjust Tournament! @fclivaz
+	// this._brackets.getCurrentRound() will help for round 0 quarter, 1 semi, 2 final
+	// this.matchIndex will help for match index: 0 1 2 3 -> round 0, 4 5 -> round 1, 6 -> round 2
+
+	public override startGame() {
+		this.game.setBroadcastFunction(() => {
+			this.floodlessBroadcast(this.buildUpdatePayload());
+		});
+
+		this.game.setRoom(this);
+
+		const ball = this.game.getBall();
+		ball.setOnCollision((collisionInfo) => {
+			this.floodlessBroadcast(this.buildCollisionPayload(collisionInfo));
+		});
+
+		this.broadcast(this.buildTournamentInitPayload());
+		this._start_time = Date.now();
+		this.game.gameStart(DEFAULT_FPS);
+	}
+
+	override async _killGame(winner: number) {
+		let res = this._send_to_db(
+			this.players[0]
+				? this.players[0].getUserId()
+				: default_users.Guest.PlayerID,
+			this.players[1]
+				? this.players[1].getUserId()
+				: default_users.Guest.PlayerID,
+			winner
+		);
+		this.broadcast(this.buildTournamentMatchOverPayload(winner));
+		this.game.gameStop();
+		if (this._onGameOver) {
+			this._onGameOver(this.id);
+		}
+		res
+			.then(function (response) {
+				console.log(`Match successfully created:`);
+				console.dir(response.data);
+			})
+			.catch(function (error) {
+				console.error(`WARN: match could not be sent to db!`);
+				console.dir(error);
+			});
+	}
+
+	private buildTournamentInitPayload(): TournamentInitPayload {
+		const game = this.game;
+		const ball = game.getBall();
+		const [p1, p2] = game.getPaddles();
+		const walls = game.getWallsForWs();
+		const lightsCamera = game.getField();
+
+		const initPayload: TournamentInitPayload = {
+			type: "tournament-init",
+			payload: {
+				ball: ball.getBallInitInfo(),
+				p1: p1.getInitInfo(),
+				p2: p2.getInitInfo(),
+				walls: walls,
+				camera: lightsCamera.getCameraInitInfo(),
+				light: lightsCamera.getLightInitInfo(),
+				roomID: this.id,
+				connectedPlayers: {
+					p1: this.players.at(0)?.getUserId(),
+					p2: this.players.at(1)?.getUserId(),
+				},
+			},
+		};
+		return initPayload;
+	}
+
+	private buildTournamentScoreUpdatePayload(): TournamentScoreUpdatePayload {
+		const scoreUpdate: TournamentScoreUpdatePayload = {
+			type: "tournament-score",
+			payload: {
+				score: {
+					p1: this.score.p1,
+					p2: this.score.p2,
+					round: this._bracket.getCurrentRound(),
+				},
+			},
+		};
+		return scoreUpdate;
+	}
+
+	private buildTournamentMatchOverPayload(
+		winner: number
+	): TournamentMatchOverPayload {
+		const gameOver: TournamentMatchOverPayload = {
+			type: "tournament-match-over",
+			payload: {
+				winner: winner === 1 ? "p1" : "p2",
+				loser: winner === 1 ? "p2" : "p1",
+				final_score: this.score,
+			},
+		};
+		return gameOver;
 	}
 }

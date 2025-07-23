@@ -6,7 +6,7 @@ import { DEFAULT_FPS } from "./Playfield.ts";
 import DatabaseSDK from "../../../../../../libs/helpers/databaseSdk.ts";
 import { default_users } from "../../../../../../libs/interfaces/User.ts";
 
-import {
+import type {
 	UpdatePayload,
 	InitPayload,
 	PlayerConnectedPayload,
@@ -14,8 +14,10 @@ import {
 	CollisionPayload,
 	ScoreUpdatePayload,
 	GameOverPayload,
-	type GameMessage,
-	type LobbyBroadcastPayload,
+	GameMessage,
+	LobbyBroadcastPayload,
+	TournamentMessage,
+	TournamentInitPayload,
 } from "./types.ts";
 
 export default class GameRoom {
@@ -199,7 +201,9 @@ export default class GameRoom {
 			});
 	}
 
-	public broadcast(message: GameMessage | LobbyBroadcastPayload): void {
+	public broadcast(
+		message: GameMessage | LobbyBroadcastPayload | TournamentMessage
+	): void {
 		if (message.type !== "update") {
 			// console.log(JSON.stringify(message, null, 2));
 		}
@@ -213,7 +217,7 @@ export default class GameRoom {
 	}
 
 	public floodlessBroadcast(
-		message: GameMessage | LobbyBroadcastPayload
+		message: GameMessage | LobbyBroadcastPayload | TournamentMessage
 	): void {
 		if (message.type === "collision") {
 			const payload = message.payload;
@@ -246,7 +250,7 @@ export default class GameRoom {
 	}
 
 	/* BUILDING PAYLOADS ---------------------------------------------------------------------------- */
-	protected buildInitPayload(): InitPayload {
+	private buildInitPayload(): InitPayload {
 		const game = this.game;
 		const ball = game.getBall();
 		const [p1, p2] = game.getPaddles();
@@ -297,7 +301,7 @@ export default class GameRoom {
 		return updatePayload;
 	}
 
-	protected buildPlayerConnectedPayload(
+	private buildPlayerConnectedPayload(
 		sessions: PlayerSession
 	): PlayerConnectedPayload {
 		const playerConnectedPayload: PlayerConnectedPayload = {
@@ -310,7 +314,7 @@ export default class GameRoom {
 		return playerConnectedPayload;
 	}
 
-	protected buildPlayerDisconnectedPayload(
+	private buildPlayerDisconnectedPayload(
 		sessions: PlayerSession
 	): PlayerDisconnectedPayload {
 		const playerDisconnectedPayload: PlayerDisconnectedPayload = {
@@ -322,7 +326,7 @@ export default class GameRoom {
 		return playerDisconnectedPayload;
 	}
 
-	protected buildScoreUpdatePayload(): ScoreUpdatePayload {
+	private buildScoreUpdatePayload(): ScoreUpdatePayload {
 		const scoreUpdate: ScoreUpdatePayload = {
 			type: "score",
 			payload: {
@@ -345,7 +349,7 @@ export default class GameRoom {
 		return collisionPayload;
 	}
 
-	protected buildGameOverPayload(winner: number): GameOverPayload {
+	private buildGameOverPayload(winner: number): GameOverPayload {
 		const gameOver: GameOverPayload = {
 			type: "gameover",
 			payload: {
@@ -357,5 +361,3 @@ export default class GameRoom {
 		return gameOver;
 	}
 }
-
-// TODO: close socket on gameover for single games

@@ -192,7 +192,7 @@ export interface TournamentOverPayload {
 
 export type TournamentMessage = // used for tournament
 
-		| InitPayload
+		| TournamentInitPayload
 		| UpdatePayload
 		| TournamentPlayerConnected
 		| TournamentPlayerDisconnected
