@@ -6,6 +6,7 @@ import DatabaseSDK from '../../../libs/helpers/databaseSdk.ts';
 import type { UserLoginProps, UserRegisterProps, User } from '../../../libs/interfaces/User.ts';
 import Logger from "../../../libs/helpers/loggers.ts";
 import { httpReply } from "../../../libs/helpers/httpResponse.ts";
+import fastifyMultipart from '@fastify/multipart';
 
 const usersSdk = new UsersSdk();
 const db_sdk = new DatabaseSDK();
