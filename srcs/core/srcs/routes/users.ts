@@ -227,7 +227,6 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 		const userId = authorization.data.sub;
 		const formdata = new FormData();
-		// @ts-expect-error
 		for await (const part of request.parts()) {
 			if (part.type === "file") {
 				if (formdata.keys.length !== 0)

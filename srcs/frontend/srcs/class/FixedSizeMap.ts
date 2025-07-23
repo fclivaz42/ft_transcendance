@@ -9,7 +9,8 @@ export default class FixedSizeMap<K, V> {
 	set(key: K, value: V) {
 		if (this._map.size >= this._maxSize) {
 			const oldestKey = this._map.keys().next().value;
-			this._map.delete(oldestKey);
+			if (oldestKey)
+				this._map.delete(oldestKey);
 		}
 		this._map.set(key, value);
 	}

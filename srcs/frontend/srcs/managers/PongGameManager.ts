@@ -78,7 +78,7 @@ class PongGameManager {
 			if (!identifier || !(identifier in payload)) throw new Error(`Identifier ${identifier} not found in payload.`);
 			const playerData = identifier === "p1" ? payload.connectedPlayers.p1 : payload.connectedPlayers.p2;
 			const avatarElement = this.getFrontElements.canvasContainer.querySelector<HTMLImageElement>(`[data-pong-avatar="${identifier}"]`);
-			if (playerData === undefined) {
+			if (playerData === undefined || playerData.startsWith("AI_")) {
 				const botUser: Users = {
 					DisplayName: i18nHandler.getValue("pong.computer") || "Computer",
 					PlayerID: "bot"

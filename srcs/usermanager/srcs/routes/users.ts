@@ -12,7 +12,7 @@ import Logger from "../../../libs/helpers/loggers.ts";
 import axios from "axios";
 import UsersSdk from "../../../libs/helpers/usersSdk.ts";
 import type { MultipartFile } from "@fastify/multipart";
-import type { Match } from "../../../libs/interfaces/Match.ts";
+import type { Match_complete } from "../../../libs/interfaces/Match.ts";
 import twoFaReceiptEndpoint from "./users/2FAreceipt.ts";
 
 export default async function initializeRoute(app: FastifyInstance, opts: FastifyPluginOptions) {
@@ -94,7 +94,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 			});
 
 		// Filter out any undefined or null friends
-		let filteredFriends: any = friends.data.filter((friend: Partial<User>) => friend);
+		let filteredFriends: any = friends.filter((friend: Partial<User>) => friend);
 
 		// Filter users to remove any personal data
 		filteredFriends = filteredFriends.map((friend: User) => UsersSdk.filterPublicUserData(friend as User));
@@ -128,7 +128,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		});
 
 		// Return the filtered friends list
-		return reply.code(friends.status).send(filteredFriends);
+		return reply.code(200).send(filteredFriends);
 	});
 
 	app.post("/:uuid/friends", async (request, reply) => {
@@ -202,11 +202,11 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 			return authorization;
 		const params = request.params as { uuid: string };
 		const matches = await db_sdk.get_player_matchlist(params.uuid);
-		const wonMatches = matches.data.filter((match: Match) => match.WPlayerID === params.uuid);
+		const wonMatches = matches.filter((match: Match_complete) => match.WPlayerID.PlayerID === params.uuid);
 		return reply.code(200).send({
 			"wonMatches": wonMatches.length,
-			"lostMatches": matches.data.length - wonMatches.length,
-			"totalMatches": matches.data.length,
+			"lostMatches": matches.length - wonMatches.length,
+			"totalMatches": matches.length,
 		});
 	});
 
@@ -279,8 +279,13 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		if (authorization)
 			return authorization;
 		const params = request.params as { uuid: string };
-		const matches = await db_sdk.get_player_matchlist(params.uuid);
-		return reply.code(matches.status).send(matches.data);
+		let matches: Array<Match_complete>;
+		try {
+			matches = await db_sdk.get_player_matchlist(params.uuid) as Array<Match_complete>;
+		} catch (exception) {
+			return reply.code(exception.status).send(exception.data)
+		}
+		return reply.code(200).send(matches);
 	});
 
 	usersAuthorizeEndpoint(app, opts);
