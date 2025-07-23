@@ -57,7 +57,7 @@ export default class Paddle {
 	private _downMoove: number;
 	private _ballDirection: Vector3;
 
-	static _ballPos: Vector3;
+	private _ballPos: Vector3;
 
 	constructor(
 		scene: Scene,
@@ -88,6 +88,7 @@ export default class Paddle {
 		const material = new StandardMaterial(`${name}-mat`, scene);
 		material.diffuseColor = color;
 		this._mesh.material = material;
+		this._ballPos = Vector3.Zero();
 	}
 
 	protected _touchingWall(): boolean {
@@ -208,13 +209,13 @@ export default class Paddle {
 			// console.log(`: ${}`);
 		} else if (debug === 2) {
 			// console.log(`ballDir: ${this._ballDirection}`);
-			// console.log(`ballPos: ${Paddle._ballPos}\n`);
+			// console.log(`ballPos: ${this._ballPos}\n`);
 		} else if (debug === 3) {
 		}
 	}
 
 	public predictBall(): number {
-		const bPos: Vector3 = Paddle._ballPos;
+		const bPos: Vector3 = this._ballPos;
 		const bVel: Vector3 = this._ballDirection;
 
 		const goalX =
@@ -258,16 +259,15 @@ export default class Paddle {
 			if (fps === 1 && this._ball.getIsLaunched()) {
 				const vel: Vector3 = this._ballDirection.clone();
 				const pad: number = this.getPosition().x;
-				const dir: boolean =
-					(vel.x < 0 && pad < 0) || (vel.x > 0 && pad > 0) ? true : false;
-				if (Paddle._ballPos.x === 0) {
+				const dir: boolean = (vel.x < 0 && pad < 0) || (vel.x > 0 && pad > 0) ? true : false;
+				if (this._ballPos.x === 0) {
 					// console.log("Ball doesn't moove");
 				} else {
 					// else if (twoAI && dir) {
 					const predictY = this.predictBall();
 					const diff = Math.abs(
 						Math.max(predictY, currentPaddle) -
-							Math.min(predictY, currentPaddle)
+						Math.min(predictY, currentPaddle)
 					);
 					const moov: number = Math.floor(diff / paddlSpeed);
 					// console.log(`currentPaddle: ${currentPaddle}`);
@@ -285,7 +285,7 @@ export default class Paddle {
 					// this.printIAInfo(2);
 				}
 			}
-			else if (Paddle._ballPos.x === 0
+			else if (this._ballPos.x === 0
 				&& !this._ball.getIsLaunched()
 				&& this.getIsIA()
 				&& (this._downMoove === 0 && this._upMoove === 0)) {
@@ -313,7 +313,7 @@ export default class Paddle {
 		if (fps === 1) {
 			let tmp: Vector3 | undefined = this._ball?.getHitbox().position.clone();
 			if (tmp === undefined) return;
-			Paddle._ballPos = tmp;
+			this._ballPos = tmp;
 			tmp = this._ball?.direction;
 			if (tmp === undefined) return;
 			this._ballDirection = tmp;
