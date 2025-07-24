@@ -9,7 +9,7 @@ type GameMode = "tournament";
 export default class TournamentManager extends RoomManager {
 	private _lobby: TournamentLobby = new TournamentLobby("TOURNAMENT_LOBBY");
 	// private _tournaments: Map<number, TournamentLobby> = new Map();
-	private _bracket?: TournamentBracket;
+	private _bracket: TournamentBracket;
 	private _tournamentStarted: boolean = false;
 	private _tournamentTimer: NodeJS.Timeout | null = null;
 	private _launchCountdown: NodeJS.Timeout | null = null;
@@ -109,8 +109,8 @@ export default class TournamentManager extends RoomManager {
 			roomId,
 			vsAI,
 			this._lobby,
-			matchIndex,
 			this._bracket,
+			matchIndex,
 			(id) => {
 				this._rooms.delete(id);
 				console.log(`TournamentRoom ${id} deleted (empty or game over).`);

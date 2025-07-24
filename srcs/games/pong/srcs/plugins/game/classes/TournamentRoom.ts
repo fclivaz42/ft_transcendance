@@ -36,13 +36,14 @@ export default class TournamentRoom extends GameRoom {
 		id: string,
 		vsAI: boolean = false,
 		lobby: TournamentLobby,
+		bracket: TournamentBracket,
 		matchIndex?: number,
-		bracket?: TournamentBracket,
 		onGameOver?: (roomId: string) => void
 	) {
 		super(id, vsAI, onGameOver);
 		this.id = id;
 		this._lobby = lobby;
+		this._bracket = bracket;
 		this._matchIndex = matchIndex;
 		this.score = { p1: 0, p2: 0, round: 0 };
 		this._onGameOver = onGameOver;
@@ -101,7 +102,7 @@ export default class TournamentRoom extends GameRoom {
 
 	public override addScore(player: number): void {
 		player === 1 ? this.score.p1++ : this.score.p2++;
-		this.score.round = this._bracket.getCurrentRound();
+		this.score.round = this._bracket?.getCurrentRound();
 		this.broadcast(this.buildTournamentScoreUpdatePayload());
 		if (this.score.p1 === 6) {
 			console.log("GAME OVER!, P1 Won!");
