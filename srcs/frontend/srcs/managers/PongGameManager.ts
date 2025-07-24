@@ -12,6 +12,7 @@ import createUserAvatar from "../components/usermenu/userAvatar.js";
 import { Users } from "../interfaces/Users.js";
 import { createPongGameoverDialog } from "../components/dialog/pongGameover/index.js";
 import RoutingHandler from "../handlers/RoutingHandler.js";
+import { AiUsers } from "../interfaces/AiUsers.js";
 
 function enforceDefined<T>(value: T | undefined, message: string): T {
 	if (!value)
@@ -66,26 +67,30 @@ class PongGameManager {
 	}
 
 	public reset() {
-		this.started = false;
 		this.cleanupGame();
 		this.websocketManager?.close();
 		this.engine?.dispose();
 	}
 
 	private async initializeFrontElements(payload: InitPayload["payload"]) {
+		let botIdx = 0;
 		this.getFrontElements.canvasContainer.querySelectorAll("[data-pong-displayname]").forEach(async (element) => {
 			const identifier = element.getAttribute("data-pong-displayname");
 			if (!identifier || !(identifier in payload)) throw new Error(`Identifier ${identifier} not found in payload.`);
 			const playerData = identifier === "p1" ? payload.connectedPlayers.p1 : payload.connectedPlayers.p2;
 			const avatarElement = this.getFrontElements.canvasContainer.querySelector<HTMLImageElement>(`[data-pong-avatar="${identifier}"]`);
+			const aiElement = this.getFrontElements.canvasContainer.querySelector(`[data-pong-bot="${identifier}"]`);
 			if (playerData === undefined || playerData.startsWith("AI_")) {
-				const botUser: Users = {
-					DisplayName: i18nHandler.getValue("pong.computer") || "Computer",
-					PlayerID: "bot"
-				}
+				const botUser: Users = playerData === "AI_opponent" ?
+					{
+						PlayerID: "",
+						DisplayName: i18nHandler.getValue("pong.computer"),
+					}
+					: AiUsers[Number(playerData?.split('_')[1]) % AiUsers.length] || AiUsers[botIdx++ % AiUsers.length];
 				this.users[identifier as "p1" | "p2"] = botUser;
-				avatarElement?.replaceWith(createUserAvatar({isComputer: true, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
-				element.textContent = i18nHandler.getValue("pong.computer") || "Computer";
+				avatarElement?.replaceWith(createUserAvatar({isComputer: true, playerId: botUser.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
+				element.textContent = botUser.DisplayName;
+				aiElement?.classList.remove("hidden");
 				return;
 			}
 			const user = UserHandler.fetchUser(playerData);
@@ -98,6 +103,7 @@ class PongGameManager {
 				console.error(`Error fetching user data for ${identifier}:`, error);
 				element.textContent = "Unknown User";
 			});
+			aiElement?.classList.add("hidden");
 		});
 	}
 
@@ -140,6 +146,7 @@ class PongGameManager {
 	}
 
 	private cleanupGame() {
+		this.started = false;
 		if (this.frontElements)
 				for (const element of Object.values(this.frontElements))
 					if (element) element.remove();

@@ -1,4 +1,5 @@
 import UserHandler from "../../handlers/UserHandler";
+import { AiUsers } from "../../interfaces/AiUsers";
 import { userMenuManager } from "../../managers/UserMenuManager";
 
 export interface UserAvatarProps {
@@ -39,8 +40,18 @@ export default function createUserAvatar(props: UserAvatarProps = {
 	img.src = "/assets/images/default_avatar.svg";
 	if (!props.isComputer && (!props.playerId || props.playerId === UserHandler.userId))
 		img.src = UserHandler.avatarUrl;
-	else if (props.isComputer)
+	else if (props.isComputer && !props.playerId) {
+		console.log("Creating AI avatar for computer player");
 		img.src = "/assets/images/computer-virus-1-svgrepo-com.svg";
+	}
+	else if (props.isComputer && props.playerId) {
+		console.log("Creating AI avatar for playerId:", props.playerId);
+		const idx = parseInt(props.playerId.split("_")[1], 10);
+		const aiSrc = AiUsers[idx % AiUsers.length].Avatar;
+		if (!aiSrc)
+			return createUserAvatar({ isComputer: true, sizeClass: props.sizeClass });
+		img.src = aiSrc;
+	}
 	else
 		UserHandler.fetchUserPicture(props.playerId).then((url) => {
 			img.src = url;

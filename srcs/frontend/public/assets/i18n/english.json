@@ -14,7 +14,7 @@
   "pong": {
     "waitingPlayer": "Waiting for another player to join...",
     "waitingFriend": "Waiting for your friend to join...",
-    "computer": "IA",
+    "computer": "AI",
     "join": {
       "error": {
         "emptyRoomCode": "Please enter a room code."
@@ -42,7 +42,7 @@
     "empty": "No history available.",
     "winner": "Winner",
     "loser": "Loser",
-    "notchain": "Not chaind !",
+    "notchain": "Not chained !",
     "notification": {
       "notchain": {
         "title": "Match not in blockchain",

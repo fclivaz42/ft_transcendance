@@ -24,8 +24,13 @@ export async function createPongCanvas(isComputer: boolean): Promise<HTMLDivElem
 						<div class="flex justify-between items-center min-h-0">
 							<div data-pong-player="p1" class="flex items-center justify-center gap-4">
 								<div class="flex flex-col items-start justify-center w-0">
-									<p data-pong-displayname="p1" class="text-xl lg:text-3xl font-bold text-center select-text">Username</p>
-									<p data-pong-ping="p1" class="text-base lg:text-lg">calculating...</p>
+									<p data-pong-displayname="p1" class="text-xl lg:text-3xl font-bold text-center select-text text-nowrap">Username</p>
+									<div class="flex gap-x-4 items-start justify-center">
+										<p data-i18n="pong.computer" data-pong-bot="p1" class="hidden bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg text-sm">
+											${sanitizer(i18nHandler.getValue("pong.computer"))}
+										</p>
+										<p data-pong-ping="p1" class="text-base lg:text-lg">calculating...</p>
+									</div>
 								</div>
 							</div>
 							<div id="score" class="text-3xl lg:text-6xl font-bold text-center flex items-center justify-center flex-nowrap gap-x-2 lg:gap-x-4">
@@ -35,8 +40,13 @@ export async function createPongCanvas(isComputer: boolean): Promise<HTMLDivElem
 							</div>
 							<div data-pong-player="p2" class="flex flex-row-reverse items-center justify-center gap-4">
 								<div class="flex flex-col items-end justify-center w-0">
-									<p data-pong-displayname="p2" class="text-xl lg:text-3xl font-bold text-center select-text">Username</p>
-									<p data-pong-ping="p2" class="text-base lg:text-lg">calculating...</p>
+									<p data-pong-displayname="p2" class="text-xl lg:text-3xl font-bold text-center select-text text-nowrap">Username</p>
+									<div class="flex gap-x-4 items-start justify-center">
+										<p data-pong-ping="p2" class="text-base lg:text-lg">calculating...</p>
+										<p data-i18n="pong.computer" data-pong-bot="p2" class="hidden bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg text-sm">
+											${sanitizer(i18nHandler.getValue("pong.computer"))}
+										</p>
+									</div>
 								</div>
 							</div>
 						</div>
