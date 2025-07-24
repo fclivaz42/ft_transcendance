@@ -7,9 +7,7 @@ class NotificationManager {
 	}
 
 	public closeAll() {
-		document.querySelectorAll("dialog[is='notification-dialog']").forEach((dialog) => {
-			dialog.remove();
-		});
+		document.querySelectorAll("dialog[role='notification']").forEach((dialog) => dialog.remove());
 	}
 }
 

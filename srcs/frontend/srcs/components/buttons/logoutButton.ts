@@ -1,11 +1,9 @@
-import { i18nHandler } from "../../handlers/i18nHandler.js";
 import UserHandler from "../../handlers/UserHandler.js";
-import { createButton } from "./index.js";
+import { createButtonIcon } from "./index.js";
 
 export function createLogoutButton(): HTMLElement {
 	const i18nId = "header.usermenu.logout";
-  return createButton({
-    title: i18nHandler.getValue(i18nId),
+  return createButtonIcon({
     logo: "/assets/ui/login-door-1-svgrepo-com.svg",
     color: "bg-red-100",
 		darkColor: "dark:bg-red-400",

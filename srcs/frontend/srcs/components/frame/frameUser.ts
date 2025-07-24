@@ -2,7 +2,7 @@ import { i18nHandler } from "../../handlers/i18nHandler";
 import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler from "../../handlers/UserHandler";
 import { sanitizer } from "../../helpers/sanitizer";
-import { createButton } from "../buttons";
+import { createButtonIcon } from "../buttons";
 import createUserAvatar from "../usermenu/userAvatar";
 
 export default async function createUserFrame(): Promise<HTMLDivElement> {
@@ -17,8 +17,7 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	const userStats = await UserHandler.fetchUserStats(user.PlayerID);
 	template.innerHTML = `
 		<div class="min-w-[500px] max-w-fit mx-auto flex flex-col gap-8 p-8 rounded-xl bg-panel dark:bg-panel_dark shadow-md">
-			<div class="flex flex-col items-center justify-center gap-4">
-				${(await createUserAvatar({ disableClick: true, playerId: user.PlayerID, sizeClass: "w-40 h-40 mx-auto"})).outerHTML}
+			<div id="userstats-profile" class="flex flex-col items-center justify-center gap-4">
 				<h2 ${user.PlayerID === UserHandler.userId ? "data-user=\"username\"" : ""} class="text-center text-2xl font-bold"'>${sanitizer(user.DisplayName) || "User Name"}</h2>
 			</div>
 			<div class="flex flex-col items-center">
@@ -38,9 +37,13 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 		</div>
 	`;
 	const userFrame = template.content.firstElementChild as HTMLDivElement;
-	const viewHistoryButton = createButton({
+
+	const userStatsProfile = userFrame.querySelector("#userstats-profile");
+	if (userStatsProfile)
+		userStatsProfile.insertAdjacentElement("afterbegin", createUserAvatar({ disableClick: true, playerId: user.PlayerID, sizeClass: "w-40 h-40 mx-auto"}));
+
+	const viewHistoryButton = createButtonIcon({
 		i18n: "user.matches.viewHistory",
-		title: i18nHandler.getValue("user.matches.viewHistory"),
 		addClasses: "w-fit mx-auto",
 		color: "bg-background",
 		f: () => {
@@ -52,18 +55,16 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	});
 	userFrame.appendChild(viewHistoryButton);
 
-	const addFriendButton = createButton({
+	const addFriendButton = createButtonIcon({
 		i18n: "user.friend.addFriend",
-		title: i18nHandler.getValue("user.friend.addFriend"),
 		addClasses: "w-fit mx-auto",
 		color: "bg-blue-200",
 		darkColor: "dark:bg-blue-600",
 		logo: "/assets/ui/profile-plus-round-1343-svgrepo-com.svg",
 	});
 
-	const removeFriendButton = createButton({
+	const removeFriendButton = createButtonIcon({
 		i18n: "user.friend.removeFriend",
-		title: i18nHandler.getValue("user.friend.removeFriend"),
 		addClasses: "w-fit mx-auto",
 		color: "bg-red-200",
 		darkColor: "dark:bg-red-600",

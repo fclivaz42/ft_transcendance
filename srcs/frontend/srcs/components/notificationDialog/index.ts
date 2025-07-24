@@ -18,6 +18,7 @@ export interface NotificationProps {
 
 export function createNotification(props: NotificationProps) {
 	const dialog = document.createElement("dialog", { is: "notification-dialog" }) as NotificationDialog;
+	dialog.setAttribute("role", "notification");
 
 	dialog.classList.add(
 		"overflow-hidden",

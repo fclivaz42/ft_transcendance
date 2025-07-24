@@ -8,29 +8,48 @@ export interface OutgoingMessage {
 }
 
 export default class PlayerSession {
-	private _socket: WebSocket;
+	private _socket: WebSocket | null;
 	private _userId: string; // remove | null ;
 	private _playerReady: boolean;
 	private _room: GameRoom | null;
 	private _paddleId: string | null;
+	public readonly isAI: boolean;
 
-	constructor(socket: WebSocket, userId: string) { // removed | null = null
+	constructor(socket: WebSocket | null, userId: string) {
+		// removed | null = null
 		this._socket = socket;
 		this._userId = userId;
 		this._playerReady = false;
 		this._room = null;
 		this._paddleId = null;
+		this.isAI = this._socket ? false : true;
 	}
 
-	public getSocket(): WebSocket { return this._socket; }
-	public getUserId(): string { return this._userId; } // removed | null
-	public isReady(): boolean { return this._playerReady; }
-	public getPaddleId(): string | null { return this._paddleId; }
-	public getRoom(): GameRoom | null { return this._room; }
+	public getSocket(): WebSocket | null {
+		return this._socket;
+	}
+	public getUserId(): string {
+		return this._userId;
+	} // removed | null
+	public isReady(): boolean {
+		return this._playerReady;
+	}
+	public getPaddleId(): string | null {
+		return this._paddleId;
+	}
+	public getRoom(): GameRoom | null {
+		return this._room;
+	}
 
-	public setReady(ready: boolean): void { this._playerReady = ready; }
-	public setRoom(room: GameRoom | null): void { this._room = room; }
-	public setPaddleId(paddleId: string | null): void { this._paddleId = paddleId; }
+	public setReady(ready: boolean): void {
+		this._playerReady = ready;
+	}
+	public setRoom(room: GameRoom | null): void {
+		this._room = room;
+	}
+	public setPaddleId(paddleId: string | null): void {
+		this._paddleId = paddleId;
+	}
 
 	public getPaddle(): Paddle | null {
 		const room = this.getRoom();
@@ -46,12 +65,9 @@ export default class PlayerSession {
 
 	public send(message: OutgoingMessage): void {
 		try {
-			this._socket.send(JSON.stringify(message));
+			if (this._socket) this._socket.send(JSON.stringify(message));
 		} catch (err) {
 			console.error("Failed to send message to client:", err);
 		}
 	}
-
-
-
 }

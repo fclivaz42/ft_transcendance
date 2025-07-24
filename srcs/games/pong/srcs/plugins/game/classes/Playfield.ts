@@ -1,4 +1,3 @@
-
 import {
 	NullEngine,
 	Scene,
@@ -37,7 +36,6 @@ interface Updatable {
 	update(fps: number): void;
 }
 
-
 export default class PlayField {
 	private _scene: Scene;
 	private _engine: NullEngine = new NullEngine();
@@ -49,28 +47,32 @@ export default class PlayField {
 	private static _fps: number = 0;
 
 	constructor() {
-
 		this._engine.setSize(WIDTH, HEIGHT);
 		this._scene = new Scene(this._engine);
 		this._camera = this._setupCamera();
 		this._light = this._setupLight();
 		this._bg = this._setupBackground();
-
-	};
+	}
 
 	private _setupCamera(): ArcRotateCamera {
 		const camera = new ArcRotateCamera(
 			"mainCam",
-			ALPHA, BETA, RADIUS,
+			ALPHA,
+			BETA,
+			RADIUS,
 			Vector3.Zero(),
 			this._scene
-		)
+		);
 		camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
 		return camera;
 	}
 
 	private _setupLight() {
-		const light = new HemisphericLight("light", new Vector3(0, 0.5, -1), this._scene);
+		const light = new HemisphericLight(
+			"light",
+			new Vector3(0, 0.5, -1),
+			this._scene
+		);
 		return light;
 	}
 
@@ -128,7 +130,7 @@ export default class PlayField {
 			for (const obj of this._updatables) {
 				obj.update(PlayField._fps);
 			}
-			PlayField._fps < DEFAULT_FPS ? PlayField._fps++ : PlayField._fps = 0;
+			PlayField._fps < DEFAULT_FPS ? PlayField._fps++ : (PlayField._fps = 0);
 			if (broadCast) broadCast();
 			this._scene.render();
 		}, frameTime);

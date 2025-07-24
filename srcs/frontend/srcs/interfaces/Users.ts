@@ -11,3 +11,7 @@ export interface Users {
 	LastAlive?: number,
 	Avatar?: string,
 };
+
+export interface Friends extends Users {
+	isAlive?: boolean,
+}

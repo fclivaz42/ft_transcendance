@@ -15,6 +15,7 @@ interface TwoFaProps {
 export interface TwoFaLogUser {
 	Code: string;
 	PlayerID: string;
+	nbrOfTry: number;
 }
 
 export var codeUser = new FixedSizeMap<string, TwoFaLogUser>(500);
@@ -26,9 +27,19 @@ export default async function twoFaReceiptEndpoint(app: FastifyInstance, opts: F
 			return authorization;
 
 		const body = request.body as TwoFaProps;
+		const client: TwoFaLogUser | undefined = codeUser.get(body.ClientId);
 
-		if (!codeUser.get(body.ClientId))
+		if (client === undefined)
 			return reply.code(404).send("No 2fa code associated with this ClientID");
+		if (client?.nbrOfTry >= 3) {
+			return httpReply({
+				detail: "Too much retry",
+				status: 401,
+				module: "usermanager",
+			}, reply, request);
+		}
+
+		client.nbrOfTry++;
 		if (codeUser.get(body.ClientId)?.Code !== body.Code)
 			return httpReply({
 				detail: "Invalid 2fa code",

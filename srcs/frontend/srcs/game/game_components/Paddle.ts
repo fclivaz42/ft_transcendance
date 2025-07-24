@@ -33,7 +33,6 @@ export class Paddle {
 		if (name === "p2") {
 			this.mesh.edgesColor = new Color4(0, 1, 1, 1);
 		}
-		console.log(`Paddle position ${name}, ${this.mesh.position.asArray()}`);
 	}
 
 	update(update: PaddleUpdate) {

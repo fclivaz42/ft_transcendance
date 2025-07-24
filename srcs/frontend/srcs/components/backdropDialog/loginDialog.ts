@@ -25,13 +25,6 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   dialog.classList.add(
     "w-[400px]",
     "max-w-full",
-    "rounded-xl",
-    "px-6",
-    "pt-1",
-    "pb-4",
-    "shadow-2xl",
-    "border",
-    "relative"
   );
 
   const dialogTitle = document.createElement("h2");

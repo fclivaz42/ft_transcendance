@@ -36,7 +36,6 @@ export function createPongJoinDialogContent(dialogRef: BackdropDialog): HTMLDivE
 	`;
 	const joinButton = template.content.querySelector("#joinPongRoom") as HTMLButtonElement;
 	joinButton.onclick = () => {
-		console.log("Join Pong Room button clicked");
 		const roomCode = (document.querySelector("#pongRoomCode") as HTMLInputElement).value.trim();
 		if (!roomCode)
 			return NotificationManager.notify({

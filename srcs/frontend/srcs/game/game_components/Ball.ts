@@ -24,8 +24,6 @@ export class Ball {
 		this.mesh.renderOutline = true;
 		this.mesh.outlineWidth = 0.1;
 		this.mesh.outlineColor = new Color3(0, 1, 0);
-
-		console.log("Ball position: ", this.mesh.position.asArray());
 	}
 
 	update(update: BallUpdate) {

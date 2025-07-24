@@ -29,3 +29,30 @@ export interface UserLoginOauthProps {
 export interface UserRegisterOauthProps extends
 	Partial<UserRegisterProps>,
 	UserLoginOauthProps { }
+
+interface d_user {
+	PlayerID: string,
+	DisplayName: string,
+	EmailAddress: string,
+	Password: string
+}
+
+interface def_users {
+	Deleted: d_user,
+	Guest: d_user
+}
+
+export const default_users: def_users = {
+	"Guest": {
+		PlayerID: "P-0",
+		DisplayName: "Guest",
+		EmailAddress: "Guest",
+		Password: "0"
+	},
+	"Deleted": {
+		PlayerID: "P-D",
+		DisplayName: "Deleted",
+		EmailAddress: "Deleted",
+		Password: "0"
+	}
+}

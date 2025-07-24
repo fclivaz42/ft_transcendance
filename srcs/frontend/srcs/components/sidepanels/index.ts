@@ -1,6 +1,6 @@
 import { sanitizer } from "../../helpers/sanitizer.js";
 import { ButtonProps, TitleProps } from "../../interfaces/baseProps.js";
-import { createButton } from "../buttons/index.js";
+import { createButtonIcon } from "../buttons/index.js";
 import { createFriendSidePanel } from "./friendSidePanel.js";
 import { createHistorySidePanel } from "./historySidePanel.js";
 import { createPongSidePanel } from "./pongSidePanel.js";
@@ -20,7 +20,7 @@ export function createSidePanel(props: TitleProps): HTMLElement {
 }
 
 export function createSidePanelButton(props: ButtonProps): HTMLElement {
-	const button = createButton({
+	const button = createButtonIcon({
 		...props,
 		color: "bg-background",
 		darkColor: "dark:bg-background_dark",
