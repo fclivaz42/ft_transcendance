@@ -65,6 +65,7 @@ export class WebSocketManager {
 			}
 			const msg: ServerMessage = JSON.parse(event.data);
 			switch (msg.type) {
+				case "tournament-init":
 				case "init":
 					this.onInit(msg.payload);
 					break;

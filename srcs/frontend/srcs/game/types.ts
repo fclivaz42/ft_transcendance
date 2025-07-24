@@ -94,7 +94,7 @@ export interface WallsInit {
 }
 
 export interface InitPayload {
-	type: "init";
+	type: "init" | "tournament-init";
 	payload: {
 		ball: BallInit;
 		p1: PaddleInit;
@@ -113,4 +113,4 @@ export type ServerMessage = InitPayload
 							| PlayerDisconnectedPayload
 							| CollisionPayload
 							| ScoreUpdatePayload
-							| GameOverPayload; 
+							| GameOverPayload;
