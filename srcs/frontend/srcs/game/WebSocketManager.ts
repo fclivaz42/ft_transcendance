@@ -64,20 +64,25 @@ export class WebSocketManager {
 				return;
 			}
 			const msg: ServerMessage = JSON.parse(event.data);
-			if (msg.type === "init") {
-				this.onInit(msg.payload);
-			}
-			else if (msg.type === "update") {
-				this.onUpdate(msg.payload);
-			}
-			else if (msg.type === "score") {
-				PongGameManager.onScoreUpdate(msg.payload.score);
-			}
-			else if (msg.type === "gameover") {
-				PongGameManager.onGameOver(msg.payload);
-			}
-			else if (msg.type === "connect") {
-				PongGameManager.onConnect(msg.payload);
+			switch (msg.type) {
+				case "init":
+					this.onInit(msg.payload);
+					break;
+				case "update":
+					this.onUpdate(msg.payload);
+					break;
+				case "score":
+					PongGameManager.onScoreUpdate(msg.payload.score);
+					break;
+				case "gameover":
+					PongGameManager.onGameOver(msg.payload);
+					break;
+				case "connect":
+					PongGameManager.onConnect(msg.payload);
+					break;
+				default:
+					console.warn("[WS] Unknown message type:", msg.type);
+					return;
 			}
 		};
 
