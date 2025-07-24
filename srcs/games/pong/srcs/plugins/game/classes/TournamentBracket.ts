@@ -1,4 +1,5 @@
 import PlayerSession from "./PlayerSession.ts";
+import TournamentLobby from "./TournamentLobby.ts";
 import type {
 	TournamentBracketStatus,
 	TournamentMatchStatus,
@@ -96,17 +97,19 @@ export default class TournamentBracket {
 		this._winners[this._currentRound] = [];
 	}
 
-	public getTournamentStatus(): TournamentMatchStatus[][] {
-		return this._rounds.map((matches, roundIndex) =>
-			matches.map((match, matchIndex) => ({
+	public async getTournamentStatus(): Promise<TournamentMatchStatus[][]> {
+		return await Promise.all(this._rounds.map(async (matches, roundIndex) =>
+			await Promise.all(matches.map(async (match, matchIndex) => ({
 				round: roundIndex,
 				matchIndex: matchIndex,
 				p1: match[0].getUserId(),
+				p1UserInfo: (await match[0].getDataFromSDK()),
 				p2: match[1].getUserId(),
+				p2UserInfo: (await match[1].getDataFromSDK()),
 				scoreP1: this._getScore(match, match[0]),
 				scoreP2: this._getScore(match, match[1]),
-			}))
-		);
+			})))
+		));
 	}
 
 	private _getScore(match: Match, player: PlayerSession): number {
@@ -119,13 +122,13 @@ export default class TournamentBracket {
 		return result.match[0] === player ? result.score.p1 : result.score.p2;
 	}
 
-	public broadcastBracket(lobby: {
-		broadcast: (msg: TournamentBracketStatus) => void;
-	}): void {
-		const payload: TournamentBracketStatus = {
-			type: "tournament-status",
-			data: this.getTournamentStatus(),
-		};
-		lobby.broadcast(payload);
+	public broadcastBracket(lobby: TournamentLobby) {
+		this.getTournamentStatus().then((status) => {
+			const payload: TournamentBracketStatus = {
+				type: "tournament-status",
+				data: status,
+			};
+			lobby.broadcast(payload);
+		});
 	}
 }

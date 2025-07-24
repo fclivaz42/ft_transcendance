@@ -1,5 +1,5 @@
 import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
-
+import { User } from "../../../../../../libs/interfaces/User.ts";
 /* GAME */
 
 export interface BallUpdate {
@@ -194,7 +194,9 @@ export interface TournamentMatchStatus {
 	round: number;
 	matchIndex: number;
 	p1: string; //replace by sdk object
+	p1UserInfo: Partial<User>;
 	p2: string; //replace by sdk object
+	p2UserInfo: Partial<User>;
 	scoreP1: number;
 	scoreP2: number;
 }

@@ -60,6 +60,9 @@ export default class TournamentManager extends RoomManager {
 
 			this._bracket?.markMatchResult(winner, loser, score);
 
+			console.log(`SANITY TEST: ${this._bracket} + is round complete?: ${this._bracket?.isRoundComplete()}`);
+			
+
 			if (this._bracket?.isFinished) {
 				console.log("Tournament finished!");
 			} else if (this._bracket?.isRoundComplete()) {
@@ -86,13 +89,19 @@ export default class TournamentManager extends RoomManager {
 			if (this._lobby.players.length !== this.MAX_PLAYERS) {
 				console.log("Filling with AI");
 				this._fillAI();
-				this._startCountdownToLaunch();
 			}
+			this._startCountdownToLaunch();
 		}, this.WAIT_TIME_MS);
 	}
 
 	private _startCountdownToLaunch() {
 		if (this._launchCountdown) return;
+		const shuffled = this._shuffle([...this._lobby.players]);
+		console.log(
+			`Length of players just before starting bracket: ${shuffled.length}.`
+		);
+		this._bracket = new TournamentBracket(shuffled, this.MAX_PLAYERS);
+		this._bracket.broadcastBracket(this._lobby);
 
 		console.log(`Starting matches in ${this.LAUNCH_COUNTDOWN_MS / 1000}s.`);
 		this._launchCountdown = setTimeout(() => {
@@ -131,27 +140,29 @@ export default class TournamentManager extends RoomManager {
 			return;
 		}
 		const room = this.createRoom(true, matchIndex);
+		this._attachGameOverCallback(room, p1, p2);
 		room.addPlayer(p1);
 		room.addPlayer(p2, true);
 		room.lock = true;
-		this._attachGameOverCallback(room, p1, p2);
 	}
 
 	private _launchTournament() {
 		this._tournamentStarted = true;
 		this._clearLaunchCountdown();
 
-		const shuffled = this._shuffle([...this._lobby.players]);
-		console.log(
-			`Length of players just before starting bracket: ${shuffled.length}.`
-		);
-		this._bracket = new TournamentBracket(shuffled, this.MAX_PLAYERS);
+		// const shuffled = this._shuffle([...this._lobby.players]);
+		// console.log(
+		// 	`Length of players just before starting bracket: ${shuffled.length}.`
+		// );
+		// this._bracket = new TournamentBracket(shuffled, this.MAX_PLAYERS);
 
 		this._startNextRound();
 	}
 
 	private _startNextRound(): void {
 		if (!this._bracket) return;
+		if (this._bracket.getCurrentRound() > 0)
+			this._bracket.broadcastBracket(this._lobby);
 
 		const matches = this._bracket.getCurrentMatches();
 		if (matches.length === 0) return;
@@ -184,10 +195,10 @@ export default class TournamentManager extends RoomManager {
 				this._handleAIRoom(p1, p2, matchIndex);
 			} else {
 				const room = this.createRoom(false, matchIndex);
+				this._attachGameOverCallback(room, p1, p2);
 				room.addPlayer(p1);
 				room.addPlayer(p2, true);
 				room.lock = true;
-				this._attachGameOverCallback(room, p1, p2);
 			}
 			matchIndex++;
 		}
