@@ -84,7 +84,7 @@ class PongGameManager {
 					PlayerID: "bot"
 				}
 				this.users[identifier as "p1" | "p2"] = botUser;
-				avatarElement?.replaceWith(await createUserAvatar({isComputer: true, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
+				avatarElement?.replaceWith(createUserAvatar({isComputer: true, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
 				element.textContent = i18nHandler.getValue("pong.computer") || "Computer";
 				return;
 			}
@@ -93,7 +93,7 @@ class PongGameManager {
 				this.users[identifier as "p1" | "p2"] = userData;
 				if (!userData) throw new Error(`User data for ${identifier} not found.`);
 				element.textContent = userData.DisplayName;
-				avatarElement?.replaceWith(await createUserAvatar({playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
+				avatarElement?.replaceWith(createUserAvatar({playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
 			}).catch((error) => {
 				console.error(`Error fetching user data for ${identifier}:`, error);
 				element.textContent = "Unknown User";
@@ -114,7 +114,6 @@ class PongGameManager {
 
 		this.websocketManager = new WebSocketManager(
 			(payload) => {
-				console.log("WebSocket payload received:", payload);
 				this.initializeFrontElements(payload);
 				this.getField.init(payload);
 				if (!this.started) {
@@ -191,14 +190,11 @@ class PongGameManager {
 	}
 
 	public onGameOver(payload: GameOverPayload["payload"]) {
-		console.log("Game Over payload received:", payload);
 		const winner = this.users[payload.winner as "p1" | "p2"];
 		if (!winner) {
 			console.error("Winner not found in users:", payload.winner);
 			return;
 		}
-		const finalScore = payload.final_score as {p1: number, p2: number};
-		console.log(`Game Over! Winner: ${winner.DisplayName}, Final Score: P1 - ${finalScore.p1}, P2 - ${finalScore.p2}`);
 		createPongGameoverDialog(payload, this.users);
 	}
 

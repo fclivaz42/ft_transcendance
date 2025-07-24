@@ -19,6 +19,12 @@ export function createPongSidePanel() {
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
+		i18n: "navbar.pong.submenu.tournament",
+		logo: buttonLogo,
+		f: () => RoutingHandler.setRoute("/pong?room=tournament"),
+	}));
+
+	sidePanel.appendChild(createSidePanelButton({
 		i18n: "navbar.pong.submenu.solo",
 		logo: buttonLogo,
 		f: () => RoutingHandler.setRoute("/pong?room=computer"),
@@ -37,10 +43,9 @@ export function createPongSidePanel() {
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
-		title: i18nHandler.getValue("navbar.pong.submenu.tournament"),
-		i18n: "navbar.pong.submenu.create",
+		i18n: "navbar.pong.submenu.local",
 		logo: buttonLogo,
-		f: () => RoutingHandler.setRoute("/pong?room=tournament"),
+		f: () => RoutingHandler.setRoute("/pong?room=local"),
 	}));
 
 	return sidePanel;

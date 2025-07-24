@@ -1,5 +1,5 @@
 import { userMenuManager } from "../managers/UserMenuManager";
-import type { Users } from "../interfaces/Users";
+import type { Users, Friends } from "../interfaces/Users";
 import NotificationManager from "../managers/NotificationManager";
 import { i18nHandler } from "./i18nHandler";
 import FixedSizeMap from "../class/FixedSizeMap";
@@ -13,7 +13,9 @@ export interface UserStats {
 class UserHandler {
 	private _clientId: string = "";
 	private _user: Users | undefined;
-	private _friendList: Users[] = [];
+	private _friendList: Friends[] = [];
+	private _updatingAliveStatus: boolean = false;
+	private _updatingFriendList: boolean = false;
 	private _publicUserCache = new FixedSizeMap<String, Users>(12);
 
 	constructor() {
@@ -27,15 +29,43 @@ class UserHandler {
 		this._clientId = clientId;
 	}
 
+	public static maskEmail(email: string): string {
+		const [user, domain] = email.split("@");
+		const maskedUser = user.slice(0, 3) + "*".repeat(Math.max(1, user.length - 3));
+		const [domainName, domainExt] = domain.split(".");
+		const maskedDomain = "*".repeat(domainName.length) + "." + domainExt;
+		return `${maskedUser}@${maskedDomain}`;
+	}
+
+	public maskEmail(email?: string): string {
+		return email ? UserHandler.maskEmail(email) : UserHandler.maskEmail(this._user?.EmailAddress || "");
+	}
+
 	public async initialize() {
 		await this.fetchUser();
-		this.updateAliveStatus();
+	}
+
+	public async updateFriendList() {
+		while (this.isLogged && !this._updatingFriendList) {
+			this._updatingFriendList = true;
+			const friendListResp: Response | undefined = await fetch("/api/users/me/friends").catch(error => {console.error(error); return undefined;});
+			if (!friendListResp || !friendListResp.ok) {
+				console.warn("Failed to fetch friend list:", friendListResp?.statusText);
+				this._friendList = [];
+				return;
+			}
+			this._friendList = await friendListResp.json() as Friends[];
+			for (const friend of this._friendList)
+				friend.isAlive = await this.getAliveStatus(friend.PlayerID);
+			console.debug("Friend list updated:", this._friendList);
+			await new Promise(resolve => setTimeout(resolve, 30000));
+			this._updatingFriendList = false;
+		}
 	}
 
 	public async updateAliveStatus() {
-		while (true) {
-			if (!this.isLogged)
-				await new Promise(resolve => setTimeout(resolve, 30000));
+		while (this.isLogged && !this._updatingAliveStatus) {
+			this._updatingAliveStatus = true;
 			try {
 				await fetch("/api/users/me/alive", {
 					method: "POST",
@@ -49,7 +79,8 @@ class UserHandler {
 			} catch (error) {
 				console.error("Failed to update alive status:", error);
 			}
-			await new Promise(resolve => setTimeout(resolve, 30000));
+			await new Promise(resolve => setTimeout(resolve, 25000));
+			this._updatingAliveStatus = false;
 		}
 	}
 
@@ -116,6 +147,8 @@ class UserHandler {
 				this._user = {...userData} as Users;
 				if (!this._user)
 					throw new Error("User data is undefined or null");
+				this.updateAliveStatus();
+				this.updateFriendList();
 				const avatarFile = await fetch("/api/users/me/picture");
 				if (avatarFile.ok) {
 					if (avatarFile.status === 200)
@@ -125,18 +158,6 @@ class UserHandler {
 				}
 			}
 		}
-		try {
-			const friendListResp = await fetch("/api/users/me/friends");
-			if (!friendListResp.ok) {
-				console.warn("Failed to fetch friend list:", friendListResp.statusText);
-				this._friendList = [];
-			} else {
-				this._friendList = await friendListResp.json() as Users[];
-			}
-		} catch (error) {
-			console.error("Error fetching friend list:", error);
-			this._friendList = [];
-		}
 		this.updateComponents();
 		return this._user as Users;
 	}
@@ -144,7 +165,7 @@ class UserHandler {
 	public async fetchUserPicture(playerId?: string): Promise<string> {
 		if (!playerId)
 			return this.avatarUrl;
-		const user = this._publicUserCache.get(playerId) || await this.fetchUser(playerId);
+		const user = this._friendList.find(friend => friend.PlayerID === playerId) || this._publicUserCache.get(playerId) || await this.fetchUser(playerId);
 		if (!user)
 			return "/assets/images/default_avatar.svg";
 		return user.Avatar || `https://placehold.co/100x100?text=${user.DisplayName.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
@@ -168,7 +189,7 @@ class UserHandler {
 		const userEmailElements = document.querySelectorAll("[data-user='email']");
 		userEmailElements.forEach(element => {
 			if (element instanceof HTMLElement) {
-				element.textContent = this.emailAddress || "Email Address";
+				element.textContent = this.maskEmail(this.emailAddress);
 			}
 		});
 
@@ -254,6 +275,12 @@ class UserHandler {
 		}
 		const data = await response.json() as { isAlive: boolean };
 		return data.isAlive || false;
+	}
+
+	public get isPrivate(): Boolean {
+		if (!this._user?.Private)
+			return false;
+		return true;
 	}
 }
 

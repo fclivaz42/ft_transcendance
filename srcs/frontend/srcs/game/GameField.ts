@@ -73,7 +73,6 @@ export class GameField {
 		);
 		camera.attachControl(this.engine.getRenderingCanvas(), false);
 		this.scene.activeCamera = camera;
-		console.log("Camera position: ", camera.position.asArray());
 
 		new HemisphericLight("light", new Vector3(...lightInfo.direction), this.scene);
 	}

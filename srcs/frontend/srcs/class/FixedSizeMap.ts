@@ -1,4 +1,3 @@
-// a custom map that will erase oldest element when maxSize is reached
 export default class FixedSizeMap<K, V> {
 	private _map = new Map<K, V>();
 	private _maxSize: number;

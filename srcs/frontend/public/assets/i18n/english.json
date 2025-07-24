@@ -38,11 +38,16 @@
   },
   "history": {
     "title": "History",
+    "subtitle": "History of {user}",
     "empty": "No history available.",
     "winner": "Winner",
     "loser": "Loser",
-    "notchain": "Match not in blockchain",
-    "notificaton": {
+    "notchain": "Not chaind !",
+    "notification": {
+      "notchain": {
+        "title": "Match not in blockchain",
+        "message": "This match is not recorded in the blockchain."
+      },
       "private": {
         "title": "Private user",
         "message": "This user is private. You cannot view their history."
@@ -85,6 +90,7 @@
         "solo": "Solo mode",
         "join": "Join a Private Game",
         "create": "Create a Private Game",
+        "local": "Local Game",
         "tournament": "Play in a Tournament"
       }
     },
@@ -184,7 +190,10 @@
       "buttons": {
         "save": "Save Changes",
         "cancel": "Cancel",
-        "logout": "Logout"
+        "logout": "Logout",
+        "public": "Make Profile Public",
+        "private": "Make Profile Private",
+        "delete": "Delete Account"
       },
       "notification": {
         "validationErrorTitle": "Validation Error",
