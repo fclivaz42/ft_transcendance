@@ -17,6 +17,5 @@ export class Wall {
 			depth: init.size[2],
 		}, scene);
 		this.mesh.position.set(init.position[0], init.position[1], 0);
-		console.log(`Wall position ${name}, ${this.mesh.position.asArray()}`);
 	}
 }

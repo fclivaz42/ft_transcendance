@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/07/06 20:36:58 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/08 22:59:53 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -28,6 +28,11 @@ interface db_sdk_options {
 	headers?: Record<string, string>;
 	response_type?: "arraybuffer" | "blob" | "json" | "text" | "stream" | "document" | "formdata"
 	body?: any
+}
+
+interface comb {
+	merged: Match,
+	uarray: Array<User>
 }
 
 export default class DatabaseSDK {
@@ -65,63 +70,65 @@ export default class DatabaseSDK {
 		})
 	}
 
-	private async get_friends_from_user(user: User): Promise<AxiosResponse<Array<User>>> {
-		if (!user.FriendsList)
-			return {
-				data: [],
-				status: 200,
-				statusText: "OK",
-				headers: {},
-				config: {} as InternalAxiosRequestConfig
-			}
-		return await this.api_request<Array<User>>("GET", "Players", "/multiget", {
-			headers: {
-				Field: "PlayerID",
-				Array: JSON.stringify(user.FriendsList)
-			}
-		})
+	private async validate_match(val_match: Match): Promise<comb> {
+		let merged: Match | undefined = undefined;
+		if (val_match.HashAddress) {
+			await this.bc_sdk.get_match_score(val_match.MatchID as string)
+				.then(function(response) {
+					merged = { ...val_match, ...response }
+				})
+				.catch(function() { val_match.HashAddress = undefined })
+		}
+		if (merged) {
+			if (!val_match.WPlayerID)
+				(merged as Partial<Match>).WPlayerID = undefined
+			if (!val_match.LPlayerID)
+				(merged as Partial<Match>).LPlayerID = undefined
+		}
+		else
+			merged = val_match
+		const uarray: User[] = [];
+		uarray[0] = this.usr_sdk.filterPublicUserData((await this.usr_sdk.getUser(merged.WPlayerID as string)).data) as User;
+		uarray[1] = this.usr_sdk.filterPublicUserData((await this.usr_sdk.getUser(merged.LPlayerID as string)).data) as User;
+		return {
+			merged,
+			uarray
+		}
 	}
 
-	private async get_player_matchlist_from_uuid(user: UUIDv4): Promise<AxiosResponse<Array<Match>>> {
+	private async get_player_matchlist_from_uuid(user: UUIDv4): Promise<Array<Match_complete>> {
 		const matchlist: Array<Match> = await this.api_request<Array<Match>>("GET", "Matches", `/PlayerID/${this.param_str}`, { params: user })
 			.then(response => response.data)
 		for (const item of matchlist) {
-			let merged: Match | undefined = undefined;
-			if (item.HashAddress) {
-				await this.bc_sdk.get_match_score(item.MatchID as string)
-					.then(function(response) {
-						merged = { ...item, ...response }
-					})
-					.catch(function() { item.HashAddress = undefined })
-			}
-			if (merged) {
-				if (item.WPlayerID === default_users.Deleted.PlayerID)
-					(merged as Partial<Match>).WPlayerID = default_users.Deleted.PlayerID
-				if (item.LPlayerID === default_users.Deleted.PlayerID)
-					(merged as Partial<Match>).LPlayerID = default_users.Deleted.PlayerID
-			}
-			else
-				merged = item
-			const u_array: Array<User> = await this.api_request<Array<User>>("GET", "Players", "/multiget", {
-				headers: {
-					Field: "PlayerID",
-					Array: JSON.stringify([merged.WPlayerID, merged.LPlayerID])
-				}
-			}).then(response => response.data)
-			Object.assign(item, merged)
-			item.WPlayerID = u_array[0]
-			item.LPlayerID = u_array[1]
+			let combd: comb = await this.validate_match(item)
+			Object.assign(item, combd.merged)
+			item.WPlayerID = combd.uarray[0]
+			item.LPlayerID = combd.uarray[1]
 		}
 		return matchlist as Array<Match_complete>
 	}
 
-	private async get_player_matchlist_from_user(user: Partial<User>): Promise<AxiosResponse<Array<Match>>> {
+	private async get_player_matchlist_from_user(user: User): Promise<Array<Match_complete>> {
 		if (!user.PlayerID)
 			throw "error.missing.playerid"
-		return await this.get_player_matchlist_from_uuid(user.PlayerID)
+		return await this.get_player_matchlist_from_uuid(user.PlayerID) as Array<Match_complete>
 	}
 
-	private async get_friends_from_uuid(user: UUIDv4): Promise<AxiosResponse<Array<User>>> {
+	private async get_friends_from_user(user: User): Promise<Array<User>> {
+		if (!user.FriendsList)
+			return []
+		const ret: Array<User> = await this.api_request<Array<User>>("GET", "Players", "/multiget", {
+			headers: {
+				Field: "PlayerID",
+				Array: JSON.stringify(user.FriendsList)
+			}
+		}).then(response => response.data)
+		for (const item in ret)
+			ret[item] = this.usr_sdk.filterPublicUserData(ret[item]) as User
+		return ret;
+	}
+
+	private async get_friends_from_uuid(user: UUIDv4): Promise<Array<User>> {
 		const req_user: User = (await this.get_user(user, "PlayerID")).data
 		return await this.get_friends_from_user(req_user)
 	}
@@ -174,7 +181,7 @@ export default class DatabaseSDK {
 	* @param user Either an UUIDv4 string or User object.
 	* @returns An AxiosResponse Promise containing an array of Users, those being the friends.
 	*/
-	public async get_user_friends(user: UUIDv4 | User): Promise<AxiosResponse<Array<User>>> {
+	public async get_user_friends(user: UUIDv4 | User): Promise<Array<User>> {
 		if (typeof user === "string")
 			return await this.get_friends_from_uuid(user)
 		return await this.get_friends_from_user(user)
@@ -237,31 +244,10 @@ export default class DatabaseSDK {
 		const matchlist: Array<Match> = await this.api_request<Array<Match>>("GET", "Matches", "/multiget")
 			.then(response => response.data)
 		for (const item of matchlist) {
-			let merged: Match | undefined = undefined;
-			if (item.HashAddress) {
-				await this.bc_sdk.get_match_score(item.MatchID as string)
-					.then(function(response) {
-						merged = { ...item, ...response }
-					})
-					.catch(function() { item.HashAddress = undefined })
-			}
-			if (merged) {
-				if (item.WPlayerID === default_users.Deleted.PlayerID)
-					(merged as Partial<Match>).WPlayerID = default_users.Deleted.PlayerID
-				if (item.LPlayerID === default_users.Deleted.PlayerID)
-					(merged as Partial<Match>).LPlayerID = default_users.Deleted.PlayerID
-			}
-			else
-				merged = item
-			const u_array: Array<User> = await this.api_request<Array<User>>("GET", "Players", "/multiget", {
-				headers: {
-					Field: "PlayerID",
-					Array: JSON.stringify([merged.WPlayerID, merged.LPlayerID])
-				}
-			}).then(response => response.data)
-			Object.assign(item, merged)
-			item.WPlayerID = u_array[0]
-			item.LPlayerID = u_array[1]
+			let combd: comb = await this.validate_match(item)
+			Object.assign(item, combd.merged)
+			item.WPlayerID = combd.uarray[0]
+			item.LPlayerID = combd.uarray[1]
 		}
 		return matchlist as Array<Match_complete>
 	}
@@ -271,7 +257,7 @@ export default class DatabaseSDK {
 	* @param user The UUIDv4 of the User or the User object.
 	* @returns An AxiosResponse Promise containing an array of every single Match.
 	*/
-	public async get_player_matchlist(user: UUIDv4 | User): Promise<AxiosResponse<Array<Match>>> {
+	public async get_player_matchlist(user: UUIDv4 | User): Promise<Array<Match_complete>> {
 		if (typeof user === "string")
 			return await this.get_player_matchlist_from_uuid(user)
 		return await this.get_player_matchlist_from_user(user)
@@ -293,37 +279,16 @@ export default class DatabaseSDK {
 	/**
 	* Get the complete match data.
 	* @param match_id The UUIDv4 string of the match you are trying to get.
-	* @returns An AxiosResponse Promise containing the complete Match data.
+	* @returns An Promise containing the complete Match data.
 	*/
 	public async get_match(match_id: UUIDv4): Promise<Match_complete> {
 		const match: Match = await this.api_request<Match>("GET", "Matches", `/MatchID/${this.param_str}`, { params: match_id })
 			.then(response => response.data)
-		let merged: Match | undefined = undefined;
-		if (match.HashAddress) {
-			await this.bc_sdk.get_match_score(match.MatchID as string)
-				.then(function(response) {
-					merged = { ...match, ...response }
-				})
-				.catch(function() { match.HashAddress = undefined })
-		}
-		if (merged) {
-			if (match.WPlayerID === default_users.Deleted.PlayerID)
-				(merged as Partial<Match>).WPlayerID = default_users.Deleted.PlayerID
-			if (match.LPlayerID === default_users.Deleted.PlayerID)
-				(merged as Partial<Match>).LPlayerID = default_users.Deleted.PlayerID
-		}
-		else
-			merged = match
-		const u_array: Array<User> = await this.api_request<Array<User>>("GET", "Players", "/multiget", {
-			headers: {
-				Field: "PlayerID",
-				Array: JSON.stringify([merged.WPlayerID, merged.LPlayerID])
-			}
-		}).then(response => response.data)
+		let combd: comb = await this.validate_match(match)
 		return {
-			...merged,
-			WPlayerID: u_array[0],
-			LPlayerID: u_array[1]
+			...combd.merged,
+			WPlayerID: combd.uarray[0],
+			LPlayerID: combd.uarray[1]
 		}
 	}
 }

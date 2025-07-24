@@ -349,7 +349,7 @@ export default class GameRoom {
 		return collisionPayload;
 	}
 
-	private buildGameOverPayload(winner: number): GameOverPayload {
+	public buildGameOverPayload(winner: number): GameOverPayload {
 		const gameOver: GameOverPayload = {
 			type: "gameover",
 			payload: {
@@ -361,3 +361,6 @@ export default class GameRoom {
 		return gameOver;
 	}
 }
+
+
+// TODO: close socket on gameover for single games
