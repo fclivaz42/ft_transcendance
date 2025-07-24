@@ -52,7 +52,7 @@ export interface CollisionPayload {
 };
 
 export interface ScoreUpdatePayload {
-	type: "score";
+	type: "score" | "tournament-score";
 	payload: {
 		score: {
 			p1: number,

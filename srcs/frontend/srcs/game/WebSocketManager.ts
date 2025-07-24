@@ -72,6 +72,7 @@ export class WebSocketManager {
 				case "update":
 					this.onUpdate(msg.payload);
 					break;
+				case "tournament-score":
 				case "score":
 					PongGameManager.onScoreUpdate(msg.payload.score);
 					break;
