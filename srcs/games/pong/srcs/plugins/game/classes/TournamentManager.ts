@@ -3,6 +3,7 @@ import RoomManager from "./RoomManager.ts";
 import TournamentBracket from "./TournamentBracket.ts";
 import TournamentLobby from "./TournamentLobby.ts";
 import TournamentRoom from "./TournamentRoom.ts";
+import { MAX_SCORE } from "./types.ts";
 
 type GameMode = "tournament";
 
@@ -197,7 +198,7 @@ export default class TournamentManager extends RoomManager {
 				const winner = Math.random() < 0.5 ? p1 : p2;
 				const loser = winner === p1 ? p2 : p1;
 
-				const winnerScore = 6;
+				const winnerScore = MAX_SCORE;
 				const loserScore = Math.floor(Math.random() * 5);
 
 				this._bracket.markMatchResult(winner, loser, {

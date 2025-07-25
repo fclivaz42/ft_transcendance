@@ -1,6 +1,8 @@
 import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
-import { User } from "../../../../../../libs/interfaces/User.ts";
+import type { User } from "../../../../../../libs/interfaces/User.ts";
 /* GAME */
+
+export const MAX_SCORE = 3;
 
 export interface BallUpdate {
 	// used for game, tournament

@@ -8,14 +8,15 @@ import { DEFAULT_FPS } from "./Playfield.ts";
 import DatabaseSDK from "../../../../../../libs/helpers/databaseSdk.ts";
 import { default_users } from "../../../../../../libs/interfaces/User.ts";
 
-import type {
-	TournamentScore,
-	TournamentInitPayload,
-	TournamentPlayerConnected,
-	TournamentPlayerDisconnected,
-	TournamentScoreUpdatePayload,
-	TournamentMatchOverPayload,
-	TournamentOverPayload,
+import {
+	type TournamentScore,
+	type TournamentInitPayload,
+	type TournamentPlayerConnected,
+	type TournamentPlayerDisconnected,
+	type TournamentScoreUpdatePayload,
+	type TournamentMatchOverPayload,
+	type TournamentOverPayload,
+	MAX_SCORE,
 } from "./types.ts";
 
 export default class TournamentRoom extends GameRoom {
@@ -104,10 +105,10 @@ export default class TournamentRoom extends GameRoom {
 		player === 1 ? this.score.p1++ : this.score.p2++;
 		this.score.round = this._bracket?.getCurrentRound();
 		this.broadcast(this.buildTournamentScoreUpdatePayload());
-		if (this.score.p1 === 6) {
+		if (this.score.p1 === MAX_SCORE) {
 			console.log("GAME OVER!, P1 Won!");
 			this._killGame(1);
-		} else if (this.score.p2 === 6) {
+		} else if (this.score.p2 === MAX_SCORE) {
 			console.log("GAME OVER! P2 Won");
 			this._killGame(2);
 		}

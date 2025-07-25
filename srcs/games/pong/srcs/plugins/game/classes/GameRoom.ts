@@ -5,6 +5,7 @@ import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
 import { DEFAULT_FPS } from "./Playfield.ts";
 import DatabaseSDK from "../../../../../../libs/helpers/databaseSdk.ts";
 import { default_users } from "../../../../../../libs/interfaces/User.ts";
+import { MAX_SCORE } from "./types.ts";
 
 import type {
 	UpdatePayload,
@@ -125,10 +126,10 @@ export default class GameRoom {
 	public addScore(player: number) {
 		player === 1 ? this.score.p1++ : this.score.p2++;
 		this.broadcast(this.buildScoreUpdatePayload());
-		if (this.score.p1 === 6) {
+		if (this.score.p1 === MAX_SCORE) {
 			console.log("GAME OVER!, P1 Won!");
 			this._killGame(1);
-		} else if (this.score.p2 === 6) {
+		} else if (this.score.p2 === MAX_SCORE) {
 			console.log("GAME OVER! P2 Won");
 			this._killGame(2);
 		}
