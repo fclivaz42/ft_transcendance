@@ -40,10 +40,10 @@ async function createHistoryElement(match: MatchComplete, targetId?: string | nu
 			<div class="flex items-center justify-between gap-4">
 				<div class="flex items-center justify-start gap-2 lg:w-[250px] w-[160px]">
 					<div class="relative" data-history-player="${match.WPlayerID.PlayerID === targetId ? "p1" : "p2"}">
-						${match.WPlayerID.PlayerID === targetId ? 
-							`<p data-i18n="history.winner" class="lg:text-xl text-sm absolute -bottom-4 left-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.winner"))}</p>`
-							: `<p data-i18n="history.loser" class="lg:text-xl text-sm absolute -bottom-4 left-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.loser"))}</p>`
-						}
+						${match.WPlayerID.PlayerID === targetId ?
+			`<p data-i18n="history.winner" class="lg:text-xl text-sm absolute -bottom-4 left-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.winner"))}</p>`
+			: `<p data-i18n="history.loser" class="lg:text-xl text-sm absolute -bottom-4 left-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.loser"))}</p>`
+		}
 						<p class="text-2xl font-bold lg:bottom-0 -bottom-4 lg:-right-16 -right-20 absolute">${sanitizer(match.WPlayerID.PlayerID === targetId ? match.WScore : match.LScore)}</p>
 					</div>
 					<p class="truncate lg:max-w-32 max-w-24 lg:text-lg text-xs font-semibold">${sanitizer(match.WPlayerID.PlayerID === targetId ? match.WPlayerID.DisplayName : match.LPlayerID.DisplayName)}</p>
@@ -54,10 +54,10 @@ async function createHistoryElement(match: MatchComplete, targetId?: string | nu
 				<div class="flex items-center justify-end gap-2 lg:w-[250px] w-[160px]">
 					<p class="truncate lg:max-w-32 max-w-24 lg:text-lg text-xs font-semibold">${sanitizer(match.WPlayerID.PlayerID !== targetId ? match.WPlayerID.DisplayName : match.LPlayerID.DisplayName)}</p>
 					<div class="relative" data-history-player="${match.WPlayerID.PlayerID !== targetId ? "p1" : "p2"}">
-						${match.WPlayerID.PlayerID !== targetId ? 
-							`<p data-i18n="history.winner" class="lg:text-xl text-sm absolute -bottom-4 right-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.winner"))}</p>`
-							: `<p data-i18n="history.loser" class="lg:text-xl text-sm absolute -bottom-4 right-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.loser"))}</p>`
-						}
+						${match.WPlayerID.PlayerID !== targetId ?
+			`<p data-i18n="history.winner" class="lg:text-xl text-sm absolute -bottom-4 right-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.winner"))}</p>`
+			: `<p data-i18n="history.loser" class="lg:text-xl text-sm absolute -bottom-4 right-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.loser"))}</p>`
+		}
 						<p class="text-2xl font-bold lg:bottom-0 -bottom-4 lg:-left-16 -left-20 absolute">${sanitizer(match.WPlayerID.PlayerID !== targetId ? match.WScore : match.LScore)}</p>
 					</div>
 				</div>
@@ -75,7 +75,7 @@ async function createHistoryElement(match: MatchComplete, targetId?: string | nu
 	const userContainers = template.content.querySelectorAll("[data-history-player]");
 	for (const container of userContainers) {
 		container.getAttribute("data-history-player") === "p1" ?
-			container.appendChild(createUserAvatar({ playerId: match.WPlayerID.PlayerID, sizeClass: "lg:w-24 lg:h-24 w-12 h-12" })):
+			container.appendChild(createUserAvatar({ playerId: match.WPlayerID.PlayerID, sizeClass: "lg:w-24 lg:h-24 w-12 h-12" })) :
 			container.appendChild(createUserAvatar({ playerId: match.LPlayerID.PlayerID, sizeClass: "lg:w-24 lg:h-24 w-12 h-12" }));
 	}
 	const historyElement = template.content.firstElementChild as HTMLDivElement;
