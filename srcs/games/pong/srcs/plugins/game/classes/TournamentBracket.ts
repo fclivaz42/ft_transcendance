@@ -71,31 +71,6 @@ export default class TournamentBracket {
 
 	}
 
-	public markMatchResult(
-		winner: PlayerSession,
-		loser: PlayerSession,
-		score: { p1: number; p2: number }
-	): void {
-		this._winners[this._currentRound].push(winner);
-
-		this._results.push({
-			round: this._currentRound, //0 quarter-final 1 semi-final 2 final
-			match: [winner, loser],
-			winner,
-			score,
-		});
-
-		loser.getSocket()?.send(JSON.stringify({ type: "eliminated" }));
-		loser.getSocket()?.close();
-
-		// if (
-		// 	this._winners[this._currentRound].length ===
-		// 	this._rounds[this._currentRound].length
-		// ) {
-		// 	this._advanceRound();
-		// }
-	}
-
 
 	public advanceRound(): void {
 		const nextPlayers = this._winners[this._currentRound];
@@ -149,3 +124,12 @@ export default class TournamentBracket {
 		});
 	}
 }
+
+// adjust advance player to next round
+// adjust broadcast of bracket to send a simple array of objects
+// finish transferring heavy lifting logic to TournamentLobby from TournamentManager
+	// startNextRound new logic
+	// all necessary broadcasts
+	// ideally TournamentRoom does not need to be touched
+	// send bracket at round start, each match end
+// cleanup and test!
