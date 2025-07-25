@@ -1,3 +1,4 @@
+import NewTournamentLobby from "./new-TournamentLobby.ts";
 import PlayerSession from "./PlayerSession.ts";
 import TournamentLobby from "./TournamentLobby.ts";
 import type {
@@ -129,13 +130,13 @@ export default class TournamentBracket {
 		return result.match[0] === player ? result.score.p1 : result.score.p2;
 	}
 
-	public broadcastBracket(lobby: TournamentLobby) {
+	public broadcastBracket(lobby: /* TournamentLobby | */ NewTournamentLobby) {
 		this.getTournamentStatus().then((status) => {
 			const payload: TournamentBracketStatus = {
 				type: "tournament-status",
 				data: status,
 			};
-			lobby.broadcast(payload);
+			lobby.lobbyBroadcast(payload);
 		});
 	}
 }

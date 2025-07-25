@@ -1,7 +1,7 @@
 import PlayerSession from "./PlayerSession";
 import TournamentBracket from "./TournamentBracket";
 import TournamentRoom from "./TournamentRoom";
-import { MAX_SCORE } from "./types";
+import { MAX_SCORE, TournamentMessage } from "./types";
 
 export default class NewTournamentLobby {
 	public lobbyID: string;
@@ -104,4 +104,8 @@ export default class NewTournamentLobby {
 			`Current Players: ${this._players.length} / ${this.MAX_PLAYERS}`
 		);
 	}
+
+    public lobbyBroadcast(msg: TournamentMessage) {
+        
+    }
 }
