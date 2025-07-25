@@ -59,6 +59,7 @@ export default class TournamentManager extends RoomManager {
 			const loser = winner === p1 ? p2 : p1;
 
 			this._bracket?.markMatchResult(winner, loser, score);
+			//room._killGame(winner === p1 ? 1 : 2); // testing this?
 
 			console.log(`SANITY TEST: ${this._bracket} + is round complete?: ${this._bracket?.isRoundComplete()}`);
 			
@@ -67,7 +68,8 @@ export default class TournamentManager extends RoomManager {
 				console.log("Tournament finished!");
 			} else if (this._bracket?.isRoundComplete()) {
 				console.log("Attempting to start next round!");
-				this._startNextRound();
+				this._bracket.advanceRound();
+				this._startCountdownToLaunch();
 			}
 		});
 	}
@@ -96,14 +98,16 @@ export default class TournamentManager extends RoomManager {
 
 	private _startCountdownToLaunch() {
 		if (this._launchCountdown) return;
-		const shuffled = this._shuffle([...this._lobby.players]);
-		console.log(
-			`Length of players just before starting bracket: ${shuffled.length}.`
-		);
-		this._bracket = new TournamentBracket(shuffled, this.MAX_PLAYERS);
+		if (!this._bracket) {
+			const shuffled = this._shuffle([...this._lobby.players]);
+			console.log(
+				`Length of players just before starting bracket: ${shuffled.length}.`
+			);
+			this._bracket = new TournamentBracket(shuffled, this.MAX_PLAYERS);
+		}
 		this._bracket.broadcastBracket(this._lobby);
 
-		console.log(`Starting matches in ${this.LAUNCH_COUNTDOWN_MS / 1000}s.`);
+		console.log(`Starting round ${this._bracket.getCurrentRound() + 1} in ${this.LAUNCH_COUNTDOWN_MS / 1000}s.`);
 		this._launchCountdown = setTimeout(() => {
 			this._launchTournament();
 		}, this.LAUNCH_COUNTDOWN_MS);
@@ -146,23 +150,35 @@ export default class TournamentManager extends RoomManager {
 		room.lock = true;
 	}
 
-	private _launchTournament() {
-		this._tournamentStarted = true;
-		this._clearLaunchCountdown();
+	// private _cleanUpTournament() {
+	// 	this._bracket.broadcastBracket(this._lobby);
+	// 	delete(this._bracket);
+	// 	delete(this._lobby);
 
+	// }
+
+	private _launchTournament() {
+		if (!this._tournamentStarted) {
+			this._tournamentStarted = true;
+		}
+		this._clearLaunchCountdown();
+		if (this._bracket.isFinished) {
+			// this._cleanUpTournament();
+			return;
+		}
+		this._startNextRound();
 		// const shuffled = this._shuffle([...this._lobby.players]);
 		// console.log(
 		// 	`Length of players just before starting bracket: ${shuffled.length}.`
 		// );
 		// this._bracket = new TournamentBracket(shuffled, this.MAX_PLAYERS);
 
-		this._startNextRound();
 	}
 
 	private _startNextRound(): void {
 		if (!this._bracket) return;
-		if (this._bracket.getCurrentRound() > 0)
-			this._bracket.broadcastBracket(this._lobby);
+		// if (this._bracket.getCurrentRound() > 0)
+		// 	this._bracket.broadcastBracket(this._lobby);
 
 		const matches = this._bracket.getCurrentMatches();
 		if (matches.length === 0) return;

@@ -66,12 +66,12 @@ export default class TournamentBracket {
 		loser.getSocket()?.send(JSON.stringify({ type: "eliminated" }));
 		loser.getSocket()?.close();
 
-		if (
-			this._winners[this._currentRound].length ===
-			this._rounds[this._currentRound].length
-		) {
-			this._advanceRound();
-		}
+		// if (
+		// 	this._winners[this._currentRound].length ===
+		// 	this._rounds[this._currentRound].length
+		// ) {
+		// 	this._advanceRound();
+		// }
 	}
 
 	private _createMatches(players: PlayerSession[]): Match[] {
@@ -82,9 +82,11 @@ export default class TournamentBracket {
 		return matches;
 	}
 
-	private _advanceRound(): void {
+	public advanceRound(): void {
 		const nextPlayers = this._winners[this._currentRound];
 		console.log(`Advancing round with next players: ${nextPlayers}`);
+
+		console.log(`nextPlayers length: ${nextPlayers.length}`);
 
 		if (nextPlayers.length === 1) {
 			this.isFinished = true;
