@@ -7,7 +7,7 @@ export default class NewTournamentLobby {
 	public lobbyID: string;
 	private _players: PlayerSession[] = [];
 	private _matchingOpen: boolean = true;
-	private _bracket: TournamentBracket | null = null;
+	private _bracket: TournamentBracket;
 	private _tournamentStarted: boolean = false;
 	private _waitTimer: NodeJS.Timeout | null = null;
 	private _roundTimer: NodeJS.Timeout | null = null;
@@ -75,6 +75,24 @@ export default class NewTournamentLobby {
 		}, this.MATCH_START_COUNTDOWN_MS);
 	}
 
+	private _launchTournament() {
+		if (!this._tournamentStarted) {
+			this._tournamentStarted = true;
+		}
+        this._clearRoundTimer();
+        if (this._bracket.isFinished) {
+            // clean up somehow?
+            return ;
+        }
+        this._startNextRound();
+	}
+
+    private _startNextRound(): void {
+        if (!this._bracket) return;
+
+        const matches = this
+    }
+
 	public isFull(): boolean {
 		console.log(`current players in the lobby: ${this._players.length}`);
 		return this._players.length >= this.MAX_PLAYERS;
@@ -105,7 +123,19 @@ export default class NewTournamentLobby {
 		);
 	}
 
-    public lobbyBroadcast(msg: TournamentMessage) {
-        
-    }
+	public lobbyBroadcast(msg: TournamentMessage) {}
+
+	private _clearWaitTimer() {
+		if (this._waitTimer) {
+			clearTimeout(this._waitTimer);
+			this._waitTimer = null;
+		}
+	}
+
+	private _clearRoundTimer() {
+		if (this._roundTimer) {
+			clearTimeout(this._roundTimer);
+			this._roundTimer = null;
+		}
+	}
 }

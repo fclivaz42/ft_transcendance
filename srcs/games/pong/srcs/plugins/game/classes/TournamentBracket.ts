@@ -1,58 +1,74 @@
+import { User } from "../../../../../../libs/interfaces/User.ts";
 import NewTournamentLobby from "./new-TournamentLobby.ts";
 import PlayerSession from "./PlayerSession.ts";
 import TournamentLobby from "./TournamentLobby.ts";
+import Matchup from "./Matchup.ts";
 import type {
+	RoomScore,
 	TournamentBracketStatus,
 	TournamentMatchStatus,
 } from "./types.ts";
 
 type Match = [PlayerSession, PlayerSession];
 
-interface PlayerPair {
-	p1: PlayerSession;
-	p2: PlayerSession;
-}
-
-interface MatchResult {
-	round: number;
-	match: Match;
-	winner: PlayerSession;
-	score: { p1: number; p2: number };
-}
-
 export default class TournamentBracket {
-	private _rounds: Match[][] = [];
-	private _winners: PlayerSession[][] = [];
-	private _results: MatchResult[] = [];
+	private _matchups: Matchup[] = [];
+	private _currentRound = 0;
 	public isFinished: boolean = false;
 
-	private _currentRound = 0;
 
 	constructor(initialPlayers: PlayerSession[], maxPlayers: number) {
 		if (initialPlayers.length !== maxPlayers) {
 			throw new Error("Tournament must start with exactly 8 players.");
 		}
-		this._rounds[0] = this._createMatches(initialPlayers);
-		this._winners[0] = [];
+		
+		this._createMatches(initialPlayers);
 	}
 
-	public getCurrentMatches(): Match[] {
-		return this._rounds[this._currentRound];
+	private _createMatches(players: PlayerSession[]): void {
+		for (let i = 0; i < players.length; i += 2) {
+			const matchIndex = i / 2;
+			const p1 = players[i];
+			const p2 = players[i + 1];
+			this._matchups.push(new Matchup(0, matchIndex, p1, p2));
+		}
+		for (let i = 4; i < 7; i++) {
+			this._matchups.push(new Matchup(i == 7 ? 2 : 1, i, null, null));
+		}
 	}
 
 	public getCurrentRound(): number {
 		return this._currentRound;
 	}
 
-	public getResults(): MatchResult[] {
-		return this._results;
+	private _ejectLoser(loser: PlayerSession | null) {
+		if (!loser) return;
+		loser.getSocket().send(JSON.stringify({type: "eliminated"}));
+		loser.getSocket().close();
 	}
 
-	public isRoundComplete(): boolean {
-		return (
-			this._winners[this._currentRound]?.length ===
-			this._rounds[this._currentRound]?.length
-		);
+	private _advanceWinner(matchup: Matchup, winner: PlayerSession | null) {
+		const round = matchup.round;
+		const index = matchup.matchIndex;
+		if (round < 2) {
+			if (round == 0) {
+
+			} else {
+
+		}
+		}
+		// handle win
+	}
+
+	public markMatchResult(matchIndex: number, score: RoomScore) {
+		const matchup = this._matchups[matchIndex];
+		matchup.scoreP1 = score.p1;
+		matchup.scoreP2 = score.p2;
+
+		this._ejectLoser(matchup.getLoser());
+		this._advanceWinner(matchup, matchup.getWinner());
+
+
 	}
 
 	public markMatchResult(
@@ -80,13 +96,6 @@ export default class TournamentBracket {
 		// }
 	}
 
-	private _createMatches(players: PlayerSession[]): Match[] {
-		const matches: Match[] = [];
-		for (let i = 0; i < players.length; i += 2) {
-			matches.push([players[i], players[i + 1]]);
-		}
-		return matches;
-	}
 
 	public advanceRound(): void {
 		const nextPlayers = this._winners[this._currentRound];
