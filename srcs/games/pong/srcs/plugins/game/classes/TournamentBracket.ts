@@ -7,6 +7,11 @@ import type {
 
 type Match = [PlayerSession, PlayerSession];
 
+interface PlayerPair {
+	p1: PlayerSession;
+	p2: PlayerSession;
+}
+
 interface MatchResult {
 	round: number;
 	match: Match;
