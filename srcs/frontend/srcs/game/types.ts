@@ -1,3 +1,5 @@
+import { Users } from "../interfaces/Users";
+
 export interface CameraInitInfo {
 	name: string;
 	position: number[];
@@ -113,4 +115,21 @@ export type ServerMessage = InitPayload
 							| PlayerDisconnectedPayload
 							| CollisionPayload
 							| ScoreUpdatePayload
-							| GameOverPayload;
+							| GameOverPayload
+							| TournamentBracketStatusPayload;
+
+export interface TournamentMatchStatus {
+	round: number;
+	matchIndex: number;
+	p1: string;
+	p1UserInfo: Partial<Users>;
+	p2: string;
+	p2UserInfo: Partial<Users>;
+	scoreP1: number;
+	scoreP2: number;
+}
+
+export interface TournamentBracketStatusPayload {
+	type: "tournament-status";
+	data: TournamentMatchStatus[][];
+}

@@ -3,6 +3,7 @@ import type { Users, Friends } from "../interfaces/Users";
 import NotificationManager from "../managers/NotificationManager";
 import { i18nHandler } from "./i18nHandler";
 import FixedSizeMap from "../class/FixedSizeMap";
+import { AiUsers } from "../interfaces/AiUsers";
 
 export interface UserStats {
 	wonMatches: number;
@@ -113,6 +114,8 @@ class UserHandler {
 	}
 
 	public async fetchUser(playerId?: string): Promise<Users | undefined> {
+		if (playerId?.startsWith("AI_"))
+			return AiUsers[parseInt(playerId.split("_")[1], 10) % AiUsers.length] || AiUsers[0];
 		if (playerId) {
 			if (playerId === this.userId) {
 				if (!this._user)
