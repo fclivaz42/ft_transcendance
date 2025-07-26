@@ -13,7 +13,7 @@ import { Users } from "../interfaces/Users.js";
 import { createPongGameoverDialog } from "../components/dialog/pongGameover/index.js";
 import RoutingHandler from "../handlers/RoutingHandler.js";
 import { AiUsers } from "../interfaces/AiUsers.js";
-import { createBracketDialog } from "../components/backdropDialog/bracketDialog.js";
+import { createBracketComponent, createBracketDialog } from "../components/backdropDialog/bracketDialog.js";
 import BackdropDialog from "../class/BackdropDialog.js";
 
 function enforceDefined<T>(value: T | undefined, message: string): T {
@@ -102,21 +102,6 @@ class PongGameManager {
 				if (score instanceof HTMLSpanElement) continue;
 				score.textContent = "0";
 			}
-			if (playerData === undefined || playerData.startsWith("AI_")) {
-				const botUser: Users = playerData === "AI_opponent" ?
-					{
-						PlayerID: "",
-						DisplayName: i18nHandler.getValue("pong.computer"),
-					}
-					: AiUsers[Number(playerData?.split('_')[1]) % AiUsers.length] || AiUsers[botIdx++ % AiUsers.length];
-				this.users[identifier as "p1" | "p2"] = botUser;
-				const newAvatar = createUserAvatar({isComputer: true, playerId: botUser.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"});
-				newAvatar.setAttribute("data-pong-avatar", identifier);
-				avatarElement?.replaceWith(newAvatar);
-				element.textContent = botUser.DisplayName;
-				aiElement?.classList.remove("hidden");
-				return;
-			}
 			const user = UserHandler.fetchUser(playerData);
 			user.then(async (userData) => {
 				this.users[identifier as "p1" | "p2"] = userData;
@@ -125,11 +110,15 @@ class PongGameManager {
 				const newAvatar = createUserAvatar({playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"});
 				newAvatar.setAttribute("data-pong-avatar", identifier);
 				avatarElement?.replaceWith(newAvatar);
+				if (userData.isBot) {
+					aiElement?.classList.remove("hidden");
+				} else {
+					aiElement?.classList.add("hidden");
+				}
 			}).catch((error) => {
 				console.error(`Error fetching user data for ${identifier}:`, error);
 				element.textContent = "Unknown User";
 			});
-			aiElement?.classList.add("hidden");
 		});
 	}
 
@@ -242,7 +231,13 @@ class PongGameManager {
 	public onBracketUpdate(update: TournamentBracketStatusPayload["data"]) {
 		if (!this.bracket)
 			this.dialogRef = createBracketDialog(update);
+		else {
+			const bracketElement = document.getElementById("pong-tournament-bracket");
+			if (bracketElement)
+				bracketElement.replaceWith(createBracketComponent(update));
+		}
 		this.bracket = update;
+
 	}
 
 	public onTournamentMatchOver(update: TournamentMatchOverPayload["payload"]) {

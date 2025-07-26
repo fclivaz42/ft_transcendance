@@ -142,6 +142,15 @@ export interface TournamentMatchOverPayload {
 	};
 }
 
+export interface TournamentOverPayload {
+	// used for tournament
+	type: "tournament-over";
+	payload: {
+		winner: string;
+		lobbyID: string;
+	};
+}
+
 export type ServerMessage = InitPayload
 							| UpdatePayload
 							| PlayerConnectedPayload
@@ -150,4 +159,5 @@ export type ServerMessage = InitPayload
 							| ScoreUpdatePayload
 							| GameOverPayload
 							| TournamentBracketStatusPayload
-							| TournamentMatchOverPayload;
+							| TournamentMatchOverPayload
+							| TournamentOverPayload;

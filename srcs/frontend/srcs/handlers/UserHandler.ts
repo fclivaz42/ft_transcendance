@@ -17,7 +17,7 @@ class UserHandler {
 	private _friendList: Friends[] = [];
 	private _updatingAliveStatus: boolean = false;
 	private _updatingFriendList: boolean = false;
-	private _publicUserCache = new FixedSizeMap<String, Users>(12);
+	private _publicUserCache = new FixedSizeMap<String, Users>(32);
 
 	constructor() {
 		let clientId = localStorage.getItem("clientId");
@@ -49,7 +49,7 @@ class UserHandler {
 	public async updateFriendList() {
 		while (this.isLogged && !this._updatingFriendList) {
 			this._updatingFriendList = true;
-			const friendListResp: Response | undefined = await fetch("/api/users/me/friends").catch(error => {console.error(error); return undefined;});
+			const friendListResp: Response | undefined = await fetch("/api/users/me/friends").catch(error => { console.error(error); return undefined; });
 			if (!friendListResp || !friendListResp.ok) {
 				console.warn("Failed to fetch friend list:", friendListResp?.statusText);
 				this._friendList = [];
@@ -57,8 +57,7 @@ class UserHandler {
 			}
 			this._friendList = await friendListResp.json() as Friends[];
 			for (const friend of this._friendList)
-				friend.isAlive = await this.getAliveStatus(friend.PlayerID);
-			console.debug("Friend list updated:", this._friendList);
+				this._friendList[this._friendList.indexOf(friend)] = await this.filterFriend(friend);
 			await new Promise(resolve => setTimeout(resolve, 30000));
 			this._updatingFriendList = false;
 		}
@@ -106,17 +105,39 @@ class UserHandler {
 	}
 
 	public get avatarUrl() {
-		return this._user?.Avatar || `https://placehold.co/100x100?text=${this.displayName?.substring(0,2) || "?"}&font=roboto&bg=cccccc`;
+		return this._user?.Avatar || `https://placehold.co/100x100?text=${this.displayName?.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
 	}
 
 	public get isLogged() {
 		return this._user !== undefined;
 	}
 
+	private deprecatedAIFetch(playerId: string) {
+		console.warn("Deprecated method 'deprecatedAIFetch' is called. Use 'fetchUser' instead.");
+		const identifier = playerId.split("_");
+		if (identifier.length === 2 && identifier[0] === "AI") {
+			if (identifier[1] === "opponent")
+				return "P-0";
+			console.warn("Deprecated AI user fetch for identifier:", identifier);
+			const aiIndex = parseInt(identifier[1], 10);
+			if (aiIndex >= 0 && aiIndex < AiUsers.size) {
+				return `P-${aiIndex + 1}`;
+			}
+		}
+		return null;
+	}
+
 	public async fetchUser(playerId?: string): Promise<Users | undefined> {
-		if (playerId?.startsWith("AI_"))
-			return AiUsers[parseInt(playerId.split("_")[1], 10) % AiUsers.length] || AiUsers[0];
+		console.log("Fetching user data for playerId:", playerId);
 		if (playerId) {
+			const deprecatedUser = this.deprecatedAIFetch(playerId);
+			if (deprecatedUser)
+				playerId = deprecatedUser;
+			if (AiUsers.has(playerId)) {
+				const user = AiUsers.get(playerId)!;
+				user.DisplayName = i18nHandler.getValue(user.DisplayName);
+				return user;
+			}
 			if (playerId === this.userId) {
 				if (!this._user)
 					return this.fetchUser();
@@ -136,6 +157,8 @@ class UserHandler {
 			}, 60000);
 			return userData as Users;
 		}
+		if (this._user)
+			return this._user;
 		const user = await fetch("/api/users/me");
 		if (!user.ok) {
 			console.warn("Failed to fetch user data:", user.statusText);
@@ -147,7 +170,7 @@ class UserHandler {
 				console.warn("User data is incomplete or missing.", userData);
 				this._user = undefined;
 			} else {
-				this._user = {...userData} as Users;
+				this._user = { ...userData } as Users;
 				if (!this._user)
 					throw new Error("User data is undefined or null");
 				this.updateAliveStatus();
@@ -163,15 +186,6 @@ class UserHandler {
 		}
 		this.updateComponents();
 		return this._user as Users;
-	}
-
-	public async fetchUserPicture(playerId?: string): Promise<string> {
-		if (!playerId)
-			return this.avatarUrl;
-		const user = this._friendList.find(friend => friend.PlayerID === playerId) || this._publicUserCache.get(playerId) || await this.fetchUser(playerId);
-		if (!user)
-			return "/assets/images/default_avatar.svg";
-		return user.Avatar || `https://placehold.co/100x100?text=${user.DisplayName.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
 	}
 
 	private updateComponents() {
@@ -228,6 +242,18 @@ class UserHandler {
 		return await stats.json() as UserStats;
 	}
 
+	private async filterFriend(bot: Users): Promise<Friends> {
+		if (AiUsers.has(bot.PlayerID)) {
+			const friend = AiUsers.get(bot.PlayerID) as Friends;
+			friend.DisplayName = i18nHandler.getValue(friend.DisplayName);
+			friend.isAlive = true;
+			return friend;
+		}
+		const friend = bot as Friends;
+		friend.isAlive = await this.getAliveStatus(bot.PlayerID);
+		return friend;
+	}
+
 	public async addFriend(PlayerID: string): Promise<Response> {
 		const res = await fetch(`/api/users/me/friends`, {
 			method: "POST",
@@ -263,9 +289,9 @@ class UserHandler {
 				throw new Error("Failed to add friend due to an unknown error.");
 			}
 		}
-		const friend = await this.fetchUser(PlayerID);
+		const friend = await this.fetchUser(PlayerID) as Friends | undefined;
 		if (friend)
-			this._friendList.push(friend as Users);
+			this._friendList.push(await this.filterFriend(friend));
 		this.updateComponents();
 		return res;
 	}

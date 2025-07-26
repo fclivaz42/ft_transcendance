@@ -1,6 +1,7 @@
 import { createDialog } from ".";
 import FixedSizeMap from "../../class/FixedSizeMap";
 import { TournamentMatchStatus } from "../../game/types";
+import { i18nHandler } from "../../handlers/i18nHandler";
 import UserHandler from "../../handlers/UserHandler";
 import { sanitizer } from "../../helpers/sanitizer";
 import { AiUsers } from "../../interfaces/AiUsers";
@@ -15,22 +16,14 @@ function createBracketRoundComponent(round: TournamentMatchStatus): HTMLDivEleme
 
 	template.innerHTML = `
 		<div class="mb-4 rounded-md dark:bg-panel_dark dark:text-white shadow-lg">
-			<div class="flex flex-row items-center justify-between py-2 px-4 gap-x-4">
-				<div class="flex items-center justify-start gap-x-2 w-48">
-					${createUserAvatar({
-						playerId: round.p1,
-						isComputer: round.p1.startsWith("AI_"),
-					}).outerHTML}
+			<div class="flex flex-row items-center justify-between py-1 px-2 gap-x-4">
+				<div data-pong-tournament-bracket="${round.p1}" class="flex items-center justify-start gap-x-2 w-48">
 					<p data-bracket-round="${sanitizer(round.round.toString())}" data-bracket-username="${sanitizer(round.p1)}" class="font-semibold truncate">Player 1</p>
 				</div>
 				<p data-bracket-round="${sanitizer(round.round.toString())}" data-bracket-score="${sanitizer(round.p1)}" class="font-bold text-lg text-right ${round.scoreP1 < round.scoreP2 ? "text-red-500" : "text-green-500"}">2</p>
 			</div>
-			<div class="flex flex-row items-center justify-between py-2 px-4 gap-x-4">
-				<div class="flex items-center justify-start gap-x-2 w-48">
-					${createUserAvatar({
-						playerId: round.p2,
-						isComputer: round.p2.startsWith("AI_"),
-					}).outerHTML}
+			<div class="flex flex-row items-center justify-between py-1 px-2 gap-x-4">
+				<div data-pong-tournament-bracket="${round.p2}" class="flex items-center justify-start gap-x-2 w-48">
 					<p data-bracket-round="${sanitizer(round.round.toString())}" data-bracket-username="${sanitizer(round.p2)}" class="font-semibold truncate">Player 2</p>
 				</div>
 				<p data-bracket-round="${sanitizer(round.round.toString())}" data-bracket-score="${sanitizer(round.p2)}" class="font-bold text-lg text-right ${round.scoreP1 > round.scoreP2 ? "text-red-500" : "text-green-500"}">1</p>
@@ -60,9 +53,10 @@ function createBracketRoundComponent(round: TournamentMatchStatus): HTMLDivEleme
 	return output;
 }
 
-function createBracketComponent(bracket: TournamentMatchStatus[][]): HTMLDivElement {
+export function createBracketComponent(bracket: TournamentMatchStatus[][]): HTMLDivElement {
 	const template = document.createElement("template");
 
+	console.warn("Filling bracket with empty rounds if needed");
 	if (bracket.length < 3)
 		for (let i = bracket.length; i < 3; i++) {
 			const emptyRound: TournamentMatchStatus = {
@@ -85,11 +79,11 @@ function createBracketComponent(bracket: TournamentMatchStatus[][]): HTMLDivElem
 		}
 
 	template.innerHTML = `
-		<div class="m-2 p-4">
+		<div id="pong-tournament-bracket" class="m-2 p-4">
 			<div class="mb-4 grid grid-flow-col grid-cols-3 items-center border-0 border-b-2 border-gray-200 text-center text-lg font-bold uppercase">
-				<div>Quarterfinals</div>
-				<div>Semifinals</div>
-				<div>Finals</div>
+				<div>${sanitizer(i18nHandler.getValue("tournament.bracket.quarterFinals"))}</div>
+				<div>${sanitizer(i18nHandler.getValue("tournament.bracket.semiFinals"))}</div>
+				<div>${sanitizer(i18nHandler.getValue("tournament.bracket.finals"))}</div>
 			</div>
 			<div class="flex flex-row gap-x-4 justify-center">
 				<div class="flex-grow flex flex-col items-center justify-evenly">
@@ -106,6 +100,12 @@ function createBracketComponent(bracket: TournamentMatchStatus[][]): HTMLDivElem
 	`
 
 	const output = template.content.firstElementChild as HTMLDivElement;
+	for(const player of output.querySelectorAll("[data-pong-tournament-bracket]")) {
+		const playerId = player.getAttribute("data-pong-tournament-bracket");
+		player.insertAdjacentElement("afterbegin", createUserAvatar({
+			playerId: playerId || "",
+		}));
+	}
 	return output;
 }
 
@@ -114,14 +114,14 @@ export function createBracketDialog(bracket: TournamentMatchStatus[][]) {
 		allowClose: false,
 	});
 	const title = document.createElement("h2");
-	title.className = "text-2xl font-semibold text-black dark:text-white mb-4";
-	title.textContent = "tournament.bracket.title";
+	title.className = "text-2xl font-semibold text-black dark:text-white mb-2";
+	title.textContent = i18nHandler.getValue("tournament.bracket.title");
 	title.setAttribute("i18n", "tournament.bracket.title");
 	dialog.appendChild(title);
 	const loadingPage = document.createElement("div");
 	dialog.appendChild(loadingPage);
 	dialog.appendChild(createBracketComponent(bracket));
-	loadingPage.appendChild(createLoadingFrame("waiting.for.next.match"));
+	loadingPage.appendChild(createLoadingFrame(i18nHandler.getValue("tournament.waitingnext")));
 	dialog.show();
 	return dialog;
 }
