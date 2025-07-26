@@ -5,7 +5,7 @@ import { WebSocketManager } from "../game/WebSocketManager.js";
 import { GameField } from "../game/GameField.js";
 import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
-import { GameOverPayload, InitPayload, PlayerConnectedPayload, TournamentBracketStatusPayload, TournamentMatchStatus } from "../game/types.js";
+import { GameOverPayload, InitPayload, PlayerConnectedPayload, TournamentBracketStatusPayload, TournamentMatchOverPayload, TournamentMatchStatus } from "../game/types.js";
 import UserHandler from "../handlers/UserHandler.js";
 import { i18nHandler } from "../handlers/i18nHandler.js";
 import createUserAvatar from "../components/usermenu/userAvatar.js";
@@ -14,6 +14,7 @@ import { createPongGameoverDialog } from "../components/dialog/pongGameover/inde
 import RoutingHandler from "../handlers/RoutingHandler.js";
 import { AiUsers } from "../interfaces/AiUsers.js";
 import { createBracketDialog } from "../components/backdropDialog/bracketDialog.js";
+import BackdropDialog from "../class/BackdropDialog.js";
 
 function enforceDefined<T>(value: T | undefined, message: string): T {
 	if (!value)
@@ -42,6 +43,7 @@ class PongGameManager {
 		p1: undefined,
 		p2: undefined
 	}
+	private dialogRef: BackdropDialog | undefined;
 
 	private bracket: TournamentMatchStatus[][] | undefined;
 
@@ -144,6 +146,7 @@ class PongGameManager {
 
 		this.websocketManager = new WebSocketManager(
 			(payload) => {
+				this.dialogRef?.close();
 				this.initializeFrontElements(payload);
 				this.getField.init(payload);
 				if (!this.started) {
@@ -170,6 +173,8 @@ class PongGameManager {
 	}
 
 	private cleanupGame() {
+		this.bracket = undefined;
+		this.dialogRef?.close();
 		if (this.frontElements)
 				for (const element of Object.values(this.frontElements))
 					if (element) element.remove();
@@ -215,8 +220,14 @@ class PongGameManager {
 		}
 	}
 
-	public getPlayers(): Record<"p1" | "p2", Users | undefined> {
+	public get getPlayers(): Record<"p1" | "p2", Users | undefined> {
 		return this.users;
+	}
+
+	public get getBracket(): TournamentMatchStatus[][]{
+		if (!this.bracket)
+			throw new Error("Bracket is not initialized.");
+		return this.bracket;
 	}
 
 	public onGameOver(payload: GameOverPayload["payload"]) {
@@ -225,21 +236,17 @@ class PongGameManager {
 			console.error("Winner not found in users:", payload.winner);
 			return;
 		}
-		createPongGameoverDialog(payload, this.users);
+		this.dialogRef = createPongGameoverDialog(payload, this.users);
 	}
 
-	public onBracketUpdate(update: TournamentBracketStatusPayload) {
-		/*alert("received bracket update");
-		console.log("Bracket update received:", update);
-		alert("updating bracket");
-		this.bracket = update.data;
-		alert("creating bracket dialog");
-		// need to be removed bc broadcasted to all players each time a player finish a match
-		const dialog = createBracketDialog(update.data);
-		alert("appending dialog to body");
-		dialog.show();*/
-		console.log("Bracket update received:", update);
-		console.log("uncomment the code below to enable bracket dialog");
+	public onBracketUpdate(update: TournamentBracketStatusPayload["data"]) {
+		if (!this.bracket)
+			this.dialogRef = createBracketDialog(update);
+		this.bracket = update;
+	}
+
+	public onTournamentMatchOver(update: TournamentMatchOverPayload["payload"]) {
+		this.dialogRef = createBracketDialog(this.getBracket);
 	}
 
 	public onConnect(payload: PlayerConnectedPayload["payload"]) {

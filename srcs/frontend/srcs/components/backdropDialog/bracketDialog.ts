@@ -122,5 +122,6 @@ export function createBracketDialog(bracket: TournamentMatchStatus[][]) {
 	dialog.appendChild(loadingPage);
 	dialog.appendChild(createBracketComponent(bracket));
 	loadingPage.appendChild(createLoadingFrame("waiting.for.next.match"));
+	dialog.show();
 	return dialog;
 }

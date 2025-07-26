@@ -109,15 +109,6 @@ export interface InitPayload {
 	}
 }
 
-export type ServerMessage = InitPayload
-							| UpdatePayload
-							| PlayerConnectedPayload
-							| PlayerDisconnectedPayload
-							| CollisionPayload
-							| ScoreUpdatePayload
-							| GameOverPayload
-							| TournamentBracketStatusPayload;
-
 export interface TournamentMatchStatus {
 	round: number;
 	matchIndex: number;
@@ -133,3 +124,30 @@ export interface TournamentBracketStatusPayload {
 	type: "tournament-status";
 	data: TournamentMatchStatus[][];
 }
+
+export interface TournamentScore {
+	// used for tournament
+	p1: number;
+	p2: number;
+	round: number;
+}
+
+export interface TournamentMatchOverPayload {
+	// used for tournament
+	type: "tournament-match-over";
+	payload: {
+		winner: string;
+		loser: string;
+		final_score: TournamentScore;
+	};
+}
+
+export type ServerMessage = InitPayload
+							| UpdatePayload
+							| PlayerConnectedPayload
+							| PlayerDisconnectedPayload
+							| CollisionPayload
+							| ScoreUpdatePayload
+							| GameOverPayload
+							| TournamentBracketStatusPayload
+							| TournamentMatchOverPayload;
