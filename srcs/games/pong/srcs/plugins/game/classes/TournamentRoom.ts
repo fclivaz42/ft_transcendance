@@ -1,7 +1,4 @@
 import PlayerSession from "./PlayerSession.ts";
-import Game from "./GameClass.ts";
-import Paddle from "./Paddle.ts";
-import TournamentLobby from "./TournamentLobby.ts";
 import TournamentBracket from "./TournamentBracket.ts";
 import GameRoom from "./GameRoom.ts";
 import { DEFAULT_FPS } from "./Playfield.ts";
@@ -11,13 +8,11 @@ import { default_users } from "../../../../../../libs/interfaces/User.ts";
 import {
 	type TournamentScore,
 	type TournamentInitPayload,
-	type TournamentPlayerConnected,
-	type TournamentPlayerDisconnected,
 	type TournamentScoreUpdatePayload,
 	type TournamentMatchOverPayload,
-	type TournamentOverPayload,
 	MAX_SCORE,
 } from "./types.ts";
+import TournamentLobby from "./TournamentLobby.ts";
 
 export default class TournamentRoom extends GameRoom {
 	//inherits id: string
@@ -48,6 +43,12 @@ export default class TournamentRoom extends GameRoom {
 		this._matchIndex = matchIndex;
 		this.score = { p1: 0, p2: 0, round: 0 };
 		this._onGameOver = onGameOver;
+	}
+
+	public getMatchIndex(): number {
+		if (this._matchIndex)
+			return this._matchIndex;
+		return -1;
 	}
 
 	public override addPlayer(

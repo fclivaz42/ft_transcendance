@@ -195,17 +195,15 @@ export interface TournamentOverPayload {
 export interface TournamentMatchStatus {
 	round: number;
 	matchIndex: number;
-	p1: string; //replace by sdk object
-	p1UserInfo: Partial<User>;
-	p2: string; //replace by sdk object
-	p2UserInfo: Partial<User>;
+	p1: string | null;
+	p2: string | null;
 	scoreP1: number;
 	scoreP2: number;
 }
 
 export interface TournamentBracketStatus {
 	type: "tournament-status";
-	data: TournamentMatchStatus[][];
+	payload: TournamentMatchStatus[];
 }
 
 export type TournamentMessage = // used for tournament

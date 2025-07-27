@@ -3,6 +3,7 @@ import Paddle from "./Paddle.ts";
 import fastifyWebsocket, { type WebSocket } from "@fastify/websocket";
 import UsersSdk from "../../../../../../libs/helpers/usersSdk.ts";
 import type { User } from "../../../../../../libs/interfaces/User.ts";
+import type TournamentLobby from "./TournamentLobby.ts";
 
 export interface OutgoingMessage {
 	type: string;
@@ -11,16 +12,16 @@ export interface OutgoingMessage {
 
 export default class PlayerSession {
 	private _socket: WebSocket | null;
-	private _userId: string; // remove | null ;
+	private _userId: string;
 	private _playerReady: boolean;
 	private _room: GameRoom | null;
+	private _tournamentLobby: TournamentLobby | undefined;
 	private _paddleId: string | null;
 	private _userSdk: UsersSdk = new UsersSdk();
 	private _userObjectFromDB: Partial<User>;
 	public isAI: boolean;
 
 	constructor(socket: WebSocket | null, userId: string) {
-		// removed | null = null
 		this._socket = socket;
 		this._userId = userId;
 		this._playerReady = false;
@@ -58,6 +59,11 @@ export default class PlayerSession {
 	public setRoom(room: GameRoom | null): void {
 		this._room = room;
 	}
+
+	public setLobby(lobby: TournamentLobby): void {
+		this._tournamentLobby = lobby;
+	}
+
 	public setPaddleId(paddleId: string | null): void {
 		this._paddleId = paddleId;
 	}
