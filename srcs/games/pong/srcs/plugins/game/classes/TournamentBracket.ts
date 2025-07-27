@@ -86,7 +86,7 @@ export default class TournamentBracket {
 	}
 
 	public markMatchResult(matchIndex: number, score: RoomScore) {
-		
+
 		const matchup = this._matchups[matchIndex];
 		if (matchup.isComplete()) {
 			console.warn(`Match ${matchIndex} already completed.`);
@@ -119,7 +119,7 @@ export default class TournamentBracket {
 		}
 	}
 
-	private _getTournamentStatus(): TournamentMatchStatus[] {
+	public getTournamentStatus(): TournamentMatchStatus[] {
 		const statusList: TournamentMatchStatus[] = [];
 
 		for (const matchup of this._matchups) {
@@ -141,7 +141,7 @@ export default class TournamentBracket {
 	): void {
 		const payload: TournamentBracketStatus = {
 			type: "tournament-status",
-			payload: this._getTournamentStatus(),
+			payload: this.getTournamentStatus(),
 		};
 		lobby.lobbyBroadcast(payload);
 	}

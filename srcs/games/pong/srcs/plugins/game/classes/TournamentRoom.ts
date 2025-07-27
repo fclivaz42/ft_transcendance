@@ -184,6 +184,7 @@ export default class TournamentRoom extends GameRoom {
 				winner: winner === 1 ? "p1" : "p2",
 				loser: winner === 1 ? "p2" : "p1",
 				final_score: this.score,
+				bracket: this._bracket.getTournamentStatus()
 			},
 		};
 		return gameOver;

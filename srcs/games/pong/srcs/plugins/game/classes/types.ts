@@ -180,6 +180,7 @@ export interface TournamentMatchOverPayload {
 		winner: string;
 		loser: string;
 		final_score: TournamentScore;
+		bracket: TournamentMatchStatus[];
 	};
 }
 
