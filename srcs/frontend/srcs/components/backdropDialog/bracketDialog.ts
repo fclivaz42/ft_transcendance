@@ -1,117 +1,127 @@
 import { createDialog } from ".";
 import FixedSizeMap from "../../class/FixedSizeMap";
+import { TournamentMatchStatus } from "../../game/types";
+import { i18nHandler } from "../../handlers/i18nHandler";
 import UserHandler from "../../handlers/UserHandler";
 import { sanitizer } from "../../helpers/sanitizer";
-import { Round, TournamentBracket } from "../../interfaces/Tournaments";
+import { AiUsers } from "../../interfaces/AiUsers";
 import { Users } from "../../interfaces/Users";
 import { createButton } from "../buttons";
 import createHeaderFrame from "../frame/components/frameHeader";
 import createLoadingFrame from "../frame/frameLoading";
 import createUserAvatar from "../usermenu/userAvatar";
 
-export const userCache = new FixedSizeMap<string, Users>(8);
-
-async function fetchCachedUser(userId: string): Promise<Users> {
-	if (userCache.has(userId))
-		return userCache.get(userId) as Users;
-	let user = await UserHandler.fetchUser(userId);
-	if (!user) 
-		user = {
-			PlayerID: userId,
-			DisplayName: "Unknown",
-		};
-	userCache.set(userId, user);
-	return userCache.get(userId) as Users;
-}
-
-function createBracketRoundComponent(round: Round): HTMLDivElement {
+function createBracketRoundComponent(round: TournamentMatchStatus): HTMLDivElement {
 	const template = document.createElement("template");
 
 	template.innerHTML = `
 		<div class="mb-4 rounded-md dark:bg-panel_dark dark:text-white shadow-lg">
-			<div class="flex flex-row items-center justify-between py-2 px-4 gap-x-4">
-				<div class="flex items-center justify-start gap-x-2 w-48">
-					${createUserAvatar({
-						playerId: round.P1,
-					}).outerHTML}
-					<p data-bracket-round="${sanitizer(round.Round.toString())}" data-bracket-username="${sanitizer(round.P1)}" class="font-semibold truncate">Player 1</p>
+			<div class="flex flex-row items-center justify-between py-1 px-2 gap-x-4">
+				<div data-pong-tournament-bracket="${round.p1}" class="flex items-center justify-start gap-x-2 w-48">
+					<p data-bracket-round="${sanitizer(round.round.toString())}" data-bracket-username="${sanitizer(round.p1)}" class="font-semibold truncate">Player 1</p>
 				</div>
-				<p data-bracket-round="${sanitizer(round.Round.toString())}" data-bracket-score="${sanitizer(round.P1)}" class="font-bold text-lg text-right ${round.P1Score < round.P2Score ? "text-red-500" : "text-green-500"}">2</p>
+				<p data-bracket-round="${sanitizer(round.round.toString())}" data-bracket-score="${sanitizer(round.p1)}" class="font-bold text-lg text-right ${round.scoreP1 < round.scoreP2 ? "text-red-500" : "text-green-500"}">2</p>
 			</div>
-			<div class="flex flex-row items-center justify-between py-2 px-4 gap-x-4">
-				<div class="flex items-center justify-start gap-x-2 w-48">
-					${createUserAvatar({
-						playerId: round.P2,
-					}).outerHTML}
-					<p data-bracket-round="${sanitizer(round.Round.toString())}" data-bracket-username="${sanitizer(round.P2)}" class="font-semibold truncate">Player 2</p>
+			<div class="flex flex-row items-center justify-between py-1 px-2 gap-x-4">
+				<div data-pong-tournament-bracket="${round.p2}" class="flex items-center justify-start gap-x-2 w-48">
+					<p data-bracket-round="${sanitizer(round.round.toString())}" data-bracket-username="${sanitizer(round.p2)}" class="font-semibold truncate">Player 2</p>
 				</div>
-				<p data-bracket-round="${sanitizer(round.Round.toString())}" data-bracket-score="${sanitizer(round.P2)}" class="font-bold text-lg text-right ${round.P1Score > round.P2Score ? "text-red-500" : "text-green-500"}">1</p>
+				<p data-bracket-round="${sanitizer(round.round.toString())}" data-bracket-score="${sanitizer(round.p2)}" class="font-bold text-lg text-right ${round.scoreP1 > round.scoreP2 ? "text-red-500" : "text-green-500"}">1</p>
 			</div>
 		</div>
 	`
 
 	const output = template.content.firstElementChild as HTMLDivElement;
 
-	fetchCachedUser(round.P1).then((user) => {
-		const p1Elem = document.querySelector(`[data-bracket-round="${round.Round.toString()}"][data-bracket-username="${round.P1}"]`);
-		const p1ScoreElem = document.querySelector(`[data-bracket-round="${round.Round.toString()}"][data-bracket-score="${round.P1}"]`);
+	UserHandler.fetchUser(round.p1).then((user) => {
+		const p1Elem = document.querySelector(`[data-bracket-round="${round.round.toString()}"][data-bracket-username="${round.p1}"]`);
+		const p1ScoreElem = document.querySelector(`[data-bracket-round="${round.round.toString()}"][data-bracket-score="${round.p1}"]`);
 		if (p1Elem)
 			p1Elem.textContent = user.DisplayName || "Player 1";
 		if (p1ScoreElem)
-			p1ScoreElem.textContent = round.P1Score.toString();
+			p1ScoreElem.textContent = round.scoreP1.toString();
 	});
 
-	fetchCachedUser(round.P2).then((user) => {
-		const P2Elem = document.querySelector(`[data-bracket-round="${round.Round.toString()}"][data-bracket-username="${round.P2}"]`);
-		const P2ScoreElem = document.querySelector(`[data-bracket-round="${round.Round.toString()}"][data-bracket-score="${round.P2}"]`);
+	UserHandler.fetchUser(round.p2).then((user) => {
+		const P2Elem = document.querySelector(`[data-bracket-round="${round.round.toString()}"][data-bracket-username="${round.p2}"]`);
+		const P2ScoreElem = document.querySelector(`[data-bracket-round="${round.round.toString()}"][data-bracket-score="${round.p2}"]`);
 		if (P2Elem)
 			P2Elem.textContent = user.DisplayName || "Player 2";
 		if (P2ScoreElem)
-			P2ScoreElem.textContent = round.P2Score.toString();
+			P2ScoreElem.textContent = round.scoreP2.toString();
 	});
 	return output;
 }
 
-function createBracketComponent(bracket: TournamentBracket): HTMLDivElement {
+export function createBracketComponent(bracket: TournamentMatchStatus[][]): HTMLDivElement {
 	const template = document.createElement("template");
 
+	console.warn("Filling bracket with empty rounds if needed");
+	if (bracket.length < 3)
+		for (let i = bracket.length; i < 3; i++) {
+			const emptyRound: TournamentMatchStatus = {
+				round: i,
+				matchIndex: 0,
+				p1: "",
+				p1UserInfo: { PlayerID: "", DisplayName: "" },
+				p2: "",
+				p2UserInfo: { PlayerID: "", DisplayName: "" },
+				scoreP1: 0,
+				scoreP2: 0,
+			};
+
+			const fakeRound: TournamentMatchStatus[] = [];
+			let roundPlayers = bracket[i - 1].length / 2;
+
+			for (let j = 0; j < roundPlayers; j++)
+					fakeRound.push(emptyRound);
+			bracket.push(fakeRound);
+		}
+
 	template.innerHTML = `
-		<div class="m-2 p-4">
+		<div id="pong-tournament-bracket" class="m-2 p-4">
 			<div class="mb-4 grid grid-flow-col grid-cols-3 items-center border-0 border-b-2 border-gray-200 text-center text-lg font-bold uppercase">
-				<div>Quarterfinals</div>
-				<div>Semifinals</div>
-				<div>Finals</div>
+				<div>${sanitizer(i18nHandler.getValue("tournament.bracket.quarterFinals"))}</div>
+				<div>${sanitizer(i18nHandler.getValue("tournament.bracket.semiFinals"))}</div>
+				<div>${sanitizer(i18nHandler.getValue("tournament.bracket.finals"))}</div>
 			</div>
 			<div class="flex flex-row gap-x-4 justify-center">
 				<div class="flex-grow flex flex-col items-center justify-evenly">
-					${bracket.Rounds.filter((round) => round.Round === 0).map(round => createBracketRoundComponent(round).outerHTML).join("")}
+					${bracket[0].map(round => createBracketRoundComponent(round).outerHTML).join("")}
 				</div>
 				<div class="flex-grow flex flex-col items-center justify-evenly mx-2">
-					${bracket.Rounds.filter((round) => round.Round === 1).map(round => createBracketRoundComponent(round).outerHTML).join("")}
+					${bracket[1].map(round => createBracketRoundComponent(round).outerHTML).join("")}
 				</div>
 				<div class="flex-grow flex flex-col items-center justify-evenly ml-2">
-					${bracket.Rounds.filter((round) => round.Round === 2).map(round => createBracketRoundComponent(round).outerHTML).join("")}
+					${bracket[2].map(round => createBracketRoundComponent(round).outerHTML).join("")}
 				</div>
 			</div>
 		</div>
 	`
 
 	const output = template.content.firstElementChild as HTMLDivElement;
+	for(const player of output.querySelectorAll("[data-pong-tournament-bracket]")) {
+		const playerId = player.getAttribute("data-pong-tournament-bracket");
+		player.insertAdjacentElement("afterbegin", createUserAvatar({
+			playerId: playerId || "",
+		}));
+	}
 	return output;
 }
 
-export function createBracketDialog(bracket: TournamentBracket) {
+export function createBracketDialog(bracket: TournamentMatchStatus[][]) {
 	const dialog = createDialog({
 		allowClose: false,
 	});
 	const title = document.createElement("h2");
-	title.className = "text-2xl font-semibold text-black dark:text-white mb-4";
-	title.textContent = "tournament.bracket.title";
+	title.className = "text-2xl font-semibold text-black dark:text-white mb-2";
+	title.textContent = i18nHandler.getValue("tournament.bracket.title");
 	title.setAttribute("i18n", "tournament.bracket.title");
 	dialog.appendChild(title);
 	const loadingPage = document.createElement("div");
 	dialog.appendChild(loadingPage);
 	dialog.appendChild(createBracketComponent(bracket));
-	loadingPage.appendChild(createLoadingFrame("waiting.for.next.match"));
+	loadingPage.appendChild(createLoadingFrame(i18nHandler.getValue("tournament.waitingnext")));
 	dialog.show();
+	return dialog;
 }

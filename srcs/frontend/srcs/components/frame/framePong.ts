@@ -7,7 +7,7 @@ import { sanitizer } from "../../helpers/sanitizer";
 import { createButtonIcon } from "../buttons";
 import createUserAvatar, { UserAvatarType } from "../usermenu/userAvatar";
 
-export async function createPongCanvas(isComputer: boolean): Promise<HTMLDivElement> {
+export async function createPongCanvas(): Promise<HTMLDivElement> {
 	const template = document.createElement("template");
 
 	const playerAvatar: (UserAvatarType)[] = [

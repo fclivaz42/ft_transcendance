@@ -11,6 +11,15 @@
       "label": "Utiliser un compte"
     }
   },
+  "tournament": {
+    "bracket": {
+      "title": "Tournament Bracket",
+      "quarterFinals": "Quarter Finals",
+      "semiFinals": "Semi Finals",
+      "finals": "Finals"
+    },
+    "waitingnext": "Waiting for next match..."
+  },
   "pong": {
     "waitingPlayer": "Waiting for another player to join...",
     "waitingFriend": "Waiting for your friend to join...",

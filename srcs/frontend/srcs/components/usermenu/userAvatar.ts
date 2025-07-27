@@ -6,7 +6,6 @@ export interface UserAvatarProps {
 	sizeClass?: string;
 	editable?: boolean;
 	playerId?: string;
-	isComputer?: boolean;
 	disableClick?: boolean;
 }
 
@@ -18,46 +17,25 @@ export default function createUserAvatar(props: UserAvatarProps = {
 	if (!props.sizeClass)
 		props.sizeClass = "min-w-10 min-h-10 w-10 h-10";
 
-	let href: string | undefined;
-	if (!props.editable && !props.disableClick && !props.isComputer) {
-		if (props.playerId)
-			href = `/user?playerId=${props.playerId}`;
-		else
-			href = "/user";
-	}
-
 	const anchor = document.createElement("a");
-	if (href) {
-		anchor.href = href;
-		anchor.target = "_blank";
-	}
 
 	const img = document.createElement("img");
 	img.onerror = () => img.src = "/assets/images/default_avatar.svg";
 	img.alt = "User Avatar";
 	img.className = `select-none border-2 rounded-full object-cover ${props.sizeClass} bg-white`;
-
 	img.src = "/assets/images/default_avatar.svg";
-	if (!props.isComputer && (!props.playerId || props.playerId === UserHandler.userId))
-		img.src = UserHandler.avatarUrl;
-	else if (props.isComputer && !props.playerId) {
-		console.log("Creating AI avatar for computer player");
-		img.src = "/assets/images/computer-virus-1-svgrepo-com.svg";
-	}
-	else if (props.isComputer && props.playerId) {
-		console.log("Creating AI avatar for playerId:", props.playerId);
-		const idx = parseInt(props.playerId.split("_")[1], 10);
-		const aiSrc = AiUsers[idx % AiUsers.length].Avatar;
-		if (!aiSrc)
-			return createUserAvatar({ isComputer: true, sizeClass: props.sizeClass });
-		img.src = aiSrc;
-	}
-	else
-		UserHandler.fetchUserPicture(props.playerId).then((url) => {
-			img.src = url;
-			if (img.src === UserHandler.avatarUrl)
-				img.dataset.user = "avatar";
+
+	if (props.playerId) {
+		UserHandler.fetchUser(props.playerId).then((user) => {
+			if (!user)
+				user = UserHandler.user || AiUsers.values().next().value;
+			if(!props.editable && !props.disableClick) {
+				anchor.href = `/user?playerId=${user.PlayerID}`;
+				anchor.target = "_blank";
+			}
+			img.src = user.Avatar || `https://placehold.co/100x100?text=${user.DisplayName.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
 		});
+	}
 
 	anchor.appendChild(img);
 

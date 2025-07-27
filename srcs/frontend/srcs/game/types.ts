@@ -1,3 +1,5 @@
+import { Users } from "../interfaces/Users";
+
 export interface CameraInitInfo {
 	name: string;
 	position: number[];
@@ -107,10 +109,55 @@ export interface InitPayload {
 	}
 }
 
+export interface TournamentMatchStatus {
+	round: number;
+	matchIndex: number;
+	p1: string;
+	p1UserInfo: Partial<Users>;
+	p2: string;
+	p2UserInfo: Partial<Users>;
+	scoreP1: number;
+	scoreP2: number;
+}
+
+export interface TournamentBracketStatusPayload {
+	type: "tournament-status";
+	data: TournamentMatchStatus[][];
+}
+
+export interface TournamentScore {
+	// used for tournament
+	p1: number;
+	p2: number;
+	round: number;
+}
+
+export interface TournamentMatchOverPayload {
+	// used for tournament
+	type: "tournament-match-over";
+	payload: {
+		winner: string;
+		loser: string;
+		final_score: TournamentScore;
+	};
+}
+
+export interface TournamentOverPayload {
+	// used for tournament
+	type: "tournament-over";
+	payload: {
+		winner: string;
+		lobbyID: string;
+	};
+}
+
 export type ServerMessage = InitPayload
 							| UpdatePayload
 							| PlayerConnectedPayload
 							| PlayerDisconnectedPayload
 							| CollisionPayload
 							| ScoreUpdatePayload
-							| GameOverPayload;
+							| GameOverPayload
+							| TournamentBracketStatusPayload
+							| TournamentMatchOverPayload
+							| TournamentOverPayload;
