@@ -53,49 +53,49 @@ export const default_users: def_users = {
 	"AI1": {
 		PlayerID: "P-0",
 		DisplayName: "bot1",
-		EmailAddress: "Guest",
+		EmailAddress: "P-0",
 		Password: "0"
 	},
 	"AI2": {
 		PlayerID: "P-1",
 		DisplayName: "bot2",
-		EmailAddress: "Guest",
+		EmailAddress: "P-1",
 		Password: "0"
 	},
 	"AI3": {
 		PlayerID: "P-2",
 		DisplayName: "bot3",
-		EmailAddress: "Guest",
+		EmailAddress: "P-2",
 		Password: "0"
 	},
 	"AI4": {
 		PlayerID: "P-3",
 		DisplayName: "bot4",
-		EmailAddress: "Guest",
+		EmailAddress: "P-3",
 		Password: "0"
 	},
 	"AI5": {
 		PlayerID: "P-4",
 		DisplayName: "bot5",
-		EmailAddress: "Guest",
+		EmailAddress: "P-4",
 		Password: "0"
 	},
 	"AI6": {
 		PlayerID: "P-5",
 		DisplayName: "bot6",
-		EmailAddress: "Guest",
+		EmailAddress: "P-5",
 		Password: "0"
 	},
 	"AI7": {
 		PlayerID: "P-6",
 		DisplayName: "bot7",
-		EmailAddress: "Guest",
+		EmailAddress: "P-6",
 		Password: "0"
 	},
 	"AI8": {
 		PlayerID: "P-7",
 		DisplayName: "bot8",
-		EmailAddress: "Guest",
+		EmailAddress: "P-7",
 		Password: "0"
 	},
 	"Deleted": {
