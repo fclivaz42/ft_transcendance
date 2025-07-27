@@ -42,6 +42,10 @@ export default class TournamentRoom extends GameRoom {
 		return -1;
 	}
 
+	public setMatchIndex(matchIndex: number): void {
+		this._matchIndex = matchIndex;
+	}
+
 	public override addPlayer(
 		playerSession: PlayerSession,
 		paddleIdOverride: boolean = false

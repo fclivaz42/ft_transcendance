@@ -6,6 +6,7 @@ import type {
 	TournamentBracketStatus,
 	TournamentMatchStatus,
 } from "./types.ts";
+import { match } from "assert";
 
 export default class TournamentBracket {
 	private _matchups: Matchup[] = [];
@@ -45,7 +46,11 @@ export default class TournamentBracket {
 	}
 
 	public isRoundComplete(round: number): boolean {
+		console.log("DEBUG:");
 		const matches = this._matchups.filter((m) => m.round === round);
+		for (const match of matches) {
+			console.log(`match index: ${match.matchIndex}`);
+		}
 		return matches.every((m) => m.isComplete()) ? true : false;
 	}
 
@@ -110,12 +115,14 @@ export default class TournamentBracket {
 	}
 
 	private _adjustMatchIndex(matchIndex: number, round: number): number {
+		if (round !== 1 && round !== 2) throw new Error("getting wrong matchIndex here!");
 		if (round === 1) return 4 + matchIndex;
 		if (round === 2) return 6;
 		return -1;
 	}
 
 	public markMatchResult(matchIndex: number, score: RoomScore) {
+		console.log(`Entered markMatchResult for matchInbdex: ${matchIndex}`);
 		const matchup = this._matchups[matchIndex];
 		if (matchup.isComplete()) {
 			console.warn(`Match ${matchIndex} already completed.`);
@@ -143,8 +150,13 @@ export default class TournamentBracket {
 		}
 	}
 
+	public cleanUp(): void {
+		this._matchups = [];
+		this._currentRound = 0;
+	}
+
 	/* *************************************************************** */
-	/*           BRACKET LOGIC                                         */
+	/*          BROADCAST MESSAGES                                     */
 	/* *************************************************************** */
 
 	public broadcastBracket(lobby: TournamentLobby): void {
