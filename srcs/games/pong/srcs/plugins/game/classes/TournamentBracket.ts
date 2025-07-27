@@ -127,7 +127,7 @@ export default class TournamentBracket {
 		matchup.scoreP1 = score.p1;
 		matchup.scoreP2 = score.p2;
 
-		this._ejectLoser(matchup.getLoser());
+		// this._ejectLoser(matchup.getLoser()); //trying not to eject loser see what happens
 		this._advanceWinner(matchup, matchup.getWinner());
 	}
 

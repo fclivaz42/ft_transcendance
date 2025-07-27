@@ -49,6 +49,13 @@ export default class TournamentLobby {
 		}, this.WAIT_TIME_MS);
 	}
 
+	private _healthCheck(): void {
+		if (this.countRealPlayers() === 0) {
+			console.log("Health Check found no connected players. Shutting down lobby.");
+			this._manager?.terminateLobby(this);
+		} 
+	}
+
 	public startRoundTimer(): void {
 		if (this._roundTimer) return;
 		if (!this._bracket) {
@@ -57,10 +64,11 @@ export default class TournamentLobby {
 		}
 		this._bracket.broadcastBracket(this);
 		console.log(
-			`Starting round ${this._bracket.getCurrentRound() + 1} in ${
+			`Starting round ${this._bracket.getCurrentRound()} in ${
 				this.MATCH_START_COUNTDOWN_MS / 1000
 			}s`
 		);
+		this._healthCheck();
 		this._roundTimer = setTimeout(() => {
 			this._launchTournament(); // implement
 		}, this.MATCH_START_COUNTDOWN_MS);
@@ -100,7 +108,6 @@ export default class TournamentLobby {
 
 		const matches = this._bracket.getCurrentMatches();
 		if (matches.every((m) => m.isComplete())) return;
-		console.log(`Starting round ${this._bracket.getCurrentRound()}`);
 
 		for (const match of matches) {
 			if (!match.p1 || !match.p2) return;
@@ -204,6 +211,10 @@ export default class TournamentLobby {
 	public isFull(): boolean {
 		console.log(`current players in the lobby: ${this._players.length}`);
 		return this._players.length >= this.MAX_PLAYERS;
+	}
+
+	public countRealPlayers() {
+		return this._players.filter(p => !p.isAI).length;
 	}
 
 	public isEmpty(): boolean {
