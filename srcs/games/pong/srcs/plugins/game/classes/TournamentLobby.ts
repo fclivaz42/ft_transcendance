@@ -151,20 +151,9 @@ export default class TournamentLobby {
 		room.setOnGameOver((roomId: string) => {
 			console.log(`Game over in room ${roomId}`);
 			const matchIndex = room.getMatchIndex();
-			console.log(`getting matchIndex: ${matchIndex}`);
 			const score = room.getScore();
-			console.log(`getting score: ${score}`);
-
-			console.log("Calling markMatchResult from gameOverCallback!");
 			this._bracket.markMatchResult(matchIndex, score);
 			this._bracket.broadcastBracket(this);
-			// console.log(
-			// 	`SANITY TEST: ${
-			// 		this._bracket
-			// 	} + is round complete?: ${this._bracket.isRoundComplete(
-			// 		this._bracket.getCurrentRound()
-			// 	)}`
-			// );
 
 			if (this._bracket.isFinished) {
 				const winner = this._bracket.getFinalWinner();
@@ -189,7 +178,7 @@ export default class TournamentLobby {
 
 	public createRoom(
 		vsAI: boolean = false,
-		matchIndex?: number
+		matchIndex: number
 	): TournamentRoom {
 		const roomId = "TOURNAMENT_" + generateRoomId();
 		const room = new TournamentRoom(
