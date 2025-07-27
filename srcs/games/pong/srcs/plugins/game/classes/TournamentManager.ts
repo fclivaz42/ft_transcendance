@@ -8,7 +8,6 @@ export default class TournamentManager extends RoomManager {
 
 	private readonly MAX_PLAYERS = 8;
 
-
 	private _findAvailableTournament(): TournamentLobby | null {
 		console.log("Searching for available tournament...");
 		for (const lobby of this._tournaments.values()) {
@@ -19,15 +18,14 @@ export default class TournamentManager extends RoomManager {
 	}
 
 	public assignTournamentPlayer(session: PlayerSession) {
-
 		let lobby = this._findAvailableTournament();
 		if (!lobby) {
 			lobby = new TournamentLobby("LOBBY_" + generateRoomId());
 			lobby.linkManager(this);
-		} 
+		}
 		this._tournaments.set(lobby.lobbyID, lobby);
 
-		session.setLobby(lobby)
+		session.setLobby(lobby);
 		lobby.addPlayer(session);
 
 		if (lobby.getPlayers().length === 1) {

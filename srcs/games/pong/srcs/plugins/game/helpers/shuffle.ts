@@ -1,4 +1,3 @@
-
 export function shuffle<T>(arr: T[]): T[] {
 	const copy = [...arr];
 	let currentIndex: number = copy.length;

@@ -66,34 +66,23 @@ export default class TournamentLobby {
 		}, this.MATCH_START_COUNTDOWN_MS);
 	}
 
+	public clearWaitTimer() {
+		if (this._waitTimer) {
+			clearTimeout(this._waitTimer);
+			this._waitTimer = null;
+		}
+	}
 
+	public clearRoundTimer() {
+		if (this._roundTimer) {
+			clearTimeout(this._roundTimer);
+			this._roundTimer = null;
+		}
+	}
 
 	/* *************************************************************** */
-
-	public linkManager(manager: TournamentManager) {
-		this._manager = manager;
-	}
-
-	public shutdown(): void {
-		for (const player of this._players) {
-			if (!player.isAI) {
-				player.getSocket()?.close();
-			}
-			this._players = [];
-			this._rooms.clear();
-		}
-	}
-
-	private _fillAI() {
-		const aiNeeded: number = this.MAX_PLAYERS - this._players.length;
-		for (var i = 0; i < aiNeeded; i++) {
-			const aiSession = new PlayerSession(null, `P-${i + 1}`);
-			aiSession.isAI = true;
-			this.addPlayer(aiSession);
-		}
-	}
-
-	
+	/*            TOURNAMENT LOGIC                                     */
+	/* *************************************************************** */
 
 	private _launchTournament() {
 		if (!this._tournamentStarted) {
@@ -101,10 +90,57 @@ export default class TournamentLobby {
 		}
 		this.clearRoundTimer();
 		if (this._bracket.isFinished) {
-			// clean up somehow?
 			return;
 		}
 		this._startNextRound();
+	}
+
+	private _startNextRound(): void {
+		if (!this._bracket) return;
+
+		const matches = this._bracket.getCurrentMatches();
+		if (matches.every((m) => m.isComplete())) return;
+		console.log(`Starting round ${this._bracket.getCurrentRound()}`);
+
+		for (const match of matches) {
+			if (!match.p1 || !match.p2) return;
+			if (match.p1.isAI && match.p2.isAI) {
+				const winner = Math.random() < 0.5 ? match.p1 : match.p2;
+				const winnerScore = MAX_SCORE;
+				const loserScore = Math.floor(Math.random() * (MAX_SCORE - 1));
+				this._bracket.markMatchResult(match.matchIndex, {
+					p1: winner === match.p1 ? winnerScore : loserScore,
+					p2: winner === match.p2 ? winnerScore : loserScore,
+				});
+				console.log(
+					`Match between ${match.p1.getUserId()} and ${match.p2.getUserId()} has concluded successfully!`
+				);
+			} else if (match.p1.isAI || match.p2.isAI) {
+				this._handleAIRoom(match.p1, match.p2, match.matchIndex);
+			} else {
+				const room = this.createRoom(false, match.matchIndex);
+				this._attachGameOverCallback(room, match.p1, match.p2);
+				room.addPlayer(match.p1);
+				room.addPlayer(match.p2, true);
+				room.lock = true;
+			}
+		}
+	}
+
+	private _handleAIRoom(
+		p1: PlayerSession,
+		p2: PlayerSession,
+		matchIndex: number
+	) {
+		if (p1.isAI && p2.isAI) {
+			console.warn("Skipping AI vs AI in _handleAIRoom");
+			return;
+		}
+		const room = this.createRoom(true, matchIndex);
+		this._attachGameOverCallback(room, p1, p2);
+		room.addPlayer(p1);
+		room.addPlayer(p2, true);
+		room.lock = true;
 	}
 
 	private _attachGameOverCallback(
@@ -169,53 +205,9 @@ export default class TournamentLobby {
 		return room;
 	}
 
-	private _handleAIRoom(
-		p1: PlayerSession,
-		p2: PlayerSession,
-		matchIndex: number
-	) {
-		if (p1.isAI && p2.isAI) {
-			console.warn("Skipping AI vs AI in _handleAIRoom");
-			return;
-		}
-		const room = this.createRoom(true, matchIndex);
-		this._attachGameOverCallback(room, p1, p2);
-		room.addPlayer(p1);
-		room.addPlayer(p2, true);
-		room.lock = true;
-	}
-
-	private _startNextRound(): void {
-		if (!this._bracket) return;
-
-		const matches = this._bracket.getCurrentMatches();
-		if (matches.every((m) => m.isComplete())) return;
-		console.log(`Starting round ${this._bracket.getCurrentRound()}`);
-
-		for (const match of matches) {
-			if (!match.p1 || !match.p2) return;
-			if (match.p1.isAI && match.p2.isAI) {
-				const winner = Math.random() < 0.5 ? match.p1 : match.p2;
-				const winnerScore = MAX_SCORE;
-				const loserScore = Math.floor(Math.random() * (MAX_SCORE - 1));
-				this._bracket.markMatchResult(match.matchIndex, {
-					p1: winner === match.p1 ? winnerScore : loserScore,
-					p2: winner === match.p2 ? winnerScore : loserScore,
-				});
-				console.log(
-					`Match between ${match.p1.getUserId()} and ${match.p2.getUserId()} has concluded successfully!`
-				);
-			} else if (match.p1.isAI || match.p2.isAI) {
-				this._handleAIRoom(match.p1, match.p2, match.matchIndex);
-			} else {
-				const room = this.createRoom(false, match.matchIndex);
-				this._attachGameOverCallback(room, match.p1, match.p2);
-				room.addPlayer(match.p1);
-				room.addPlayer(match.p2, true);
-				room.lock = true;
-			}
-		}
-	}
+	/* *************************************************************** */
+	/*           GETTERS & SETTERS                                     */
+	/* *************************************************************** */
 
 	public isFull(): boolean {
 		console.log(`current players in the lobby: ${this._players.length}`);
@@ -238,19 +230,9 @@ export default class TournamentLobby {
 		return this._players;
 	}
 
-	public clearWaitTimer() {
-		if (this._waitTimer) {
-			clearTimeout(this._waitTimer);
-			this._waitTimer = null;
-		}
-	}
-
-	public clearRoundTimer() {
-		if (this._roundTimer) {
-			clearTimeout(this._roundTimer);
-			this._roundTimer = null;
-		}
-	}
+	/* *************************************************************** */
+	/*            PLAYER MANAGEMENT                                    */
+	/* *************************************************************** */
 
 	public addPlayer(playerSession: PlayerSession): void {
 		this._players.push(playerSession);
@@ -270,6 +252,33 @@ export default class TournamentLobby {
 		);
 		this.lobbyBroadcast(this.buildTournamentPlayerDisconnected(playerSession));
 	}
+
+	private _fillAI() {
+		const aiNeeded: number = this.MAX_PLAYERS - this._players.length;
+		for (var i = 0; i < aiNeeded; i++) {
+			const aiSession = new PlayerSession(null, `P-${i + 1}`);
+			aiSession.isAI = true;
+			this.addPlayer(aiSession);
+		}
+	}
+
+	public linkManager(manager: TournamentManager) {
+		this._manager = manager;
+	}
+
+	public shutdown(): void {
+		for (const player of this._players) {
+			if (!player.isAI) {
+				player.getSocket()?.close();
+			}
+			this._players = [];
+			this._rooms.clear();
+		}
+	}
+
+	/* *************************************************************** */
+	/*            WS BROADCASTING                                      */
+	/* *************************************************************** */
 
 	public lobbyBroadcast(message: TournamentMessage): void {
 		if (message.type !== "update") {

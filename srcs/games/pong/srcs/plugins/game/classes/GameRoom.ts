@@ -355,5 +355,3 @@ export default class GameRoom {
 		return gameOver;
 	}
 }
-
-// TODO: close socket on gameover for single games
