@@ -49,11 +49,10 @@ export default class TournamentLobby {
 		}, this.WAIT_TIME_MS);
 	}
 
-	private _healthCheck(): void {
-		if (this.countRealPlayers() === 0) {
-			console.log("Health Check found no connected players. Shutting down lobby.");
-			this._manager?.terminateLobby(this);
-		} 
+	public healthCheck(): boolean {
+		const realPlayers = this.countRealPlayers();
+		console.log(`[HealthCheck] ${this.lobbyID} → ${realPlayers} real players`);
+		return realPlayers > 0;
 	}
 
 	public startRoundTimer(): void {
@@ -68,7 +67,6 @@ export default class TournamentLobby {
 				this.MATCH_START_COUNTDOWN_MS / 1000
 			}s`
 		);
-		this._healthCheck();
 		this._roundTimer = setTimeout(() => {
 			this._launchTournament(); // implement
 		}, this.MATCH_START_COUNTDOWN_MS);

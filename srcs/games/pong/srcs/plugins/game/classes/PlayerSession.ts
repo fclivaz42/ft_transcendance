@@ -39,6 +39,10 @@ export default class PlayerSession {
 		return this._userObjectFromDB;
 	}
 
+	public getTournamentLobby(): TournamentLobby | undefined {
+		return this._tournamentLobby;
+	}
+
 	public getSocket(): WebSocket | null {
 		return this._socket;
 	}

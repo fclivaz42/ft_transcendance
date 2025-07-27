@@ -5,6 +5,7 @@ import RoomManager from "./RoomManager.ts";
 
 export default class TournamentManager extends RoomManager {
 	private _tournaments: Map<string, TournamentLobby> = new Map();
+	private _healthCheckInterval: NodeJS.Timeout | null = null;
 
 	private readonly MAX_PLAYERS = 8;
 
@@ -24,6 +25,7 @@ export default class TournamentManager extends RoomManager {
 			lobby.linkManager(this);
 		}
 		this._tournaments.set(lobby.lobbyID, lobby);
+		this.addSession(session);
 
 		session.setLobby(lobby);
 		lobby.addPlayer(session);
@@ -36,10 +38,52 @@ export default class TournamentManager extends RoomManager {
 			lobby.clearWaitTimer();
 			lobby.startRoundTimer();
 		}
+
+		this._startHealthCheck();
+	}
+
+	private _startHealthCheck() {
+		if (this._healthCheckInterval) return;
+
+		const CHECK_INTERVAL_MS = 5000;
+		this._healthCheckInterval = setInterval(() => {
+			if (this._tournaments.size > 0) {
+				console.log(`tournaments size: ${this._tournaments.size}`)
+				this._healthCheck();
+			} else {
+				this._stopHealthCheck();
+			}
+		}, CHECK_INTERVAL_MS);
+	}
+
+	private _stopHealthCheck() {
+		if (this._healthCheckInterval) {
+			clearInterval(this._healthCheckInterval);
+			this._healthCheckInterval = null;
+		}
+	}
+
+	private _healthCheck() {
+		for (const tournament of this._tournaments.values()) {
+			if (!tournament.healthCheck()) this.terminateLobby(tournament);
+			else console.log(`${tournament.lobbyID}: health check OK!`);
+		}
 	}
 
 	public terminateLobby(lobby: TournamentLobby): void {
 		lobby.shutdown();
 		this._tournaments.delete(lobby.lobbyID);
+	}
+
+	public removeSession(session: PlayerSession): void {
+			this._connectedSessions.delete(session.getUserId());
+	
+			const lobby = session.getTournamentLobby();
+			if (lobby) {
+				lobby.removePlayer(session);
+				if (lobby.isEmpty()) {
+					this._tournaments.delete(lobby.lobbyID);
+				}
+			}
 	}
 }
