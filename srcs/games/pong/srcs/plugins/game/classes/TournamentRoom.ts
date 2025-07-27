@@ -15,7 +15,6 @@ import {
 import TournamentLobby from "./TournamentLobby.ts";
 
 export default class TournamentRoom extends GameRoom {
-
 	public override score: TournamentScore;
 	private _matchIndex: number | undefined;
 	private _lobby: TournamentLobby;
@@ -39,8 +38,7 @@ export default class TournamentRoom extends GameRoom {
 	}
 
 	public getMatchIndex(): number {
-		if (this._matchIndex)
-			return this._matchIndex;
+		if (this._matchIndex) return this._matchIndex;
 		return -1;
 	}
 
@@ -99,26 +97,27 @@ export default class TournamentRoom extends GameRoom {
 			this._killGame(2);
 		}
 	}
-	
+
 	public override startGame() {
 		this.game.setBroadcastFunction(() => {
 			this.floodlessBroadcast(this.buildUpdatePayload());
 		});
-		
+
 		this.game.setRoom(this);
-		
+
 		const ball = this.game.getBall();
 		ball.setOnCollision((collisionInfo) => {
 			this.floodlessBroadcast(this.buildCollisionPayload(collisionInfo));
 		});
-		
+
 		this.broadcast(this.buildTournamentInitPayload());
 		this._start_time = Date.now();
-		console.log("Made it to startGame... Starting game with:")
-		console.log(`${this.players[0].getUserId()} and ${this.players[1].getUserId()}`);
+		console.log("Made it to startGame... Starting game with:");
+		console.log(
+			`${this.players[0].getUserId()} and ${this.players[1].getUserId()}`
+		);
 		this.game.gameStart(DEFAULT_FPS);
 	}
-
 
 	private buildTournamentInitPayload(): TournamentInitPayload {
 		const game = this.game;
@@ -169,7 +168,7 @@ export default class TournamentRoom extends GameRoom {
 				winner: winner === 1 ? "p1" : "p2",
 				loser: winner === 1 ? "p2" : "p1",
 				final_score: this.score,
-				bracket: this._bracket.getTournamentStatus()
+				bracket: this._bracket.getTournamentStatus(),
 			},
 		};
 		return gameOver;

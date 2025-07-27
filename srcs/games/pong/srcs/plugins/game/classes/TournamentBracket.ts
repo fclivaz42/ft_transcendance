@@ -20,6 +20,18 @@ export default class TournamentBracket {
 		this._createMatches(initialPlayers);
 	}
 
+	/* *************************************************************** */
+	/*           GETTERS & SETTERS                                     */
+	/* *************************************************************** */
+
+	public getCurrentMatches(): Matchup[] {
+		return this._matchups.filter((m) => m.round === this._currentRound);
+	}
+
+	public getCurrentRound(): number {
+		return this._currentRound;
+	}
+
 	private _createMatches(players: PlayerSession[]): void {
 		for (let i = 0; i < players.length; i += 2) {
 			const matchIndex = i / 2;
@@ -32,25 +44,31 @@ export default class TournamentBracket {
 		}
 	}
 
-	public getCurrentMatches(): Matchup[] {
-		return this._matchups.filter(m => m.round === this._currentRound);
+	public isRoundComplete(round: number): boolean {
+		const matches = this._matchups.filter((m) => m.round === round);
+		return matches.every((m) => m.isComplete()) ? true : false;
 	}
 
-	public getCurrentRound(): number {
-		return this._currentRound;
+	public getTournamentStatus(): TournamentMatchStatus[] {
+		const statusList: TournamentMatchStatus[] = [];
+
+		for (const matchup of this._matchups) {
+			const status: TournamentMatchStatus = {
+				round: matchup.round,
+				matchIndex: matchup.matchIndex,
+				p1: matchup.p1?.getUserId() ?? null,
+				p2: matchup.p2?.getUserId() ?? null,
+				scoreP1: matchup.scoreP1,
+				scoreP2: matchup.scoreP2,
+			};
+			statusList.push(status);
+		}
+		return statusList;
 	}
 
-	private _ejectLoser(loser: PlayerSession | null) {
-		if (!loser || loser.isAI) return;
-		loser.getSocket()?.send(JSON.stringify({ type: "eliminated" }));
-		loser.getSocket()?.close();
-	}
-
-	private _adjustMatchIndex(matchIndex: number, round: number): number {
-		if (round === 1) return 4 + matchIndex;
-		if (round === 2) return 6;
-		return -1;
-	}
+	/* *************************************************************** */
+	/*           BRACKET LOGIC                                         */
+	/* *************************************************************** */
 
 	private _advanceWinner(matchup: Matchup, winner: PlayerSession | null) {
 		const round: number = matchup.round;
@@ -85,8 +103,19 @@ export default class TournamentBracket {
 		}
 	}
 
-	public markMatchResult(matchIndex: number, score: RoomScore) {
+	private _ejectLoser(loser: PlayerSession | null) {
+		if (!loser || loser.isAI) return;
+		loser.getSocket()?.send(JSON.stringify({ type: "eliminated" }));
+		loser.getSocket()?.close();
+	}
 
+	private _adjustMatchIndex(matchIndex: number, round: number): number {
+		if (round === 1) return 4 + matchIndex;
+		if (round === 2) return 6;
+		return -1;
+	}
+
+	public markMatchResult(matchIndex: number, score: RoomScore) {
 		const matchup = this._matchups[matchIndex];
 		if (matchup.isComplete()) {
 			console.warn(`Match ${matchIndex} already completed.`);
@@ -98,11 +127,6 @@ export default class TournamentBracket {
 
 		this._ejectLoser(matchup.getLoser());
 		this._advanceWinner(matchup, matchup.getWinner());
-	}
-
-	public isRoundComplete(round: number): boolean {
-		const matches = this._matchups.filter((m) => m.round === round);
-		return matches.every((m) => m.isComplete()) ? true : false;
 	}
 
 	public advanceRound(): void {
@@ -119,26 +143,11 @@ export default class TournamentBracket {
 		}
 	}
 
-	public getTournamentStatus(): TournamentMatchStatus[] {
-		const statusList: TournamentMatchStatus[] = [];
+	/* *************************************************************** */
+	/*           BRACKET LOGIC                                         */
+	/* *************************************************************** */
 
-		for (const matchup of this._matchups) {
-			const status: TournamentMatchStatus = {
-				round: matchup.round,
-				matchIndex: matchup.matchIndex,
-				p1: matchup.p1?.getUserId() ?? null,
-				p2: matchup.p2?.getUserId() ?? null,
-				scoreP1: matchup.scoreP1,
-				scoreP2: matchup.scoreP2,
-			};
-			statusList.push(status);
-		}
-		return statusList;
-	}
-
-	public broadcastBracket(
-		lobby: TournamentLobby
-	): void {
+	public broadcastBracket(lobby: TournamentLobby): void {
 		const payload: TournamentBracketStatus = {
 			type: "tournament-status",
 			payload: this.getTournamentStatus(),
@@ -147,10 +156,7 @@ export default class TournamentBracket {
 	}
 
 	public getFinalWinner(): PlayerSession | null {
-		const finals = this._matchups.filter(m => m.round === 2);
+		const finals = this._matchups.filter((m) => m.round === 2);
 		return finals.at(0)?.getWinner() ?? null;
 	}
 }
-
-// send bracket at round start, each match end
-// cleanup and test!

@@ -33,7 +33,9 @@ export default class PlayerSession {
 
 	public async getDataFromSDK() {
 		if (!this._userObjectFromDB && !this.isAI)
-			this._userObjectFromDB = this._userSdk.filterPublicUserData((await this._userSdk.getUser(this._userId)).data);
+			this._userObjectFromDB = this._userSdk.filterPublicUserData(
+				(await this._userSdk.getUser(this._userId)).data
+			);
 		return this._userObjectFromDB;
 	}
 
