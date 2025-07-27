@@ -46,11 +46,7 @@ export default class TournamentBracket {
 	}
 
 	public isRoundComplete(round: number): boolean {
-		console.log("DEBUG:");
 		const matches = this._matchups.filter((m) => m.round === round);
-		for (const match of matches) {
-			console.log(`match index: ${match.matchIndex}`);
-		}
 		return matches.every((m) => m.isComplete()) ? true : false;
 	}
 
@@ -122,7 +118,6 @@ export default class TournamentBracket {
 	}
 
 	public markMatchResult(matchIndex: number, score: RoomScore) {
-		console.log(`Entered markMatchResult for matchInbdex: ${matchIndex}`);
 		const matchup = this._matchups[matchIndex];
 		if (matchup.isComplete()) {
 			console.warn(`Match ${matchIndex} already completed.`);
@@ -145,8 +140,8 @@ export default class TournamentBracket {
 		)) {
 			console.log(`Round: ${this._currentRound}`);
 			console.log(`MatchIndex: ${matchup.matchIndex}`);
-			console.log(`P1: ${matchup.p1}`);
-			console.log(`P2: ${matchup.p2}`);
+			console.log(`P1: ${matchup.p1?.getUserId()}`);
+			console.log(`P2: ${matchup.p2?.getUserId()}`);
 		}
 	}
 

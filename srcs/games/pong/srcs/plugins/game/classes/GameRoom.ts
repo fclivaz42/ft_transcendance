@@ -47,7 +47,6 @@ export default class GameRoom {
 	}
 
 	public isFull(): boolean {
-		console.log(`current players in room: ${this.players.length}`);
 		return this.players.length >= 2;
 	}
 
