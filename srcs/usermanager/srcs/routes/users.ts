@@ -201,6 +201,15 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		if (authorization)
 			return authorization;
 		const params = request.params as { uuid: string };
+		const user = await db_sdk.get_user(params.uuid, "PlayerID");
+		if (user.status !== 200)
+			return reply.code(user.status).send(user.data);
+		if (user.data.Private)
+			return httpReply({
+				detail: "User is private",
+				status: 403,
+				module: "usermanager",
+			}, reply, request);
 		const matches = await db_sdk.get_player_matchlist(params.uuid);
 		const wonMatches = matches.filter((match: Match_complete) => match.WPlayerID.PlayerID === params.uuid);
 		return reply.code(200).send({

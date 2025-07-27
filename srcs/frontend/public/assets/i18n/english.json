@@ -55,6 +55,7 @@
     }
   },
   "user": {
+    "isPrivate": "This user is private.",
     "friend": {
       "addFriend": "Add Friend",
       "removeFriend": "Remove Friend"
