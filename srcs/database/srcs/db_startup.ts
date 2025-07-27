@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/03/18 17:42:46 by fclivaz           #+#    #+#             //
-//   Updated: 2025/07/08 08:13:32 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/25 21:13:01 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -135,26 +135,44 @@ export async function add_default_user() {
 export async function check_contract() {
 	const block = new BlockchainSDK();
 	const resp: object | undefined = DatabaseWorker.get_contract(tables.CurrentContract.Name);
+	let setup: boolean = false;
+	let tries: number = 0;
 	if (resp !== undefined) {
-		await block.deploy(resp[tables.CurrentContract.Fields[0]])
-			.then(function(response: at.AxiosResponse) {
-				Logger.info(`Sent ${resp[tables.CurrentContract.Fields[0]]} successfully.`)
-			})
-			.catch(function(error: at.AxiosError) {
-				Logger.info(`Failed to send ${resp[tables.CurrentContract.Fields[0]]}\n ${error}`)
-			})
+		while (tries < 10 && !setup) {
+			await block.deploy(resp[tables.CurrentContract.Fields[0]])
+				.then(function(response: at.AxiosResponse) {
+					Logger.info(`Sent ${resp[tables.CurrentContract.Fields[0]]} successfully.`)
+					setup = true;
+				})
+				.catch(function(error: at.AxiosError) {
+					Logger.info(`Failed to send ${resp[tables.CurrentContract.Fields[0]]}\n ${error}`)
+				})
+			if (!setup) {
+				await new Promise(resolve => setTimeout(resolve, 2000));
+				tries += 1;
+			}
+		}
 		Logger.info(`Blockchain already there: ${resp[tables.CurrentContract.Fields[0]]}`)
 		return;
 	}
-	block.deploy(undefined)
-		.then(function(response: at.AxiosResponse) {
-			const obj = {};
-			obj[tables.CurrentContract.Fields[0]] = response.data;
-			DatabaseWorker.post(tables.CurrentContract.Name, tables.CurrentContract.Fields, obj)
-			Logger.info(`Blockchain initialized: ${response.data}`)
-		})
-		.catch(function(error: at.AxiosError) {
-			console.error("WARN: BLOCKCHAIN NOT INITIALIZED!")
-			Logger.info(`${error.name} ${error.code}`)
-		})
+	while (tries < 10 && !setup) {
+		await block.deploy(undefined)
+			.then(function(response: at.AxiosResponse) {
+				const obj = {};
+				obj[tables.CurrentContract.Fields[0]] = response.data;
+				DatabaseWorker.post(tables.CurrentContract.Name, tables.CurrentContract.Fields, obj)
+				Logger.info(`Blockchain initialized: ${response.data}`)
+				setup = true;
+			})
+			.catch(function(error: at.AxiosError) {
+				console.error("Warn: Could not contact blockchain module.")
+				Logger.info(`${error.name} ${error.code}`)
+			})
+		if (!setup) {
+			await new Promise(resolve => setTimeout(resolve, 2000));
+			tries += 1;
+		}
+		else
+			return;
+	}
 }

@@ -16,6 +16,8 @@ export default async function usersRegisterEndpoint(app: FastifyInstance, opts: 
 			return authorization;
 
 		const userRegister = request.body as UserRegisterProps;
+		if (!request.body || !request.body["DisplayName"] || !request.body["EmailAddress"] || !request.body["Password"])
+			return reply.code(401).send("error.missing.fields")
 
 		let resp: undefined;
 		if (resp = UsersValidation.enforceUserValidation(reply, request, userRegister))
