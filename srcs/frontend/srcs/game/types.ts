@@ -112,17 +112,15 @@ export interface InitPayload {
 export interface TournamentMatchStatus {
 	round: number;
 	matchIndex: number;
-	p1: string;
-	p1UserInfo: Partial<Users>;
-	p2: string;
-	p2UserInfo: Partial<Users>;
+	p1: string | null;
+	p2: string | null;
 	scoreP1: number;
 	scoreP2: number;
 }
 
 export interface TournamentBracketStatusPayload {
 	type: "tournament-status";
-	data: TournamentMatchStatus[][];
+	payload: TournamentMatchStatus[];
 }
 
 export interface TournamentScore {
@@ -139,6 +137,7 @@ export interface TournamentMatchOverPayload {
 		winner: string;
 		loser: string;
 		final_score: TournamentScore;
+		bracket: TournamentMatchStatus[];
 	};
 }
 
@@ -150,6 +149,17 @@ export interface TournamentOverPayload {
 		lobbyID: string;
 	};
 }
+
+export type LobbyBroadcastPayload =
+	| { type: "timer"; payload: { secondsRemaining: number } }
+	| {
+			type: "match_result";
+			payload: {
+				roomID: string;
+				winner: string;
+				score: { p1: number; p2: number };
+			};
+	  };
 
 export type ServerMessage = InitPayload
 							| UpdatePayload

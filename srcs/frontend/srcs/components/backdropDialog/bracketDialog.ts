@@ -33,7 +33,9 @@ function createBracketRoundComponent(round: TournamentMatchStatus): HTMLDivEleme
 
 	const output = template.content.firstElementChild as HTMLDivElement;
 
-	UserHandler.fetchUser(round.p1).then((user) => {
+	UserHandler.fetchUser(round.p1 || undefined).then((user) => {
+		if (!user)
+			throw new Error(`User not found for player ID: ${round.p1}`);
 		const p1Elem = document.querySelector(`[data-bracket-round="${round.round.toString()}"][data-bracket-username="${round.p1}"]`);
 		const p1ScoreElem = document.querySelector(`[data-bracket-round="${round.round.toString()}"][data-bracket-score="${round.p1}"]`);
 		if (p1Elem)
@@ -42,7 +44,9 @@ function createBracketRoundComponent(round: TournamentMatchStatus): HTMLDivEleme
 			p1ScoreElem.textContent = round.scoreP1.toString();
 	});
 
-	UserHandler.fetchUser(round.p2).then((user) => {
+	UserHandler.fetchUser(round.p2 || undefined).then((user) => {
+		if (!user)
+			throw new Error(`User not found for player ID: ${round.p2}`);
 		const P2Elem = document.querySelector(`[data-bracket-round="${round.round.toString()}"][data-bracket-username="${round.p2}"]`);
 		const P2ScoreElem = document.querySelector(`[data-bracket-round="${round.round.toString()}"][data-bracket-score="${round.p2}"]`);
 		if (P2Elem)
@@ -53,30 +57,9 @@ function createBracketRoundComponent(round: TournamentMatchStatus): HTMLDivEleme
 	return output;
 }
 
-export function createBracketComponent(bracket: TournamentMatchStatus[][]): HTMLDivElement {
+export function createBracketComponent(bracket: TournamentMatchStatus[]): HTMLDivElement {
 	const template = document.createElement("template");
-
-	console.warn("Filling bracket with empty rounds if needed");
-	if (bracket.length < 3)
-		for (let i = bracket.length; i < 3; i++) {
-			const emptyRound: TournamentMatchStatus = {
-				round: i,
-				matchIndex: 0,
-				p1: "",
-				p1UserInfo: { PlayerID: "", DisplayName: "" },
-				p2: "",
-				p2UserInfo: { PlayerID: "", DisplayName: "" },
-				scoreP1: 0,
-				scoreP2: 0,
-			};
-
-			const fakeRound: TournamentMatchStatus[] = [];
-			let roundPlayers = bracket[i - 1].length / 2;
-
-			for (let j = 0; j < roundPlayers; j++)
-					fakeRound.push(emptyRound);
-			bracket.push(fakeRound);
-		}
+	console.log(bracket);
 
 	template.innerHTML = `
 		<div id="pong-tournament-bracket" class="m-2 p-4">
@@ -87,13 +70,13 @@ export function createBracketComponent(bracket: TournamentMatchStatus[][]): HTML
 			</div>
 			<div class="flex flex-row gap-x-4 justify-center">
 				<div class="flex-grow flex flex-col items-center justify-evenly">
-					${bracket[0].map(round => createBracketRoundComponent(round).outerHTML).join("")}
+					${bracket.filter(round => round.round === 0).map(round => createBracketRoundComponent(round).outerHTML).join("")}
 				</div>
 				<div class="flex-grow flex flex-col items-center justify-evenly mx-2">
-					${bracket[1].map(round => createBracketRoundComponent(round).outerHTML).join("")}
+					${bracket.filter(round => round.round === 1).map(round => createBracketRoundComponent(round).outerHTML).join("")}
 				</div>
 				<div class="flex-grow flex flex-col items-center justify-evenly ml-2">
-					${bracket[2].map(round => createBracketRoundComponent(round).outerHTML).join("")}
+					${bracket.filter(round => round.round === 2).map(round => createBracketRoundComponent(round).outerHTML).join("")}
 				</div>
 			</div>
 		</div>
@@ -109,7 +92,7 @@ export function createBracketComponent(bracket: TournamentMatchStatus[][]): HTML
 	return output;
 }
 
-export function createBracketDialog(bracket: TournamentMatchStatus[][]) {
+export function createBracketDialog(bracket: TournamentMatchStatus[]) {
 	const dialog = createDialog({
 		allowClose: false,
 	});
