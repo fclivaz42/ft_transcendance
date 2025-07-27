@@ -114,38 +114,6 @@ export default class TournamentRoom extends GameRoom {
 			this._killGame(2);
 		}
 	}
-
-	// public startGame() inherited
-
-	// TODO: Please adjust to Tournament! @fclivaz
-
-	// this._brackets.getCurrentRound() will help for round 0 quarter, 1 semi, 2 final
-	// this.matchIndex will help for match index: 0 1 2 3 -> round 0, 4 5 -> round 1, 6 -> round 2
-
-	override async _send_to_db(p1: string, p2: string, winner: number) {
-		const db_sdk = new DatabaseSDK();
-		let winner_id: string = winner === 1 ? p1 : p2;
-		let loser_id: string = winner === 1 ? p2 : p1;
-		if (winner_id.startsWith("AI_")) winner_id = default_users.Guest.PlayerID;
-		if (loser_id.startsWith("AI_")) loser_id = default_users.Guest.PlayerID;
-		return db_sdk.create_match({
-			WPlayerID: await db_sdk
-				.get_user(winner_id, "PlayerID")
-				.then((response) => response.data.PlayerID)
-				.catch((error) => default_users.Deleted.PlayerID),
-			LPlayerID: await db_sdk
-				.get_user(loser_id, "PlayerID")
-				.then((response) => response.data.PlayerID)
-				.catch((error) => default_users.Deleted.PlayerID),
-			WScore: this.score.p1 > this.score.p2 ? this.score.p1 : this.score.p2,
-			LScore: this.score.p1 < this.score.p2 ? this.score.p1 : this.score.p2,
-			StartTime: this._start_time,
-			EndTime: Date.now(),
-			// WARN: MUST BE CHANGED FOR TOURNAMENT
-			MatchIndex: 0,
-		});
-	}
-
 	
 	public override startGame() {
 		this.game.setBroadcastFunction(() => {
@@ -165,36 +133,7 @@ export default class TournamentRoom extends GameRoom {
 		console.log(`${this.players[0].getUserId()} and ${this.players[1].getUserId()}`);
 		this.game.gameStart(DEFAULT_FPS);
 	}
-	
-	// TODO: Please adjust Tournament! @fclivaz
-	// this._brackets.getCurrentRound() will help for round 0 quarter, 1 semi, 2 final
-	// this.matchIndex will help for match index: 0 1 2 3 -> round 0, 4 5 -> round 1, 6 -> round 2
-	
-	override async _killGame(winner: number) {
-		let res = this._send_to_db(
-			this.players[0]
-				? this.players[0].getUserId()
-				: default_users.Guest.PlayerID,
-			this.players[1]
-				? this.players[1].getUserId()
-				: default_users.Guest.PlayerID,
-			winner
-		);
-		this.broadcast(this.buildTournamentMatchOverPayload(winner));
-		this.game.gameStop();
-		if (this._onGameOver) {
-			this._onGameOver(this.id);
-		}
-		res
-			.then(function (response) {
-				console.log(`Match successfully created:`);
-				console.dir(response.data);
-			})
-			.catch(function (error) {
-				console.error(`WARN: match could not be sent to db!`);
-				console.dir(error);
-			});
-	}
+
 
 	private buildTournamentInitPayload(): TournamentInitPayload {
 		const game = this.game;

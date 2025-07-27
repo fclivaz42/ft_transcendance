@@ -28,7 +28,7 @@ export default class TournamentBracket {
 			this._matchups.push(new Matchup(0, matchIndex, p1, p2));
 		}
 		for (let i = 4; i < 7; i++) {
-			this._matchups.push(new Matchup(i == 7 ? 2 : 1, i, null, null));
+			this._matchups.push(new Matchup(i == 6 ? 2 : 1, i, null, null));
 		}
 	}
 
@@ -76,7 +76,7 @@ export default class TournamentBracket {
 			(m) => m.round === nextRound && m.matchIndex === nextMatchIndex
 		);
 
-		if (!nextMatch) throw new Error("Next round match nout found");
+		if (!nextMatch) throw new Error("Next round match not found");
 
 		if (index % 2 === 0) {
 			nextMatch.p1 = winner;

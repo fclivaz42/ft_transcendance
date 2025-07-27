@@ -155,8 +155,6 @@ export default class GameRoom {
 		const db_sdk = new DatabaseSDK();
 		let winner_id: string = winner === 1 ? p1 : p2;
 		let loser_id: string = winner === 1 ? p2 : p1;
-		if (winner_id.startsWith("AI_")) winner_id = default_users.Guest.PlayerID;
-		if (loser_id.startsWith("AI_")) loser_id = default_users.Guest.PlayerID;
 		return db_sdk.create_match({
 			WPlayerID: await db_sdk
 				.get_user(winner_id, "PlayerID")
@@ -177,12 +175,8 @@ export default class GameRoom {
 
 	protected async _killGame(winner: number) {
 		let res = this._send_to_db(
-			this.players[0]
-				? this.players[0].getUserId()
-				: default_users.Guest.PlayerID,
-			this.players[1]
-				? this.players[1].getUserId()
-				: default_users.Guest.PlayerID,
+			this.players[0].getUserId(),
+			this.players[1].getUserId(),
 			winner
 		);
 		this.broadcast(this.buildGameOverPayload(winner));
@@ -361,6 +355,5 @@ export default class GameRoom {
 		return gameOver;
 	}
 }
-
 
 // TODO: close socket on gameover for single games
