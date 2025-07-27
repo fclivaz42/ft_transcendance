@@ -15,13 +15,6 @@ import {
 import TournamentLobby from "./TournamentLobby.ts";
 
 export default class TournamentRoom extends GameRoom {
-	//inherits id: string
-	//inherits player: PlayerSession[] = [];
-	//inherits game: Game;
-	//inherits lock: boolean;
-	// inherits _lastMessage?: string as PRIVATE;
-	// inherits _lastCollision?: CollisionPayload as PRIVATE;
-	// inherits _start_time: number = Date.now(): as PRIVATE;
 
 	public override score: TournamentScore;
 	private _matchIndex: number | undefined;
@@ -90,17 +83,9 @@ export default class TournamentRoom extends GameRoom {
 		}
 	}
 
-	// public isFull(): boolean inherited
-	// public isEmpty(): boolean inherited
-	// public getGame(): Game inherited
-
 	public override getScore(): TournamentScore {
 		return this.score;
 	}
-
-	// public setOnGameOver(callback) inherited
-	// public addPlayer() inherited
-	// public removePlayer() inherited
 
 	public override addScore(player: number): void {
 		player === 1 ? this.score.p1++ : this.score.p2++;

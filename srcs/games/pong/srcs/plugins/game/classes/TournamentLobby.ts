@@ -32,28 +32,9 @@ export default class TournamentLobby {
 		this.lobbyID = id;
 	}
 
-	public linkManager(manager: TournamentManager) {
-		this._manager = manager;
-	}
-
-	public shutdown(): void {
-		for (const player of this._players) {
-			if (!player.isAI) {
-				player.getSocket()?.close();
-			}
-			this._players = [];
-			this._rooms.clear();
-		}
-	}
-
-	private _fillAI() {
-		const aiNeeded: number = this.MAX_PLAYERS - this._players.length;
-		for (var i = 0; i < aiNeeded; i++) {
-			const aiSession = new PlayerSession(null, `P-${i+1}`);
-			aiSession.isAI = true;
-			this.addPlayer(aiSession);
-		}
-	}
+	/* *************************************************************** */
+	/*            TIMERS                                               */
+	/* *************************************************************** */
 
 	public startWaitTimer(): void {
 		if (this._waitTimer) return;
@@ -84,6 +65,35 @@ export default class TournamentLobby {
 			this._launchTournament(); // implement
 		}, this.MATCH_START_COUNTDOWN_MS);
 	}
+
+
+
+	/* *************************************************************** */
+
+	public linkManager(manager: TournamentManager) {
+		this._manager = manager;
+	}
+
+	public shutdown(): void {
+		for (const player of this._players) {
+			if (!player.isAI) {
+				player.getSocket()?.close();
+			}
+			this._players = [];
+			this._rooms.clear();
+		}
+	}
+
+	private _fillAI() {
+		const aiNeeded: number = this.MAX_PLAYERS - this._players.length;
+		for (var i = 0; i < aiNeeded; i++) {
+			const aiSession = new PlayerSession(null, `P-${i + 1}`);
+			aiSession.isAI = true;
+			this.addPlayer(aiSession);
+		}
+	}
+
+	
 
 	private _launchTournament() {
 		if (!this._tournamentStarted) {
@@ -187,7 +197,7 @@ export default class TournamentLobby {
 			if (match.p1.isAI && match.p2.isAI) {
 				const winner = Math.random() < 0.5 ? match.p1 : match.p2;
 				const winnerScore = MAX_SCORE;
-				const loserScore = Math.floor(Math.random() * 5);
+				const loserScore = Math.floor(Math.random() * (MAX_SCORE - 1));
 				this._bracket.markMatchResult(match.matchIndex, {
 					p1: winner === match.p1 ? winnerScore : loserScore,
 					p2: winner === match.p2 ? winnerScore : loserScore,
@@ -301,14 +311,16 @@ export default class TournamentLobby {
 		return playerDisconnectedPayload;
 	}
 
-	private buildTournamentOverPayload(winner: PlayerSession): TournamentOverPayload {
+	private buildTournamentOverPayload(
+		winner: PlayerSession
+	): TournamentOverPayload {
 		const tournamentOverPayload: TournamentOverPayload = {
 			type: "tournament-over",
 			payload: {
 				winner: winner.getUserId(),
-				lobbyID: this.lobbyID
-			}
-		}
+				lobbyID: this.lobbyID,
+			},
+		};
 		return tournamentOverPayload;
 	}
 }
