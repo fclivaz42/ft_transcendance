@@ -13,10 +13,11 @@
   },
   "tournament": {
     "bracket": {
-      "title": "Tournament Bracket",
       "quarterFinals": "Quarter Finals",
       "semiFinals": "Semi Finals",
-      "finals": "Finals"
+      "finals": "Finals",
+      "winner": "Winner",
+      "congratulations": "Congratulations!"
     },
     "waitingnext": "Waiting for next match..."
   },
@@ -97,10 +98,10 @@
       "submenu": {
         "play": "Play now",
         "solo": "Solo mode",
-        "join": "Join a Private Game",
-        "create": "Create a Private Game",
+        "join": "Join room",
+        "create": "Create room",
         "local": "Local Game",
-        "tournament": "Play in a Tournament"
+        "tournament": "Tournament"
       }
     },
     "friend": {

@@ -30,10 +30,10 @@ export default function createUserAvatar(props: UserAvatarProps = {
 			if (!user)
 				user = UserHandler.user || AiUsers.values().next().value;
 			if(!props.editable && !props.disableClick) {
-				anchor.href = `/user?playerId=${user.PlayerID}`;
+				anchor.href = `/user?playerId=${user!.PlayerID}`;
 				anchor.target = "_blank";
 			}
-			img.src = user.Avatar || `https://placehold.co/100x100?text=${user.DisplayName.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
+			img.src = user!.Avatar || `https://placehold.co/100x100?text=${user.DisplayName.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
 		});
 	}
 

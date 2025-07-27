@@ -259,6 +259,10 @@ class PongGameManager {
 		input.value = payload.roomID;
 		pongRoomCode.classList.replace("hidden", "flex");
 	}
+
+	public onTournamentOver(payload: TournamentMatchOverPayload["payload"]) {
+		this.dialogRef = createBracketDialog(this.getBracket, true);
+	};
 }
 
 export default new PongGameManager();

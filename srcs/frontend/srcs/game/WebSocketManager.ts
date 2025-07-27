@@ -79,6 +79,9 @@ export class WebSocketManager {
 				case "tournament-match-over":
 					PongGameManager.onTournamentMatchOver(msg.payload);
 					break;
+				case "tournament-over":
+					PongGameManager.onTournamentOver(msg.payload);
+					break;
 				case "gameover":
 					PongGameManager.onGameOver(msg.payload);
 					break;
