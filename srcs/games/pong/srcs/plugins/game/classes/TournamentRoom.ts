@@ -188,4 +188,26 @@ export default class TournamentRoom extends GameRoom {
 		};
 		return gameOver;
 	}
+
+	override async _killGame(winner: number) {
+		let res = this._send_to_db(
+			this.players[0].getUserId(),
+			this.players[1].getUserId(),
+			winner
+		);
+		this.broadcast(this.buildTournamentMatchOverPayload(winner));
+		this.game.gameStop();
+		if (this._onGameOver) {
+			this._onGameOver(this.id);
+		}
+		res
+			.then(function (response) {
+				console.log(`Match successfully created:`);
+				console.dir(response.data);
+			})
+			.catch(function (error) {
+				console.error(`WARN: match could not be sent to db!`);
+				console.dir(error);
+			});
+	}
 }
