@@ -1,7 +1,6 @@
 import Game from "./GameClass.ts";
 import Paddle from "./Paddle.ts";
 import PlayerSession from "./PlayerSession.ts";
-import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
 import { DEFAULT_FPS } from "./Playfield.ts";
 import DatabaseSDK from "../../../../../../libs/helpers/databaseSdk.ts";
 import { default_users } from "../../../../../../libs/interfaces/User.ts";
