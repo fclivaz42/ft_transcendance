@@ -48,7 +48,7 @@ class UserHandler {
 	public async updateFriendList() {
 		while (this.isLogged && !this._updatingFriendList) {
 			this._updatingFriendList = true;
-			const friendListResp: Response | undefined = await fetch("/api/users/me/friends").catch(error => {console.error(error); return undefined;});
+			const friendListResp: Response | undefined = await fetch("/api/users/me/friends").catch(error => { console.error(error); return undefined; });
 			if (!friendListResp || !friendListResp.ok) {
 				console.warn("Failed to fetch friend list:", friendListResp?.statusText);
 				this._friendList = [];
@@ -105,7 +105,7 @@ class UserHandler {
 	}
 
 	public get avatarUrl() {
-		return this._user?.Avatar || `https://placehold.co/100x100?text=${this.displayName?.substring(0,2) || "?"}&font=roboto&bg=cccccc`;
+		return this._user?.Avatar || `https://placehold.co/100x100?text=${this.displayName?.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
 	}
 
 	public get isLogged() {
@@ -144,7 +144,7 @@ class UserHandler {
 				console.warn("User data is incomplete or missing.", userData);
 				this._user = undefined;
 			} else {
-				this._user = {...userData} as Users;
+				this._user = { ...userData } as Users;
 				if (!this._user)
 					throw new Error("User data is undefined or null");
 				this.updateAliveStatus();
