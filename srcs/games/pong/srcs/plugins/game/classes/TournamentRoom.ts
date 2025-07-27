@@ -16,7 +16,7 @@ import TournamentLobby from "./TournamentLobby.ts";
 
 export default class TournamentRoom extends GameRoom {
 	public override score: TournamentScore;
-	private _matchIndex: number | undefined;
+	private _matchIndex: number;
 	private _lobby: TournamentLobby;
 	private _bracket: TournamentBracket;
 
@@ -25,7 +25,7 @@ export default class TournamentRoom extends GameRoom {
 		vsAI: boolean = false,
 		lobby: TournamentLobby,
 		bracket: TournamentBracket,
-		matchIndex?: number,
+		matchIndex: number,
 		onGameOver?: (roomId: string) => void
 	) {
 		super(id, vsAI, onGameOver);
@@ -38,8 +38,7 @@ export default class TournamentRoom extends GameRoom {
 	}
 
 	public getMatchIndex(): number {
-		if (this._matchIndex) return this._matchIndex;
-		return -1;
+		return this._matchIndex;
 	}
 
 	public setMatchIndex(matchIndex: number): void {
