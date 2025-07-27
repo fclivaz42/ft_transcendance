@@ -11,8 +11,8 @@ export async function createPongCanvas(isComputer: boolean): Promise<HTMLDivElem
 	const template = document.createElement("template");
 
 	const playerAvatar: (UserAvatarType)[] = [
-		createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}),
-		createUserAvatar({sizeClass: "lg:w-20 lg:h-20 w-14 h-14"})
+		createUserAvatar({ sizeClass: "lg:w-20 lg:h-20 w-14 h-14" }),
+		createUserAvatar({ sizeClass: "lg:w-20 lg:h-20 w-14 h-14" })
 	];
 	playerAvatar[0].setAttribute("data-pong-avatar", "p1");
 	playerAvatar[1].setAttribute("data-pong-avatar", "p2");
@@ -84,43 +84,43 @@ export function createPongLoading(message: string): HTMLDivElement {
 					<p class="text-lg text-gray-700 dark:text-gray-300" data-i18n="pong.roomCode">${sanitizer(i18nHandler.getValue("pong.privateJoin.roomCode"))}</p>
 					<input type="text" id="pong-room-code-input" class="w-16 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" readonly>
 					${createButtonIcon({
-						id: "pong-room-code-copy",
-						i18n: "pong.privateJoin.copyUrl",
-						color: "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded",
-						darkColor: "dark:bg-blue-700 dark:hover:bg-blue-800",
-					}).outerHTML}
+		id: "pong-room-code-copy",
+		i18n: "pong.privateJoin.copyUrl",
+		color: "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded",
+		darkColor: "dark:bg-blue-700 dark:hover:bg-blue-800",
+	}).outerHTML}
 				</div>
 			</div>
 		</div>
 	`;
 	const loadingContainer = template.content.firstElementChild as HTMLDivElement;
-		if (!UserHandler.isLogged) {
-			throw new Error("notification.user.notLogged");
-		}
+	if (!UserHandler.isLogged) {
+		throw new Error("notification.user.notLogged");
+	}
 
-		let url: URL | undefined;
-		const room = RoutingHandler.searchParams.get("room");
-		switch (room) {
-			case "computer":
-				url = new URL("computer", PONG_HOST);
-				break;
-			case "local":
-				url = new URL("local", PONG_HOST);
-			case "tournament":
-				url = new URL("tournament", PONG_HOST);
-				break;
-			default:
-				if (!room)
-					url = new URL("remote", PONG_HOST);
-				else if (room === "host")
-					url = new URL("friend_host", PONG_HOST);
-				else {
-					url = new URL("friend_join", PONG_HOST);
-					url.searchParams.set("roomId", room);
-				}
-				break;
-		}
-		startGame(url.toString());
+	let url: URL | undefined;
+	const room = RoutingHandler.searchParams.get("room");
+	switch (room) {
+		case "computer":
+			url = new URL("computer", PONG_HOST);
+			break;
+		case "local":
+			url = new URL("local", PONG_HOST);
+		case "tournament":
+			url = new URL("tournament", PONG_HOST);
+			break;
+		default:
+			if (!room)
+				url = new URL("remote", PONG_HOST);
+			else if (room === "host")
+				url = new URL("friend_host", PONG_HOST);
+			else {
+				url = new URL("friend_join", PONG_HOST);
+				url.searchParams.set("roomId", room);
+			}
+			break;
+	}
+	startGame(url.toString());
 
 	return loadingContainer;
 }
