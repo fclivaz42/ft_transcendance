@@ -39,13 +39,62 @@ interface d_user {
 
 interface def_users {
 	Deleted: d_user,
-	Guest: d_user
+	AI1: d_user,
+	AI2: d_user,
+	AI3: d_user,
+	AI4: d_user,
+	AI5: d_user,
+	AI6: d_user,
+	AI7: d_user,
+	AI8: d_user,
 }
 
 export const default_users: def_users = {
-	"Guest": {
+	"AI1": {
 		PlayerID: "P-0",
-		DisplayName: "Guest",
+		DisplayName: "bot1",
+		EmailAddress: "Guest",
+		Password: "0"
+	},
+	"AI2": {
+		PlayerID: "P-1",
+		DisplayName: "bot2",
+		EmailAddress: "Guest",
+		Password: "0"
+	},
+	"AI3": {
+		PlayerID: "P-2",
+		DisplayName: "bot3",
+		EmailAddress: "Guest",
+		Password: "0"
+	},
+	"AI4": {
+		PlayerID: "P-3",
+		DisplayName: "bot4",
+		EmailAddress: "Guest",
+		Password: "0"
+	},
+	"AI5": {
+		PlayerID: "P-4",
+		DisplayName: "bot5",
+		EmailAddress: "Guest",
+		Password: "0"
+	},
+	"AI6": {
+		PlayerID: "P-5",
+		DisplayName: "bot6",
+		EmailAddress: "Guest",
+		Password: "0"
+	},
+	"AI7": {
+		PlayerID: "P-6",
+		DisplayName: "bot7",
+		EmailAddress: "Guest",
+		Password: "0"
+	},
+	"AI8": {
+		PlayerID: "P-7",
+		DisplayName: "bot8",
 		EmailAddress: "Guest",
 		Password: "0"
 	},
