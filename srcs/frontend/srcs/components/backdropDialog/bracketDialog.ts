@@ -14,9 +14,11 @@ import createUserAvatar from "../usermenu/userAvatar";
 
 function createBracketRoundComponent(round: TournamentMatchStatus): HTMLDivElement {
 	const template = document.createElement("template");
+	let isPlayerInMatch = false;
+	if (round.p1 === UserHandler.userId || round.p2 === UserHandler.userId) isPlayerInMatch = true;
 
 	template.innerHTML = `
-		<div class="mb-4 rounded-md dark:bg-panel_dark dark:text-white shadow-lg">
+		<div class="mb-4 rounded-md ${isPlayerInMatch ? "dark:bg-blue-500 bg-blue-100" : "dark:bg-panel_dark bg-panel"} shadow-lg">
 			<div class="flex flex-row items-center justify-between py-1 px-2 gap-x-4">
 				<div data-bracket="${sanitizer(round.p1) || ""}" class="flex items-center justify-start gap-x-2 w-48">
 					<p data-bracket-round="${sanitizer(round.round.toString())}" data-bracket-username="${sanitizer(round.p1) || ""}" class="font-semibold truncate ${round.scoreP1 > round.scoreP2 ? "text-green-500" : ""}">???</p>
@@ -112,7 +114,6 @@ async function createWinnerComponent(winnerId: string): Promise<HTMLDivElement> 
 			<div data-tournament-winner class="flex items-center justify-center gap-x-2">
 				<p class="text-xl font-semibold">${sanitizer(winner.DisplayName || "Unknown Player")}</p>
 			</div>
-			<p class="text-lg text-gray-600 dark:text-gray-400 mt-2">${sanitizer(i18nHandler.getValue("tournament.bracket.congratulations"))}</p>
 		</div>
 	`;
 

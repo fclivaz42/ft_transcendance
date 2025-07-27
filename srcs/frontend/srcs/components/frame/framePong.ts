@@ -26,7 +26,7 @@ export async function createPongCanvas(): Promise<HTMLDivElement> {
 								<div class="flex flex-col items-start justify-center w-0">
 									<p data-pong-displayname="p1" class="text-xl lg:text-3xl font-bold text-center select-text text-nowrap">Username</p>
 									<div class="flex gap-x-4 items-start justify-center">
-										<p data-i18n="pong.computer" data-pong-bot="p1" class="hidden bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg text-sm">
+										<p data-i18n="pong.computer" data-pong-bot="p1" class="hidden bg-gray-800 text-gray-300 px-2 py-1 rounded-lg text-sm">
 											${sanitizer(i18nHandler.getValue("pong.computer"))}
 										</p>
 										<p data-pong-ping="p1" class="text-base lg:text-lg">calculating...</p>
@@ -43,7 +43,7 @@ export async function createPongCanvas(): Promise<HTMLDivElement> {
 									<p data-pong-displayname="p2" class="text-xl lg:text-3xl font-bold text-center select-text text-nowrap">Username</p>
 									<div class="flex gap-x-4 items-start justify-center">
 										<p data-pong-ping="p2" class="text-base lg:text-lg">calculating...</p>
-										<p data-i18n="pong.computer" data-pong-bot="p2" class="hidden bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-lg text-sm">
+										<p data-i18n="pong.computer" data-pong-bot="p2" class="hidden bg-gray-800 text-gray-300 px-2 py-1 rounded-lg text-sm">
 											${sanitizer(i18nHandler.getValue("pong.computer"))}
 										</p>
 									</div>
