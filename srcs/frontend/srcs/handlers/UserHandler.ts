@@ -153,7 +153,7 @@ class UserHandler {
 			const userData = await user.json();
 			this._publicUserCache.set(playerId, userData as Users);
 			setTimeout(() => {
-				this._publicUserCache.delete(playerId);
+				this._publicUserCache.delete(playerId!);
 			}, 60000);
 			return userData as Users;
 		}

@@ -45,7 +45,7 @@ class PongGameManager {
 	}
 	private dialogRef: BackdropDialog | undefined;
 
-	private bracket: TournamentMatchStatus[][] | undefined;
+	private bracket: TournamentMatchStatus[] | undefined;
 
 	public calculatePing() {
 		if (this.pingInterval.sentPing === undefined) {
@@ -213,7 +213,7 @@ class PongGameManager {
 		return this.users;
 	}
 
-	public get getBracket(): TournamentMatchStatus[][]{
+	public get getBracket(): TournamentMatchStatus[]{
 		if (!this.bracket)
 			throw new Error("Bracket is not initialized.");
 		return this.bracket;
@@ -228,7 +228,7 @@ class PongGameManager {
 		this.dialogRef = createPongGameoverDialog(payload, this.users);
 	}
 
-	public onBracketUpdate(update: TournamentBracketStatusPayload["data"]) {
+	public onBracketUpdate(update: TournamentBracketStatusPayload["payload"]) {
 		if (!this.bracket)
 			this.dialogRef = createBracketDialog(update);
 		else {
@@ -241,7 +241,8 @@ class PongGameManager {
 	}
 
 	public onTournamentMatchOver(update: TournamentMatchOverPayload["payload"]) {
-		this.dialogRef = createBracketDialog(this.getBracket);
+		this.bracket = update.bracket;
+		this.dialogRef = createBracketDialog(update.bracket);
 	}
 
 	public onConnect(payload: PlayerConnectedPayload["payload"]) {
