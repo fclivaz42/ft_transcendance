@@ -11,6 +11,7 @@ import DatabaseSDK from "../../../libs/helpers/databaseSdk.ts";
 import Logger from "../../../libs/helpers/loggers.ts";
 import axios from "axios";
 import UsersSdk from "../../../libs/helpers/usersSdk.ts";
+import type { UsersSdkStats } from "../../../libs/helpers/usersSdk.ts";
 import type { MultipartFile } from "@fastify/multipart";
 import type { Match_complete } from "../../../libs/interfaces/Match.ts";
 import twoFaReceiptEndpoint from "./users/2FAreceipt.ts";
@@ -204,19 +205,14 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		const user = await db_sdk.get_user(params.uuid, "PlayerID");
 		if (user.status !== 200)
 			return reply.code(user.status).send(user.data);
-		if (user.data.Private)
-			return httpReply({
-				detail: "User is private",
-				status: 403,
-				module: "usermanager",
-			}, reply, request);
 		const matches = await db_sdk.get_player_matchlist(params.uuid);
 		const wonMatches = matches.filter((match: Match_complete) => match.WPlayerID.PlayerID === params.uuid);
 		return reply.code(200).send({
-			"wonMatches": wonMatches.length,
-			"lostMatches": matches.length - wonMatches.length,
-			"totalMatches": matches.length,
-		});
+			wonMatches: wonMatches.length,
+			lostMatches: matches.length - wonMatches.length,
+			totalMatches: matches.length,
+			isPrivate: user.data.Private === 1,
+		} as UsersSdkStats);
 	});
 
 	app.delete("/:uuid", async (request, reply) => {

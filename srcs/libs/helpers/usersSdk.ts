@@ -44,7 +44,8 @@ export interface UsersSdkToken extends UsersSdkAuthorizeResponse {
 export interface UsersSdkStats {
 	wonMatches: number;
 	lostMatches: number;
-	totalMatches: number
+	totalMatches: number,
+	isPrivate: boolean;
 }
 
 export interface UsersSdkAliveResponse {

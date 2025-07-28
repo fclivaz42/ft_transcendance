@@ -62,23 +62,8 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 		darkColor: `${UserHandler.isPrivate ? "dark:bg-green-600 hover:dark:bg-green-700" : "dark:bg-yellow-600 hover:dark:bg-yellow-700"} text-white`,
 		id: "privateButton",
 		f: () => {
-			const multipartFormData = new FormData();
-			multipartFormData.append("Private", UserHandler.isPrivate ? "0" : "1");
-			fetch("/api/users/update", {
-				method: "PUT",
-				body: multipartFormData,
-			}).then(response => {
-				if (!response.ok) {
-					NotificationManager.notify({
-						"level": "error",
-						"title": i18nHandler.getValue("panel.updateProfile.notification.updateErrorTitle"),
-						"message": i18nHandler.getValue("panel.updateProfile.notification.updateErrorMessage")
-					});
-					return;
-				}
-				UserHandler.fetchUser().finally(() => {
-					updatePrivateButton(privateButton);
-				});
+			UserHandler.togglePrivacy().then(response => {
+				updatePrivateButton(privateButton);
 				NotificationManager.notify({
 					"level": "success",
 					"title": i18nHandler.getValue("panel.updateProfile.notification.updateSuccessTitle"),
