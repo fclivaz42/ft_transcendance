@@ -11,10 +11,20 @@
       "label": "Utiliser un compte"
     }
   },
+  "tournament": {
+    "bracket": {
+      "quarterFinals": "Quarter Finals",
+      "semiFinals": "Semi Finals",
+      "finals": "Finals",
+      "winner": "Winner"
+    },
+    "waitingnext": "Waiting for next match...",
+    "lost": "Waiting for tournament to finish..."
+  },
   "pong": {
     "waitingPlayer": "Waiting for another player to join...",
     "waitingFriend": "Waiting for your friend to join...",
-    "computer": "IA",
+    "computer": "AI",
     "join": {
       "error": {
         "emptyRoomCode": "Please enter a room code."
@@ -42,7 +52,7 @@
     "empty": "No history available.",
     "winner": "Winner",
     "loser": "Loser",
-    "notchain": "Not chaind !",
+    "notchain": "Not chained !",
     "notification": {
       "notchain": {
         "title": "Match not in blockchain",
@@ -89,10 +99,10 @@
       "submenu": {
         "play": "Play now",
         "solo": "Solo mode",
-        "join": "Join a Private Game",
-        "create": "Create a Private Game",
+        "join": "Join room",
+        "create": "Create room",
         "local": "Local Game",
-        "tournament": "Play in a Tournament"
+        "tournament": "Tournament"
       }
     },
     "friend": {

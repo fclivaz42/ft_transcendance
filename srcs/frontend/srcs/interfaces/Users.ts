@@ -10,6 +10,7 @@ export interface Users {
 	Private?: number,
 	LastAlive?: number,
 	Avatar?: string,
+	isBot?: boolean,
 };
 
 export interface Friends extends Users {
