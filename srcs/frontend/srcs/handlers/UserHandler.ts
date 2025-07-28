@@ -3,6 +3,7 @@ import type { Users, Friends } from "../interfaces/Users";
 import NotificationManager from "../managers/NotificationManager";
 import { i18nHandler } from "./i18nHandler";
 import FixedSizeMap from "../class/FixedSizeMap";
+import RoutingHandler from "./RoutingHandler";
 
 export interface UserStats {
 	wonMatches: number;
@@ -30,6 +31,8 @@ class UserHandler {
 	}
 
 	public static maskEmail(email: string): string {
+		if (!email)
+			return "Email Address";
 		const [user, domain] = email.split("@");
 		const maskedUser = user.slice(0, 3) + "*".repeat(Math.max(1, user.length - 3));
 		const [domainName, domainExt] = domain.split(".");
@@ -136,13 +139,13 @@ class UserHandler {
 		const user = await fetch("/api/users/me");
 		if (!user.ok) {
 			console.warn("Failed to fetch user data:", user.statusText);
-			this._user = undefined;
+			this.clearUserData();
 		}
 		else {
 			const userData = await user.json();
 			if (!userData || !userData.PlayerID || !userData.DisplayName || !userData.EmailAddress) {
 				console.warn("User data is incomplete or missing.", userData);
-				this._user = undefined;
+				this.clearUserData();
 			} else {
 				this._user = { ...userData } as Users;
 				if (!this._user)
@@ -169,6 +172,11 @@ class UserHandler {
 		if (!user)
 			return "/assets/images/default_avatar.svg";
 		return user.Avatar || `https://placehold.co/100x100?text=${user.DisplayName.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
+	}
+
+	private clearUserData() {
+		this._user = undefined;
+		this._friendList = [];
 	}
 
 	private updateComponents() {
@@ -281,6 +289,20 @@ class UserHandler {
 		if (!this._user?.Private)
 			return false;
 		return true;
+	}
+
+	public async logout(): Promise<void> {
+		fetch("/api/users/logout", {
+			method: "GET",
+		}).then(async (response) => {
+			if (response.ok) {
+				this.clearUserData();
+				await RoutingHandler.setRoute("/", false);
+				this.updateComponents();
+			}
+		}).catch((error) => {
+			console.error("Error during logout:", error);
+		});
 	}
 }
 

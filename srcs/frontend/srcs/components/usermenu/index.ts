@@ -16,6 +16,7 @@ import { createPasswordStrengthList } from "../input/passwordStrengh.js";
 import { sanitizer } from "../../helpers/sanitizer";
 import { createButton } from "../buttons";
 import { removeClassStartingWith } from "../../utilities/selectors";
+import { createUserDelete } from "../dialog/userDelete";
 
 function updatePrivateButton(button: HTMLButtonElement): void {
 	if (UserHandler.isPrivate) {
@@ -99,15 +100,7 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 		addClasses: "w-2/3",
 		color: "bg-red-600 hover:bg-red-700 text-white",
 		darkColor: "dark:bg-red-600 hover:dark:bg-red-700 text-white",
-		f: () => {
-			fetch("/api/users/logout", {
-				method: "GET",
-			}).then(() => {
-				UserHandler.fetchUser();
-				dialog.remove();
-				RoutingHandler.setRoute("/");
-			});
-		}
+		f: () => { UserHandler.logout().then(() => dialog.close()) }
 	});
 
 	const deleteButton = createButton({
@@ -116,6 +109,8 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 		color: "bg-red-800 hover:bg-red-900 text-white",
 		darkColor: "dark:bg-red-800 hover:dark:bg-red-900 text-white",
 		f: () => {
+			dialog.close();
+			createUserDelete();
 		}
 	});
 
