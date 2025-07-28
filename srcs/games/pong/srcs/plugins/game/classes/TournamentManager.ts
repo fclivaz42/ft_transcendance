@@ -48,7 +48,7 @@ export default class TournamentManager extends RoomManager {
 		const CHECK_INTERVAL_MS = 5000;
 		this._healthCheckInterval = setInterval(() => {
 			if (this._tournaments.size > 0) {
-				console.log(`tournaments size: ${this._tournaments.size}`)
+				console.log(`tournaments size: ${this._tournaments.size}`);
 				this._healthCheck();
 			} else {
 				this._stopHealthCheck();
@@ -76,14 +76,13 @@ export default class TournamentManager extends RoomManager {
 	}
 
 	public removeSession(session: PlayerSession): void {
-			this._connectedSessions.delete(session.getUserId());
-	
-			const lobby = session.getTournamentLobby();
-			if (lobby) {
-				lobby.removePlayer(session);
-				if (lobby.isEmpty()) {
-					this._tournaments.delete(lobby.lobbyID);
-				}
+		this._connectedSessions.delete(session.getUserId());
+		const lobby = session.getTournamentLobby();
+		if (lobby) {
+			lobby.removePlayer(session);
+			if (lobby.isEmpty()) {
+				this._tournaments.delete(lobby.lobbyID);
 			}
+		}
 	}
 }

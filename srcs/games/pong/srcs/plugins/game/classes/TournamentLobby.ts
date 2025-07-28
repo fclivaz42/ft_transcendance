@@ -12,7 +12,6 @@ import type {
 	TournamentPlayerConnected,
 	TournamentPlayerDisconnected,
 } from "./types.ts";
-import Matchup from "./Matchup.ts";
 
 export default class TournamentLobby {
 	public lobbyID: string;
@@ -268,6 +267,7 @@ export default class TournamentLobby {
 	}
 
 	public removePlayer(playerSession: PlayerSession): void {
+		playerSession.disconnected = true;
 		this._players = this._players.filter((p) => p !== playerSession);
 		console.log(
 			`Removed player ${playerSession.getUserId()} from TournamentLobby ${
@@ -275,6 +275,7 @@ export default class TournamentLobby {
 			}`
 		);
 		this.lobbyBroadcast(this.buildTournamentPlayerDisconnected(playerSession));
+		this.adjustDisconnects();
 	}
 
 	private _fillAI() {
@@ -298,6 +299,35 @@ export default class TournamentLobby {
 			this._bracket.cleanUp();
 			this._players = [];
 			this._rooms.clear();
+		}
+	}
+
+	public adjustDisconnects(): void {
+		console.log("Checking matches for disconnects");
+		const dcdMatches = this._bracket
+			.getAllMatches()
+			.filter((p) => p.p1?.disconnected || p.p2?.disconnected);
+		for (const match of dcdMatches) {
+			if (match.p1?.disconnected && match.p2?.disconnected) {
+				this.shutdown();
+				return;
+			}
+			const dcdPlayer = match.p1?.disconnected ? match.p1 : match.p2;
+			if (dcdPlayer) {
+				this._bracket.markMatchResult(match.matchIndex, {
+					p1: match.p1 === dcdPlayer ? 0 : MAX_SCORE,
+					p2: match.p2 === dcdPlayer ? 0 : MAX_SCORE,
+				});
+				dcdPlayer.disconnected = false;
+				const dcdPlayerRoom = dcdPlayer.getRoom();
+				if (dcdPlayerRoom) dcdPlayerRoom.game.gameStop();
+				this._bracket.broadcastBracket(this);
+				if (this._bracket.isRoundComplete(this._bracket.getCurrentRound())) {
+					console.log("Attempting to start next round");
+					this._bracket.advanceRound();
+					this.startRoundTimer();
+				}
+			}
 		}
 	}
 
@@ -332,7 +362,7 @@ export default class TournamentLobby {
 		return playerConnectedPayload;
 	}
 
-	private buildTournamentPlayerDisconnected(
+	public buildTournamentPlayerDisconnected(
 		sessions: PlayerSession
 	): TournamentPlayerDisconnected {
 		const playerDisconnectedPayload: TournamentPlayerDisconnected = {

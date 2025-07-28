@@ -19,6 +19,7 @@ export default class PlayerSession {
 	private _paddleId: string | null;
 	private _userSdk: UsersSdk = new UsersSdk();
 	private _userObjectFromDB: Partial<User>;
+	private _hasDisconnected: boolean = false;
 	public isAI: boolean;
 
 	constructor(socket: WebSocket | null, userId: string) {
@@ -37,6 +38,14 @@ export default class PlayerSession {
 				(await this._userSdk.getUser(this._userId)).data
 			);
 		return this._userObjectFromDB;
+	}
+
+	public get disconnected(): boolean {
+		return this._hasDisconnected;
+	}
+
+	public set disconnected(val: boolean) {
+		this._hasDisconnected = val;
 	}
 
 	public getTournamentLobby(): TournamentLobby | undefined {

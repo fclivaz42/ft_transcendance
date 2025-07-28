@@ -1,10 +1,11 @@
 import TournamentLobby from "./TournamentLobby.ts";
 import PlayerSession from "./PlayerSession.ts";
 import Matchup from "./Matchup.ts";
-import type {
-	RoomScore,
-	TournamentBracketStatus,
-	TournamentMatchStatus,
+import {
+	MAX_SCORE,
+	type RoomScore,
+	type TournamentBracketStatus,
+	type TournamentMatchStatus,
 } from "./types.ts";
 import { match } from "assert";
 
@@ -24,6 +25,10 @@ export default class TournamentBracket {
 	/* *************************************************************** */
 	/*           GETTERS & SETTERS                                     */
 	/* *************************************************************** */
+
+	public getAllMatches(): Matchup[] {
+		return this._matchups;
+	}
 
 	public getCurrentMatches(): Matchup[] {
 		return this._matchups.filter((m) => m.round === this._currentRound);
@@ -111,7 +116,8 @@ export default class TournamentBracket {
 	}
 
 	private _adjustMatchIndex(matchIndex: number, round: number): number {
-		if (round !== 1 && round !== 2) throw new Error("getting wrong matchIndex here!");
+		if (round !== 1 && round !== 2)
+			throw new Error("getting wrong matchIndex here!");
 		if (round === 1) return 4 + matchIndex;
 		if (round === 2) return 6;
 		return -1;
