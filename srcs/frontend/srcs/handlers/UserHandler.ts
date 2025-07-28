@@ -61,6 +61,10 @@ class UserHandler {
 			this._friendList = await friendListResp.json() as Friends[];
 			for (const friend of this._friendList)
 				this._friendList[this._friendList.indexOf(friend)] = await this.filterFriend(friend);
+			this._friendList.sort((a, b) => { 
+				if (a.isAlive !== b.isAlive) return a.isAlive ? -1 : 1;
+				return a.DisplayName.toLowerCase().localeCompare(b.DisplayName.toLowerCase());
+			});
 			await new Promise(resolve => setTimeout(resolve, 30000));
 			this._updatingFriendList = false;
 		}
