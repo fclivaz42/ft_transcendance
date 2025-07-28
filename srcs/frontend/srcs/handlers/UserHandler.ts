@@ -61,10 +61,7 @@ class UserHandler {
 			this._friendList = await friendListResp.json() as Friends[];
 			for (const friend of this._friendList)
 				this._friendList[this._friendList.indexOf(friend)] = await this.filterFriend(friend);
-			this._friendList.sort((a, b) => { 
-				if (a.isAlive !== b.isAlive) return a.isAlive ? -1 : 1;
-				return a.DisplayName.toLowerCase().localeCompare(b.DisplayName.toLowerCase());
-			});
+			this.sortFriendsList();
 			await new Promise(resolve => setTimeout(resolve, 30000));
 			this._updatingFriendList = false;
 		}
@@ -259,8 +256,15 @@ class UserHandler {
 			return friend;
 		}
 		const friend = bot as Friends;
-		friend.isAlive = await this.getAliveStatus(bot.PlayerID);
+		friend.isAlive = friend.LastAlive && Date.now() - friend.LastAlive < 30000 ? true : false;
 		return friend;
+	}
+
+	private sortFriendsList() {
+		this._friendList.sort((a, b) => { 
+			if (a.isAlive !== b.isAlive) return a.isAlive ? -1 : 1;
+			return a.DisplayName.toLowerCase().localeCompare(b.DisplayName.toLowerCase());
+		});
 	}
 
 	public async addFriend(PlayerID: string): Promise<Response> {
@@ -301,18 +305,9 @@ class UserHandler {
 		const friend = await this.fetchUser(PlayerID) as Friends | undefined;
 		if (friend)
 			this._friendList.push(await this.filterFriend(friend));
+		this.sortFriendsList();
 		this.updateComponents();
 		return res;
-	}
-
-	public async getAliveStatus(playerId: string): Promise<boolean> {
-		const response = await fetch(`/api/users/${playerId}/alive`);
-		if (!response.ok) {
-			console.error("Failed to fetch alive status:", response.statusText);
-			return false;
-		}
-		const data = await response.json() as { isAlive: boolean };
-		return data.isAlive || false;
 	}
 
 	public get isPrivate(): Boolean {
