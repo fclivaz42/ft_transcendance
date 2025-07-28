@@ -17,7 +17,8 @@
     "@fastify/websocket": "^11.0.2",
     "fastify": "^5.2.2",
     "fastify-plugin": "^5.0.1",
-    "xhr2": "^0.2.1"
+    "xhr2": "^0.2.1",
+    "axios": "^1.8.4"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",

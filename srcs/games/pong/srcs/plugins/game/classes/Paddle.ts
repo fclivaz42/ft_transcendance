@@ -9,13 +9,11 @@ import {
 	Vector2,
 } from "@babylonjs/core";
 import Ball from "./Ball.ts";
-import { Session } from "inspector/promises";
 import Game, { PADDLE_SPEED } from "./GameClass.ts";
-import { match } from "assert";
 import type { WallMap } from "./GameClass.ts";
 import GameRoom from "./GameRoom.ts";
 
-const DIFF_SCORE_PLAYER = 50;
+const DIFF_SCORE_PLAYER = 5;
 
 interface Score {
 	p1: number;
@@ -59,7 +57,7 @@ export default class Paddle {
 	private _downMoove: number;
 	private _ballDirection: Vector3;
 
-	static _ballPos: Vector3;
+	private _ballPos: Vector3;
 
 	constructor(
 		scene: Scene,
@@ -90,6 +88,7 @@ export default class Paddle {
 		const material = new StandardMaterial(`${name}-mat`, scene);
 		material.diffuseColor = color;
 		this._mesh.material = material;
+		this._ballPos = Vector3.Zero();
 	}
 
 	protected _touchingWall(): boolean {
@@ -210,13 +209,13 @@ export default class Paddle {
 			// console.log(`: ${}`);
 		} else if (debug === 2) {
 			// console.log(`ballDir: ${this._ballDirection}`);
-			// console.log(`ballPos: ${Paddle._ballPos}\n`);
+			// console.log(`ballPos: ${this._ballPos}\n`);
 		} else if (debug === 3) {
 		}
 	}
 
 	public predictBall(): number {
-		const bPos: Vector3 = Paddle._ballPos;
+		const bPos: Vector3 = this._ballPos;
 		const bVel: Vector3 = this._ballDirection;
 
 		const goalX =
@@ -260,14 +259,15 @@ export default class Paddle {
 			if (fps === 1 && this._ball.getIsLaunched()) {
 				const vel: Vector3 = this._ballDirection.clone();
 				const pad: number = this.getPosition().x;
-				const dir: boolean = ((vel.x < 0 && pad < 0) || vel.x > 0 && pad > 0) ? true : false;
-				const paddles: Paddle[] = this._gameRoom.getGame().getPaddles();
-				const twoIA: boolean = (paddles[0].getIsIA() && paddles[1].getIsIA()) ? true : false;
-				if ((twoIA && dir) || (!twoIA)) {
+				const dir: boolean = (vel.x < 0 && pad < 0) || (vel.x > 0 && pad > 0) ? true : false;
+				if (this._ballPos.x === 0) {
+					// console.log("Ball doesn't moove");
+				} else {
+					// else if (twoAI && dir) {
 					const predictY = this.predictBall();
 					const diff = Math.abs(
 						Math.max(predictY, currentPaddle) -
-							Math.min(predictY, currentPaddle)
+						Math.min(predictY, currentPaddle)
 					);
 					const moov: number = Math.floor(diff / paddlSpeed);
 					// console.log(`currentPaddle: ${currentPaddle}`);
@@ -285,7 +285,7 @@ export default class Paddle {
 					// this.printIAInfo(2);
 				}
 			}
-			else if (Paddle._ballPos.x === 0
+			else if (this._ballPos.x === 0
 				&& !this._ball.getIsLaunched()
 				&& this.getIsIA()
 				&& (this._downMoove === 0 && this._upMoove === 0)) {
@@ -313,7 +313,7 @@ export default class Paddle {
 		if (fps === 1) {
 			let tmp: Vector3 | undefined = this._ball?.getHitbox().position.clone();
 			if (tmp === undefined) return;
-			Paddle._ballPos = tmp;
+			this._ballPos = tmp;
 			tmp = this._ball?.direction;
 			if (tmp === undefined) return;
 			this._ballDirection = tmp;
@@ -331,8 +331,9 @@ export default class Paddle {
 			// 	}`
 			// );
 		}
-		if (this._ball.getIsLaunched())
-			DIFF_SCORE_PLAYER - diff < 0 ? this.randMoove(fps, DIFF_SCORE_PLAYER) : this.randMoove(fps, diff);
+		DIFF_SCORE_PLAYER - diff < 0
+			? this.randMoove(fps, DIFF_SCORE_PLAYER)
+			: this.randMoove(fps, diff);
 		this.iaAlgo(fps);
 	}
 
@@ -340,25 +341,9 @@ export default class Paddle {
 		const coef = DIFF_SCORE_PLAYER - diff;
 		const refresh = 30;
 		const ran = Math.floor((Math.random() * 10000) % coef);
-		const paddles: Paddle[] = this._gameRoom.getGame().getPaddles();
-		const twoIA: boolean = (paddles[0].getIsIA() && paddles[1].getIsIA()) ? true : false;
-		if (twoIA) {
-			if ((this.getName() === "player1" && fps === refresh) ||
-				(this.getName() === "player2" && fps === refresh + 10) &&
-				this._downMoove === 0 && this._upMoove === 0) {
-				if (ran > coef / 2)
-					this._upMoove += ran;
-				else if (ran < coef / 2)
-					this._downMoove += ran;
-				else if (ran === coef / 2)
-					Math.random() < 0.5 ? this._upMoove = coef * 1.5 : this._downMoove = coef * 1.5;
-			}
-		}
-		else if (fps === refresh && this._downMoove === 0 && this._upMoove === 0) {
-			if (ran > coef / 2)
-				this._upMoove += ran;
-			else if (ran < coef / 2)
-				this._downMoove += ran;
+		if (fps === refresh && this._downMoove === 0 && this._upMoove === 0) {
+			if (ran > coef / 2) this._upMoove += ran;
+			else if (ran < coef / 2) this._downMoove += ran;
 			else if (ran === coef / 2)
 				Math.random() < 0.5
 					? (this._upMoove = coef * 1.5)

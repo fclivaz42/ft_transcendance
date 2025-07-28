@@ -15,7 +15,7 @@ function createLogin2faContent(dialogRef: BackdropDialog): HTMLDivElement {
 	template.innerHTML = `
 		<div class="flex flex-col items-center p-4 gap-4 w-72 justify-center text-center select-none">
 			<div class="flex flex-col items-center gap-2">
-				<img src="/assets/ui/two-factor-authentication-svgrepo-com.svg" alt="2FA Icon" class="w-16 h-16 invert">
+				<img src="/assets/ui/two-factor-authentication-svgrepo-com.svg" alt="2FA Icon" class="w-16 h-16 dark:invert">
 				<p class="text-xl">${sanitizer(i18nHandler.getValue("panel.2faPanel.title"))}</p>
 			</div>
 			${createTextbox({

@@ -25,9 +25,6 @@ function createFriendItem(user: Friends) {
 		<div class="hover:animate-duration-100 hover:animate-scale cursor-pointer relative group select-none w-64 mx-auto flex items-center justify-between p-2 bg-background dark:bg-background_dark rounded-xl">
 			<p class="truncate max-w-42 left-12 absolute">${sanitizer(user.DisplayName)}</p>
 			<div class="absolute -right-1 -top-1 h-4 w-4 rounded-full ${user.isAlive ? "bg-green-500" : "bg-gray-400"}"></div>
-						<button data-delfriend="${sanitizer(user.PlayerID)}" class="absolute top-0 bottom-0 right-1 bg-panel dark:bg-panel_dark rounded-full w-8 h-8 my-auto dark:hover:text-red-400 hover:text-red-600 group-hover:opacity-100 opacity-0 transition-opacity duration-100 hover:animate-scale hover:animate-duration-100 cursor-pointer text-sm font-semibold">
-				<p>✕</p>
-			</button>
 		</div>
 	`
 	const friendItem = template.content.firstElementChild as HTMLElement;
@@ -84,27 +81,6 @@ export function createFriendSidePanel() {
 	sidePanel.appendChild(loading);
 
 	containerReady.then(() => {
-		for (const deleteButton of friendContainer.querySelectorAll("[data-delfriend]")) {
-			deleteButton.addEventListener("click", async (event) => {
-				const target = event.currentTarget as HTMLButtonElement;
-				const playerId = target.getAttribute("data-delfriend");
-				if (!playerId) return;
-
-				UserHandler.removeFriend(playerId)
-					.then(() => {
-						const friendItem = target.closest(".group");
-						if (friendItem)
-							friendItem.remove();
-					})
-					.catch((error) => {
-						NotificationManager.notify({
-							"level": "error",
-							"title": i18nHandler.getValue("notification.generic.errorTitle"),
-							"message": i18nHandler.getValue("user.notification.deleteError"),
-						});
-					});
-			});
-		}
 		loading.remove();
 		sidePanel.appendChild(friendContainer);
 	});

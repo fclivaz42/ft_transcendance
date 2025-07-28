@@ -7,6 +7,7 @@ import createUserAvatar from "../usermenu/userAvatar";
 import { createButtonIcon } from "../buttons";
 import NotificationManager from "../../managers/NotificationManager";
 import { sanitizer } from "../../helpers/sanitizer";
+import { AiUsers } from "../../interfaces/AiUsers";
 
 async function fetchHistory(playerId?: string): Promise<MatchComplete[]> {
 	const history = await fetch(playerId ? `/api/users/${playerId}/matches` : "/api/users/me/matches");
@@ -35,6 +36,14 @@ async function createHistoryElement(match: MatchComplete, targetId?: string | nu
 	if (!targetId)
 		targetId = UserHandler.userId || match.WPlayerID.PlayerID || match.LPlayerID.PlayerID;
 	const template = document.createElement("template");
+	if (AiUsers.has(match.WPlayerID.PlayerID)) {
+		match.WPlayerID = AiUsers.get(match.WPlayerID.PlayerID)!;
+		match.WPlayerID.DisplayName = i18nHandler.getValue(match.WPlayerID.DisplayName || "AI");
+	}
+	if (AiUsers.has(match.LPlayerID.PlayerID)) {
+		match.LPlayerID = AiUsers.get(match.LPlayerID.PlayerID)!;
+		match.LPlayerID.DisplayName = i18nHandler.getValue(match.LPlayerID.DisplayName || "AI");
+	}
 	template.innerHTML = `
 		<div class="relative cursor-pointer select-none w-fit bg-panel dark:bg-panel_dark p-4 mb-4 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center hover:animate-scale hover:animate-duration-100">
 			<div class="flex items-center justify-between gap-4">
@@ -151,13 +160,9 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 	}
 	template.innerHTML = `
 		<div class="min-w-fit">
-			${createHeaderFrame({
-		title: `${i18nHandler.getValue("history.title")}`,
-		i18n: "history.title",
-	}).outerHTML}
-			<h3 class="text-center text-2xl font-bold mb-4">
+			<h2 class="text-center text-2xl font-bold mb-4">
 				${i18nHandler.getValue("history.subtitle").replace("{user}", player.DisplayName)}
-			</h3>
+			</h2>
 			<div id="history-elements" class="mx-auto flex flex-col items-center gap-4 w-fit">
 			</div>
 			<div class="flex items-center justify-center gap-4 mt-4">

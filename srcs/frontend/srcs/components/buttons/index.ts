@@ -7,7 +7,7 @@ export function createButtonIcon(props: ButtonProps): HTMLAnchorElement {
 
   button.className = `${props.color || "bg-white"} ${props.darkColor || "dark:bg-black"} hover:animate-scale hover:animate-duration-100 cursor-pointer rounded-lg p-3 text-xs font-semibold flex align-middle items-center gap-x-3`;
   button.innerHTML = `
-    ${props.logo ? `<img class="select-none h-4 w-4 dark:invert" src="${sanitizer(props.logo)}">` : ""}
+    ${props.logo ? `<img class="select-none ${sanitizer(props.logoSize) || "h-4 w-4"} dark:invert" src="${sanitizer(props.logo)}">` : ""}
   `;
 	if (props.i18n)
 		button.innerHTML += `<p data-i18n="${sanitizer(props.i18n)}">${sanitizer(i18nHandler.getValue(props.i18n))}</p>`;
@@ -31,7 +31,7 @@ export function createButton(props: ButtonProps): HTMLButtonElement {
 	template.innerHTML = `
 		<button data-i18n="${sanitizer(props.i18n)}" class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 ${props.addClasses} ${props.color || "bg-white"} ${props.darkColor || "dark:bg-black"}">
 		 ${sanitizer(i18nHandler.getValue(props.i18n || ""))}
-		 ${props.logo ? `<img class="select-none h-4 w-4 dark:invert" src="${sanitizer(props.logo)}">` : ""}
+		 ${props.logo ? `<img class="select-none ${sanitizer(props.logoSize) || "h-4 w-4"} dark:invert" src="${sanitizer(props.logo)}">` : ""}
 		</button>
 	`;
 	const button = template.content.firstElementChild as HTMLButtonElement;

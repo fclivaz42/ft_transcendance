@@ -1,5 +1,6 @@
 import GameRoom from "./GameRoom.ts";
 import PlayerSession from "./PlayerSession.ts";
+import { generateRoomId } from "../helpers/id_generator.ts";
 import fastifyWebsocket, { type WebSocket } from "@fastify/websocket";
 
 type GameMode = "remote" | "friend_host" | "friend_join" | "local" | "computer";
@@ -11,46 +12,11 @@ export interface AssignPlayerOptions {
 }
 
 export default class RoomManager {
-	private _rooms: Map<string, GameRoom> = new Map();
-	private _connectedSessions: Map<string, PlayerSession> = new Map();
-
-	/* ROOM ID GENERATION -------------------------------------------------------------------------- */
-	protected _generateRandomLetter(): string {
-		return String.fromCharCode(65 + Math.floor(Math.random() * 26));
-	}
-
-	protected _generateRandomNumber(): number {
-		return Math.floor(Math.random() * 10);
-	}
-
-	protected _shuffle<T>(arr: T[]): T[] {
-		const copy = [...arr];
-		let currentIndex: number = copy.length;
-
-		while (currentIndex !== 0) {
-			let randomIndex: number = Math.floor(Math.random() * currentIndex);
-			currentIndex--;
-			[copy[currentIndex], copy[randomIndex]] = [
-				copy[randomIndex],
-				copy[currentIndex],
-			];
-		}
-		return copy;
-	}
-
-	protected _generateRoomId(): string {
-		const letters = Array.from({ length: 2 }, () =>
-			this._generateRandomLetter()
-		);
-		const numbers = Array.from({ length: 2 }, () =>
-			this._generateRandomNumber().toString()
-		);
-		return this._shuffle(letters.concat(numbers)).join("");
-	}
-	/* --------------------------------------------------------------------------------------------- */
+	protected _rooms: Map<string, GameRoom> = new Map();
+	protected _connectedSessions: Map<string, PlayerSession> = new Map();
 
 	public createRoom(vsAI: boolean = false): GameRoom {
-		const roomId = this._generateRoomId();
+		const roomId = generateRoomId();
 		const room = new GameRoom(roomId, vsAI, (id) => {
 			this._rooms.delete(id);
 			console.log(`Room ${id} deleted (empty or game over).`);

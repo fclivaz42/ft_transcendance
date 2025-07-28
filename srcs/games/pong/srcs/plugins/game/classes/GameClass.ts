@@ -45,7 +45,7 @@ export default class Game {
 	private _p2: Paddle;
 	private _ball: Ball;
 	private _walls: WallMap;
-	private _room: GameRoom | null = null;
+	private _room: GameRoom;
 
 	constructor(vsAI: boolean = false) {
 		this._field = new PlayField();

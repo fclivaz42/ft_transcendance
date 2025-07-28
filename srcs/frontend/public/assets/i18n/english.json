@@ -11,10 +11,20 @@
       "label": "Utiliser un compte"
     }
   },
+  "tournament": {
+    "bracket": {
+      "quarterFinals": "Quarter Finals",
+      "semiFinals": "Semi Finals",
+      "finals": "Finals",
+      "winner": "Winner"
+    },
+    "waitingnext": "Waiting for next match...",
+    "lost": "Waiting for tournament to finish..."
+  },
   "pong": {
     "waitingPlayer": "Waiting for another player to join...",
     "waitingFriend": "Waiting for your friend to join...",
-    "computer": "IA",
+    "computer": "AI",
     "join": {
       "error": {
         "emptyRoomCode": "Please enter a room code."
@@ -42,7 +52,7 @@
     "empty": "No history available.",
     "winner": "Winner",
     "loser": "Loser",
-    "notchain": "Not chaind !",
+    "notchain": "Not chained !",
     "notification": {
       "notchain": {
         "title": "Match not in blockchain",
@@ -55,6 +65,7 @@
     }
   },
   "user": {
+    "isPrivate": "This user is private.",
     "friend": {
       "addFriend": "Add Friend",
       "removeFriend": "Remove Friend"
@@ -88,10 +99,10 @@
       "submenu": {
         "play": "Play now",
         "solo": "Solo mode",
-        "join": "Join a Private Game",
-        "create": "Create a Private Game",
+        "join": "Join room",
+        "create": "Create room",
         "local": "Local Game",
-        "tournament": "Play in a Tournament"
+        "tournament": "Tournament"
       }
     },
     "friend": {
@@ -195,6 +206,12 @@
         "private": "Make Profile Private",
         "delete": "Delete Account"
       },
+      "delete": {
+        "title": "Delete Account",
+        "passwordPlaceholder": "Current Password",
+        "confirmButton": "Delete",
+        "info": "*Note: This action is irreversible. All your data will be permanently deleted or replaced with a generic 'deleted' user profile."
+      },
       "notification": {
         "validationErrorTitle": "Validation Error",
         "validationErrorMessage": "Please correct the errors in the form before submitting.",
@@ -205,7 +222,9 @@
         "networkErrorTitle": "Network Error",
         "networkErrorMessage": "Unable to connect to the server. Please try again.",
         "noChangesTitle": "No Changes",
-        "noChangesMessage": "No changes were made to your profile."
+        "noChangesMessage": "No changes were made to your profile.",
+        "oauthNoPassword": "No password has been set for this account.\nYou can set a password in your profile settings.",
+        "badPassword": "Bad password. Please try again."
       },
       "validation": {
 

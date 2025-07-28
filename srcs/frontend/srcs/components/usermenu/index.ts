@@ -16,6 +16,7 @@ import { createPasswordStrengthList } from "../input/passwordStrengh.js";
 import { sanitizer } from "../../helpers/sanitizer";
 import { createButton } from "../buttons";
 import { removeClassStartingWith } from "../../utilities/selectors";
+import { createUserDelete } from "../dialog/userDelete";
 
 function updatePrivateButton(button: HTMLButtonElement): void {
 	if (UserHandler.isPrivate) {
@@ -99,15 +100,7 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 		addClasses: "w-2/3",
 		color: "bg-red-600 hover:bg-red-700 text-white",
 		darkColor: "dark:bg-red-600 hover:dark:bg-red-700 text-white",
-		f: () => {
-			fetch("/api/users/logout", {
-				method: "GET",
-			}).then(() => {
-				UserHandler.fetchUser();
-				dialog.remove();
-				RoutingHandler.setRoute("/");
-			});
-		}
+		f: () => { UserHandler.logout().then(() => dialog.close()) }
 	});
 
 	const deleteButton = createButton({
@@ -116,6 +109,8 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 		color: "bg-red-800 hover:bg-red-900 text-white",
 		darkColor: "dark:bg-red-800 hover:dark:bg-red-900 text-white",
 		f: () => {
+			dialog.close();
+			createUserDelete();
 		}
 	});
 
@@ -314,6 +309,7 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 	dialog.appendChild(createUserAvatar({
 		sizeClass: "min-h-32 min-h-32 w-32 h-32",
 		editable: true,
+		playerId: UserHandler.user?.PlayerID,
 	}));
 	dialog.appendChild(userIdentifier);
 	dialog.appendChild(privateButton);
@@ -450,7 +446,7 @@ export async function createUserMenuSettings(): Promise<HTMLDivElement> {
         </div>
     `;
 	const userMenuSettings = template.content.firstElementChild as HTMLDivElement;
-	userMenuSettings.appendChild(createUserAvatar({ disableClick: true }));
+	userMenuSettings.appendChild(createUserAvatar({ disableClick: true, playerId: UserHandler.user?.PlayerID }));
 	userMenuSettings.onclick = async () => (await createUserDialog()).showModal();
 	return userMenuSettings;
 }
