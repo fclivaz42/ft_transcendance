@@ -65,20 +65,31 @@ export class WebSocketManager {
 			}
 			const msg: ServerMessage = JSON.parse(event.data);
 			switch (msg.type) {
+				case "tournament-init":
 				case "init":
 					this.onInit(msg.payload);
 					break;
 				case "update":
 					this.onUpdate(msg.payload);
 					break;
+				case "tournament-score":
 				case "score":
 					PongGameManager.onScoreUpdate(msg.payload.score);
+					break;
+				case "tournament-match-over":
+					PongGameManager.onTournamentMatchOver(msg.payload);
+					break;
+				case "tournament-over":
+					PongGameManager.onTournamentOver(msg.payload);
 					break;
 				case "gameover":
 					PongGameManager.onGameOver(msg.payload);
 					break;
 				case "connect":
 					PongGameManager.onConnect(msg.payload);
+					break;
+				case "tournament-status":
+					PongGameManager.onBracketUpdate(msg.payload);
 					break;
 				default:
 					console.warn("[WS] Unknown message type:", msg.type);

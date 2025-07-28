@@ -1,94 +1,175 @@
+import TournamentLobby from "./TournamentLobby.ts";
 import PlayerSession from "./PlayerSession.ts";
-
-type Match = [PlayerSession, PlayerSession];
-
-interface MatchResult {
-	round: number;
-	match: Match;
-	winner: PlayerSession;
-	score: { p1: number; p2: number };
-}
+import Matchup from "./Matchup.ts";
+import {
+	MAX_SCORE,
+	type RoomScore,
+	type TournamentBracketStatus,
+	type TournamentMatchStatus,
+} from "./types.ts";
+import { match } from "assert";
 
 export default class TournamentBracket {
-	private _rounds: Match[][] = [];
-	private _winners: PlayerSession[][] = [];
-	private _results: MatchResult[] = [];
-	public isFinished: boolean = false;
-
+	private _matchups: Matchup[] = [];
 	private _currentRound = 0;
+	public isFinished: boolean = false;
 
 	constructor(initialPlayers: PlayerSession[], maxPlayers: number) {
 		if (initialPlayers.length !== maxPlayers) {
 			throw new Error("Tournament must start with exactly 8 players.");
 		}
-		this._rounds[0] = this._createMatches(initialPlayers);
-		this._winners[0] = [];
+
+		this._createMatches(initialPlayers);
 	}
 
-	public getCurrentMatches(): Match[] {
-		return this._rounds[this._currentRound];
+	/* *************************************************************** */
+	/*           GETTERS & SETTERS                                     */
+	/* *************************************************************** */
+
+	public getAllMatches(): Matchup[] {
+		return this._matchups;
+	}
+
+	public getCurrentMatches(): Matchup[] {
+		return this._matchups.filter((m) => m.round === this._currentRound);
 	}
 
 	public getCurrentRound(): number {
 		return this._currentRound;
 	}
 
-	public getResults(): MatchResult[] {
-		return this._results;
-	}
-
-	public isRoundComplete(): boolean {
-		return (
-			this._winners[this._currentRound]?.length ===
-			this._rounds[this._currentRound]?.length
-		);
-	}
-
-	public markMatchResult(
-		winner: PlayerSession,
-		loser: PlayerSession,
-		score: { p1: number; p2: number }
-	): void {
-		this._winners[this._currentRound].push(winner);
-
-		this._results.push({
-			round: this._currentRound, //0 quarter-final 1 semi-final 2 final
-			match: [winner, loser],
-			winner,
-			score,
-		});
-
-		loser.getSocket()?.send(JSON.stringify({ type: "eliminated" }));
-		loser.getSocket()?.close();
-
-		if (
-			this._winners[this._currentRound].length ===
-			this._rounds[this._currentRound].length
-		) {
-			this._advanceRound();
-		}
-	}
-
-	private _createMatches(players: PlayerSession[]): Match[] {
-		const matches: Match[] = [];
+	private _createMatches(players: PlayerSession[]): void {
 		for (let i = 0; i < players.length; i += 2) {
-			matches.push([players[i], players[i + 1]]);
+			const matchIndex = i / 2;
+			const p1 = players[i];
+			const p2 = players[i + 1];
+			this._matchups.push(new Matchup(0, matchIndex, p1, p2));
 		}
-		return matches;
+		for (let i = 4; i < 7; i++) {
+			this._matchups.push(new Matchup(i == 6 ? 2 : 1, i, null, null));
+		}
 	}
 
-	private _advanceRound(): void {
-		const nextPlayers = this._winners[this._currentRound];
-		console.log(`Advancing round with next players: ${nextPlayers}`);
+	public isRoundComplete(round: number): boolean {
+		const matches = this._matchups.filter((m) => m.round === round);
+		return matches.every((m) => m.isComplete()) ? true : false;
+	}
 
-		if (nextPlayers.length === 1) {
+	public getTournamentStatus(): TournamentMatchStatus[] {
+		const statusList: TournamentMatchStatus[] = [];
+
+		for (const matchup of this._matchups) {
+			const status: TournamentMatchStatus = {
+				round: matchup.round,
+				matchIndex: matchup.matchIndex,
+				p1: matchup.p1?.getUserId() ?? null,
+				p2: matchup.p2?.getUserId() ?? null,
+				scoreP1: matchup.scoreP1,
+				scoreP2: matchup.scoreP2,
+			};
+			statusList.push(status);
+		}
+		return statusList;
+	}
+
+	/* *************************************************************** */
+	/*           BRACKET LOGIC                                         */
+	/* *************************************************************** */
+
+	private _advanceWinner(matchup: Matchup, winner: PlayerSession | null) {
+		const round: number = matchup.round;
+		const index: number = matchup.matchIndex;
+
+		if (!winner) return;
+
+		if (round >= 2) {
 			this.isFinished = true;
-			console.log("Tournament finished. Winner:", nextPlayers[0].getUserId());
+			console.log(`Tournament finished. Winner: ${winner.getUserId()}`);
 			return;
 		}
 
-		this._currentRound++;
-		this._rounds[this._currentRound] = this._createMatches(nextPlayers);
-		this._winners[this._currentRound] = [];
+		const nextRound: number = round + 1;
+		const nextMatchIndex: number = this._adjustMatchIndex(
+			Math.floor(index / 2),
+			nextRound
+		);
+		if (nextMatchIndex < 0)
+			throw new Error("Error: something went wrong in _adjustMatchIndex");
+
+		const nextMatch = this._matchups.find(
+			(m) => m.round === nextRound && m.matchIndex === nextMatchIndex
+		);
+
+		if (!nextMatch) throw new Error("Next round match not found");
+
+		if (index % 2 === 0) {
+			nextMatch.p1 = winner;
+		} else {
+			nextMatch.p2 = winner;
+		}
+	}
+
+	private _ejectLoser(loser: PlayerSession | null) {
+		if (!loser || loser.isAI) return;
+		loser.getSocket()?.send(JSON.stringify({ type: "eliminated" }));
+		loser.getSocket()?.close();
+	}
+
+	private _adjustMatchIndex(matchIndex: number, round: number): number {
+		if (round !== 1 && round !== 2)
+			throw new Error("getting wrong matchIndex here!");
+		if (round === 1) return 4 + matchIndex;
+		if (round === 2) return 6;
+		return -1;
+	}
+
+	public markMatchResult(matchIndex: number, score: RoomScore) {
+		const matchup = this._matchups[matchIndex];
+		if (matchup.isComplete()) {
+			console.warn(`Match ${matchIndex} already completed.`);
+			return;
+		}
+
+		matchup.scoreP1 = score.p1;
+		matchup.scoreP2 = score.p2;
+
+		// this._ejectLoser(matchup.getLoser()); //trying not to eject loser see what happens
+		this._advanceWinner(matchup, matchup.getWinner());
+	}
+
+	public advanceRound(): void {
+		if (this._currentRound < 2) this._currentRound++;
+		console.log(`Advancing round to ${this._currentRound}`);
+		console.log(`Next matches:`);
+		for (const matchup of this._matchups.filter(
+			(m) => m.round === this._currentRound
+		)) {
+			console.log(`Round: ${this._currentRound}`);
+			console.log(`MatchIndex: ${matchup.matchIndex}`);
+			console.log(`P1: ${matchup.p1?.getUserId()}`);
+			console.log(`P2: ${matchup.p2?.getUserId()}`);
+		}
+	}
+
+	public cleanUp(): void {
+		this._matchups = [];
+		this._currentRound = 0;
+	}
+
+	/* *************************************************************** */
+	/*          BROADCAST MESSAGES                                     */
+	/* *************************************************************** */
+
+	public broadcastBracket(lobby: TournamentLobby): void {
+		const payload: TournamentBracketStatus = {
+			type: "tournament-status",
+			payload: this.getTournamentStatus(),
+		};
+		lobby.lobbyBroadcast(payload);
+	}
+
+	public getFinalWinner(): PlayerSession | null {
+		const finals = this._matchups.filter((m) => m.round === 2);
+		return finals.at(0)?.getWinner() ?? null;
 	}
 }
