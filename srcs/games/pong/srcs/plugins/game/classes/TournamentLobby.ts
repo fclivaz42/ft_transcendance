@@ -12,6 +12,7 @@ import type {
 	TournamentPlayerConnected,
 	TournamentPlayerDisconnected,
 } from "./types.ts";
+import Matchup from "./Matchup.ts";
 
 export default class TournamentLobby {
 	public lobbyID: string;
@@ -101,6 +102,30 @@ export default class TournamentLobby {
 		this._startNextRound();
 	}
 
+	private pseudoGameOver() {
+		console.log("Game over in fully AI room");
+		this._bracket.broadcastBracket(this);
+
+		if (this._bracket.isFinished) {
+			const winner = this._bracket.getFinalWinner();
+			if (!winner) {
+				console.error(
+					`Tournament finished, but winner could not be determined`
+				);
+				return;
+			}
+			console.log(`Tournament finished! Winner: ${winner.getUserId()}`);
+			this.lobbyBroadcast(this.buildTournamentOverPayload(winner));
+			this._manager?.terminateLobby(this);
+		} else if (
+			this._bracket?.isRoundComplete(this._bracket.getCurrentRound())
+		) {
+			console.log("Attempting to start next round!");
+			this._bracket.advanceRound();
+			this.startRoundTimer();
+		}
+	}
+
 	private _startNextRound(): void {
 		if (!this._bracket) return;
 
@@ -120,6 +145,7 @@ export default class TournamentLobby {
 				console.log(
 					`Match between ${match.p1.getUserId()} and ${match.p2.getUserId()} has concluded successfully!`
 				);
+				this.pseudoGameOver();
 			} else if (match.p1.isAI || match.p2.isAI) {
 				this._handleAIRoom(match.p1, match.p2, match.matchIndex);
 			} else {
@@ -181,10 +207,7 @@ export default class TournamentLobby {
 		});
 	}
 
-	public createRoom(
-		vsAI: boolean = false,
-		matchIndex: number
-	): TournamentRoom {
+	public createRoom(vsAI: boolean = false, matchIndex: number): TournamentRoom {
 		const roomId = "TOURNAMENT_" + generateRoomId();
 		const room = new TournamentRoom(
 			roomId,
@@ -212,7 +235,7 @@ export default class TournamentLobby {
 	}
 
 	public countRealPlayers() {
-		return this._players.filter(p => !p.isAI).length;
+		return this._players.filter((p) => !p.isAI).length;
 	}
 
 	public isEmpty(): boolean {
@@ -272,7 +295,7 @@ export default class TournamentLobby {
 			if (!player.isAI) {
 				player.getSocket()?.close();
 			}
-			this._bracket.cleanUp()
+			this._bracket.cleanUp();
 			this._players = [];
 			this._rooms.clear();
 		}
