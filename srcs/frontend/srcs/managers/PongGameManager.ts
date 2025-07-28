@@ -5,7 +5,7 @@ import { WebSocketManager } from "../game/WebSocketManager.js";
 import { GameField } from "../game/GameField.js";
 import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
-import { GameOverPayload, InitPayload, PlayerConnectedPayload, TournamentBracketStatusPayload, TournamentMatchOverPayload, TournamentMatchStatus } from "../game/types.js";
+import { GameOverPayload, InitPayload, PlayerConnectedPayload, TournamentBracketStatusPayload, TournamentMatchOverPayload, TournamentMatchStatus, TournamentOverPayload } from "../game/types.js";
 import UserHandler from "../handlers/UserHandler.js";
 import { i18nHandler } from "../handlers/i18nHandler.js";
 import createUserAvatar from "../components/usermenu/userAvatar.js";
@@ -242,7 +242,7 @@ class PongGameManager {
 
 	public onTournamentMatchOver(update: TournamentMatchOverPayload["payload"]) {
 		this.bracket = update.bracket;
-		this.dialogRef = createBracketDialog(update.bracket);
+		this.dialogRef = createBracketDialog(update.bracket, update.winner === UserHandler.userId ? "waitingnext" : "lost", update.winner);
 	}
 
 	public onConnect(payload: PlayerConnectedPayload["payload"]) {
@@ -260,8 +260,8 @@ class PongGameManager {
 		pongRoomCode.classList.replace("hidden", "flex");
 	}
 
-	public onTournamentOver(payload: TournamentMatchOverPayload["payload"]) {
-		this.dialogRef = createBracketDialog(this.getBracket, "final");
+	public onTournamentOver(payload: TournamentOverPayload["payload"]) {
+		this.dialogRef = createBracketDialog(this.getBracket, "final", payload.winner);
 	};
 }
 

@@ -125,7 +125,7 @@ async function createWinnerComponent(winnerId: string): Promise<HTMLDivElement> 
 	return output;
 }
 
-export function createBracketDialog(bracket: TournamentMatchStatus[], status: "lost" | "final" | "waitingnext" = "waitingnext") {
+export function createBracketDialog(bracket: TournamentMatchStatus[], status: "lost" | "final" | "waitingnext" = "waitingnext", winnerId?: string) {
 	const dialog = createDialog({
 		allowClose: false,
 	});
@@ -154,9 +154,9 @@ export function createBracketDialog(bracket: TournamentMatchStatus[], status: "l
 			bannerContainer.appendChild(createLoadingFrame(i18nHandler.getValue("tournament.lost")));
 			break;
 		case "final":
-			const finalMatch = bracket[bracket.length - 1];
-			const winnerId = finalMatch.scoreP1 > finalMatch.scoreP2 ? finalMatch.p1 : finalMatch.p2;
-			createWinnerComponent(winnerId || "").then((winnerComponent) => {
+			if (!winnerId)
+				throw new Error("Winner ID is required for final status.");
+			createWinnerComponent(winnerId).then((winnerComponent) => {
 				bannerContainer.appendChild(winnerComponent);
 			});
 			const playAgain = createButtonIcon({
