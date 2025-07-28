@@ -261,7 +261,7 @@ class PongGameManager {
 	}
 
 	public onTournamentOver(payload: TournamentMatchOverPayload["payload"]) {
-		this.dialogRef = createBracketDialog(this.getBracket, true);
+		this.dialogRef = createBracketDialog(this.getBracket, "final");
 	};
 }
 
