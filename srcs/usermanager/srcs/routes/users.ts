@@ -283,7 +283,6 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 	});
 
 	app.get("/:uuid/matches", async (request, reply) => {
-		Logger.info("Received request for matches");
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
 			return authorization;
