@@ -13,7 +13,7 @@ import Game, { PADDLE_SPEED } from "./GameClass.ts";
 import type { WallMap } from "./GameClass.ts";
 import GameRoom from "./GameRoom.ts";
 
-const DIFF_SCORE_PLAYER = 50;
+const DIFF_SCORE_PLAYER = 5;
 
 interface Score {
 	p1: number;
