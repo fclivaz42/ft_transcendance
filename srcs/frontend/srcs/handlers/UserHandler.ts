@@ -61,6 +61,10 @@ class UserHandler {
 			this._friendList = await friendListResp.json() as Friends[];
 			for (const friend of this._friendList)
 				this._friendList[this._friendList.indexOf(friend)] = await this.filterFriend(friend);
+			this._friendList.sort((a, b) => { 
+				if (a.isAlive !== b.isAlive) return a.isAlive ? -1 : 1;
+				return a.DisplayName.toLowerCase().localeCompare(b.DisplayName.toLowerCase());
+			});
 			await new Promise(resolve => setTimeout(resolve, 30000));
 			this._updatingFriendList = false;
 		}
@@ -115,27 +119,24 @@ class UserHandler {
 		return this._user !== undefined;
 	}
 
-	private deprecatedAIFetch(playerId: string) {
-		console.warn("Deprecated method 'deprecatedAIFetch' is called. Use 'fetchUser' instead.");
-		const identifier = playerId.split("_");
-		if (identifier.length === 2 && identifier[0] === "AI") {
-			if (identifier[1] === "opponent")
-				return "P-0";
-			console.warn("Deprecated AI user fetch for identifier:", identifier);
-			const aiIndex = parseInt(identifier[1], 10);
-			if (aiIndex >= 0 && aiIndex < AiUsers.size) {
-				return `P-${aiIndex + 1}`;
-			}
-		}
-		return null;
+	public async togglePrivacy() {
+		if (!this.isLogged)
+			throw new Error("User is not logged in.");
+		const multipartFormData = new FormData();
+		multipartFormData.append("Private", this.isPrivate ? "0" : "1");
+		const req = await fetch("/api/users/update", {
+			method: "PUT",
+			body: multipartFormData,
+		});
+		if (!req.ok)
+			throw new Error(`Failed to update user privacy: ${req.statusText}`);
+		const update = await req.json() as Users;
+		this._user!.Private = Number(update.Private);
+		return this.isPrivate;
 	}
 
 	public async fetchUser(playerId?: string): Promise<Users | undefined> {
-		console.log("Fetching user data for playerId:", playerId);
 		if (playerId) {
-			const deprecatedUser = this.deprecatedAIFetch(playerId);
-			if (deprecatedUser)
-				playerId = deprecatedUser;
 			if (AiUsers.has(playerId)) {
 				const user = AiUsers.get(playerId)!;
 				user.DisplayName = i18nHandler.getValue(user.DisplayName);

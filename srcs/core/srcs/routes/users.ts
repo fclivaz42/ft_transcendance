@@ -379,6 +379,13 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 						module: 'usermanager'
 					});
 			});
+		if (userStats.data.isPrivate && params.uuid !== authorization.data.sub) {
+			return httpReply({
+				detail: "User is private",
+				status: 403,
+				module: "usermanager",
+			}, reply, request);
+		}
 		return reply.code(userStats.status).send(userStats.data);
 	});
 }

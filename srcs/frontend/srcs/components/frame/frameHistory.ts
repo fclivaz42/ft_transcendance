@@ -135,7 +135,7 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 		});
 		RoutingHandler.setRoute("/", false);
 		return document.createElement("div");
-	} else if (player.Private) {
+	} else if (player.Private && player.PlayerID !== UserHandler.userId) {
 		NotificationManager.notify({
 			level: "error",
 			title: i18nHandler.getValue("history.notification.private.title"),
