@@ -96,6 +96,7 @@ export function createPongLoading(message: string): HTMLDivElement {
 			break;
 		case "local":
 			url = new URL("local", PONG_HOST);
+			break;
 		case "tournament":
 			url = new URL("tournament", PONG_HOST);
 			break;
