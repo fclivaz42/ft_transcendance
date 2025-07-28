@@ -10,42 +10,41 @@ export function createPongSidePanel() {
 		i18n: "navbar.pong.title"
 	});
 	sidePanel.id = "pongSidePanel";
-	const buttonLogo = "/assets/ui/login-door-1-svgrepo-com.svg";
 
 	sidePanel.appendChild(createSidePanelButton({
 		i18n: "navbar.pong.submenu.play",
-		logo: buttonLogo,
+		logo: "/assets/ui/game-controller-svgrepo-com.svg",
 		f: () => RoutingHandler.setRoute("/pong"),
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
 		i18n: "navbar.pong.submenu.tournament",
-		logo: buttonLogo,
+		logo: "/assets/ui/cup-star-svgrepo-com.svg",
 		f: () => RoutingHandler.setRoute("/pong?room=tournament"),
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
 		i18n: "navbar.pong.submenu.solo",
-		logo: buttonLogo,
+		logo: "/assets/ui/computer-svgrepo-com.svg",
 		f: () => RoutingHandler.setRoute("/pong?room=computer"),
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
+		i18n: "navbar.pong.submenu.local",
+		logo: "/assets/ui/game-controller-svgrepo-com.svg",
+		f: () => RoutingHandler.setRoute("/pong?room=local"),
+	}));
+
+	sidePanel.appendChild(createSidePanelButton({
 		i18n: "navbar.pong.submenu.join",
-		logo: buttonLogo,
+		logo: "/assets/ui/lock-alt-svgrepo-com.svg",
 		f: () => createPongJoinDialog(),
 	}));
 
 	sidePanel.appendChild(createSidePanelButton({
 		i18n: "navbar.pong.submenu.create",
-		logo: buttonLogo,
+		logo: "/assets/ui/lock-alt-svgrepo-com.svg",
 		f: () => RoutingHandler.setRoute("/pong?room=host"),
-	}));
-
-	sidePanel.appendChild(createSidePanelButton({
-		i18n: "navbar.pong.submenu.local",
-		logo: buttonLogo,
-		f: () => RoutingHandler.setRoute("/pong?room=local"),
 	}));
 
 	return sidePanel;
