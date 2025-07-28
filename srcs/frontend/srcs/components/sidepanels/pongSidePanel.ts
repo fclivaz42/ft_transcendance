@@ -10,42 +10,46 @@ export function createPongSidePanel() {
 		i18n: "navbar.pong.title"
 	});
 	sidePanel.id = "pongSidePanel";
+	const buttonContainer = document.createElement("div");
+	buttonContainer.className = "grid grid-cols-2 gap-4";
 
-	sidePanel.appendChild(createSidePanelButton({
+	buttonContainer.appendChild(createSidePanelButton({
 		i18n: "navbar.pong.submenu.play",
 		logo: "/assets/ui/game-controller-svgrepo-com.svg",
 		f: () => RoutingHandler.setRoute("/pong"),
 	}));
 
-	sidePanel.appendChild(createSidePanelButton({
+	buttonContainer.appendChild(createSidePanelButton({
 		i18n: "navbar.pong.submenu.tournament",
 		logo: "/assets/ui/cup-star-svgrepo-com.svg",
 		f: () => RoutingHandler.setRoute("/pong?room=tournament"),
 	}));
 
-	sidePanel.appendChild(createSidePanelButton({
+	buttonContainer.appendChild(createSidePanelButton({
 		i18n: "navbar.pong.submenu.solo",
 		logo: "/assets/ui/computer-svgrepo-com.svg",
 		f: () => RoutingHandler.setRoute("/pong?room=computer"),
 	}));
 
-	sidePanel.appendChild(createSidePanelButton({
+	buttonContainer.appendChild(createSidePanelButton({
 		i18n: "navbar.pong.submenu.local",
 		logo: "/assets/ui/game-controller-svgrepo-com.svg",
 		f: () => RoutingHandler.setRoute("/pong?room=local"),
 	}));
 
-	sidePanel.appendChild(createSidePanelButton({
+	buttonContainer.appendChild(createSidePanelButton({
 		i18n: "navbar.pong.submenu.join",
 		logo: "/assets/ui/lock-alt-svgrepo-com.svg",
 		f: () => createPongJoinDialog(),
 	}));
 
-	sidePanel.appendChild(createSidePanelButton({
+	buttonContainer.appendChild(createSidePanelButton({
 		i18n: "navbar.pong.submenu.create",
 		logo: "/assets/ui/lock-alt-svgrepo-com.svg",
 		f: () => RoutingHandler.setRoute("/pong?room=host"),
 	}));
+
+	sidePanel.appendChild(buttonContainer);
 
 	return sidePanel;
 }

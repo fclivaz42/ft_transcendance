@@ -24,8 +24,9 @@ export function createSidePanelButton(props: ButtonProps): HTMLElement {
 		...props,
 		color: "bg-background",
 		darkColor: "dark:bg-background_dark",
+		addClasses: "flex-col justify-center items-center text-center gap-y-2 aspect-square m-0 overflow-hidden",
+		logoSize: "h-8 w-8",
 	});
-	button.classList.add("my-4");
 	return button;
 }
 
