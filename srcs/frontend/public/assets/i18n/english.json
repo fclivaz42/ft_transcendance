@@ -198,7 +198,7 @@
       },
       "delete": {
         "title": "Delete Account",
-        "password": "Current Password",
+        "passwordPlaceholder": "Current Password",
         "confirmButton": "Delete",
         "info": "*Note: This action is irreversible. All your data will be permanently deleted or replaced with a generic 'deleted' user profile."
       },

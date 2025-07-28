@@ -17,7 +17,7 @@ function createUserDeleteContent(dialogRef: BackdropDialog): HTMLDivElement {
 			</div>
 			${createTextbox({
 				type: "password",
-				placeholder: "Current password"
+				placeholder: i18nHandler.getValue("panel.updateProfile.delete.passwordPlaceholder"),
 			}).outerHTML}
 			<div class="flex gap-2 w-2/3 justify-between">
 				${createButton({
