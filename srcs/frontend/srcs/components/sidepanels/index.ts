@@ -11,10 +11,10 @@ export const defaultPanelSize = "w-72";
 export function createSidePanel(props: TitleProps): HTMLElement {
 	const container = document.createElement("div");
 
-	container.className = `${defaultPanelSize} overflow-hidden bg-panel dark:bg-panel_dark h-[80%] rounded-xl p-8`;
+	container.className = `${defaultPanelSize} overflow-y-auto scrollbar-thin bg-panel dark:bg-panel_dark h-[80%] rounded-xl p-8`;
 	container.innerHTML = `
 		<h3 class="text-lg text-center font-bold duration-0 text-black dark:text-white"${props.i18n ? " data-i18n=\"" + sanitizer(props.i18n) + "\"" : ""}>${sanitizer(props.title)}</h3>
-        <hr class="my-4">
+    <hr class="my-4">
 	`;
 	return container;
 }
@@ -24,8 +24,9 @@ export function createSidePanelButton(props: ButtonProps): HTMLElement {
 		...props,
 		color: "bg-background",
 		darkColor: "dark:bg-background_dark",
+		addClasses: "flex-col justify-center items-center text-center gap-y-2 aspect-square m-0 overflow-hidden",
+		logoSize: "h-8 w-8",
 	});
-	button.classList.add("my-4");
 	return button;
 }
 

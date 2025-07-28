@@ -8,12 +8,7 @@ export function createLogoutButton(): HTMLElement {
     color: "bg-red-100",
 		darkColor: "dark:bg-red-400",
 		f: () => {
-			fetch("/api/users/logout", {
-				method: "GET",
-			}).then((response) => {
-				if (response.ok)
-					UserHandler.fetchUser();
-			});
+			UserHandler.logout();
 		},
     id: "logoutButton",
     i18n: i18nId,

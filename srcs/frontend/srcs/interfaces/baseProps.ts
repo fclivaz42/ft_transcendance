@@ -14,4 +14,5 @@ export interface ButtonProps extends BaseProps {
   darkColor?: string;
 	href?: string;
 	addClasses?:string;
+	logoSize?: string;
 }
