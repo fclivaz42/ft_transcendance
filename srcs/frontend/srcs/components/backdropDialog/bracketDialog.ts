@@ -125,48 +125,52 @@ async function createWinnerComponent(winnerId: string): Promise<HTMLDivElement> 
 	return output;
 }
 
-export function createBracketDialog(bracket: TournamentMatchStatus[], isFinal: boolean = false) {
+export function createBracketDialog(bracket: TournamentMatchStatus[], status: "lost" | "final" | "waitingnext" = "waitingnext") {
 	const dialog = createDialog({
 		allowClose: false,
 	});
 	const bannerContainer = document.createElement("div");
 	dialog.appendChild(bannerContainer);
 	dialog.appendChild(createBracketComponent(bracket));
-	if (!isFinal)
-		bannerContainer.appendChild(createLoadingFrame(i18nHandler.getValue("tournament.waitingnext")));
-	else {
-		const finalMatch = bracket[bracket.length - 1];
-		const winnerId = finalMatch.scoreP1 > finalMatch.scoreP2 ? finalMatch.p1 : finalMatch.p2;
-		createWinnerComponent(winnerId || "").then((winnerComponent) => {
-			bannerContainer.appendChild(winnerComponent);
-		});
-		const playAgain = createButtonIcon({
-			id: "pong-gameover-play-again",
-			i18n: "pong.gameover.playagain",
-			color: "text-white bg-blue-500 hover:bg-blue-600",
-			darkColor: "dark:bg-blue-700 dark:hover:bg-blue-800",
-		});
-		playAgain.onclick = () => {
-			dialog.close();
-			RoutingHandler.setRoute("/pong?room=tournament", false);
-		}
-
-		const leaveButton = createButtonIcon({
-			id: "pong-gameover-leave",
-			i18n: "pong.gameover.leave",
-			color: "text-white bg-red-500 hover:bg-red-600",
-			darkColor: "dark:bg-red-700 dark:hover:bg-red-800",
-		});
-		leaveButton.onclick = () => {
-			dialog.close();
-			RoutingHandler.setRoute("/");
-		}
-		
-		const buttonContainer = document.createElement("div");
-		buttonContainer.className = "flex gap-16 p-4";
-		buttonContainer.appendChild(playAgain);
-		buttonContainer.appendChild(leaveButton);
-		dialog.appendChild(buttonContainer);
+	const buttonContainer = document.createElement("div");
+	buttonContainer.className = "flex gap-16";
+	const leaveButton = createButtonIcon({
+		id: "pong-gameover-leave",
+		i18n: "pong.gameover.leave",
+		color: "text-white bg-red-500 hover:bg-red-600",
+		darkColor: "dark:bg-red-700 dark:hover:bg-red-800",
+	});
+	leaveButton.onclick = () => {
+		dialog.close();
+		RoutingHandler.setRoute("/");
+	}
+	buttonContainer.appendChild(leaveButton);
+	dialog.appendChild(buttonContainer);
+	switch (status) {
+		case "waitingnext":
+			bannerContainer.appendChild(createLoadingFrame(i18nHandler.getValue("tournament.waitingnext")));
+			break;
+		case "lost":
+			bannerContainer.appendChild(createLoadingFrame(i18nHandler.getValue("tournament.lost")));
+			break;
+		case "final":
+			const finalMatch = bracket[bracket.length - 1];
+			const winnerId = finalMatch.scoreP1 > finalMatch.scoreP2 ? finalMatch.p1 : finalMatch.p2;
+			createWinnerComponent(winnerId || "").then((winnerComponent) => {
+				bannerContainer.appendChild(winnerComponent);
+			});
+			const playAgain = createButtonIcon({
+				id: "pong-gameover-play-again",
+				i18n: "pong.gameover.playagain",
+				color: "text-white bg-blue-500 hover:bg-blue-600",
+				darkColor: "dark:bg-blue-700 dark:hover:bg-blue-800",
+			});
+			playAgain.onclick = () => {
+				dialog.close();
+				RoutingHandler.setRoute("/pong?room=tournament", false);
+			}
+			buttonContainer.appendChild(playAgain);
+			break;
 	}
 	dialog.show();
 	return dialog;

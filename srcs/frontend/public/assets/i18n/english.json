@@ -18,7 +18,8 @@
       "finals": "Finals",
       "winner": "Winner"
     },
-    "waitingnext": "Waiting for next match..."
+    "waitingnext": "Waiting for next match...",
+    "lost": "Waiting for tournament to finish..."
   },
   "pong": {
     "waitingPlayer": "Waiting for another player to join...",
