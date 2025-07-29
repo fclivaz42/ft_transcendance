@@ -136,13 +136,7 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 	const playerId = RoutingHandler.searchParams.get("playerId");
 	const player = playerId ? await UserHandler.fetchUser(playerId) : UserHandler.user;
 	if (!player) {
-		NotificationManager.notify({
-			level: "error",
-			title: i18nHandler.getValue("notification.generic.errorTitle"),
-			message: i18nHandler.getValue("notification.generic.errorMessage"),
-		});
-		RoutingHandler.setRoute("/", false);
-		return document.createElement("div");
+		throw new Error("notification.user.notLogged");
 	} else if (player.Private && player.PlayerID !== UserHandler.userId) {
 		NotificationManager.notify({
 			level: "error",
