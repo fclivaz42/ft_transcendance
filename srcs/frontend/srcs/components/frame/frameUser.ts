@@ -20,21 +20,29 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	template.innerHTML = `
 		<div class="min-w-[500px] max-w-fit mx-auto flex flex-col gap-8 p-8 rounded-xl bg-panel dark:bg-panel_dark shadow-md">
 			<div id="userstats-profile" class="flex flex-col items-center justify-center gap-4">
-				<h2 ${user.PlayerID === UserHandler.userId ? "data-user=\"username\"" : ""} class="text-center text-2xl font-bold"'>${sanitizer(user.DisplayName) || "User Name"}</h2>
+				<div class="w-full flex items-center justify-center gap-2">
+					${user.isBot ? `
+						<p data-i18n="pong.computer" class="select-none bg-gray-800 text-gray-300 px-2 py-1 rounded-lg text-sm">
+							${sanitizer(i18nHandler.getValue("pong.computer"))}
+						</p>
+					`: ""}
+					<h2 ${user.PlayerID === UserHandler.userId ? "data-user=\"username\"" : ""} class="text-center text-2xl font-bold"'>${sanitizer(user.DisplayName) || "User Name"}</h2>
+				</div>
 			</div>
 			${!isPrivate ? `
+				<hr>
 				<div class="flex flex-col items-center">
 					<h3 class="text-sm" data-i18n="user.matches.total">${sanitizer(i18nHandler.getValue("user.matches.total"))}</h3>
-					<p data-user="matchesTotal" class="text-center text-xl font-semibold">${userStats.totalMatches}</p>
+					<p data-user="matchesTotal" class="text-center text-xl font-semibold">${userStats!.totalMatches}</p>
 				</div>
 				<div class="flex gap-8 justify-center">
 					<div>
 						<h3 class="text-sm" data-i18n="user.matches.won">${sanitizer(i18nHandler.getValue("user.matches.won"))}</h3>
-						<p data-user="matchesWon" class="text-center text-xl font-semibold">${userStats.wonMatches}</p>
+						<p data-user="matchesWon" class="text-center text-xl font-semibold">${userStats!.wonMatches}</p>
 					</div>
 					<div>
 						<h3 class="text-sm" data-i18n="user.matches.lost">${sanitizer(i18nHandler.getValue("user.matches.lost"))}</h3>
-						<p data-user="matchesLost" class="text-center text-xl font-semibold">${userStats.lostMatches}</p>
+						<p data-user="matchesLost" class="text-center text-xl font-semibold">${userStats!.lostMatches}</p>
 					</div>
 				` : `
 				<div class="flex items-center justify-center gap-x-2">
@@ -49,7 +57,7 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 
 	const userStatsProfile = userFrame.querySelector("#userstats-profile");
 	if (userStatsProfile)
-		userStatsProfile.insertAdjacentElement("afterbegin", createUserAvatar({ disableClick: true, playerId: user.PlayerID, sizeClass: "w-40 h-40 mx-auto"}));
+		userStatsProfile.insertAdjacentElement("afterbegin", createUserAvatar({ disableClick: true, playerId: user.PlayerID, sizeClass: "w-40 h-40 mx-auto" }));
 
 	if (!isPrivate) {
 		const viewHistoryButton = createButtonIcon({

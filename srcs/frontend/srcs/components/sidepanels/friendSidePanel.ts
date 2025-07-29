@@ -22,8 +22,13 @@ function createFriendContainer() {
 function createFriendItem(user: Friends) {
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<div class="hover:animate-duration-100 hover:animate-scale cursor-pointer relative group select-none w-64 mx-auto flex items-center justify-between p-2 bg-background dark:bg-background_dark rounded-xl">
-			<p class="truncate max-w-42 left-12 absolute">${sanitizer(user.DisplayName)}</p>
+		<div class="hover:animate-duration-100 hover:animate-scale cursor-pointer relative group select-none w-64 mx-auto flex items-center p-2 bg-background dark:bg-background_dark rounded-xl">
+			${user.isBot ? `
+				<p data-i18n="pong.computer" class="ml-2 select-none bg-gray-800 text-gray-300 px-2 py-1 rounded-lg text-sm">
+					${sanitizer(i18nHandler.getValue("pong.computer"))}
+				</p>
+			` : ""}
+			<p class="truncate max-w-42 ml-2">${sanitizer(user.DisplayName)}</p>
 			<div class="absolute -right-1 -top-1 h-4 w-4 rounded-full ${user.isAlive ? "bg-green-500" : "bg-gray-400"}"></div>
 		</div>
 	`
