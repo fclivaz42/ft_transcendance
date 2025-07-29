@@ -29,6 +29,8 @@ export default function createUserAvatar(props: UserAvatarProps = {
 		UserHandler.fetchUser(props.playerId).then((user) => {
 			if (!user)
 				user = UserHandler.user || AiUsers.values().next().value;
+			else if (user.PlayerID === UserHandler.userId)
+				img.setAttribute("data-user", "avatar");
 			if(!props.editable && !props.disableClick) {
 				anchor.href = `/user?playerId=${user!.PlayerID}`;
 				anchor.target = "_blank";

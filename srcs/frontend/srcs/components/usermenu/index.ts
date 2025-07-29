@@ -1,11 +1,10 @@
 
-import UserHandler from "../../handlers/UserHandler";
+import UserHandler, { updateUserData } from "../../handlers/UserHandler";
 import { userMenuManager } from "../../managers/UserMenuManager";
 import { createDialog } from "../backdropDialog";
 import createUserAvatar from "./userAvatar";
 import NotificationManager from "../../managers/NotificationManager";
 import { i18nHandler } from "../../handlers/i18nHandler";
-import RoutingHandler from "../../handlers/RoutingHandler";
 
 
 import { createInfoInput, CustomInputContainer } from "../input/infoInput";
@@ -38,6 +37,7 @@ function updatePrivateButton(button: HTMLButtonElement): void {
 
 export async function createUserDialog(): Promise<HTMLDialogElement> {
 	const dialog = createDialog({ allowClose: true });
+	userMenuManager.uploadFile.value = "";
 	dialog.className += " w-[500px] max-w-[90vw]";
 
 	const userIdentifier = document.createElement("div");
@@ -210,31 +210,32 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 			}
 
 			// --- PRÉPARATION DES DONNÉES POUR LE BACKEND (LOGIQUE RESTAURÉE) ---
-			const multipartFormData = new FormData();
+			const updateData: Partial<updateUserData> = {};
 			let changesMade = false;
 
 			// Si l'utilisateur a sélectionné un nouvel avatar
 			if (userMenuManager.uploadFile.files?.[0]) {
-				multipartFormData.append("avatar", userMenuManager.uploadFile.files[0], userMenuManager.uploadFile.files[0].name);
+				updateData.Avatar = userMenuManager.uploadFile.files[0];
+				userMenuManager.uploadFile.value = "";
 				changesMade = true;
 			}
 
 			// Si le champ mot de passe a été rempli (et qu'il est valide)
 			// La validation frontend a déjà mis à jour isPasswordActuallyValid
 			if (passwordValue) { // On ajoute au FormData s'il y a une valeur, la validation aura géré l'isValidité
-				multipartFormData.append("Password", passwordValue);
+				updateData.Password = passwordValue;
 				changesMade = true;
 			}
 
 			// Si l'email a été rempli ET modifié (et qu'il est valide)
 			if (emailValue && emailValue !== UserHandler.emailAddress) {
-				multipartFormData.append("EmailAddress", emailValue);
+				updateData.EmailAddress = emailValue;
 				changesMade = true;
 			}
 
 			// Si le nom d'affichage a été rempli ET modifié (et qu'il est valide)
 			if (displayNameValue && displayNameValue !== UserHandler.displayName) {
-				multipartFormData.append("DisplayName", displayNameValue);
+				updateData.DisplayName = displayNameValue;
 				changesMade = true;
 			}
 
@@ -242,32 +243,20 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 			// La soumission se fait si des changements ont été détectés dans les champs À ENVOYER
 			// ET que le formulaire est valide (selon `isFormValidForSubmission`)
 			if (changesMade) {
-				fetch("/api/users/update", {
-					method: "PUT",
-					body: multipartFormData
-				}).then(response => {
-					if (response.ok) {
-						UserHandler.fetchUser();
-						NotificationManager.notify({
-							"level": "success",
-							"title": i18nHandler.getValue("panel.updateProfile.notification.updateSuccessTitle"),
-							"message": i18nHandler.getValue("panel.updateProfile.notification.updateSuccessMessage")
-						});
-						dialog.remove();
-					} else {
-						console.error("Failed to update profile");
-						NotificationManager.notify({
-							"level": "error",
-							"title": i18nHandler.getValue("panel.updateProfile.notification.updateErrorTitle"),
-							"message": i18nHandler.getValue("panel.updateProfile.notification.updateErrorMessage")
-						});
-					}
+				UserHandler.updateUser(updateData).then(response => {
+					UserHandler.fetchUser();
+					NotificationManager.notify({
+						"level": "success",
+						"title": i18nHandler.getValue("panel.updateProfile.notification.updateSuccessTitle"),
+						"message": i18nHandler.getValue("panel.updateProfile.notification.updateSuccessMessage")
+					});
+					dialog.remove();
 				}).catch(error => {
-					console.error("Network error during profile update:", error);
+					console.error("Failed to update profile");
 					NotificationManager.notify({
 						"level": "error",
-						"title": i18nHandler.getValue("panel.updateProfile.notification.networkErrorTitle"),
-						"message": i18nHandler.getValue("panel.updateProfile.notification.networkErrorMessage")
+						"title": i18nHandler.getValue("panel.updateProfile.notification.updateErrorTitle"),
+						"message": i18nHandler.getValue("panel.updateProfile.notification.updateErrorMessage")
 					});
 				});
 			} else {
