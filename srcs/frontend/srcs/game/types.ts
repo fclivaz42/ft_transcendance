@@ -161,6 +161,20 @@ export type LobbyBroadcastPayload =
 			};
 	  };
 
+export interface PingResponsePayload {
+    type: "pingResponse",
+    payload: {
+        value: number;
+    }
+}
+
+export interface PingRequestPayload {
+    type: "pingRequest",
+    payload: {
+        value: number;
+    }
+}
+
 export type ServerMessage = InitPayload
 							| UpdatePayload
 							| PlayerConnectedPayload
@@ -170,4 +184,6 @@ export type ServerMessage = InitPayload
 							| GameOverPayload
 							| TournamentBracketStatusPayload
 							| TournamentMatchOverPayload
-							| TournamentOverPayload;
+							| TournamentOverPayload
+							| PingResponsePayload
+							| PingRequestPayload;

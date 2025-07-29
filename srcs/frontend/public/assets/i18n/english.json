@@ -175,6 +175,8 @@
         "registerErrorTitle": "Registration Error",
         "registerErrorMessage": "An error occurred while trying to register.",
         "registerCredentialTaken": "This username or email is already taken.",
+        "registerDisplayNameTaken": "This username is already taken.",
+        "registerEmailTaken": "This email is already registered.",
         "registerPassMismatch": "The passwords do not match. Please try again."
       }
     },
