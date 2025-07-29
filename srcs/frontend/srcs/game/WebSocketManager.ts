@@ -65,6 +65,9 @@ export class WebSocketManager {
 			}
 			const msg: ServerMessage = JSON.parse(event.data);
 			switch (msg.type) {
+				case "pingResponse":
+					PongGameManager.onPingResponse(msg.payload);
+					break;
 				case "tournament-init":
 				case "init":
 					this.onInit(msg.payload);
@@ -92,7 +95,7 @@ export class WebSocketManager {
 					PongGameManager.onBracketUpdate(msg.payload);
 					break;
 				default:
-					console.warn("[WS] Unknown message type:", msg.type);
+					console.warn("[WS] Unknown message type:", msg);
 					return;
 			}
 		};

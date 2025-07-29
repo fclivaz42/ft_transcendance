@@ -92,17 +92,31 @@ class LoginDialogManager {
 						"Content-Type": "application/json"
 					},
 					body: JSON.stringify(user),
-				}).then(response => {
+				}).then(async response => {
 					if (response.ok) {
 						UserHandler.fetchUser();
 						dialog.remove();
 					} else {
-						if (response.status === 409)
+						if (response.status === 409) {
+							const data = await response.json();
+							let message: string;
+							switch (data.detail) {
+								case "error.duplicate.EmailAddress":
+									message = i18nHandler.getValue("panel.registerPanel.notification.registerEmailTaken");
+									break;
+								case "error.duplicate.DisplayName":
+									message = i18nHandler.getValue("panel.registerPanel.notification.registerDisplayNameTaken");
+									break;
+								default:
+									message = i18nHandler.getValue("panel.registerPanel.notification.registerCredentialTaken");
+									break;
+							}
 							NotificationManager.notify({
 								level: "error",
 								title: i18nHandler.getValue("panel.registerPanel.notification.registerErrorTitle"),
-								message: i18nHandler.getValue("panel.registerPanel.notification.registerCredentialTaken")
+								message
 							});
+						}
 						else
 							NotificationManager.notify({
 								level: "error",

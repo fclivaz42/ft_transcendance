@@ -5,7 +5,7 @@ import { WebSocketManager } from "../game/WebSocketManager.js";
 import { GameField } from "../game/GameField.js";
 import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
-import { GameOverPayload, InitPayload, PlayerConnectedPayload, TournamentBracketStatusPayload, TournamentMatchOverPayload, TournamentMatchStatus, TournamentOverPayload } from "../game/types.js";
+import { GameOverPayload, InitPayload, PingRequestPayload, PingResponsePayload, PlayerConnectedPayload, TournamentBracketStatusPayload, TournamentMatchOverPayload, TournamentMatchStatus, TournamentOverPayload } from "../game/types.js";
 import UserHandler from "../handlers/UserHandler.js";
 import { i18nHandler } from "../handlers/i18nHandler.js";
 import createUserAvatar from "../components/usermenu/userAvatar.js";
@@ -56,18 +56,27 @@ class PongGameManager {
 			return;
 		}
 		this.pingInterval.ping = Date.now() - this.pingInterval.sentPing;
-		// TODO: send ping to server
-		/*this.websocketManager?.socketInstance.send(JSON.stringify({
-			type: "ping",
-			payload: {
-				ping: this.pingInterval.ping
-			}
-		}));*/
+		const pingRequest: PingRequestPayload = {
+			type: "pingRequest",
+			payload: { value: this.pingInterval.ping }
+		}
+		this.websocketManager?.socketInstance.send(JSON.stringify(pingRequest));
 		this.pingInterval.sentPing = undefined;
-		const pingElemens = document.querySelectorAll<HTMLSpanElement>("[data-pong-ping]");
-		for (const element of pingElemens) {
-			// TODO: differentiate between players
-			element.textContent = `${this.pingInterval.ping}ms`;
+		const pingElements = document.querySelectorAll<HTMLSpanElement>("[data-pong-ping]");
+		for (const element of pingElements) {
+			const identifier = element.getAttribute("data-pong-ping");
+			if (this.getPlayers[identifier! as "p1" | "p2"]!.PlayerID! === UserHandler.userId)
+				element.textContent = `${this.pingInterval.ping}ms`;
+		}
+	}
+
+	public onPingResponse(update: PingResponsePayload["payload"]) {
+		this.pingInterval.ping = update.value;
+		const pingElements = document.querySelectorAll<HTMLSpanElement>("[data-pong-ping]");
+		for (const element of pingElements) {
+			const identifier = element.getAttribute("data-pong-ping");
+			if (this.getPlayers[identifier! as "p1" | "p2"]!.PlayerID! !== UserHandler.userId)
+				element.textContent = `${this.pingInterval.ping}ms`;
 		}
 	}
 
