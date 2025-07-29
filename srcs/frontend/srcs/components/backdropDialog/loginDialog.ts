@@ -31,7 +31,7 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   dialogTitle.className = "text-2xl font-bold mb-2 text-center";
 
   const panelsContainer = document.createElement("div");
-  panelsContainer.className = "relative w-full flex flex-col items-center justify-center overflow-hidden";
+  panelsContainer.className = "relative w-full flex flex-col items-center justify-center min-h-[280px]";
 
   // --- PANEL CREATION ---
   // Ensure all panel variables are destructured here, within the function's scope.
@@ -168,7 +168,7 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   const setPanelContainerHeight = (panel: HTMLElement) => {
 
     requestAnimationFrame(() => { // S'assurer que le navigateur a eu le temps de rendre
-      panelsContainer.style.height = `${panel.scrollHeight}px`;
+      //panelsContainer.style.height = `${panel.scrollHeight}px`;
     });
   };
 

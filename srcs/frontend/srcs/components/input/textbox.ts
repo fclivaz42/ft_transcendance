@@ -4,6 +4,7 @@ export interface TextboxProps {
 	type?: "text" | "password" | "email" | "number";
 	name?: string;
 	id?: string;
+	autoComplete?: string;
 }
 
 export default function createTextbox(props: TextboxProps): HTMLInputElement {
@@ -14,6 +15,11 @@ export default function createTextbox(props: TextboxProps): HTMLInputElement {
 	textbox.className = "w-full px-4 py-2 mt-2 text-gray-600 dark:text-white bg-white dark:bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 pr-10 transition-all duration-300 ease-in-out border-blue-500 focus:ring-blue-500 focus:border-blue-500";
 	textbox.name = props.name || "";
 	textbox.id = props.id || "";
+	if (props.autoComplete) {
+		textbox.setAttribute("autocomplete", props.autoComplete);
+	} /*else {
+		textbox.setAttribute("autocomplete", "off");
+	}*/
 
 	return textbox;	
 }

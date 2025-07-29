@@ -54,7 +54,8 @@ export interface CustomPasswordInputContainer extends HTMLDivElement {
 export function createPasswordInput(
     placeholder: string,
     name: string,
-    enableStrengthCheck: boolean = true // Ce paramètre sera stocké mais la logique de liste est gérée à l'extérieur
+    enableStrengthCheck: boolean = true, // Ce paramètre sera stocké mais la logique de liste est gérée à l'extérieur
+	autoComplete?: string
 ): CustomPasswordInputContainer {
     const container = document.createElement("div") as CustomPasswordInputContainer;
     container.className = "relative w-full"; // Ces classes sont bonnes
@@ -64,6 +65,7 @@ export function createPasswordInput(
 		placeholder: placeholder,
 		name: name,
 		id: name, // Important pour associer le label
+		autoComplete: autoComplete,
 	});
 
     const toggleButton = document.createElement("button");

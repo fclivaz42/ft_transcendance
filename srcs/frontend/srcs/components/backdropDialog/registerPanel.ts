@@ -24,6 +24,7 @@ export function createRegisterPanel(options: LoginDialogOptions) {
     w-full
     items-center
     pb-6
+		h-fit
   `.replace(/\s+/g, " ");
 
   const registerForm = document.createElement("form");
@@ -205,13 +206,13 @@ const validateRegisterConfirmPassword = (value: string) => {
   registerEmailContainer.appendChild(registerEmailErrorFeedback);
 
   // Champ Mot de passe
-  const registerPasswordContainer: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.passwordLabel"), "password", true);
+  const registerPasswordContainer: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.passwordLabel"), "password", true, "new-password"); // Force à true pour montrer la force ici
   const registerPasswordErrorFeedback = document.createElement("div");
   registerPasswordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
   registerPasswordContainer.appendChild(registerPasswordErrorFeedback);
 
   // Champ Confirmer mot de passe
-  const registerConfirmPasswordContainer: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.registerPanel.confirmPasswordLabel"), "confirmPassword", false);
+  const registerConfirmPasswordContainer: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.registerPanel.confirmPasswordLabel"), "confirmPassword", false, "new-password");
   const registerConfirmPasswordErrorFeedback = document.createElement("div");
   registerConfirmPasswordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
   registerConfirmPasswordContainer.appendChild(registerConfirmPasswordErrorFeedback);
