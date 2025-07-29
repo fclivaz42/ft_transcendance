@@ -8,9 +8,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { betterFastify } from '../../libs/helpers/fastifyHelper.ts'
 import Logger from '../../libs/helpers/loggers.ts'
-import frontendRoutes from './modules/frontend/routes.ts'
 import websocketPlugin from '@fastify/websocket'
 import fastifyMultipart from '@fastify/multipart'
+import registerFrontendModule from './modules/frontend.ts'
 
 if (process.env.KEYPATH === undefined || process.env.CERTPATH === undefined) {
 	Logger.error("Keypath and/or Certpath are not defined. Exiting.")
@@ -30,6 +30,7 @@ const folder: string[] = fs.readdirSync(subfolder)
 const ts_files: string[] = folder.filter(file => file.endsWith('.ts'));
 
 async function load_modules() {
+	await registerFrontendModule(fastify);
 	for (const file of ts_files) {
 		const file_path: string = path.join(subfolder, file)
 		const module_routes = (await import(`file://${file_path}`))
@@ -44,7 +45,6 @@ await fastify.register(fastifyMultipart, {
 })
 await fastify.register(websocketPlugin);
 await load_modules()
-await fastify.register(frontendRoutes);
 
 betterFastify(fastify);
 
