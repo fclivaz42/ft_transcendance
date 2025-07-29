@@ -106,15 +106,20 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 	editProfileTitle.className = "text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2";
 	editProfileTitle.textContent = i18nHandler.getValue("panel.updateProfile.title");
 
+	// --- Form Inputs ---
+	const formContainer = document.createElement("form") as HTMLFormElement;
+	formContainer.className = "flex flex-col items-center gap-y-4 w-full";
+
 	// --- Display Name ---
 	const displayNameTextbox: CustomInputContainer = createInfoInput(i18nHandler.getValue("panel.updateProfile.fields.usernameLabel"), "displayName");
-	// displayNameTextbox.inputElement.value = UserHandler.displayName || ""; // Pré-remplir
+	displayNameTextbox.firstElementChild?.setAttribute("autoComplete", "username");
 	const displayNameErrorFeedback = document.createElement("div");
 	displayNameErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
 	displayNameTextbox.appendChild(displayNameErrorFeedback);
 
 	// --- Email ---
 	const emailTextbox: CustomInputContainer = createInfoInput(i18nHandler.getValue("panel.updateProfile.fields.emailLabel"), "email");
+	emailTextbox.firstElementChild?.setAttribute("autoComplete", "email");
 	emailTextbox.inputElement.type = "email"
 	const emailErrorFeedback = document.createElement("div");
 	emailErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
@@ -122,6 +127,7 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 
 	// --- New Password ---
 	const passwordTextbox: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.updateProfile.fields.passwordLabel"), "newPassword", true);
+	passwordTextbox.firstElementChild?.setAttribute("autoComplete", "new-password");
 	const passwordErrorFeedback = document.createElement("div");
 	passwordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
 	passwordTextbox.appendChild(passwordErrorFeedback);
@@ -132,6 +138,7 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 
 	// --- Confirm New Password ---
 	const confirmPasswordTextbox: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.updateProfile.fields.confirmPasswordLabel"), "confirmNewPassword", false);
+	confirmPasswordTextbox.firstElementChild?.setAttribute("autoComplete", "new-password");
 	const confirmPasswordErrorFeedback = document.createElement("div");
 	confirmPasswordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
 	confirmPasswordTextbox.appendChild(confirmPasswordErrorFeedback);
@@ -291,10 +298,11 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 	dialog.appendChild(deleteButton);
 	dialog.appendChild(hr);
 	dialog.appendChild(editProfileTitle);
-	dialog.appendChild(displayNameTextbox);
-	dialog.appendChild(emailTextbox);
-	dialog.appendChild(passwordTextbox);
-	dialog.appendChild(confirmPasswordTextbox);
+	formContainer.appendChild(displayNameTextbox);
+	formContainer.appendChild(emailTextbox);
+	formContainer.appendChild(passwordTextbox);
+	formContainer.appendChild(confirmPasswordTextbox);
+	dialog.appendChild(formContainer);
 	dialog.appendChild(buttonsContainer);
 
 
