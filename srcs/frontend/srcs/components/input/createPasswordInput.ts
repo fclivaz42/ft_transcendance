@@ -54,7 +54,8 @@ export interface CustomPasswordInputContainer extends HTMLDivElement {
 export function createPasswordInput(
     placeholder: string,
     name: string,
-    enableStrengthCheck: boolean = true // Ce paramètre sera stocké mais la logique de liste est gérée à l'extérieur
+    enableStrengthCheck: boolean = true, // Ce paramètre sera stocké mais la logique de liste est gérée à l'extérieur
+	autoComplete?: string
 ): CustomPasswordInputContainer {
     const container = document.createElement("div") as CustomPasswordInputContainer;
     container.className = "relative w-full"; // Ces classes sont bonnes
@@ -63,20 +64,22 @@ export function createPasswordInput(
 		type: "password",
 		placeholder: placeholder,
 		name: name,
+		id: name, // Important pour associer le label
+		autoComplete: autoComplete,
 	});
 
     const toggleButton = document.createElement("button");
     toggleButton.type = "button";
     toggleButton.tabIndex = -1;
     toggleButton.className = `
-absolute inset-y-1 right-2 
-    flex items-center justify-center
-    w-8 h-8 // UNE LARGEUR ET HAUTEUR FIXES
-    p-1 // PADDING
-    text-gray-500 hover:text-gray-700
-    dark:text-gray-400 dark:hover:text-gray-200
-    focus:outline-none 
-    z-10 cursor-pointer
+		absolute inset-y-1 right-2 
+		flex items-center justify-center
+		w-8 h-8 // UNE LARGEUR ET HAUTEUR FIXES
+		p-1 // PADDING
+		text-gray-500 hover:text-gray-700
+		dark:text-gray-400 dark:hover:text-gray-200
+		focus:outline-none 
+		z-10 cursor-pointer
     `.replace(/\s+/g, " ");
 
     const eyeIcon = document.createElement("img");

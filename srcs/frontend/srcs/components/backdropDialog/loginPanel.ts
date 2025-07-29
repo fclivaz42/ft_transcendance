@@ -26,6 +26,7 @@ export function createLoginPanel(options: LoginDialogOptions)
         w-full
         items-center
         pb-6
+		h-fit
     `.replace(/\s+/g, " ");
 
     const loginForm = document.createElement("form");
@@ -84,12 +85,12 @@ export function createLoginPanel(options: LoginDialogOptions)
 // (Inputs, checkbox, bouton, liens)
 // ============================================================
     //champ Nom user
-  const loginDisplayNameContainer = createInfoInput(i18nHandler.getValue("panel.usernameLabel"), "displayName");
+  const loginDisplayNameContainer = createInfoInput(i18nHandler.getValue("panel.usernameLabel"), "displayName", "username");
   const displayNameErrorFeedback = document.createElement("div");
   displayNameErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
   loginDisplayNameContainer.appendChild(displayNameErrorFeedback);
    // Champ Mot de passe
-  const loginPasswordContainer: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.passwordLabel"), "password", false); // Force à false pour ne pas montrer la force ici
+  const loginPasswordContainer: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.passwordLabel"), "password", false, "current-password"); // Force à false pour ne pas montrer la force ici
   const passwordErrorFeedback = document.createElement("div");
   passwordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
   loginPasswordContainer.appendChild(passwordErrorFeedback);

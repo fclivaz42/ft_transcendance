@@ -45,14 +45,14 @@ async function createHistoryElement(match: MatchComplete, targetId?: string | nu
 		match.LPlayerID.DisplayName = i18nHandler.getValue(match.LPlayerID.DisplayName || "AI");
 	}
 	template.innerHTML = `
-		<div class="relative cursor-pointer select-none w-fit bg-panel dark:bg-panel_dark p-4 mb-4 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center hover:animate-scale hover:animate-duration-100">
+		<div class="relative select-none w-fit bg-panel dark:bg-panel_dark p-4 mb-4 rounded-lg shadow-md flex flex-col gap-2 justify-center items-center ">
 			<div class="flex items-center justify-between gap-4">
 				<div class="flex items-center justify-start gap-2 lg:w-[250px] w-[160px]">
 					<div class="relative" data-history-player="${match.WPlayerID.PlayerID === targetId ? "p1" : "p2"}">
 						${match.WPlayerID.PlayerID === targetId ?
-			`<p data-i18n="history.winner" class="lg:text-xl text-sm absolute -bottom-4 left-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.winner"))}</p>`
-			: `<p data-i18n="history.loser" class="lg:text-xl text-sm absolute -bottom-4 left-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.loser"))}</p>`
-		}
+							`<p data-i18n="history.winner" class="lg:text-xl text-sm absolute -bottom-4 left-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.winner"))}</p>`
+							: `<p data-i18n="history.loser" class="lg:text-xl text-sm absolute -bottom-4 left-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.loser"))}</p>`
+						}
 						<p class="text-2xl font-bold lg:bottom-0 -bottom-4 lg:-right-16 -right-20 absolute">${sanitizer(match.WPlayerID.PlayerID === targetId ? match.WScore : match.LScore)}</p>
 					</div>
 					<p class="truncate lg:max-w-32 max-w-24 lg:text-lg text-xs font-semibold">${sanitizer(match.WPlayerID.PlayerID === targetId ? match.WPlayerID.DisplayName : match.LPlayerID.DisplayName)}</p>
@@ -64,14 +64,22 @@ async function createHistoryElement(match: MatchComplete, targetId?: string | nu
 					<p class="truncate lg:max-w-32 max-w-24 lg:text-lg text-xs font-semibold">${sanitizer(match.WPlayerID.PlayerID !== targetId ? match.WPlayerID.DisplayName : match.LPlayerID.DisplayName)}</p>
 					<div class="relative" data-history-player="${match.WPlayerID.PlayerID !== targetId ? "p1" : "p2"}">
 						${match.WPlayerID.PlayerID !== targetId ?
-			`<p data-i18n="history.winner" class="lg:text-xl text-sm absolute -bottom-4 right-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.winner"))}</p>`
-			: `<p data-i18n="history.loser" class="lg:text-xl text-sm absolute -bottom-4 right-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.loser"))}</p>`
-		}
+							`<p data-i18n="history.winner" class="lg:text-xl text-sm absolute -bottom-4 right-8 bg-green-600 dark:bg-green-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.winner"))}</p>`
+							: `<p data-i18n="history.loser" class="lg:text-xl text-sm absolute -bottom-4 right-8 bg-red-600 dark:bg-red-800 rounded-md p-1 opacity-70">${sanitizer(i18nHandler.getValue("history.loser"))}</p>`
+						}
 						<p class="text-2xl font-bold lg:bottom-0 -bottom-4 lg:-left-16 -left-20 absolute">${sanitizer(match.WPlayerID.PlayerID !== targetId ? match.WScore : match.LScore)}</p>
 					</div>
 				</div>
 			</div>
 			<hr class="w-full my-2">
+			<div class="w-full flex items-center justify-between font-semibold">
+				<p>Date: <span class="font-normal">
+					${new Date(match.StartTime).toLocaleDateString()} 
+					${new Date(match.StartTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+				</span></p>
+				${match.HashAddress ? `<p class="text-xs truncate max-w-32 lg:max-w-64 font-semibold">Hash: <a target="_blank" href="https://subnets-test.avax.network/c-chain/tx/${sanitizer(match.HashAddress)}" class="font-normal dark:text-blue-100 text-blue-600 underline">${sanitizer(match.HashAddress)}</a></p>` : ""}
+			</div>
+
 			${(() => {
 			if (!match.HashAddress)
 				return `<p class="absolute -top-3 -right-3 mx-auto text-xs bg-red-100 dark:bg-red-900 rounded-md p-2">
@@ -95,7 +103,7 @@ async function createHistoryElement(match: MatchComplete, targetId?: string | nu
 				title: i18nHandler.getValue("history.notification.notchain.title"),
 				message: i18nHandler.getValue("history.notification.notchain.message"),
 			});
-		window.open(`https://subnets-test.avax.network/c-chain/tx/${sanitizer(match.HashAddress)}`, "_blank");
+		//window.open(`https://subnets-test.avax.network/c-chain/tx/${sanitizer(match.HashAddress)}`, "_blank");
 	}
 	return historyElement;
 }
@@ -128,13 +136,7 @@ export default async function createHistoryFrame(): Promise<HTMLDivElement> {
 	const playerId = RoutingHandler.searchParams.get("playerId");
 	const player = playerId ? await UserHandler.fetchUser(playerId) : UserHandler.user;
 	if (!player) {
-		NotificationManager.notify({
-			level: "error",
-			title: i18nHandler.getValue("notification.generic.errorTitle"),
-			message: i18nHandler.getValue("notification.generic.errorMessage"),
-		});
-		RoutingHandler.setRoute("/", false);
-		return document.createElement("div");
+		throw new Error("notification.user.notLogged");
 	} else if (player.Private && player.PlayerID !== UserHandler.userId) {
 		NotificationManager.notify({
 			level: "error",

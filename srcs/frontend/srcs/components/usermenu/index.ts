@@ -1,11 +1,10 @@
 
-import UserHandler from "../../handlers/UserHandler";
+import UserHandler, { updateUserData } from "../../handlers/UserHandler";
 import { userMenuManager } from "../../managers/UserMenuManager";
 import { createDialog } from "../backdropDialog";
 import createUserAvatar from "./userAvatar";
 import NotificationManager from "../../managers/NotificationManager";
 import { i18nHandler } from "../../handlers/i18nHandler";
-import RoutingHandler from "../../handlers/RoutingHandler";
 
 
 import { createInfoInput, CustomInputContainer } from "../input/infoInput";
@@ -38,6 +37,7 @@ function updatePrivateButton(button: HTMLButtonElement): void {
 
 export async function createUserDialog(): Promise<HTMLDialogElement> {
 	const dialog = createDialog({ allowClose: true });
+	userMenuManager.uploadFile.value = "";
 	dialog.className += " w-[500px] max-w-[90vw]";
 
 	const userIdentifier = document.createElement("div");
@@ -106,15 +106,20 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 	editProfileTitle.className = "text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2";
 	editProfileTitle.textContent = i18nHandler.getValue("panel.updateProfile.title");
 
+	// --- Form Inputs ---
+	const formContainer = document.createElement("form") as HTMLFormElement;
+	formContainer.className = "flex flex-col items-center gap-y-4 w-full";
+
 	// --- Display Name ---
 	const displayNameTextbox: CustomInputContainer = createInfoInput(i18nHandler.getValue("panel.updateProfile.fields.usernameLabel"), "displayName");
-	// displayNameTextbox.inputElement.value = UserHandler.displayName || ""; // Pré-remplir
+	displayNameTextbox.firstElementChild?.setAttribute("autoComplete", "username");
 	const displayNameErrorFeedback = document.createElement("div");
 	displayNameErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
 	displayNameTextbox.appendChild(displayNameErrorFeedback);
 
 	// --- Email ---
 	const emailTextbox: CustomInputContainer = createInfoInput(i18nHandler.getValue("panel.updateProfile.fields.emailLabel"), "email");
+	emailTextbox.firstElementChild?.setAttribute("autoComplete", "email");
 	emailTextbox.inputElement.type = "email"
 	const emailErrorFeedback = document.createElement("div");
 	emailErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
@@ -122,6 +127,7 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 
 	// --- New Password ---
 	const passwordTextbox: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.updateProfile.fields.passwordLabel"), "newPassword", true);
+	passwordTextbox.firstElementChild?.setAttribute("autoComplete", "new-password");
 	const passwordErrorFeedback = document.createElement("div");
 	passwordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
 	passwordTextbox.appendChild(passwordErrorFeedback);
@@ -132,6 +138,7 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 
 	// --- Confirm New Password ---
 	const confirmPasswordTextbox: CustomPasswordInputContainer = createPasswordInput(i18nHandler.getValue("panel.updateProfile.fields.confirmPasswordLabel"), "confirmNewPassword", false);
+	confirmPasswordTextbox.firstElementChild?.setAttribute("autoComplete", "new-password");
 	const confirmPasswordErrorFeedback = document.createElement("div");
 	confirmPasswordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
 	confirmPasswordTextbox.appendChild(confirmPasswordErrorFeedback);
@@ -210,31 +217,32 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 			}
 
 			// --- PRÉPARATION DES DONNÉES POUR LE BACKEND (LOGIQUE RESTAURÉE) ---
-			const multipartFormData = new FormData();
+			const updateData: Partial<updateUserData> = {};
 			let changesMade = false;
 
 			// Si l'utilisateur a sélectionné un nouvel avatar
 			if (userMenuManager.uploadFile.files?.[0]) {
-				multipartFormData.append("avatar", userMenuManager.uploadFile.files[0], userMenuManager.uploadFile.files[0].name);
+				updateData.Avatar = userMenuManager.uploadFile.files[0];
+				userMenuManager.uploadFile.value = "";
 				changesMade = true;
 			}
 
 			// Si le champ mot de passe a été rempli (et qu'il est valide)
 			// La validation frontend a déjà mis à jour isPasswordActuallyValid
 			if (passwordValue) { // On ajoute au FormData s'il y a une valeur, la validation aura géré l'isValidité
-				multipartFormData.append("Password", passwordValue);
+				updateData.Password = passwordValue;
 				changesMade = true;
 			}
 
 			// Si l'email a été rempli ET modifié (et qu'il est valide)
 			if (emailValue && emailValue !== UserHandler.emailAddress) {
-				multipartFormData.append("EmailAddress", emailValue);
+				updateData.EmailAddress = emailValue;
 				changesMade = true;
 			}
 
 			// Si le nom d'affichage a été rempli ET modifié (et qu'il est valide)
 			if (displayNameValue && displayNameValue !== UserHandler.displayName) {
-				multipartFormData.append("DisplayName", displayNameValue);
+				updateData.DisplayName = displayNameValue;
 				changesMade = true;
 			}
 
@@ -242,32 +250,20 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 			// La soumission se fait si des changements ont été détectés dans les champs À ENVOYER
 			// ET que le formulaire est valide (selon `isFormValidForSubmission`)
 			if (changesMade) {
-				fetch("/api/users/update", {
-					method: "PUT",
-					body: multipartFormData
-				}).then(response => {
-					if (response.ok) {
-						UserHandler.fetchUser();
-						NotificationManager.notify({
-							"level": "success",
-							"title": i18nHandler.getValue("panel.updateProfile.notification.updateSuccessTitle"),
-							"message": i18nHandler.getValue("panel.updateProfile.notification.updateSuccessMessage")
-						});
-						dialog.remove();
-					} else {
-						console.error("Failed to update profile");
-						NotificationManager.notify({
-							"level": "error",
-							"title": i18nHandler.getValue("panel.updateProfile.notification.updateErrorTitle"),
-							"message": i18nHandler.getValue("panel.updateProfile.notification.updateErrorMessage")
-						});
-					}
+				UserHandler.updateUser(updateData).then(response => {
+					UserHandler.fetchUser();
+					NotificationManager.notify({
+						"level": "success",
+						"title": i18nHandler.getValue("panel.updateProfile.notification.updateSuccessTitle"),
+						"message": i18nHandler.getValue("panel.updateProfile.notification.updateSuccessMessage")
+					});
+					dialog.remove();
 				}).catch(error => {
-					console.error("Network error during profile update:", error);
+					console.error("Failed to update profile");
 					NotificationManager.notify({
 						"level": "error",
-						"title": i18nHandler.getValue("panel.updateProfile.notification.networkErrorTitle"),
-						"message": i18nHandler.getValue("panel.updateProfile.notification.networkErrorMessage")
+						"title": i18nHandler.getValue("panel.updateProfile.notification.updateErrorTitle"),
+						"message": i18nHandler.getValue("panel.updateProfile.notification.updateErrorMessage")
 					});
 				});
 			} else {
@@ -302,10 +298,11 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 	dialog.appendChild(deleteButton);
 	dialog.appendChild(hr);
 	dialog.appendChild(editProfileTitle);
-	dialog.appendChild(displayNameTextbox);
-	dialog.appendChild(emailTextbox);
-	dialog.appendChild(passwordTextbox);
-	dialog.appendChild(confirmPasswordTextbox);
+	formContainer.appendChild(displayNameTextbox);
+	formContainer.appendChild(emailTextbox);
+	formContainer.appendChild(passwordTextbox);
+	formContainer.appendChild(confirmPasswordTextbox);
+	dialog.appendChild(formContainer);
 	dialog.appendChild(buttonsContainer);
 
 

@@ -205,7 +205,10 @@ class UserHandler {
 		const userAvatarElements = document.querySelectorAll("[data-user='avatar']");
 		userAvatarElements.forEach(element => {
 			if (element instanceof HTMLImageElement) {
-				element.src = this.avatarUrl;
+				if (!element.src)
+					element.src = this.avatarUrl;
+				else
+					fetch(this.avatarUrl);
 			}
 		});
 
@@ -329,6 +332,42 @@ class UserHandler {
 			console.error("Error during logout:", error);
 		});
 	}
+	
+	public async updateUser(data: Partial<updateUserData>): Promise<Users> {
+		const multipartFormdata = new FormData();
+		if (Object.keys(data).length === 0)
+			throw new Error("No data provided to update user.");
+		if (data.Avatar)
+			multipartFormdata.append("Avatar", data.Avatar);
+		if (data.DisplayName)
+			multipartFormdata.append("DisplayName", data.DisplayName);
+		if (data.EmailAddress)
+			multipartFormdata.append("EmailAddress", data.EmailAddress);
+		if (data.Private)
+			multipartFormdata.append("Private", data.Private ? "1" : "0");
+		if (data.Password)
+			multipartFormdata.append("Password", data.Password);
+		const response = await fetch("/api/users/update", {
+			method: "PUT",
+			body: multipartFormdata,
+		});
+		if (!response.ok)
+			throw new Error(`Failed to update user data: ${response.statusText}`);
+		const updatedUser = await response.json() as Partial<Users>;
+		this._user = { ...this._user, ...updatedUser } as Users;
+		if (data.Avatar)
+			this._user.Avatar = "/api/users/me/picture";
+		this.updateComponents();
+		return this._user;
+	}
 }
+
+	export interface updateUserData {
+		DisplayName: string;
+		EmailAddress: string;
+		Avatar: File;
+		Private: boolean;
+		Password: string;	
+	}
 
 export default new UserHandler();
