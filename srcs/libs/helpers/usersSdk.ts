@@ -44,7 +44,8 @@ export interface UsersSdkToken extends UsersSdkAuthorizeResponse {
 export interface UsersSdkStats {
 	wonMatches: number;
 	lostMatches: number;
-	totalMatches: number
+	totalMatches: number,
+	isPrivate: boolean;
 }
 
 export interface UsersSdkAliveResponse {
@@ -187,8 +188,14 @@ class UsersSdk {
 	 * @returns Filtered user object without sensitive information.
 	 */
 	static filterUserData(user: User) {
-		const { Password, OAuthID, ...filteredUser } = user;
-		return filteredUser;
+		if (user.Password) {
+			const { Password, OAuthID, ...filteredUser } = user;
+			return filteredUser;
+		}
+		else {
+			const { OAuthID, ...filteredUser } = user;
+			return filteredUser;
+		}
 	}
 
 	/**
@@ -208,7 +215,7 @@ class UsersSdk {
 	public static filterPublicUserData(user: User) {
 		const filteredUser = this.filterUserData(user);
 
-		const { Bappy, EmailAddress, FamilyName, FirstName, FriendsList, PhoneNumber, ...publicUser } = filteredUser;
+		const { EmailAddress, FriendsList, ...publicUser } = filteredUser;
 		return publicUser;
 	}
 

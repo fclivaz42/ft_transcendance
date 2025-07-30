@@ -1,9 +1,15 @@
-// TEST
-import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh, Vector2 } from "@babylonjs/core";
+import {
+	MeshBuilder,
+	Scene,
+	Vector3,
+	Color3,
+	StandardMaterial,
+	BoundingBox,
+	Mesh,
+	Vector2,
+} from "@babylonjs/core";
 import Ball from "./Ball.ts";
-import { Session } from "inspector/promises";
 import Game, { PADDLE_SPEED } from "./GameClass.ts";
-import { match } from "assert";
 import type { WallMap } from "./GameClass.ts";
 import GameRoom from "./GameRoom.ts";
 
@@ -21,7 +27,7 @@ interface PaddleOptions {
 	depth: number;
 	speed: number;
 	isAi: boolean;
-};
+}
 
 interface InitInfo {
 	max_speed: number;
@@ -30,7 +36,6 @@ interface InitInfo {
 }
 
 export default class Paddle {
-
 	protected _scene: Scene;
 	protected _mesh: Mesh;
 	protected _name: string;
@@ -41,7 +46,10 @@ export default class Paddle {
 	protected _colliders: any[] = [];
 
 	private _moveDirection: "up" | "down" | null = null;
-	private _bounds: { minY: number, maxY: number } = { minY: -Infinity, maxY: Infinity };
+	private _bounds: { minY: number; maxY: number } = {
+		minY: -Infinity,
+		maxY: Infinity,
+	};
 	private _ball: Ball;
 	private _gameRoom: GameRoom;
 	private _walls: WallMap;
@@ -49,7 +57,7 @@ export default class Paddle {
 	private _downMoove: number;
 	private _ballDirection: Vector3;
 
-	static _ballPos: Vector3;
+	private _ballPos: Vector3;
 
 	constructor(
 		scene: Scene,
@@ -63,7 +71,7 @@ export default class Paddle {
 			height = 0.5,
 			depth = 0.5,
 			speed = 0.05,
-			isAi = false
+			isAi = false,
 		} = options;
 
 		this._scene = scene;
@@ -80,8 +88,8 @@ export default class Paddle {
 		const material = new StandardMaterial(`${name}-mat`, scene);
 		material.diffuseColor = color;
 		this._mesh.material = material;
+		this._ballPos = Vector3.Zero();
 	}
-
 
 	protected _touchingWall(): boolean {
 		for (let i of this._colliders) {
@@ -94,14 +102,30 @@ export default class Paddle {
 		return false;
 	}
 
-	public getIsIA(): boolean { return this._isAi; }
-	public getName(): string { return this._name; }
-	public getMesh(): Mesh { return this._mesh; }
-	public getPosition(): Vector3 { return this.getMesh().position; }
-	public getSpeed(): number { return this._speed; }
-	public getDirection(): Vector3 { return this._direction; }
-	public getCollisionBox(): BoundingBox { return this._mesh.getBoundingInfo().boundingBox; }
-	public getSize(): Vector3 { return this.getCollisionBox().extendSize.scale(2); }
+	public getIsIA(): boolean {
+		return this._isAi;
+	}
+	public getName(): string {
+		return this._name;
+	}
+	public getMesh(): Mesh {
+		return this._mesh;
+	}
+	public getPosition(): Vector3 {
+		return this.getMesh().position;
+	}
+	public getSpeed(): number {
+		return this._speed;
+	}
+	public getDirection(): Vector3 {
+		return this._direction;
+	}
+	public getCollisionBox(): BoundingBox {
+		return this._mesh.getBoundingInfo().boundingBox;
+	}
+	public getSize(): Vector3 {
+		return this.getCollisionBox().extendSize.scale(2);
+	}
 	public getInitInfo(): InitInfo {
 		return {
 			max_speed: this.getSpeed(),
@@ -110,19 +134,30 @@ export default class Paddle {
 		};
 	}
 
-	public setGameRoom(gameRoom: GameRoom) { this._gameRoom = gameRoom; }
-	public setBall(ball: Ball): void { this._ball = ball; }
-	public setWalls(walls: WallMap): void { this._walls = walls; }
-	public setSpeed(speed: number): void { this._speed = speed; }
-	public setColliders(colliders: any): void { this._colliders = colliders; }
-	public setAI(io: boolean): void { this._isAi = io; }
+	public setGameRoom(gameRoom: GameRoom) {
+		this._gameRoom = gameRoom;
+	}
+	public setBall(ball: Ball): void {
+		this._ball = ball;
+	}
+	public setWalls(walls: WallMap): void {
+		this._walls = walls;
+	}
+	public setSpeed(speed: number): void {
+		this._speed = speed;
+	}
+	public setColliders(colliders: any): void {
+		this._colliders = colliders;
+	}
+	public setAI(io: boolean): void {
+		this._isAi = io;
+	}
 	public setMoveDirection(dir: "up" | "down" | null): void {
 		this._moveDirection = dir;
 	}
 	public setVerticalBounds(bounds: { minY: number; maxY: number }): void {
 		this._bounds = bounds;
 	}
-
 
 	public calculateBounce(ball: Ball): void {
 		const lastHit = ball.getLastHit();
@@ -134,10 +169,11 @@ export default class Paddle {
 		const collisionBox = this.getCollisionBox();
 		const collisionCenter = collisionBox.centerWorld;
 		const collisionHeight = collisionBox.extendSizeWorld.y * 2;
-		let impact = (ball.getHitbox().position.y - collisionCenter.y) / (collisionHeight / 2);
+		let impact =
+			(ball.getHitbox().position.y - collisionCenter.y) / (collisionHeight / 2);
 		impact = Math.max(-1, Math.min(impact, 1));
 		ball.direction.x *= -1;
-		ball.direction.y = (impact * 0.8 + ball.direction.y * 0.2); //weighted average for bounce
+		ball.direction.y = impact * 0.8 + ball.direction.y * 0.2; //weighted average for bounce
 		/* To prevent too much of a vertical bounce */
 		if (impact !== 0 && Math.abs(ball.direction.y) < 0.1) {
 			ball.direction.y = 0.1 * Math.sign(ball.direction.y || 1);
@@ -147,13 +183,12 @@ export default class Paddle {
 	}
 
 	public update(fps: number): void {
-
-		if (this._isAi)
-			this.manageIA(fps);
+		if (this._isAi) this.manageIA(fps);
 		else {
 			if (!this._moveDirection) return;
 			// console.log("received command to move, attempting to move");
-			const deltaY = this._moveDirection === "up" ? this.getSpeed() : -this.getSpeed();
+			const deltaY =
+				this._moveDirection === "up" ? this.getSpeed() : -this.getSpeed();
 			const currentY = this.getMesh().position.y;
 			const newY = currentY + deltaY;
 
@@ -169,24 +204,24 @@ export default class Paddle {
 
 	public printIAInfo(debug: number = 0): void {
 		if (debug === 1) {
-			console.log(`upMoove: ${this._upMoove}`);
-			console.log(`downMoove: ${this._downMoove}`);
+			// console.log(`upMoove: ${this._upMoove}`);
+			// console.log(`downMoove: ${this._downMoove}`);
 			// console.log(`: ${}`);
-		}
-		else if (debug === 2) {
-			console.log(`ballDir: ${this._ballDirection}`);
-			console.log(`ballPos: ${Paddle._ballPos}\n`);
-		}
-		else if (debug === 3) {
-
+		} else if (debug === 2) {
+			// console.log(`ballDir: ${this._ballDirection}`);
+			// console.log(`ballPos: ${this._ballPos}\n`);
+		} else if (debug === 3) {
 		}
 	}
 
 	public predictBall(): number {
-		const bPos: Vector3 = Paddle._ballPos;
+		const bPos: Vector3 = this._ballPos;
 		const bVel: Vector3 = this._ballDirection;
 
-		const goalX = bVel.x > 0 ? this._walls.eastWall.getMesh().position.x : this._walls.westWall.getMesh().position.x;
+		const goalX =
+			bVel.x > 0
+				? this._walls.eastWall.getMesh().position.x
+				: this._walls.westWall.getMesh().position.x;
 
 		const dToX = goalX - bPos.x;
 		const timeToImpact = dToX / bVel.x;
@@ -204,10 +239,8 @@ export default class Paddle {
 		const offset = modulo % halfHeight;
 		let predictedY: number;
 
-		if (goingUp)
-			predictedY = offset;
-		else
-			predictedY = halfHeight - offset;
+		if (goingUp) predictedY = offset;
+		else predictedY = halfHeight - offset;
 
 		return rawY >= 0 ? predictedY : -predictedY;
 	}
@@ -226,25 +259,33 @@ export default class Paddle {
 			if (fps === 1 && this._ball.getIsLaunched()) {
 				const vel: Vector3 = this._ballDirection.clone();
 				const pad: number = this.getPosition().x;
-				const dir: boolean = ((vel.x < 0 && pad < 0) || vel.x > 0 && pad > 0) ? true : false;
-				const paddles: Paddle[] = this._gameRoom.getGame().getPaddles();
-				const twoIA: boolean = (paddles[0].getIsIA() && paddles[1].getIsIA()) ? true : false;
-				if ((twoIA && dir) || (!twoIA)) {
+				const dir: boolean = (vel.x < 0 && pad < 0) || (vel.x > 0 && pad > 0) ? true : false;
+				if (this._ballPos.x === 0) {
+					// console.log("Ball doesn't moove");
+				} else {
+					// else if (twoAI && dir) {
 					const predictY = this.predictBall();
-					const diff = Math.abs(Math.max(predictY, currentPaddle) - Math.min(predictY, currentPaddle));
+					const diff = Math.abs(
+						Math.max(predictY, currentPaddle) -
+						Math.min(predictY, currentPaddle)
+					);
 					const moov: number = Math.floor(diff / paddlSpeed);
 					// console.log(`currentPaddle: ${currentPaddle}`);
 					// console.log(`diff: ${diff}`);
 					// console.log(`moov: ${moov}`);
 					if (predictY === 0)
-						currentPaddle < 0 ? this._upMoove = moov : this._downMoove = moov;
+						currentPaddle < 0
+							? (this._upMoove = moov)
+							: (this._downMoove = moov);
 					else
-						predictY > currentPaddle ? this._upMoove = moov : this._downMoove = moov;
+						predictY > currentPaddle
+							? (this._upMoove = moov)
+							: (this._downMoove = moov);
 					// this.printIAInfo(1);
 					// this.printIAInfo(2);
 				}
 			}
-			else if (Paddle._ballPos.x === 0
+			else if (this._ballPos.x === 0
 				&& !this._ball.getIsLaunched()
 				&& this.getIsIA()
 				&& (this._downMoove === 0 && this._upMoove === 0)) {
@@ -258,39 +299,41 @@ export default class Paddle {
 				if (currentPaddle + paddlSpeed < maxY)
 					this.getMesh().position.y += this.getSpeed();
 				this._upMoove--;
-			}
-			else if (this._downMoove) {
+			} else if (this._downMoove) {
 				if (currentPaddle - paddlSpeed > minY)
 					this.getMesh().position.y -= this.getSpeed();
 				this._downMoove--;
 			}
-		}
-		catch (e) {
+		} catch (e) {
 			console.log(e);
 		}
 	}
 
 	public async manageIA(fps: number) {
-
 		if (fps === 1) {
 			let tmp: Vector3 | undefined = this._ball?.getHitbox().position.clone();
-			if (tmp === undefined)
-				return;
-			Paddle._ballPos = tmp;
+			if (tmp === undefined) return;
+			this._ballPos = tmp;
 			tmp = this._ball?.direction;
-			if (tmp === undefined)
-				return;
+			if (tmp === undefined) return;
 			this._ballDirection = tmp;
 		}
 		const score: Score = this._gameRoom.score;
 		let diff: number = score.p1 - score.p2;
 		if (fps === 1) {
-			console.log(`\nscore{ p1: ${this._gameRoom.score.p1}, p2: ${this._gameRoom.score.p2}}`);
-			console.log(`difference score: ${diff}`);
-			console.log(`AI power: ${DIFF_SCORE_PLAYER - diff > 0 ? DIFF_SCORE_PLAYER - diff : 0}`);
+			// console.log(
+			// 	`\nscore{ p1: ${this._gameRoom.score.p1}, p2: ${this._gameRoom.score.p2}}`
+			// );
+			// console.log(`difference score: ${diff}`);
+			// console.log(
+			// 	`AI power: ${
+			// 		DIFF_SCORE_PLAYER - diff > 0 ? DIFF_SCORE_PLAYER - diff : 0
+			// 	}`
+			// );
 		}
-		if (this._ball.getIsLaunched())
-			DIFF_SCORE_PLAYER - diff < 0 ? this.randMoove(fps, DIFF_SCORE_PLAYER) : this.randMoove(fps, diff);
+		DIFF_SCORE_PLAYER - diff < 0
+			? this.randMoove(fps, DIFF_SCORE_PLAYER)
+			: this.randMoove(fps, diff);
 		this.iaAlgo(fps);
 	}
 
@@ -298,27 +341,13 @@ export default class Paddle {
 		const coef = DIFF_SCORE_PLAYER - diff;
 		const refresh = 30;
 		const ran = Math.floor((Math.random() * 10000) % coef);
-		const paddles: Paddle[] = this._gameRoom.getGame().getPaddles();
-		const twoIA: boolean = (paddles[0].getIsIA() && paddles[1].getIsIA()) ? true : false;
-		if (twoIA) {
-			if ((this.getName() === "player1" && fps === refresh) ||
-				(this.getName() === "player2" && fps === refresh + 10) &&
-				this._downMoove === 0 && this._upMoove === 0) {
-				if (ran > coef / 2)
-					this._upMoove += ran;
-				else if (ran < coef / 2)
-					this._downMoove += ran;
-				else if (ran === coef / 2)
-					Math.random() < 0.5 ? this._upMoove = coef * 1.5 : this._downMoove = coef * 1.5;
-			}
-		}
-		else if (fps === refresh && this._downMoove === 0 && this._upMoove === 0) {
-			if (ran > coef / 2)
-				this._upMoove += ran;
-			else if (ran < coef / 2)
-				this._downMoove += ran;
+		if (fps === refresh && this._downMoove === 0 && this._upMoove === 0) {
+			if (ran > coef / 2) this._upMoove += ran;
+			else if (ran < coef / 2) this._downMoove += ran;
 			else if (ran === coef / 2)
-				Math.random() < 0.5 ? this._upMoove = coef * 1.5 : this._downMoove = coef * 1.5;
+				Math.random() < 0.5
+					? (this._upMoove = coef * 1.5)
+					: (this._downMoove = coef * 1.5);
 		}
 	}
 }

@@ -1,60 +1,50 @@
-import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler from "../../handlers/UserHandler";
-import { sanitizer } from "../../helpers/sanitizer";
+import { AiUsers } from "../../interfaces/AiUsers";
 import { userMenuManager } from "../../managers/UserMenuManager";
 
 export interface UserAvatarProps {
 	sizeClass?: string;
 	editable?: boolean;
 	playerId?: string;
-	isComputer?: boolean;
 	disableClick?: boolean;
 }
 
-export type UserAvatarType = HTMLDivElement & { firstChild: HTMLImageElement };
+export type UserAvatarType = HTMLDivElement & { firstChild: HTMLImageElement } | HTMLAnchorElement & { firstChild: HTMLImageElement };
 
-export default async function createUserAvatar(props: UserAvatarProps = {
+export default function createUserAvatar(props: UserAvatarProps = {
 	editable: false
-}): Promise<UserAvatarType> {
+}): UserAvatarType {
 	if (!props.sizeClass)
-		props.sizeClass = "w-10 h-10";
+		props.sizeClass = "min-w-10 min-h-10 w-10 h-10";
 
-	let src: string;
-	if (!props.isComputer && (!props.playerId || props.playerId === UserHandler.userId))
-		src = UserHandler.avatarUrl;
-	else if (props.isComputer)
-		src = "/assets/images/computer-virus-1-svgrepo-com.svg";
-	else
-		src = await UserHandler.fetchUserPicture(props.playerId);
+	const anchor = document.createElement("a");
 
-	const template = document.createElement("template");
-	let href: string | undefined;
-	if (!props.editable && !props.disableClick && !props.isComputer) {
-		if (props.playerId)
-			href = `/user?playerId=${props.playerId}`;
-		else
-			href = "/user";
+	const img = document.createElement("img");
+	img.onerror = () => img.src = "/assets/images/default_avatar.svg";
+	img.alt = "User Avatar";
+	img.className = `select-none border-2 rounded-full object-cover ${props.sizeClass} bg-white`;
+	img.src = "/assets/images/default_avatar.svg";
+
+	if (props.playerId) {
+		UserHandler.fetchUser(props.playerId).then((user) => {
+			if (!user)
+				user = UserHandler.user || AiUsers.values().next().value;
+			if(!props.editable && !props.disableClick) {
+				anchor.href = `/user?playerId=${user!.PlayerID}`;
+				anchor.target = "_blank";
+			}
+			img.src = user!.Avatar || `https://placehold.co/100x100?text=${user.DisplayName.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
+		});
 	}
-	template.innerHTML = `
-		<a ${href ? `href="${sanitizer(href)}" target="_blank"` : ""}><img src="${sanitizer(src)}" ${src === UserHandler.avatarUrl ? "data-user=\"avatar\"": ""} alt="User Avatar" class="select-none border-2 rounded-full object-cover ${sanitizer(props.sizeClass)} bg-white"></a>
-	`;
 
-	const userAvatar = template.content.firstElementChild as UserAvatarType;
+	anchor.appendChild(img);
 
-	try {
-		const fetched = await fetch(userAvatar.firstChild.src, { cache: "force-cache" });
-		if (!fetched.ok)
-			throw new Error(`Failed to fetch user avatar: ${fetched.status} ${fetched.statusText}`);
-	} catch (error) {
-		userAvatar.firstChild.src = "/assets/images/default_avatar.svg";
-	}
+	const userAvatar = anchor as UserAvatarType;
 
 	if (props.editable) {
-		console.log("User avatar is editable, setting up upload functionality.");
 		userAvatar.firstChild.onload = () => {
-			console.log("User avatar loaded successfully.");
 			const newContainer = document.createElement("div");
-			newContainer.className = "relative rounded-full overflow-hidden";
+			newContainer.className = `relative rounded-full overflow-hidden ${props.sizeClass}`;
 			userAvatar.classList.add("cursor-pointer");
 			if (!userAvatar.parentElement)
 				throw new Error("User avatar must have a parent element to replace it.");
@@ -90,5 +80,5 @@ export default async function createUserAvatar(props: UserAvatarProps = {
 		}
 	}
 
-	return userAvatar;	
+	return userAvatar;
 }

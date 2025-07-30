@@ -19,13 +19,10 @@ export class WebSocketManager {
 		private addr: string
 	) {
 		this.socket = new WebSocket(this.addr);
-		console.log("I am being called!");
-		console.log(this.socket);
 
 		window.addEventListener('keyup', (event) => {
 			if (this.socket.readyState !== WebSocket.OPEN)
 				return;
-			console.log("Key up event:", event.key);
 			if (event.key === 'w' || event.key === "s") {
 				this.socket.send(JSON.stringify({
 					type: "move",
@@ -39,7 +36,6 @@ export class WebSocketManager {
 		window.addEventListener('keypress', (event) => {
 			if (this.socket.readyState !== WebSocket.OPEN)
 				return;
-			console.log("Key press event:", event.key);
 			let data: any | undefined;
 			switch (event.key) {
 				case "w":
@@ -68,21 +64,39 @@ export class WebSocketManager {
 				return;
 			}
 			const msg: ServerMessage = JSON.parse(event.data);
-			if (msg.type === "init") {
-				console.log(msg);
-				this.onInit(msg.payload);
-			}
-			else if (msg.type === "update") {
-				this.onUpdate(msg.payload);
-			}
-			else if (msg.type === "score") {
-				PongGameManager.onScoreUpdate(msg.payload.score);
-			}
-			else if (msg.type === "gameover") {
-				PongGameManager.onGameOver(msg.payload);
-			}
-			else if (msg.type === "connect") {
-				PongGameManager.onConnect(msg.payload);
+			switch (msg.type) {
+				case "pingResponse":
+					PongGameManager.onPingResponse(msg.payload);
+					break;
+				case "tournament-init":
+				case "init":
+					this.onInit(msg.payload);
+					break;
+				case "update":
+					this.onUpdate(msg.payload);
+					break;
+				case "tournament-score":
+				case "score":
+					PongGameManager.onScoreUpdate(msg.payload.score);
+					break;
+				case "tournament-match-over":
+					PongGameManager.onTournamentMatchOver(msg.payload);
+					break;
+				case "tournament-over":
+					PongGameManager.onTournamentOver(msg.payload);
+					break;
+				case "gameover":
+					PongGameManager.onGameOver(msg.payload);
+					break;
+				case "connect":
+					PongGameManager.onConnect(msg.payload);
+					break;
+				case "tournament-status":
+					PongGameManager.onBracketUpdate(msg.payload);
+					break;
+				default:
+					console.warn("[WS] Unknown message type:", msg);
+					return;
 			}
 		};
 

@@ -1,3 +1,5 @@
+import { Users } from "../interfaces/Users";
+
 export interface CameraInitInfo {
 	name: string;
 	position: number[];
@@ -52,7 +54,7 @@ export interface CollisionPayload {
 };
 
 export interface ScoreUpdatePayload {
-	type: "score";
+	type: "score" | "tournament-score";
 	payload: {
 		score: {
 			p1: number,
@@ -94,7 +96,7 @@ export interface WallsInit {
 }
 
 export interface InitPayload {
-	type: "init";
+	type: "init" | "tournament-init";
 	payload: {
 		ball: BallInit;
 		p1: PaddleInit;
@@ -107,10 +109,81 @@ export interface InitPayload {
 	}
 }
 
+export interface TournamentMatchStatus {
+	round: number;
+	matchIndex: number;
+	p1: string | null;
+	p2: string | null;
+	scoreP1: number;
+	scoreP2: number;
+}
+
+export interface TournamentBracketStatusPayload {
+	type: "tournament-status";
+	payload: TournamentMatchStatus[];
+}
+
+export interface TournamentScore {
+	// used for tournament
+	p1: number;
+	p2: number;
+	round: number;
+}
+
+export interface TournamentMatchOverPayload {
+	// used for tournament
+	type: "tournament-match-over";
+	payload: {
+		winner: string;
+		loser: string;
+		final_score: TournamentScore;
+		bracket: TournamentMatchStatus[];
+	};
+}
+
+export interface TournamentOverPayload {
+	// used for tournament
+	type: "tournament-over";
+	payload: {
+		winner: string;
+		lobbyID: string;
+	};
+}
+
+export type LobbyBroadcastPayload =
+	| { type: "timer"; payload: { secondsRemaining: number } }
+	| {
+			type: "match_result";
+			payload: {
+				roomID: string;
+				winner: string;
+				score: { p1: number; p2: number };
+			};
+	  };
+
+export interface PingResponsePayload {
+    type: "pingResponse",
+    payload: {
+        value: number;
+    }
+}
+
+export interface PingRequestPayload {
+    type: "pingRequest",
+    payload: {
+        value: number;
+    }
+}
+
 export type ServerMessage = InitPayload
 							| UpdatePayload
 							| PlayerConnectedPayload
 							| PlayerDisconnectedPayload
 							| CollisionPayload
 							| ScoreUpdatePayload
-							| GameOverPayload; 
+							| GameOverPayload
+							| TournamentBracketStatusPayload
+							| TournamentMatchOverPayload
+							| TournamentOverPayload
+							| PingResponsePayload
+							| PingRequestPayload;

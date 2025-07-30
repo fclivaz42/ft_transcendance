@@ -8,6 +8,7 @@ export function sanitizer(data: any): any {
 			.replace(/&/g, "&amp;")
 			.replace(/</g, "&lt;")
 			.replace(/>/g, "&gt;")
+			.replace(/\n/g, "<br>")
 			.replace(/"/g, "&quot;")
 			.replace(/"/g, "&#39;");
 		if (sanitized !== data)

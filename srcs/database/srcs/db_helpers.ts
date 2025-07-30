@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/04/21 21:57:13 by fclivaz           #+#    #+#             //
-//   Updated: 2025/06/26 17:12:59 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/25 21:41:08 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -128,6 +128,14 @@ export default class RequestHandler {
 		let response: object;
 		try {
 			if (table === "Players") {
+				if (!body)
+					return reply.code(401).send("error.empty.body")
+				if (!body[tables.Players.Fields[1]])
+					return reply.code(401).send("error.empty.displayname")
+				if (!body[tables.Players.Fields[2]])
+					return reply.code(401).send("error.empty.emailaddress")
+				if (!body[tables.Players.Fields[3]])
+					return reply.code(401).send("error.empty.password")
 				body["Password"] = await hash_password(body["Password"])
 				body["Admin"] = 0;
 			}

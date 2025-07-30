@@ -5,13 +5,16 @@ import { WebSocketManager } from "../game/WebSocketManager.js";
 import { GameField } from "../game/GameField.js";
 import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
-import { GameOverPayload, InitPayload, PlayerConnectedPayload } from "../game/types.js";
+import { GameOverPayload, InitPayload, PingRequestPayload, PingResponsePayload, PlayerConnectedPayload, TournamentBracketStatusPayload, TournamentMatchOverPayload, TournamentMatchStatus, TournamentOverPayload } from "../game/types.js";
 import UserHandler from "../handlers/UserHandler.js";
 import { i18nHandler } from "../handlers/i18nHandler.js";
 import createUserAvatar from "../components/usermenu/userAvatar.js";
 import { Users } from "../interfaces/Users.js";
 import { createPongGameoverDialog } from "../components/dialog/pongGameover/index.js";
 import RoutingHandler from "../handlers/RoutingHandler.js";
+import { AiUsers } from "../interfaces/AiUsers.js";
+import { createBracketComponent, createBracketDialog } from "../components/backdropDialog/bracketDialog.js";
+import BackdropDialog from "../class/BackdropDialog.js";
 
 function enforceDefined<T>(value: T | undefined, message: string): T {
 	if (!value)
@@ -40,6 +43,9 @@ class PongGameManager {
 		p1: undefined,
 		p2: undefined
 	}
+	private dialogRef: BackdropDialog | undefined;
+
+	private bracket: TournamentMatchStatus[] | undefined;
 
 	public calculatePing() {
 		if (this.pingInterval.sentPing === undefined) {
@@ -50,18 +56,27 @@ class PongGameManager {
 			return;
 		}
 		this.pingInterval.ping = Date.now() - this.pingInterval.sentPing;
-		// TODO: send ping to server
-		/*this.websocketManager?.socketInstance.send(JSON.stringify({
-			type: "ping",
-			payload: {
-				ping: this.pingInterval.ping
-			}
-		}));*/
+		const pingRequest: PingRequestPayload = {
+			type: "pingRequest",
+			payload: { value: this.pingInterval.ping }
+		}
+		this.websocketManager?.socketInstance.send(JSON.stringify(pingRequest));
 		this.pingInterval.sentPing = undefined;
-		const pingElemens = document.querySelectorAll<HTMLSpanElement>("[data-pong-ping]");
-		for (const element of pingElemens) {
-			// TODO: differentiate between players
-			element.textContent = `${this.pingInterval.ping}ms`;
+		const pingElements = document.querySelectorAll<HTMLSpanElement>("[data-pong-ping]");
+		for (const element of pingElements) {
+			const identifier = element.getAttribute("data-pong-ping");
+			if (this.getPlayers[identifier! as "p1" | "p2"]!.PlayerID! === UserHandler.userId)
+				element.textContent = `${this.pingInterval.ping}ms`;
+		}
+	}
+
+	public onPingResponse(update: PingResponsePayload["payload"]) {
+		this.pingInterval.ping = update.value;
+		const pingElements = document.querySelectorAll<HTMLSpanElement>("[data-pong-ping]");
+		for (const element of pingElements) {
+			const identifier = element.getAttribute("data-pong-ping");
+			if (this.getPlayers[identifier! as "p1" | "p2"]!.PlayerID! !== UserHandler.userId)
+				element.textContent = `${this.pingInterval.ping}ms`;
 		}
 	}
 
@@ -72,28 +87,43 @@ class PongGameManager {
 		this.engine?.dispose();
 	}
 
+	public resetGameField() {
+		if (!this.engine)
+			throw new Error("Engine is not initialized.");
+		for (const scene of this.engine.scenes)
+			scene.dispose();
+		this.engine.scenes.length = 0;
+		this.field?.scene.dispose();
+		this.field = new GameField(this.engine);
+	}
+
 	private async initializeFrontElements(payload: InitPayload["payload"]) {
+		this.resetGameField();
+		let botIdx = 0;
 		this.getFrontElements.canvasContainer.querySelectorAll("[data-pong-displayname]").forEach(async (element) => {
 			const identifier = element.getAttribute("data-pong-displayname");
 			if (!identifier || !(identifier in payload)) throw new Error(`Identifier ${identifier} not found in payload.`);
 			const playerData = identifier === "p1" ? payload.connectedPlayers.p1 : payload.connectedPlayers.p2;
 			const avatarElement = this.getFrontElements.canvasContainer.querySelector<HTMLImageElement>(`[data-pong-avatar="${identifier}"]`);
-			if (playerData === undefined) {
-				const botUser: Users = {
-					DisplayName: i18nHandler.getValue("pong.computer") || "Computer",
-					PlayerID: "bot"
-				}
-				this.users[identifier as "p1" | "p2"] = botUser;
-				avatarElement?.replaceWith(await createUserAvatar({isComputer: true, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
-				element.textContent = i18nHandler.getValue("pong.computer") || "Computer";
-				return;
+			avatarElement?.setAttribute("data-pong-avatar", identifier);
+			const aiElement = this.getFrontElements.canvasContainer.querySelector(`[data-pong-bot="${identifier}"]`);
+			for (const score of this.getFrontElements.scoreElement.children) {
+				if (score instanceof HTMLSpanElement) continue;
+				score.textContent = "0";
 			}
 			const user = UserHandler.fetchUser(playerData);
 			user.then(async (userData) => {
 				this.users[identifier as "p1" | "p2"] = userData;
 				if (!userData) throw new Error(`User data for ${identifier} not found.`);
 				element.textContent = userData.DisplayName;
-				avatarElement?.replaceWith(await createUserAvatar({playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"}));
+				const newAvatar = createUserAvatar({playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"});
+				newAvatar.setAttribute("data-pong-avatar", identifier);
+				avatarElement?.replaceWith(newAvatar);
+				if (userData.isBot) {
+					aiElement?.classList.remove("hidden");
+				} else {
+					aiElement?.classList.add("hidden");
+				}
 			}).catch((error) => {
 				console.error(`Error fetching user data for ${identifier}:`, error);
 				element.textContent = "Unknown User";
@@ -103,7 +133,7 @@ class PongGameManager {
 
 	public async initialize(addr: string) {
 		this.reset();
-		const canvasContainer = await createPongCanvas(addr.includes("computer"));
+		const canvasContainer = await createPongCanvas();
 		this.frontElements = {
 			canvasContainer: canvasContainer,
 			canvas: enforceDefined(canvasContainer.querySelector<HTMLCanvasElement>("canvas"), "Canvas element not found in the container.") as HTMLCanvasElement,
@@ -114,7 +144,7 @@ class PongGameManager {
 
 		this.websocketManager = new WebSocketManager(
 			(payload) => {
-				console.log("WebSocket payload received:", payload);
+				this.dialogRef?.close();
 				this.initializeFrontElements(payload);
 				this.getField.init(payload);
 				if (!this.started) {
@@ -141,6 +171,8 @@ class PongGameManager {
 	}
 
 	private cleanupGame() {
+		this.bracket = undefined;
+		this.dialogRef?.close();
 		if (this.frontElements)
 				for (const element of Object.values(this.frontElements))
 					if (element) element.remove();
@@ -186,20 +218,40 @@ class PongGameManager {
 		}
 	}
 
-	public getPlayers(): Record<"p1" | "p2", Users | undefined> {
+	public get getPlayers(): Record<"p1" | "p2", Users | undefined> {
 		return this.users;
 	}
 
+	public get getBracket(): TournamentMatchStatus[]{
+		if (!this.bracket)
+			throw new Error("Bracket is not initialized.");
+		return this.bracket;
+	}
+
 	public onGameOver(payload: GameOverPayload["payload"]) {
-		console.log("Game Over payload received:", payload);
 		const winner = this.users[payload.winner as "p1" | "p2"];
 		if (!winner) {
 			console.error("Winner not found in users:", payload.winner);
 			return;
 		}
-		const finalScore = payload.final_score as {p1: number, p2: number};
-		console.log(`Game Over! Winner: ${winner.DisplayName}, Final Score: P1 - ${finalScore.p1}, P2 - ${finalScore.p2}`);
-		createPongGameoverDialog(payload, this.users);
+		this.dialogRef = createPongGameoverDialog(payload, this.users);
+	}
+
+	public onBracketUpdate(update: TournamentBracketStatusPayload["payload"]) {
+		if (!this.bracket)
+			this.dialogRef = createBracketDialog(update);
+		else {
+			const bracketElement = document.getElementById("pong-tournament-bracket");
+			if (bracketElement)
+				bracketElement.replaceWith(createBracketComponent(update));
+		}
+		this.bracket = update;
+
+	}
+
+	public onTournamentMatchOver(update: TournamentMatchOverPayload["payload"]) {
+		this.bracket = update.bracket;
+		this.dialogRef = createBracketDialog(update.bracket, update.winner === UserHandler.userId ? "waitingnext" : "lost", update.winner);
 	}
 
 	public onConnect(payload: PlayerConnectedPayload["payload"]) {
@@ -216,6 +268,10 @@ class PongGameManager {
 		input.value = payload.roomID;
 		pongRoomCode.classList.replace("hidden", "flex");
 	}
+
+	public onTournamentOver(payload: TournamentOverPayload["payload"]) {
+		this.dialogRef = createBracketDialog(this.getBracket, "final", payload.winner);
+	};
 }
 
 export default new PongGameManager();

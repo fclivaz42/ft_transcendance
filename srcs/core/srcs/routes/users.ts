@@ -6,6 +6,7 @@ import DatabaseSDK from '../../../libs/helpers/databaseSdk.ts';
 import type { UserLoginProps, UserRegisterProps, User } from '../../../libs/interfaces/User.ts';
 import Logger from "../../../libs/helpers/loggers.ts";
 import { httpReply } from "../../../libs/helpers/httpResponse.ts";
+import fastifyMultipart from '@fastify/multipart';
 
 const usersSdk = new UsersSdk();
 const db_sdk = new DatabaseSDK();
@@ -201,18 +202,19 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 	fastify.all('/delete', async (request, reply) => {
 		if (request.method !== 'DELETE')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only DELETE method is allowed for user deletion.' });
-		if (!request.headers.password)
+		const { password } = request.body as { password?: string };
+		if (!password)
 			return reply.code(401).send({ error: 'Unauthorized', message: 'Missing password.' });
-		if (typeof request.headers.password !== "string")
+		if (typeof password !== "string")
 			return reply.code(401).send({ error: 'Unauthorized', message: 'Password is not a string.' });
 
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 		try {
-			const test = await db_sdk.log_user(authorization.data.sub, "PlayerID", request.headers.password as string)
+			const test = await db_sdk.log_user(authorization.data.sub, "PlayerID", password as string)
 				.then(response => response.data)
 		} catch (exception) {
 			if (exception.status === 403)
-				return reply.code(403).send({ error: "Unauthorized", message: "No password is set due to 2FA." })
+				return reply.code(403).send({ error: "Unauthorized", message: "No password is set due to Oauth2." })
 			return reply.code(401).send({ error: "Unauthorized", message: "Wrong password." })
 		}
 		const deleteUser = await usersSdk.deleteUser(authorization.data.sub);
@@ -227,7 +229,6 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 		const userId = authorization.data.sub;
 		const formdata = new FormData();
-		// @ts-expect-error
 		for await (const part of request.parts()) {
 			if (part.type === "file") {
 				if (formdata.keys.length !== 0)
@@ -378,6 +379,13 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 						module: 'usermanager'
 					});
 			});
+		if (userStats.data.isPrivate && params.uuid !== authorization.data.sub) {
+			return httpReply({
+				detail: "User is private",
+				status: 403,
+				module: "usermanager",
+			}, reply, request);
+		}
 		return reply.code(userStats.status).send(userStats.data);
 	});
 }

@@ -82,7 +82,7 @@ class RoutingHandler {
 			window.history.replaceState({}, "", new URL(url, window.location.origin).toString());
 	}
 
-	setRoute(route: string, save: boolean = true): void {
+	async setRoute(route: string, save: boolean = true) {
 		if (route === this._url.pathname)
 			save = false;
 		const url = new URL(route, window.location.origin);
@@ -94,7 +94,7 @@ class RoutingHandler {
 			window.history.pushState({}, "", url);
 		else
 			window.history.replaceState({}, "", url);
-		this.displayRoute();
+		return this.displayRoute();
 	}
 
 	get url(): URL {

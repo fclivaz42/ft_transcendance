@@ -40,31 +40,36 @@ async function oauth_routes(app: FastifyInstance, opts: FastifyPluginOptions) {
   });
 
   app.get('/callback', async (req, rep) => {
-    // TODO: Need to test this route
-    const { code, state } = req.query as { code?: string; state?: string };
+    const { code, state, error } = req.query as { code?: string; state?: string, error?: string };
 
-    if (!code || !state)
+    if ((!code || !state) && (!error))
       return httpReply({
 				detail: "Missing code or state in query parameters.",
 				status: 400,
 				module: "oauth2",
 			}, rep, req);
 
-    await oauth2sdk.getCallback(code, state)
+    await oauth2sdk.getCallback(code as string, state as string)
 			.then(response => {
 				UsersSdk.showerCookie(rep, response.data.token, response.data.exp - response.data.iat);
 				rep.status(303).header('Location', '/');
 			})
 			.catch(err => {
-				if (!axios.isAxiosError(err)) {
+				if (error) {
+					Logger.error(`Error in /callback route: ${error}`);
+					return rep.status(303).header('Location', `/?error=notification.oauth2.callbackError;${error}`).send();
+				}
+				else if (!axios.isAxiosError(err)) {
 					Logger.error(`Unexpected error in /callback route:\n${err}`);
 					return rep.status(303).header('Location', '/?error=notification.oauth2.callbackError').send();
 				}
-				if (err.response?.status === 404) {
+				else if (err.response?.status === 404) {
 					return rep.status(303).header('Location', '/?error=notification.oauth2.callbackError;notification.oauth2.noSession').send();
 				}
-				Logger.error(`Error in /callback route:\n${err}`);
-				return rep.status(303).header('Location', `/?error=notification.oauth2.callbackError${err.response? ";" + err.response.data.detail : ""}`).send();
+				else {
+					Logger.error(`Error in /callback route:\n${err}`);
+					return rep.status(303).header('Location', `/?error=notification.oauth2.callbackError${err.response? ";" + err.response.data.detail : ""}`).send();
+				}
 			});
   });
 }
