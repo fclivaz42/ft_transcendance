@@ -1,4 +1,4 @@
-
+// TEST
 import { MeshBuilder, Scene, Vector3, Color3, StandardMaterial, BoundingBox, Mesh, Vector2 } from "@babylonjs/core";
 import Ball from "./Ball.ts";
 import { Session } from "inspector/promises";
