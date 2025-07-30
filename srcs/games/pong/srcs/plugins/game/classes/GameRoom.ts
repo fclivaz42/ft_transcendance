@@ -54,6 +54,11 @@ export default class GameRoom {
 		return this.players.length === 0;
 	}
 
+	public isEmptyAIExclusive(): boolean {
+		const realPlayers = this.players.filter((p) => !p.isAI);
+		return realPlayers.length === 0;
+	}
+
 	public getGame(): Game {
 		return this.game;
 	}
@@ -119,6 +124,19 @@ export default class GameRoom {
 			: this.game.setP2IA(true);
 		// on a player disconnect sets AI to missing player and locks the room
 		this.lock = true;
+	}
+
+	public removeAIfromRoom(): void {
+		this.players = [];
+		console.log(`Removed all AI players from ${this.id}`);
+		if (this.isEmpty()) {
+			this.game.gameStop();
+			if (this._onGameOver) {
+				this._onGameOver(this.id);
+			}
+			return;
+		}
+		throw new Error("room still not empty, de hell?")
 	}
 
 	public addScore(player: number) {

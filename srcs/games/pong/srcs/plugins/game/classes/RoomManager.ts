@@ -70,7 +70,7 @@ export default class RoomManager {
 				return session;
 			case "computer":
 				room = this.createRoom(true);
-				const aiSession = new PlayerSession(null, "AI_opponent");
+				const aiSession = new PlayerSession(null, "P-0");
 				room.addPlayer(session);
 				room.addPlayer(aiSession, true);
 				room.lock = true;
@@ -97,6 +97,11 @@ export default class RoomManager {
 		if (room) {
 			room.removePlayer(session);
 			if (room.isEmpty()) {
+				this._rooms.delete(room.id);
+			}
+			else if (room.isEmptyAIExclusive()) {
+				console.log("found AI!");
+				room.removeAIfromRoom();
 				this._rooms.delete(room.id);
 			}
 		}
