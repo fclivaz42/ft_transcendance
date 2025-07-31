@@ -3,13 +3,15 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
 import { Engine } from "@babylonjs/core/Engines/engine.js";
+import { GlowLayer } from "@babylonjs/core/Layers/glowLayer.js";
+import { Color3 } from "@babylonjs/core/Maths/math.color.js";
 
 import { Ball } from "./game_components/Ball.js";
 import { Paddle } from "./game_components/Paddle.js";
 import { Wall } from "./game_components/Wall.js";
+import { GridTron } from "./effects/GridTron.js";
 
 import { InitPayload, UpdatePayload, CameraInitInfo, LightInitInfo } from "./types.js";
-import { GlowLayer } from "@babylonjs/core";
 
 // Temp values, overriding WebSocket info
 const ALPHA: number = Math.PI / 2;
@@ -22,11 +24,14 @@ export class GameField {
 	private p1: Paddle | null = null;
 	private p2: Paddle | null = null;
 	private walls: Wall[] = [];
+	private glowLayer: GlowLayer;
+	private gridTron: GridTron | null = null;
 
 	constructor(private engine: Engine) {
 		this.scene = new Scene(this.engine);
-		// const glow = new GlowLayer("glow", this.scene);
-		// glow.intensity = 0.8;
+		
+		this.glowLayer = new GlowLayer("glow", this.scene);
+		this.glowLayer.intensity = 0.8;
 	}
 
 	public init(payload: InitPayload["payload"]) {
@@ -42,7 +47,7 @@ export class GameField {
 		// skyboxMaterial.specularColor = new Color3(0, 0, 0); 
 		// skybox.material = skyboxMaterial;
 
-
+		this.createGridTronEffect();
 		this.ball = new Ball(this.scene, payload.ball);
 		this.p1 = new Paddle(this.scene, "p1", payload.p1);
 		this.p2 = new Paddle(this.scene, "p2", payload.p2);
@@ -53,7 +58,10 @@ export class GameField {
 	}
 
 	public update(payload: UpdatePayload["payload"]) {
-		this.ball?.update(payload.ball);
+		if (this.ball) {
+			this.ball.update(payload.ball);
+		}
+		
 		this.p1?.update(payload.p1);
 		this.p2?.update(payload.p2);
 	}
@@ -75,5 +83,65 @@ export class GameField {
 		this.scene.activeCamera = camera;
 
 		new HemisphericLight("light", new Vector3(...lightInfo.direction), this.scene);
+	}
+
+	private createGridTronEffect(): void {
+		const gridConfig = {
+			gameWidth: 13.7 * 2, // = 27.4
+			gameHeight: 16.6,
+			gameReferenceZ: 0,
+			gridTotalDepth: 40,
+			gridSize: 2,
+			lineWidth: 0.08,
+			emissiveColor: new Color3(0.1, 0.4, 0.6)
+		};
+
+		this.gridTron = new GridTron(this.scene, gridConfig);
+		this.gridTron.create();
+		
+		// (bleu clair)
+		this.setGridColorRGB(0.3, 0.6, 1);
+	}
+
+	public dispose(): void {
+		// Reset des références d'objets de jeu
+		this.ball = null;
+		this.p1 = null;
+		this.p2 = null;
+		this.walls = [];
+		
+		if (this.gridTron) {
+			this.gridTron.dispose();
+			this.gridTron = null;
+		}
+
+
+		if (this.glowLayer) {
+			this.glowLayer.dispose();
+		}
+		
+		if (this.scene) {
+			this.scene.dispose();
+		}
+	}
+
+	public showGrid(): void {
+		this.gridTron?.show();
+	}
+
+	public hideGrid(): void {
+		this.gridTron?.hide();
+	}
+
+	public setGridOpacity(opacity: number): void {
+		this.gridTron?.setOpacity(opacity);
+	}
+
+	public setGridColor(color: Color3): void {
+		this.gridTron?.setColor(color);
+	}
+
+	public setGridColorRGB(r: number, g: number, b: number): void {
+		this.gridTron?.setColorRGB(r, g, b);
 	}
 }
