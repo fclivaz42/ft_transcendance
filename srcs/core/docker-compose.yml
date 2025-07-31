@@ -20,7 +20,7 @@ services:
       - sarif-libs:/libs
       - sarif-frontend:/var/www/sarif-frontend
     ports:
-      - "443:443"
+      - "8443:443"
     build:
       context: .
       args:
