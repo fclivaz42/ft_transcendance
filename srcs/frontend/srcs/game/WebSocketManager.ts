@@ -29,8 +29,15 @@ export class WebSocketManager {
 					payload: {
 						direction: "stop"
 					}
-				}))
-			};
+				}));
+			} else if (event.key === "i" || event.key === "k") {
+				this.socket.send(JSON.stringify({
+					type: "move2",
+					payload: {
+						direction: "stop"
+					}
+				}));
+			}
 		});
 
 		window.addEventListener('keypress', (event) => {
@@ -46,6 +53,12 @@ export class WebSocketManager {
 					break;
 				case " ":
 					data = { type: "ball", payload: { direction: "launch" } };
+					break;
+				case "i":
+					data = { type: "move2", payload: { direction: "up" } };
+					break;
+				case "k":
+					data = { type: "move2", payload: { direction: "down" } };
 					break;
 				case "o":
 					data = { type: "ia", payload: { direction: "p1" } };

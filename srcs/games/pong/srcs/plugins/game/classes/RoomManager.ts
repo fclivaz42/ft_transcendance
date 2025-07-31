@@ -29,7 +29,9 @@ export default class RoomManager {
 	public findAvailableRoom(): GameRoom | null {
 		console.log("Searching for room...");
 		for (const room of this._rooms.values()) {
-			if (!room.isFull() && !room.lock) return room;
+			if (!room.isFull() && !room.lock && !room.closed) {
+				return room;
+			}
 		}
 		console.log("Available room not found...");
 		return null;
@@ -52,6 +54,7 @@ export default class RoomManager {
 				break;
 			case "friend_host":
 				room = (roomId && this._rooms.get(roomId)) || this.createRoom();
+				room.closed = true;
 				room.addPlayer(session);
 				break;
 			case "friend_join":
@@ -65,8 +68,13 @@ export default class RoomManager {
 				break;
 			case "local":
 				room = this.createRoom();
+				room.closed = true;
 				room.addPlayer(session);
-				// room.forceLocalPlayer(session); // assign both paddles, change controls
+				const localPlayer = new PlayerSession(null, "P-0");
+				localPlayer.isAI = false;
+				localPlayer.local = true;
+				room.addPlayer(localPlayer);
+				room.lock = true;
 				return session;
 			case "computer":
 				room = this.createRoom(true);

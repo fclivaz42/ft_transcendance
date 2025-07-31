@@ -84,6 +84,16 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 		} else if (mode === "tournament") {
 			session = new PlayerSession(socket, query.userId);
 			(manager as TournamentManager).assignTournamentPlayer(session);
+		} else if (mode === "local") {
+			session = manager.assignPlayer(socket, {
+				userId: query.userId,
+				mode: "local"
+			});
+		} else if (mode === "friend_host") {
+			session = manager.assignPlayer(socket, {
+				userId: query.userId,
+				mode: "friend_host",
+			});
 		} else {
 			session = manager.assignPlayer(socket, {
 				userId: query.userId,
@@ -109,7 +119,7 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 				) {
 					let ball: Ball | undefined = session.getRoom()?.getGame().getBall();
 					ball?.launch();
-					ball?.setCurrSpeed(0.25); // ball.getBaseSpeed() instead of hardcode?
+					ball?.setCurrSpeed(0.25); // potential problem! resets ball speed mid game :(
 				} else if (type === "move" && payload?.direction) {
 					const paddle = session.getPaddle();
 
@@ -137,6 +147,18 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 					socket.close();
 				} else if (type === "pingRequest") {
 					pingResponse(session, mode, payload?.value);
+				} else if (mode === "local" && type === "move2" && payload?.direction) {
+					const room = session.getRoom();
+					if (room) {
+						const p2Paddle = room.players[1].getPaddle();
+						if (p2Paddle) {
+							if (payload.direction === "up" || payload.direction === "down") {
+								p2Paddle.setMoveDirection(payload.direction);
+							} else if (payload.direction === "stop") {
+								p2Paddle.setMoveDirection(null);
+							}
+						}
+					}
 				}
 			} catch (err) {
 				console.error("Invalid message from client:", err);

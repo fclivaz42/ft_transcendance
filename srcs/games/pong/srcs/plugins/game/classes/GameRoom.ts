@@ -29,6 +29,7 @@ export default class GameRoom {
 	protected _lastMessage?: string;
 	protected _lastCollision?: CollisionPayload;
 	protected _start_time: number = Date.now();
+	private	_private: boolean = false;
 
 	protected _onGameOver?: (roomId: string) => void;
 
@@ -49,6 +50,15 @@ export default class GameRoom {
 	public isFull(): boolean {
 		return this.players.length >= 2;
 	}
+
+	public get closed(): boolean {
+		return this._private;
+	}
+
+	public set closed(val: boolean) {
+		this._private = val;
+	}
+
 
 	public isEmpty(): boolean {
 		return this.players.length === 0;
@@ -76,6 +86,11 @@ export default class GameRoom {
 		paddleIdOverride: boolean = false
 	): void {
 		this.players.push(playerSession);
+
+		if (playerSession.local) {
+			playerSession.setRoom(this);
+			console.log("added dummy player to local room.");
+		}
 
 		if (!playerSession.isAI) {
 			playerSession.setRoom(this);

@@ -1,6 +1,6 @@
 import GameRoom from "../classes/GameRoom.ts";
 import PlayerSession from "../classes/PlayerSession.ts";
-import { PingResponse } from "../classes/types";
+import type { PingResponse } from "../classes/types.ts";
 
 export function pingResponse(player: PlayerSession, mode: string, pingValue: number | undefined) {
 
