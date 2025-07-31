@@ -84,8 +84,6 @@ export class WebSocketManager {
 					PongGameManager.onScoreUpdate(msg.payload.score);
 					break;
 				case "collision":
-					// 🎵 Jouer le son de collision !
-					console.log("[WS] Collision reçue:", msg.payload.collider);
 					this.onCollision(msg.payload);
 					break;
 				case "tournament-match-over":
