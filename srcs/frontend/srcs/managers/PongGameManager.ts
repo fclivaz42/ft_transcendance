@@ -98,6 +98,7 @@ class PongGameManager {
 		for (const scene of this.engine.scenes)
 			scene.dispose();
 		this.engine.scenes.length = 0;
+		this.field?.grid?.dispose(); // Nettoyage spécifique du GridTron
 		this.field?.scene.dispose();
 		this.field = new GameField(this.engine);
 	}

@@ -3,14 +3,14 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
 import { Engine } from "@babylonjs/core/Engines/engine.js";
-import { GlowLayer } from "@babylonjs/core/Layers/glowLayer.js";
-import { Color3 } from "@babylonjs/core/Maths/math.color.js";
 
 import { Ball } from "./game_components/Ball.js";
 import { Paddle } from "./game_components/Paddle.js";
 import { Wall } from "./game_components/Wall.js";
-import { GridTron } from "./effects/GridTron.js";
 
+import { GridTron } from "./effects/GridTron.js";
+import { GlowLayer } from "@babylonjs/core/Layers/glowLayer.js";
+import { Color3 } from "@babylonjs/core/Maths/math.color.js";
 import { InitPayload, UpdatePayload, CameraInitInfo, LightInitInfo } from "./types.js";
 
 // Temp values, overriding WebSocket info
@@ -24,6 +24,7 @@ export class GameField {
 	private p1: Paddle | null = null;
 	private p2: Paddle | null = null;
 	private walls: Wall[] = [];
+
 	private glowLayer: GlowLayer;
 	private gridTron: GridTron | null = null;
 
@@ -58,10 +59,7 @@ export class GameField {
 	}
 
 	public update(payload: UpdatePayload["payload"]) {
-		if (this.ball) {
-			this.ball.update(payload.ball);
-		}
-		
+		this.ball?.update(payload.ball);
 		this.p1?.update(payload.p1);
 		this.p2?.update(payload.p2);
 	}
@@ -84,7 +82,7 @@ export class GameField {
 
 		new HemisphericLight("light", new Vector3(...lightInfo.direction), this.scene);
 	}
-
+	// --- Effect Grid  ---
 	private createGridTronEffect(): void {
 		const gridConfig = {
 			gameWidth: 13.7 * 2, // = 27.4
@@ -100,48 +98,11 @@ export class GameField {
 		this.gridTron.create();
 		
 		// (bleu clair)
-		this.setGridColorRGB(0.3, 0.6, 1);
+		this.gridTron.setColorRGB(0.3, 0.6, 1);
 	}
 
-	public dispose(): void {
-		// Reset des références d'objets de jeu
-		this.ball = null;
-		this.p1 = null;
-		this.p2 = null;
-		this.walls = [];
-		
-		if (this.gridTron) {
-			this.gridTron.dispose();
-			this.gridTron = null;
-		}
-
-
-		if (this.glowLayer) {
-			this.glowLayer.dispose();
-		}
-		
-		if (this.scene) {
-			this.scene.dispose();
-		}
-	}
-
-	public showGrid(): void {
-		this.gridTron?.show();
-	}
-
-	public hideGrid(): void {
-		this.gridTron?.hide();
-	}
-
-	public setGridOpacity(opacity: number): void {
-		this.gridTron?.setOpacity(opacity);
-	}
-
-	public setGridColor(color: Color3): void {
-		this.gridTron?.setColor(color);
-	}
-
-	public setGridColorRGB(r: number, g: number, b: number): void {
-		this.gridTron?.setColorRGB(r, g, b);
+	// Accès direct au GridTron pour que chaque classe gère ses responsabilités
+	public get grid(): GridTron | null {
+		return this.gridTron;
 	}
 }

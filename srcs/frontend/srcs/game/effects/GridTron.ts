@@ -187,7 +187,7 @@ export class GridTron
         }
     }
 
-    //managements
+
     public dispose(): void {
         if (this.gridParent) {
             this.gridParent.dispose();
