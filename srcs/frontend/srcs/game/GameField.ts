@@ -101,7 +101,7 @@ export class GameField {
 		this.gridTron.setColorRGB(0.3, 0.6, 1);
 	}
 
-	// Accès direct au GridTron pour que chaque classe gère ses responsabilités
+
 	public get grid(): GridTron | null {
 		return this.gridTron;
 	}
