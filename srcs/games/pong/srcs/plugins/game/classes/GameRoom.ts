@@ -227,6 +227,16 @@ export default class GameRoom {
 		}
 	}
 
+	public selectiveSend(message: GameMessage | LobbyBroadcastPayload | TournamentMessage, playerList: PlayerSession[]): void {
+		for (const p of playerList) {
+			try {
+				p.send(message);
+			} catch (err) {
+				console.error(`Failed to send to player: ${p.getUserId()}: ${err}`);
+			}
+		}
+	}
+
 	public floodlessBroadcast(
 		message: GameMessage | LobbyBroadcastPayload | TournamentMessage
 	): void {

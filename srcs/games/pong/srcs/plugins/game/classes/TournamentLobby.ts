@@ -6,6 +6,7 @@ import { generateRoomId } from "../helpers/id_generator.ts";
 import TournamentManager from "./TournamentManager.ts";
 import { MAX_SCORE } from "./types.ts";
 import type {
+	GameMessage,
 	RoomScore,
 	TournamentMessage,
 	TournamentOverPayload,
@@ -319,7 +320,7 @@ export default class TournamentLobby {
 			if (!player.isAI) {
 				player.getSocket()?.close();
 			}
-			this._bracket.cleanUp();
+			if (this._bracket) this._bracket.cleanUp();
 			this._players = [];
 			this._rooms.clear();
 		}

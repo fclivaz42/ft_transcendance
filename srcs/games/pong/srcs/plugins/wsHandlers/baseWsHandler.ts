@@ -6,6 +6,7 @@ import Ball from "../game/classes/Ball.ts";
 import Game from "../game/classes/GameClass.ts";
 import GameRoom from "../game/classes/GameRoom.ts";
 import TournamentManager from "../game/classes/TournamentManager.ts";
+import { pingResponse } from "../game/helpers/pingResponse.ts";
 
 interface GameWsQuery {
 	userId: string;
@@ -14,6 +15,7 @@ interface GameWsQuery {
 
 interface payload {
 	direction?: string;
+	value?: number;
 }
 
 interface ClientMessage {
@@ -133,6 +135,8 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 					}
 				} else if (type === "disconnect") {
 					socket.close();
+				} else if (type === "pingRequest") {
+					pingResponse(session, mode, payload?.value);
 				}
 			} catch (err) {
 				console.error("Invalid message from client:", err);
