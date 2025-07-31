@@ -146,19 +146,15 @@ class PongGameManager {
 		}
 		this.engine = new Engine(this.getFrontElements.canvas, true);
 		this.field = new GameField(this.engine);
+
         this.audioManager = AudioManager.getInstance(); 
         if (!this.audioManager) {
-            // Si aucune instance n'existe, en créer une (le AudioManager lui-même gère le préchargement)
             this.audioManager = new AudioManager(); 
         }
-
-        // 🔊 Débloquer l'audio via l'AudioManager après la première interaction utilisateur
         const resumeAudioOnInteraction = async () => {
             document.removeEventListener('click', resumeAudioOnInteraction);
             document.removeEventListener('keydown', resumeAudioOnInteraction);
-            // Appelle la méthode de l'AudioManager pour débloquer l'AudioContext
             await this.audioManager?.unmuteAll(); 
-            console.log("🔓 AudioManager: Audio débloqué par interaction utilisateur.");
             if (this.audioManager) {
                 this.audioManager.playBackgroundMusic(); 
             }
@@ -187,15 +183,12 @@ class PongGameManager {
 				}
 			},
 			(payload) => this.getField.update(payload),(payload) => {
-                // Gestion des sons de collision via l'AudioManager
                 if (payload.collider === "player1" || payload.collider === "player2" || 
                     payload.collider === "p1" || payload.collider === "p2") {
-                    // 🏓 Son de raquette
                     this.audioManager?.playPaddleHit(); 
                 } else {
-                    // 🧱 Son de mur
                     this.audioManager?.playWallBounce(); 
-                } // potato
+                } 
             }, addr
 		);
         if (this.audioManager) {
