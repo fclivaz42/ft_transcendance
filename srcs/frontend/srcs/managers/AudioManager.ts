@@ -235,6 +235,11 @@ export default class AudioManager
         this.playBufferSound("Goal", finalVolume);
     }
 
+    public playMissedSound(volume?: number): void {
+        const finalVolume = volume !== undefined ? volume : SOUNDS_CONFIG.missed.volume;
+        this.playBufferSound("missed", finalVolume);
+    }
+
     // --- Background Music Control ---
 
     public async playBackgroundMusic(targetVolume?: number, duration: number = 2): Promise<void> 

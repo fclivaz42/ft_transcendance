@@ -33,7 +33,7 @@ interface frontElements {
 }
 
 class PongGameManager {
-    private audioManager: AudioManager | undefined;
+	private audioManager: AudioManager | null | undefined;
 	private engine: Engine | undefined;
 	private field: GameField | undefined;
 	private started: boolean = false;
@@ -153,13 +153,15 @@ class PongGameManager {
         }
         const resumeAudioOnInteraction = async () => {
             document.removeEventListener('click', resumeAudioOnInteraction);
-            document.removeEventListener('keydown', resumeAudioOnInteraction);
+            document.removeEventListener('keypress', resumeAudioOnInteraction);
             await this.audioManager?.unmuteAll(); 
             if (this.audioManager) {
                 this.audioManager.playBackgroundMusic(); 
             }
         };
         document.addEventListener('click', resumeAudioOnInteraction, { once: true });
+        document.addEventListener('keypress', resumeAudioOnInteraction, { once: true });
+
         
 
 		this.websocketManager = new WebSocketManager(
@@ -186,14 +188,21 @@ class PongGameManager {
                 if (payload.collider === "player1" || payload.collider === "player2" || 
                     payload.collider === "p1" || payload.collider === "p2") {
                     this.audioManager?.playPaddleHit(); 
-                } else {
+                } 
+				else if (payload.collider === "eastWall") 
+				{
+                    this.audioManager?.playGoalSound();
+                } 
+				else if (payload.collider === "westWall")
+				{
+					this.audioManager?.playMissedSound();
+				}
+				else 
+				{
                     this.audioManager?.playWallBounce(); 
                 } 
             }, addr
 		);
-        if (this.audioManager) {
-            this.websocketManager.setAudioManager(this.audioManager);
-        }
 		window.addEventListener("resize", () => {
 			this.getEngine.resize();
 		});
