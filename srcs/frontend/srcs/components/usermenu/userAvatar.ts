@@ -18,6 +18,7 @@ export default function createUserAvatar(props: UserAvatarProps = {
 		props.sizeClass = "min-w-10 min-h-10 w-10 h-10";
 
 	const anchor = document.createElement("a");
+	anchor.className = "select-none outline-none";
 
 	const img = document.createElement("img");
 	img.onerror = () => img.src = "/assets/images/default_avatar.svg";
