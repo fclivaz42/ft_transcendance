@@ -45,7 +45,7 @@ export default class TournamentManager extends RoomManager {
 	private _startHealthCheck() {
 		if (this._healthCheckInterval) return;
 
-		const CHECK_INTERVAL_MS = 5000;
+		const CHECK_INTERVAL_MS = 2500;
 		this._healthCheckInterval = setInterval(() => {
 			if (this._tournaments.size > 0) {
 				console.log(`tournaments size: ${this._tournaments.size}`);

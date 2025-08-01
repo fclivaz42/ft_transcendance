@@ -21,6 +21,7 @@ export default class PlayerSession {
 	private _userObjectFromDB: Partial<User>;
 	private _hasDisconnected: boolean = false;
 	public isAI: boolean;
+	private _special: boolean = false;
 
 	constructor(socket: WebSocket | null, userId: string) {
 		this._socket = socket;
@@ -38,6 +39,14 @@ export default class PlayerSession {
 				(await this._userSdk.getUser(this._userId)).data
 			);
 		return this._userObjectFromDB;
+	}
+
+	public get local(): boolean {
+		return this._special;
+	}
+
+	public set local(val: boolean) {
+		this._special = val;
 	}
 
 	public get disconnected(): boolean {

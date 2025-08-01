@@ -1,5 +1,6 @@
 import { type CameraInitInfo, type LightInitInfo } from "./Playfield.ts";
 import type { User } from "../../../../../../libs/interfaces/User.ts";
+import { pingResponse } from "../helpers/pingResponse.ts";
 /* GAME */
 
 export const MAX_SCORE = 3;
@@ -112,6 +113,13 @@ export interface ConnectedPlayers {
 	p2: string | undefined;
 }
 
+export interface PingResponse {
+	type: "pingResponse";
+	payload: {
+		value?: number;
+	}
+}
+
 export type GameMessage = // used for game
 
 		| InitPayload
@@ -120,7 +128,8 @@ export type GameMessage = // used for game
 		| PlayerDisconnectedPayload
 		| CollisionPayload
 		| ScoreUpdatePayload
-		| GameOverPayload;
+		| GameOverPayload
+		| PingResponse;
 
 /* TOURNAMENT */
 
@@ -206,6 +215,8 @@ export interface TournamentBracketStatus {
 	type: "tournament-status";
 	payload: TournamentMatchStatus[];
 }
+
+
 
 export type TournamentMessage = // used for tournament
 
