@@ -77,7 +77,9 @@ export class GameField {
 			Vector3.Zero(),
 			this.scene
 		);
-		camera.attachControl(this.engine.getRenderingCanvas(), false);
+		// camera.attachControl(this.engine.getRenderingCanvas(), false);
+		camera.inputs.clear();
+		camera.inputs.addPointers();
 		this.scene.activeCamera = camera;
 
 		new HemisphericLight("light", new Vector3(...lightInfo.direction), this.scene);
