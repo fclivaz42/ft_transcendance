@@ -163,7 +163,7 @@
         "passwordRequired": "Password is required.",
         "confirmPasswordRequired": "Please confirm your password.",
         "passwordMismatch": "Passwords do not match.",
-        "lengthError": "Must be between [3 - 20] characters.",
+        "lengthError": "Must be between [3 - 14] characters.",
         "charactersError": "Username can only contain [a-z], [0-9], [-].",
         "emailFormatError": "Please enter a valid email address.",
         "emailIllegalCharacters": "Email contains invalid characters."

@@ -24,17 +24,14 @@ class LoginDialogManager {
   public initialize() {
     const handleSwitchMode = (newMode: 'login' | 'register' | 'forgotPassword') => {
       this.currentDialogMode = newMode;
-      console.log(`LoginDialogManager: Mode de dialogue changé en ${newMode}`);
     };
 
     // --- Fonction de gestion de la soumission (Login ou Register) ---
     const handleAuthSubmit = async (mode: 'login' | 'register', data: { displayName: string; email: string, password?: string; confirmPassword?: string }) => {
-      console.log(`Soumission en mode ${mode} pour l'e-mail: ${data.displayName}`);
 
       // *******************************************************************
       //APPELS AU BACKEND
       // *******************************************************************
-//test
 			// User object
 			let user = {
 				DisplayName: data.displayName,
@@ -129,8 +126,6 @@ class LoginDialogManager {
     };
 
     const handleForgotPasswordSubmit = (email: string, code: string) => {
-        console.log(`Mot de passe oublié soumis: Email=${email}, Code=${code}`);
-  
         alert("Réinitialisation du mot de passe (simulée) pour : " + email);
 
     };

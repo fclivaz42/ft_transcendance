@@ -29,7 +29,7 @@ export default class GameRoom {
 	protected _lastMessage?: string;
 	protected _lastCollision?: CollisionPayload;
 	protected _start_time: number = Date.now();
-	private	_private: boolean = false;
+	private _private: boolean = false;
 
 	protected _onGameOver?: (roomId: string) => void;
 
@@ -41,8 +41,8 @@ export default class GameRoom {
 		this.id = id;
 		this.game = new Game(vsAI);
 		const paddles: Paddle[] = this.game.getPaddles();
-		paddles.at(0)?.setGameRoom(this);
-		paddles.at(1)?.setGameRoom(this);
+		paddles[0]?.setGameRoom(this);
+		paddles[1]?.setGameRoom(this);
 		this.score = { p1: 0, p2: 0 };
 		this._onGameOver = onGameOver;
 	}
@@ -183,7 +183,7 @@ export default class GameRoom {
 		this.game.gameStart(DEFAULT_FPS);
 	}
 
-	protected async _send_to_db(p1: string, p2: string, winner: number) {
+	protected async _send_to_db(p1: string, p2: string, winner: number, match_index: number) {
 		const db_sdk = new DatabaseSDK();
 		let winner_id: string = winner === 1 ? p1 : p2;
 		let loser_id: string = winner === 1 ? p2 : p1;
@@ -191,25 +191,25 @@ export default class GameRoom {
 			WPlayerID: await db_sdk
 				.get_user(winner_id, "PlayerID")
 				.then((response) => response.data.PlayerID)
-				.catch((error) => default_users.Deleted.PlayerID),
+				.catch(() => default_users.Deleted.PlayerID) as string,
 			LPlayerID: await db_sdk
 				.get_user(loser_id, "PlayerID")
 				.then((response) => response.data.PlayerID)
-				.catch((error) => default_users.Deleted.PlayerID),
+				.catch(() => default_users.Deleted.PlayerID) as string,
 			WScore: this.score.p1 > this.score.p2 ? this.score.p1 : this.score.p2,
 			LScore: this.score.p1 < this.score.p2 ? this.score.p1 : this.score.p2,
 			StartTime: this._start_time,
 			EndTime: Date.now(),
-			// WARN: MUST BE CHANGED FOR TOURNAMENT
-			MatchIndex: 0,
+			MatchIndex: match_index,
 		});
 	}
 
 	protected async _killGame(winner: number) {
 		let res = this._send_to_db(
-			this.players[0].getUserId(),
-			this.players[1].getUserId(),
-			winner
+			this.players[0] ? this.players[0].getUserId() : default_users.Deleted.PlayerID,
+			this.players[1] ? this.players[1].getUserId() : default_users.Deleted.PlayerID,
+			winner,
+			0,
 		);
 		this.broadcast(this.buildGameOverPayload(winner));
 		this.game.gameStop();
@@ -217,13 +217,19 @@ export default class GameRoom {
 			this._onGameOver(this.id);
 		}
 		res
-			.then(function (response) {
+			.then(function(response) {
 				console.log(`Match successfully created:`);
 				console.dir(response.data);
 			})
-			.catch(function (error) {
-				console.error(`WARN: match could not be sent to db!`);
-				console.dir(error);
+			.catch(function(error) {
+				if (typeof error === "string") {
+					if (error.includes("database"))
+						console.error(`WARN: Database down! Match not saved.`)
+					else if (error.includes("blockchain"))
+						console.error(`WARN: Blockchain down! Match not validated.`)
+				}
+				else
+					console.error(`WARN: unknown error! ${error}`)
 			});
 	}
 
@@ -304,8 +310,8 @@ export default class GameRoom {
 				light: lightsCamera.getLightInitInfo(),
 				roomID: this.id,
 				connectedPlayers: {
-					p1: this.players.at(0)?.getUserId(),
-					p2: this.players.at(1)?.getUserId(),
+					p1: this.players[0]?.getUserId(),
+					p2: this.players[1]?.getUserId(),
 				},
 			},
 		};
