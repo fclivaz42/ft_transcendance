@@ -10,7 +10,7 @@
 //                                                                            //
 // ************************************************************************** //
 
-import { fastifyLogger } from "../../libs/helpers/fastifyHelper.ts";
+import { betterFastify, fastifyLogger } from "../../libs/helpers/fastifyHelper.ts";
 import Logger from "../../libs/helpers/loggers.ts";
 import { add_default_user, check_contract, init_db } from "./db_startup.ts"
 import { tables } from "./db_vars.ts"
@@ -60,9 +60,20 @@ fs.mkdir(process.env.FILELOCATION, { recursive: true, mode: 0o755 }, (err) => {
 if (process.env.RUNMODE === "debug")
 	Logger.info(process.env.API_KEY)
 
+if (!process.env.KEY_PATH ||
+	!process.env.CERT_PATH) {
+		throw new Error("KEY_PATH and CERT_PATH environment variables must be set to run the server with HTTPS.");
+	}
+
 const fastify = Fastify({
-	logger: false
+	logger: false,
+	https: {
+		key: fs.readFileSync(process.env.KEY_PATH),
+		cert: fs.readFileSync(process.env.CERT_PATH)
+	}
 })
+
+betterFastify(fastify);
 
 fastify.register(multipart, {
 	limits: {

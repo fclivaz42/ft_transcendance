@@ -36,24 +36,35 @@ interface comb {
 	uarray: Array<User>
 }
 
-export default class DatabaseSDK {
+export interface DatabaseSdkConfig {
+	apiKey: string;
+	serverUrl: string;
+}
 
-	private api_key = process.env.API_KEY
-	private server_url = "http://database:3000"
+export const defaultConfig: DatabaseSdkConfig = {
+	apiKey: process.env.API_KEY || "",
+	serverUrl: process.env.DATABASE_URL || "https://database:3000"
+}
+
+export default class DatabaseSDK {
+	private _config: DatabaseSdkConfig = defaultConfig;
+
 	private param_str = "{?PARAMS}"
 	private bc_sdk = new BlockchainSDK();
 	private usr_sdk = new UsersSdk();
 
-	constructor() { }
+	constructor(config?: DatabaseSdkConfig) {
+		this._config = config || defaultConfig;
+	}
 
 	private async api_request<T>(method: "GET" | "POST" | "PUT" | "DELETE", table: "Players" | "Matches" | "Tournaments" | "CurrentContract", endpoint?: string, options?: db_sdk_options): Promise<AxiosResponse<T>> {
 		if (options?.body) {
 			if (!options.headers)
 				options.headers = {};
 		}
-		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+		const httpsAgent = new https.Agent({ rejectUnauthorized:  !(process.env.IGNORE_TLS?.toLowerCase() === "true") });
 
-		let url = `${this.server_url}/${table}`
+		let url = `${this._config.serverUrl}/${table}`
 		if (endpoint)
 			url = url + endpoint
 		if (endpoint && options?.params)
@@ -63,7 +74,7 @@ export default class DatabaseSDK {
 			method,
 			url,
 			headers: {
-				Authorization: this.api_key,
+				Authorization: this._config.apiKey,
 				...options?.headers,
 			},
 			data: options?.body,
