@@ -21,7 +21,6 @@ export default class HomeManager {
    */
   public initialize(parentElement: HTMLElement) {
     if (!parentElement) {
-      console.error("HomeManager: Le parentElement fourni est null ou indéfini.");
       return;
     }
 
@@ -31,7 +30,7 @@ export default class HomeManager {
     const accountButtonText = i18nHandler.getValue("home.accountButton.label");
 
     // Créer l'élément de la page d'accueil
-this._homePageElement = createHomePage({
+	this._homePageElement = createHomePage({
       guestButtonText, // Passe les options des boutons
       accountButtonText,
     });
@@ -46,8 +45,6 @@ this._homePageElement = createHomePage({
     // Attacher les écouteurs d'événements
     this._guestButton?.addEventListener("click", () => this._handleGuestLogin());
     this._accountButton?.addEventListener("click", () => this._handleAccountLogin());
-
-    console.log("HomeManager: Page d'accueil initialisée.");
   }
 
   /**
@@ -55,7 +52,6 @@ this._homePageElement = createHomePage({
    * Pour l'instant, juste un log, la logique de transition viendra ici.
    */
   private _handleGuestLogin() {
-    console.log("HomeManager: Bouton 'Jouer en Guest' cliqué.");
     // FUTURE: Déclencher la transition vers la page principale du jeu
     // Exemple: this.transitionToGamePage();
   }
@@ -65,7 +61,6 @@ this._homePageElement = createHomePage({
    * Pour l'instant, juste un log, la logique de transition vers le dialogue de login viendra ici.
    */
   private _handleAccountLogin() {
-    console.log("HomeManager: Bouton 'Utiliser un compte' cliqué.");
     // FUTURE: Ouvrir le dialogue de login
     // Exemple: this._loginDialogManager.showLoginDialog();
     // FUTURE: Déclencher la transition vers la page principale du jeu après login réussi

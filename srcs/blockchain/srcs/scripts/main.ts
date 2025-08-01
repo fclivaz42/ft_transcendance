@@ -1,10 +1,26 @@
 import Fastify from 'fastify'
 import fs from 'node:fs'
 import path from 'node:path'
+import Logger from '../../../libs/helpers/loggers.ts';
+import { betterFastify } from '../../../libs/helpers/fastifyHelper.ts';
+
+if (process.env.RUNMODE === "debug")
+	Logger.info(process.env.API_KEY)
+
+if (!process.env.KEY_PATH ||
+	!process.env.CERT_PATH) {
+		throw new Error("KEY_PATH and CERT_PATH environment variables must be set to run the server with HTTPS.");
+	}
 
 const fastify = Fastify({
-	logger: true,
+	logger: false,
+	https: {
+		key: fs.readFileSync(process.env.KEY_PATH),
+		cert: fs.readFileSync(process.env.CERT_PATH)
+	}
 })
+
+betterFastify(fastify);
 
 const subfolder = path.join(import.meta.dirname, "routes")
 const folder = fs.readdirSync(subfolder)

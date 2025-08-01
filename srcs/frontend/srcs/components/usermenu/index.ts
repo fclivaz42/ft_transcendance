@@ -259,11 +259,22 @@ export async function createUserDialog(): Promise<HTMLDialogElement> {
 					});
 					dialog.remove();
 				}).catch(error => {
-					console.error("Failed to update profile");
+					let message: string;
+					switch (error.message?.toLowerCase()) {
+						case "error.duplicate.displayname":
+							message = i18nHandler.getValue("panel.registerPanel.notification.registerDisplayNameTaken");
+							break;
+						case "error.duplicate.emailaddress":
+							message = i18nHandler.getValue("panel.registerPanel.notification.registerEmailTaken");
+							break;
+						default:
+							message = i18nHandler.getValue("panel.updateProfile.notification.updateErrorMessage");
+							break;
+					}
 					NotificationManager.notify({
 						"level": "error",
 						"title": i18nHandler.getValue("panel.updateProfile.notification.updateErrorTitle"),
-						"message": i18nHandler.getValue("panel.updateProfile.notification.updateErrorMessage")
+						"message": message
 					});
 				});
 			} else {

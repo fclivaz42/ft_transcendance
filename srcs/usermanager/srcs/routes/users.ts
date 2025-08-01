@@ -259,11 +259,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 			try {
 				user = await db_sdk.update_user(user as User).then(resp => resp.data)
 			} catch (exception) {
-				Logger.error(exception);
-				if (exception instanceof AxiosError)
-					return reply.code(exception.status).send(exception.code)
-				return reply.code(500).send("error.fatal.error")
-				return reply.code(200).send(UsersSdk.filterUserData(user as User));
+				return reply.code(exception.status).send(exception.response?.data)
 			}
 		}
 		return reply.code(200).send(UsersSdk.filterUserData(user as User));

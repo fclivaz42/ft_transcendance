@@ -57,7 +57,7 @@ export interface Oauth2sdkSessionResponse {
 
 export const defaultConfig: Oauth2sdkConfig = {
 	apiKey: process.env.API_KEY || "",
-	serverUrl: "https://oauth2:3000",
+	serverUrl: process.env.OAUTH2_URL || "https://oauth2:3000",
 }
 
 class Oauth2sdk {
@@ -76,7 +76,7 @@ class Oauth2sdk {
 	 * @example apiRequest<Oauth2sdkLoginResponse>("get", "login")
 	 */
 	private async apiRequest<T>(method: "get" | "post", endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
-		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+		const httpsAgent = new https.Agent({ rejectUnauthorized:  !(process.env.IGNORE_TLS?.toLowerCase() === "true") });
 		const url = `${this._config.serverUrl}/oauth/${endpoint}${params ? `?${params.toString()}` : ""}`;
 		return axios({
 			httpsAgent,

@@ -6,13 +6,20 @@ import websocketRoutes from "./plugins/websocketRoutes.ts";
 import { betterFastify } from "../../../libs/helpers/fastifyHelper.ts";
 import Logger from "../../../libs/helpers/loggers.ts";
 
-const app: FastifyInstance = fastify({
-	logger: true,
+if (!process.env.KEY_PATH ||
+	!process.env.CERT_PATH) {
+		throw new Error("KEY_PATH and CERT_PATH environment variables must be set to run the server with HTTPS.");
+	}
+
+const app = fastify({
+	logger: false,
 	https: {
-		key: fs.readFileSync("/etc/ssl/private/sarif.key"),
-		cert: fs.readFileSync("/etc/ssl/certs/sarif.crt"),
-	},
+		key: fs.readFileSync(process.env.KEY_PATH),
+		cert: fs.readFileSync(process.env.CERT_PATH)
+	}
 });
+
+betterFastify(app);
 
 if (process.env.API_KEY === undefined || process.env.RUNMODE === undefined) {
 	console.error(
@@ -46,6 +53,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 			process.exit(1);
 		}
 	};
-	betterFastify(app);
 	start();
 }

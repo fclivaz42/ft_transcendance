@@ -9,7 +9,7 @@ class UserMenuManager {
 
   public initialize() {
 		this._uploadFile.type = "file";
-		this._uploadFile.accept = "image/*";
+		this._uploadFile.accept = "image/jpeg,image/png,image/gif,image/webp,image/bmp,image/tiff,image/heic";
 		this.update().then(() => headerManager.header.appendChild(this._userMenu));
   }
 

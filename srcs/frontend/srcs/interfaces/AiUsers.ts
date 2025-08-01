@@ -2,6 +2,11 @@ import { Users } from "./Users";
 
 
 export const AiUsers = new Map<string, Users>([
+	["P-D", {
+		PlayerID: "P-D",
+		DisplayName: "generic.deletedUser",
+		isBot: true,
+	}],
 	["P-0", {
 		PlayerID: "P-0",
 		DisplayName: "pong.computer",

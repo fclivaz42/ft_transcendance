@@ -11,8 +11,8 @@ EmailManager.initialize();
 
 const server = fastify({
 	https: {
-		key: fs.readFileSync(config.ServerConfig.cert._keypath),
-		cert: fs.readFileSync(config.ServerConfig.cert._certpath)
+		key: fs.readFileSync(config.ServerConfig.cert._KEY_PATH),
+		cert: fs.readFileSync(config.ServerConfig.cert._CERT_PATH)
 	}
 });
 

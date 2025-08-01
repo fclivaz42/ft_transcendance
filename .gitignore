@@ -1,5 +1,6 @@
 # solidity cache file
 data/
+ssl/
 artifacts/
 cache/
 .env

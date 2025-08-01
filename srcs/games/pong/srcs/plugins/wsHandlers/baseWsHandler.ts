@@ -25,12 +25,12 @@ interface ClientMessage {
 
 interface CreateWsHandlerParams {
 	mode:
-		| "remote"
-		| "friend_host"
-		| "friend_join"
-		| "local"
-		| "computer"
-		| "tournament";
+	| "remote"
+	| "friend_host"
+	| "friend_join"
+	| "local"
+	| "computer"
+	| "tournament";
 	manager: RoomManager | TournamentManager;
 }
 
@@ -129,19 +129,6 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 						} else if (payload.direction === "stop") {
 							paddle.setMoveDirection(null);
 						}
-					}
-				} else if (type === "ia" && payload?.direction) {
-					const paddle = session.getPaddle();
-					if (paddle) {
-						console.log(`payload: ${payload.direction}`);
-						if (payload.direction === "p1" && paddle.getName() === "player1")
-							paddle.getIsIA() === true
-								? paddle.setAI(false)
-								: paddle.setAI(true);
-						if (payload.direction === "p2" && paddle.getName() === "player2")
-							paddle.getIsIA() === true
-								? paddle.setAI(false)
-								: paddle.setAI(true);
 					}
 				} else if (type === "disconnect") {
 					socket.close();

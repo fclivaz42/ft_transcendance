@@ -6,8 +6,8 @@ import { betterFastify } from "../../libs/helpers/fastifyHelper.ts";
 
 const server = fastify({
 	https: {
-		key: fs.readFileSync(config.ServerConfig.cert._keypath),
-		cert: fs.readFileSync(config.ServerConfig.cert._certpath)
+		key: fs.readFileSync(config.ServerConfig.cert._KEY_PATH),
+		cert: fs.readFileSync(config.ServerConfig.cert._CERT_PATH)
 	}
 });
 

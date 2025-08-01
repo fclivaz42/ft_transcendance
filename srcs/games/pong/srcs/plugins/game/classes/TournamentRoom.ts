@@ -140,8 +140,8 @@ export default class TournamentRoom extends GameRoom {
 				light: lightsCamera.getLightInitInfo(),
 				roomID: this.id,
 				connectedPlayers: {
-					p1: this.players.at(0)?.getUserId(),
-					p2: this.players.at(1)?.getUserId(),
+					p1: this.players[0]?.getUserId(),
+					p2: this.players[1]?.getUserId(),
 				},
 			},
 		};
@@ -179,9 +179,10 @@ export default class TournamentRoom extends GameRoom {
 
 	override async _killGame(winner: number) {
 		let res = this._send_to_db(
-			this.players[0].getUserId(),
-			this.players[1].getUserId(),
-			winner
+			this.players[0] ? this.players[0].getUserId() : default_users.Deleted.PlayerID,
+			this.players[1] ? this.players[1].getUserId() : default_users.Deleted.PlayerID,
+			winner,
+			this._matchIndex
 		);
 		this.broadcast(this.buildTournamentMatchOverPayload(winner));
 		this.game.gameStop();
@@ -189,13 +190,19 @@ export default class TournamentRoom extends GameRoom {
 			this._onGameOver(this.id);
 		}
 		res
-			.then(function (response) {
+			.then(function(response) {
 				console.log(`Match successfully created:`);
 				console.dir(response.data);
 			})
-			.catch(function (error) {
-				console.error(`WARN: match could not be sent to db!`);
-				console.dir(error);
+			.catch(function(error) {
+				if (typeof error === "string") {
+					if (error.includes("database"))
+						console.error(`WARN: Database down! Match not saved.`)
+					else if (error.includes("blockchain"))
+						console.error(`WARN: Blockchain down! Match not validated.`)
+				}
+				else
+					console.error(`WARN: unknown error! ${error}`)
 			});
 	}
 }

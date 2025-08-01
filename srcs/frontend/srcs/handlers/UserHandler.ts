@@ -18,7 +18,7 @@ class UserHandler {
 	private _friendList: Friends[] = [];
 	private _updatingAliveStatus: boolean = false;
 	private _updatingFriendList: boolean = false;
-	private _publicUserCache = new FixedSizeMap<String, Users>(32);
+	private _publicUserCache = new FixedSizeMap<String, Users>(12);
 
 	constructor() {
 		let clientId = localStorage.getItem("clientId");
@@ -145,9 +145,12 @@ class UserHandler {
 
 	public async fetchUser(playerId?: string): Promise<Users | undefined> {
 		if (playerId) {
+			if (this._friendList.find(friend => friend.PlayerID === playerId))
+				return this._friendList.find(friend => friend.PlayerID === playerId);
 			if (AiUsers.has(playerId)) {
 				const user = AiUsers.get(playerId)!;
-				user.DisplayName = i18nHandler.getValue(user.DisplayName);
+				if (user.DisplayName.includes("."))
+					user.DisplayName = i18nHandler.getValue(user.DisplayName);
 				return user;
 			}
 			if (playerId === this.userId) {
@@ -163,10 +166,8 @@ class UserHandler {
 				return undefined;
 			}
 			const userData = await user.json();
-			this._publicUserCache.set(playerId, userData as Users);
-			setTimeout(() => {
-				this._publicUserCache.delete(playerId!);
-			}, 60000);
+			if (!this._friendList.find(friend => friend.PlayerID === playerId))
+				this._publicUserCache.set(playerId, userData as Users);
 			return userData as Users;
 		}
 		if (this._user)
@@ -201,8 +202,7 @@ class UserHandler {
 				this.updateFriendList();
 				const avatarFile = await fetch("/api/users/me/picture");
 				if (avatarFile.ok) {
-					if (avatarFile.status === 200)
-						this._user.Avatar = "/api/users/me/picture";
+					this._user.Avatar = "/api/users/me/picture";
 				} else {
 					console.warn("Failed to fetch user avatar:", avatarFile.statusText);
 				}
@@ -277,7 +277,8 @@ class UserHandler {
 	private async filterFriend(bot: Users): Promise<Friends> {
 		if (AiUsers.has(bot.PlayerID)) {
 			const friend = AiUsers.get(bot.PlayerID) as Friends;
-			friend.DisplayName = i18nHandler.getValue(friend.DisplayName);
+			if (friend.DisplayName.includes("."))
+				friend.DisplayName = i18nHandler.getValue(friend.DisplayName);
 			friend.isAlive = true;
 			return friend;
 		}
@@ -374,8 +375,10 @@ class UserHandler {
 			method: "PUT",
 			body: multipartFormdata,
 		});
-		if (!response.ok)
-			throw new Error(`Failed to update user data: ${response.statusText}`);
+		if (!response.ok) {
+			const body = await response.json();
+			throw new Error(body?.detail || `Failed to update user: ${response.statusText}`);
+		}
 		const updatedUser = await response.json() as Partial<Users>;
 		this._user = { ...this._user, ...updatedUser } as Users;
 		if (data.Avatar)

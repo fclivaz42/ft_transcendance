@@ -198,7 +198,6 @@ export function createHomePage() {
             // Optionnel: Déclencher la navigation ou le changement de vue après l'animation
             setTimeout(() => {
                 // Par exemple, rediriger l'utilisateur ou changer l'état de l'application
-                console.log(`Navigating to ${colorClass} related content`);
                 // window.location.href = `/app/${colorClass.includes('red') ? 'guest' : 'account'}`;
                 // Si vous avez un système de routage SPA, ce serait ici :
                 // router.navigate(colorClass.includes('red') ? '/guest' : '/account');
