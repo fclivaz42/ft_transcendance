@@ -10,14 +10,17 @@ import { sanitizer } from "../../../helpers/sanitizer";
 function createUserDeleteContent(dialogRef: BackdropDialog): HTMLDivElement {
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<div class="flex flex-col items-center p-4 gap-4 w-72 justify-center text-center select-none">
+		<form class="flex flex-col items-center p-4 gap-4 w-72 justify-center text-center select-none" onsubmit="event.preventDefault();">
 			<div class="flex flex-col items-center gap-2">
 				<img src="/assets/ui/delete-2-svgrepo-com.svg" alt="Delete icon" class="w-16 h-16 dark:invert">
 				<p data-i18n="panel.updateProfile.delete.title" class="text-xl">${sanitizer(i18nHandler.getValue("panel.updateProfile.delete.title"))}</p>
 			</div>
+			<!-- Hidden input for accessibility, not used in the form -->
+			<input name="username" type="text" class="hidden" autocomplete="username" value="${sanitizer(UserHandler.displayName) || ""}"/>
 			${createTextbox({
 				type: "password",
 				placeholder: i18nHandler.getValue("panel.updateProfile.delete.passwordPlaceholder"),
+				autoComplete: "current-password",
 			}).outerHTML}
 			<div class="flex gap-2 w-2/3 justify-between">
 				${createButton({
@@ -34,7 +37,7 @@ function createUserDeleteContent(dialogRef: BackdropDialog): HTMLDivElement {
 				}).outerHTML}
 			</div>
 			<p>${sanitizer(i18nHandler.getValue("panel.updateProfile.delete.info"))}</p>
-		</div>
+		</form>
 	`;
 	const element = template.content.firstElementChild as HTMLDivElement;
 	const sumbitButton = element.querySelector("button:first-of-type") as HTMLButtonElement;
@@ -72,13 +75,16 @@ function createUserDeleteContent(dialogRef: BackdropDialog): HTMLDivElement {
 			}
 		} catch (error) {
 			const err = error as Error;
-			console.error(err);
 			NotificationManager.notify({
 				level: "error",
 				message: i18nHandler.getValue(err.message) ||  i18nHandler.getValue("notification.generic.errorMessage"),
 				title: i18nHandler.getValue("notification.generic.errorTitle"),
 			});
 		}
+	};
+	passwordInput.onsubmit = (event: Event) => {
+		event.preventDefault();
+		sumbitButton.click();
 	};
 	cancelButton.onclick = () => {
 		dialogRef.remove();

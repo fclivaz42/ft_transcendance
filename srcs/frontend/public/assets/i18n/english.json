@@ -1,6 +1,7 @@
 {
   "generic": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "deletedUser": "Deleted User"
   },
   "home": {
     "title": "Welcome to SARIF's Pong",
