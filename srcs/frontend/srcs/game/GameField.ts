@@ -16,7 +16,7 @@ import { InitPayload, UpdatePayload, CameraInitInfo, LightInitInfo } from "./typ
 // Temp values, overriding WebSocket info
 const ALPHA: number = Math.PI / 2;
 const BETA: number = Math.PI / 2;
-const RADIUS: number = -26;
+const RADIUS: number = -22;
 
 export class GameField {
 	public scene: Scene;
@@ -87,8 +87,8 @@ export class GameField {
 	// --- Effect Grid  ---
 	private createGridTronEffect(): void {
 		const gridConfig = {
-			gameWidth: 13.7 * 2, // = 27.4
-			gameHeight: 16.6,
+			gameWidth: 13.5 * 2, // = 27.4
+			gameHeight: 15.7,
 			gameReferenceZ: 0,
 			gridTotalDepth: 40,
 			gridSize: 2,
