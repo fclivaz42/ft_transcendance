@@ -66,7 +66,7 @@ class PongGameManager {
 		const pingElements = document.querySelectorAll<HTMLSpanElement>("[data-pong-ping]");
 		for (const element of pingElements) {
 			const identifier = element.getAttribute("data-pong-ping");
-			if (this.getPlayers[identifier! as "p1" | "p2"]!.PlayerID! === UserHandler.userId)
+			if (this.getPlayers[identifier! as "p1" | "p2"]?.PlayerID! === UserHandler.userId)
 				element.textContent = `${this.pingInterval.ping}ms`;
 		}
 	}
@@ -76,7 +76,7 @@ class PongGameManager {
 		const pingElements = document.querySelectorAll<HTMLSpanElement>("[data-pong-ping]");
 		for (const element of pingElements) {
 			const identifier = element.getAttribute("data-pong-ping");
-			if (this.getPlayers[identifier! as "p1" | "p2"]!.PlayerID! !== UserHandler.userId)
+			if (this.getPlayers[identifier! as "p1" | "p2"]?.PlayerID !== UserHandler.userId)
 				element.textContent = `${this.pingInterval.ping}ms`;
 		}
 	}
@@ -251,6 +251,8 @@ class PongGameManager {
 	}
 
 	public get getPlayers(): Record<"p1" | "p2", Users | undefined> {
+		if (!this.users)
+			throw new Error("Users are not initialized.");
 		return this.users;
 	}
 
