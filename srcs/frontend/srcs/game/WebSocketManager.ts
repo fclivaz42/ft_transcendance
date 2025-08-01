@@ -2,14 +2,11 @@ import { i18nHandler } from "../handlers/i18nHandler.js";
 import RoutingHandler from "../handlers/RoutingHandler.js";
 import NotificationManager from "../managers/NotificationManager.js";
 import PongGameManager from "../managers/PongGameManager.js";
-import { GameField } from "./GameField.js";
 import { ServerMessage, InitPayload, UpdatePayload, CollisionPayload } from "./types.js";
 
 type InitHandler = (payload: InitPayload["payload"]) => void;
 type UpdateHanlder = (payload: UpdatePayload["payload"]) => void;
 type CollisionHandler = (payload: CollisionPayload["payload"]) => void;
-
-export { InitHandler, UpdateHanlder, CollisionHandler };
 
 export const PONG_HOST = `wss://${location.host}/api/game/`
 

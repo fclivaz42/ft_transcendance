@@ -7,18 +7,14 @@ import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
 import { GameOverPayload, InitPayload, PingRequestPayload, PingResponsePayload, PlayerConnectedPayload, TournamentBracketStatusPayload, TournamentMatchOverPayload, TournamentMatchStatus, TournamentOverPayload } from "../game/types.js";
 import UserHandler from "../handlers/UserHandler.js";
-import { i18nHandler } from "../handlers/i18nHandler.js";
 import createUserAvatar from "../components/usermenu/userAvatar.js";
 import { Users } from "../interfaces/Users.js";
 import { createPongGameoverDialog } from "../components/dialog/pongGameover/index.js";
 import RoutingHandler from "../handlers/RoutingHandler.js";
-import { AiUsers } from "../interfaces/AiUsers.js";
 import { createBracketComponent, createBracketDialog } from "../components/backdropDialog/bracketDialog.js";
 import BackdropDialog from "../class/BackdropDialog.js";
 
-import AudioManager from "./AudioManager.js"; 
-import { CollisionPayload } from "../game/types.js";
-import {InitHandler} from "../game/WebSocketManager.js";
+import AudioManager from "./AudioManager.js";
 
 function enforceDefined<T>(value: T | undefined, message: string): T {
 	if (!value)
@@ -43,7 +39,7 @@ class PongGameManager {
 		lastCheck: number | undefined;
 		ping: number | undefined;
 		sentPing: number | undefined;
-	} = {ping: undefined, sentPing: undefined, lastCheck: undefined};
+	} = { ping: undefined, sentPing: undefined, lastCheck: undefined };
 	private users: Record<"p1" | "p2", Users | undefined> = {
 		p1: undefined,
 		p2: undefined
@@ -122,7 +118,7 @@ class PongGameManager {
 				this.users[identifier as "p1" | "p2"] = userData;
 				if (!userData) throw new Error(`User data for ${identifier} not found.`);
 				element.textContent = userData.DisplayName;
-				const newAvatar = createUserAvatar({playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14"});
+				const newAvatar = createUserAvatar({ playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14" });
 				newAvatar.setAttribute("data-pong-avatar", identifier);
 				avatarElement?.replaceWith(newAvatar);
 				if (userData.isBot) {
@@ -148,22 +144,22 @@ class PongGameManager {
 		this.engine = new Engine(this.getFrontElements.canvas, true);
 		this.field = new GameField(this.engine);
 
-        this.audioManager = AudioManager.getInstance(); 
-        if (!this.audioManager) {
-            this.audioManager = new AudioManager(); 
-        }
-        const resumeAudioOnInteraction = async () => {
-            document.removeEventListener('click', resumeAudioOnInteraction);
-            document.removeEventListener('keypress', resumeAudioOnInteraction);
-            await this.audioManager?.unmuteAll(); 
-            if (this.audioManager) {
-                this.audioManager.playBackgroundMusic(); 
-            }
-        };
-        document.addEventListener('click', resumeAudioOnInteraction, { once: true });
-        document.addEventListener('keypress', resumeAudioOnInteraction, { once: true });
+		this.audioManager = AudioManager.getInstance();
+		if (!this.audioManager) {
+			this.audioManager = new AudioManager();
+		}
+		const resumeAudioOnInteraction = async () => {
+			document.removeEventListener('click', resumeAudioOnInteraction);
+			document.removeEventListener('keypress', resumeAudioOnInteraction);
+			await this.audioManager?.unmuteAll();
+			if (this.audioManager) {
+				this.audioManager.playBackgroundMusic();
+			}
+		};
+		document.addEventListener('click', resumeAudioOnInteraction, { once: true });
+		document.addEventListener('keypress', resumeAudioOnInteraction, { once: true });
 
-        
+
 
 		this.websocketManager = new WebSocketManager(
 			(payload) => {
@@ -185,24 +181,17 @@ class PongGameManager {
 					});
 				}
 			},
-			(payload) => this.getField.update(payload),(payload) => {
-                if (payload.collider === "player1" || payload.collider === "player2" || 
-                    payload.collider === "p1" || payload.collider === "p2") {
-                    this.audioManager?.playPaddleHit(); 
-                } 
-				else if (payload.collider === "eastWall") 
-				{
-                    this.audioManager?.playGoalSound();
-                } 
-				else if (payload.collider === "westWall")
-				{
+			(payload) => this.getField.update(payload), (payload) => {
+				if (payload.collider === "player1" || payload.collider === "player2") {
+					this.audioManager?.playPaddleHit();
+				}
+				else if (payload.collider === "westWall" || payload.collider === "eastWall") {
 					this.audioManager?.playMissedSound();
 				}
-				else 
-				{
-                    this.audioManager?.playWallBounce(); 
-                } 
-            }, addr
+				else {
+					this.audioManager?.playWallBounce();
+				}
+			}, addr
 		);
 		window.addEventListener("resize", () => {
 			this.getEngine.resize();
@@ -213,13 +202,13 @@ class PongGameManager {
 		this.bracket = undefined;
 		this.dialogRef?.close();
 		if (this.frontElements)
-				for (const element of Object.values(this.frontElements))
-					if (element) element.remove();
+			for (const element of Object.values(this.frontElements))
+				if (element) element.remove();
 		this.frontElements = undefined;
-        if (this.audioManager) {
-            this.audioManager.dispose(); 
-            this.audioManager = undefined;
-        }
+		if (this.audioManager) {
+			this.audioManager.dispose();
+			this.audioManager = undefined;
+		}
 		this.pingInterval = {
 			ping: undefined,
 			sentPing: undefined,
@@ -239,7 +228,7 @@ class PongGameManager {
 		return this.field;
 	}
 
-	private get getFrontElements(): frontElements{
+	private get getFrontElements(): frontElements {
 		if (!this.frontElements)
 			throw new Error("Front elements are not initialized.");
 		return this.frontElements;
@@ -252,11 +241,11 @@ class PongGameManager {
 			const updatedScore = score[identifier].toString();
 			if (element.textContent === updatedScore) continue;
 			window.requestAnimationFrame(() => {
-					element.classList.add("animate-slide-up-fade");
-					element.textContent = updatedScore;
-					setTimeout(() => {
-							element.classList.remove("animate-slide-up-fade");
-					}, 1000);
+				element.classList.add("animate-slide-up-fade");
+				element.textContent = updatedScore;
+				setTimeout(() => {
+					element.classList.remove("animate-slide-up-fade");
+				}, 1000);
 			});
 		}
 	}
@@ -265,7 +254,7 @@ class PongGameManager {
 		return this.users;
 	}
 
-	public get getBracket(): TournamentMatchStatus[]{
+	public get getBracket(): TournamentMatchStatus[] {
 		if (!this.bracket)
 			throw new Error("Bracket is not initialized.");
 		return this.bracket;
