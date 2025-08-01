@@ -375,8 +375,10 @@ class UserHandler {
 			method: "PUT",
 			body: multipartFormdata,
 		});
-		if (!response.ok)
-			throw new Error(`Failed to update user data: ${response.statusText}`);
+		if (!response.ok) {
+			const body = await response.json();
+			throw new Error(body?.detail || `Failed to update user: ${response.statusText}`);
+		}
 		const updatedUser = await response.json() as Partial<Users>;
 		this._user = { ...this._user, ...updatedUser } as Users;
 		if (data.Avatar)

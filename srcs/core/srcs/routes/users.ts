@@ -224,7 +224,6 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 	fastify.all('/update', async (request, reply) => {
 		if (!(request.method === 'PUT' || request.method === 'PATCH'))
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only PUT or PATCH method is allowed for user update.' });
-
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 		const userId = authorization.data.sub;
 		const formdata = new FormData();
@@ -256,10 +255,10 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			resp = await usersSdk.updateUser(userId, formdata);
 		} catch (err) {
 			if (axios.isAxiosError(err)) {
-				Logger.error(`User update failed: ${err.message}`);
+				Logger.error(`User update failed: ${err.response?.data || err.response?.data?.detail || err.message}`);
 				return httpReply({
 					module: 'usermanager',
-					detail: err.response?.data?.detail || 'User update failed',
+					detail: err.response?.data || 'User update failed',
 					status: err.response?.status || 500,
 				}, reply, request);
 			}
