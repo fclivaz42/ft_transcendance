@@ -64,7 +64,7 @@ function createUserDeleteContent(dialogRef: BackdropDialog): HTMLDivElement {
 						message: i18nHandler.getValue("panel.updateProfile.notification.oauthNoPassword"),
 					});
 				} else if (res.message === "Wrong password.") {
-					throw new Error("error.badPassword");
+					throw new Error("panel.updateProfile.notification.badPassword");
 				} else
 					throw new Error("generic.error");
 			} else {

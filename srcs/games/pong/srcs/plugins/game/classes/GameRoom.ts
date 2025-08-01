@@ -29,6 +29,7 @@ export default class GameRoom {
 	protected _lastMessage?: string;
 	protected _lastCollision?: CollisionPayload;
 	protected _start_time: number = Date.now();
+	private	_private: boolean = false;
 
 	protected _onGameOver?: (roomId: string) => void;
 
@@ -50,8 +51,22 @@ export default class GameRoom {
 		return this.players.length >= 2;
 	}
 
+	public get closed(): boolean {
+		return this._private;
+	}
+
+	public set closed(val: boolean) {
+		this._private = val;
+	}
+
+
 	public isEmpty(): boolean {
 		return this.players.length === 0;
+	}
+
+	public isEmptyAIExclusive(): boolean {
+		const realPlayers = this.players.filter((p) => !p.isAI);
+		return realPlayers.length === 0;
 	}
 
 	public getGame(): Game {
@@ -71,6 +86,11 @@ export default class GameRoom {
 		paddleIdOverride: boolean = false
 	): void {
 		this.players.push(playerSession);
+
+		if (playerSession.local) {
+			playerSession.setRoom(this);
+			console.log("added dummy player to local room.");
+		}
 
 		if (!playerSession.isAI) {
 			playerSession.setRoom(this);
@@ -119,6 +139,19 @@ export default class GameRoom {
 			: this.game.setP2IA(true);
 		// on a player disconnect sets AI to missing player and locks the room
 		this.lock = true;
+	}
+
+	public removeAIfromRoom(): void {
+		this.players = [];
+		console.log(`Removed all AI players from ${this.id}`);
+		if (this.isEmpty()) {
+			this.game.gameStop();
+			if (this._onGameOver) {
+				this._onGameOver(this.id);
+			}
+			return;
+		}
+		throw new Error("room still not empty, de hell?")
 	}
 
 	public addScore(player: number) {
@@ -205,6 +238,16 @@ export default class GameRoom {
 				p.send(message);
 			} catch (err) {
 				console.error(`Failed to send to player: ${this.id}: ${err}`);
+			}
+		}
+	}
+
+	public selectiveSend(message: GameMessage | LobbyBroadcastPayload | TournamentMessage, playerList: PlayerSession[]): void {
+		for (const p of playerList) {
+			try {
+				p.send(message);
+			} catch (err) {
+				console.error(`Failed to send to player: ${p.getUserId()}: ${err}`);
 			}
 		}
 	}

@@ -46,3 +46,8 @@ frameManager.initialize();
 
 // note that the loginDialogManager is not initialized here, it is initialized on its own when needed (e.g., when the login button is clicked)
 // this should be the case for all dialog managers, as they are only needed when the user interacts with the UI
+
+if (localStorage.getItem("gdprAcceptedVersion") !== i18nHandler.getValue("panel.gdpr.version")) {
+	const { createGdprNotice } = await import("./components/dialog/grpdNotice/index.js");
+	createGdprNotice();
+}

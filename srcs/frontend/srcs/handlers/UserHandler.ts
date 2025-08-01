@@ -54,8 +54,12 @@ class UserHandler {
 			this._updatingFriendList = true;
 			const friendListResp: Response | undefined = await fetch("/api/users/me/friends").catch(error => { console.error(error); return undefined; });
 			if (!friendListResp || !friendListResp.ok) {
-				console.warn("Failed to fetch friend list:", friendListResp?.statusText);
+				if (friendListResp?.status === 401 || friendListResp?.status === 403) {
+					this.clearUserData();
+					this.updateComponents();
+				}
 				this._friendList = [];
+				console.error("Failed to fetch friend list:", friendListResp?.statusText);
 				return;
 			}
 			this._friendList = await friendListResp.json() as Friends[];
@@ -71,7 +75,7 @@ class UserHandler {
 		while (this.isLogged && !this._updatingAliveStatus) {
 			this._updatingAliveStatus = true;
 			try {
-				await fetch("/api/users/me/alive", {
+				const res = await fetch("/api/users/me/alive", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -80,6 +84,13 @@ class UserHandler {
 						PlayerId: this._clientId,
 					}),
 				});
+				if (!res.ok) {
+					if (res.status === 401 || res.status === 403) {
+						this.clearUserData();
+						this.updateComponents();
+					}
+					throw new Error(res.statusText);
+				}
 			} catch (error) {
 				console.error("Failed to update alive status:", error);
 			}
@@ -160,12 +171,24 @@ class UserHandler {
 		}
 		if (this._user)
 			return this._user;
-		const user = await fetch("/api/users/me");
-		if (!user.ok) {
-			console.warn("Failed to fetch user data:", user.statusText);
-			this.clearUserData();
-		}
-		else {
+		const user = await fetch("/api/users/me")
+			.then(response => {
+				if (!response.ok) {
+					if (response.status === 401 || response.status === 403) {
+						this.clearUserData();
+						this.updateComponents();
+						return undefined;
+					}
+					throw new Error(`Failed to fetch user data: ${response.statusText}`);
+				}
+				return response;
+			})
+			.catch(error => {
+				console.error(error);
+				this.clearUserData();
+				return undefined;
+			});
+		if (user) {
 			const userData = await user.json();
 			if (!userData || !userData.PlayerID || !userData.DisplayName || !userData.EmailAddress) {
 				console.warn("User data is incomplete or missing.", userData);
@@ -186,7 +209,7 @@ class UserHandler {
 			}
 		}
 		this.updateComponents();
-		return this._user as Users;
+		return this._user;
 	}
 
 	private clearUserData() {

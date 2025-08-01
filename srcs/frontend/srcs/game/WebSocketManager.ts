@@ -2,11 +2,11 @@ import { i18nHandler } from "../handlers/i18nHandler.js";
 import RoutingHandler from "../handlers/RoutingHandler.js";
 import NotificationManager from "../managers/NotificationManager.js";
 import PongGameManager from "../managers/PongGameManager.js";
-import { GameField } from "./GameField.js";
-import { ServerMessage, InitPayload, UpdatePayload } from "./types.js";
+import { ServerMessage, InitPayload, UpdatePayload, CollisionPayload } from "./types.js";
 
 type InitHandler = (payload: InitPayload["payload"]) => void;
 type UpdateHanlder = (payload: UpdatePayload["payload"]) => void;
+type CollisionHandler = (payload: CollisionPayload["payload"]) => void;
 
 export const PONG_HOST = `wss://${location.host}/api/game/`
 
@@ -16,6 +16,7 @@ export class WebSocketManager {
 	constructor(
 		private onInit: InitHandler,
 		private onUpdate: UpdateHanlder,
+		private onCollision: CollisionHandler,
 		private addr: string
 	) {
 		this.socket = new WebSocket(this.addr);
@@ -23,17 +24,31 @@ export class WebSocketManager {
 		window.addEventListener('keyup', (event) => {
 			if (this.socket.readyState !== WebSocket.OPEN)
 				return;
-			if (event.key === 'w' || event.key === "s") {
-				this.socket.send(JSON.stringify({
-					type: "move",
-					payload: {
-						direction: "stop"
+			switch (event.key) {
+				case "w":
+				case "s":
+					this.socket.send(JSON.stringify({
+						type: "move",
+						payload: {
+							direction: "stop"
+						}
+					}));
+					break;
+				case "ArrowUp":
+				case "ArrowDown":
+					if (RoutingHandler.url.searchParams.get("room") === "local") {
+						this.socket.send(JSON.stringify({
+							type: "move2",
+							payload: {
+								direction: "stop"
+							}
+						}));
 					}
-				}))
-			};
+					break;
+			}
 		});
 
-		window.addEventListener('keypress', (event) => {
+		window.addEventListener('keydown', (event) => {
 			if (this.socket.readyState !== WebSocket.OPEN)
 				return;
 			let data: any | undefined;
@@ -46,6 +61,14 @@ export class WebSocketManager {
 					break;
 				case " ":
 					data = { type: "ball", payload: { direction: "launch" } };
+					break;
+				case "ArrowUp":
+					if (RoutingHandler.url.searchParams.get("room") === "local")
+						data = { type: "move2", payload: { direction: "up" } };
+					break;
+				case "ArrowDown":
+					if (RoutingHandler.url.searchParams.get("room") === "local")
+						data = { type: "move2", payload: { direction: "down" } };
 					break;
 				case "o":
 					data = { type: "ia", payload: { direction: "p1" } };
@@ -78,6 +101,9 @@ export class WebSocketManager {
 				case "tournament-score":
 				case "score":
 					PongGameManager.onScoreUpdate(msg.payload.score);
+					break;
+				case "collision":
+					this.onCollision(msg.payload);
 					break;
 				case "tournament-match-over":
 					PongGameManager.onTournamentMatchOver(msg.payload);

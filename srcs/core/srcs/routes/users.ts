@@ -210,8 +210,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 		try {
-			const test = await db_sdk.log_user(authorization.data.sub, "PlayerID", password as string)
-				.then(response => response.data)
+			await db_sdk.log_user(authorization.data.sub, "PlayerID", password as string)
 		} catch (exception) {
 			if (exception.status === 403)
 				return reply.code(403).send({ error: "Unauthorized", message: "No password is set due to Oauth2." })

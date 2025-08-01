@@ -6,6 +6,7 @@ import { generateRoomId } from "../helpers/id_generator.ts";
 import TournamentManager from "./TournamentManager.ts";
 import { MAX_SCORE } from "./types.ts";
 import type {
+	GameMessage,
 	RoomScore,
 	TournamentMessage,
 	TournamentOverPayload,
@@ -136,7 +137,7 @@ export default class TournamentLobby {
 			if (match.p1.isAI && match.p2.isAI) {
 				const winner = Math.random() < 0.5 ? match.p1 : match.p2;
 				const winnerScore = MAX_SCORE;
-				const loserScore = Math.floor(Math.random() * (MAX_SCORE - 1));
+				const loserScore = Math.floor(Math.random() * (MAX_SCORE));
 				this._bracket.markMatchResult(match.matchIndex, {
 					p1: winner === match.p1 ? winnerScore : loserScore,
 					p2: winner === match.p2 ? winnerScore : loserScore,
@@ -173,6 +174,8 @@ export default class TournamentLobby {
 		room.lock = true;
 	}
 
+	private _
+
 	private _attachGameOverCallback(
 		room: TournamentRoom,
 		p1: PlayerSession,
@@ -181,7 +184,16 @@ export default class TournamentLobby {
 		room.setOnGameOver((roomId: string) => {
 			console.log(`Game over in room ${roomId}`);
 			const matchIndex = room.getMatchIndex();
-			const score = room.getScore();
+			let score = {p1: 0, p2: 0};
+			if (p1.isAI && p2.isAI) {
+				const winner = Math.random() < 0.5 ? p1 : p2;
+				const winnerScore = MAX_SCORE;
+				const loserScore = Math.floor(Math.random() * (MAX_SCORE));
+				score = {
+					p1: winner === p1 ? winnerScore : loserScore,
+					p2: winner === p2 ? winnerScore : loserScore
+				}
+			} else score = room.getScore();
 			this._bracket.markMatchResult(matchIndex, score);
 			this._bracket.broadcastBracket(this);
 
@@ -267,15 +279,27 @@ export default class TournamentLobby {
 	}
 
 	public removePlayer(playerSession: PlayerSession): void {
-		playerSession.disconnected = true;
-		this._players = this._players.filter((p) => p !== playerSession);
-		console.log(
-			`Removed player ${playerSession.getUserId()} from TournamentLobby ${
-				this.lobbyID
-			}`
-		);
+		playerSession.isAI = true;
+		// this._players = this._players.filter((p) => p !== playerSession);
+		// console.log(
+		// 	`Removed player ${playerSession.getUserId()} from TournamentLobby ${
+		// 		this.lobbyID
+		// 	}`
+		// );
 		this.lobbyBroadcast(this.buildTournamentPlayerDisconnected(playerSession));
-		this.adjustDisconnects();
+		const room = playerSession.getRoom();
+		if (room) { // means that the game is progress, right?
+			const otherPlayer = room.players.find(p => p !== playerSession);
+			if (otherPlayer && otherPlayer.isAI)
+				room.removeAIfromRoom();
+			else {
+				playerSession.getPaddleId() === "p1"
+					? room.game.setP1IA(true)
+					: room.game.setP2IA(true);
+				room.lock = true;
+			}
+		}
+		// this.adjustDisconnects();
 	}
 
 	private _fillAI() {
@@ -296,7 +320,7 @@ export default class TournamentLobby {
 			if (!player.isAI) {
 				player.getSocket()?.close();
 			}
-			this._bracket.cleanUp();
+			if (this._bracket) this._bracket.cleanUp();
 			this._players = [];
 			this._rooms.clear();
 		}

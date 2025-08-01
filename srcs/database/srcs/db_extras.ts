@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/18 20:58:12 by fclivaz           #+#    #+#             //
-//   Updated: 2025/07/05 23:31:28 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/31 00:52:29 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -59,8 +59,10 @@ async function logger_preparser(request: fft.FastifyRequest, reply: fft.FastifyR
 		const usr = await check_password(params[mode] as string, mode, headers["password"])
 		if (usr !== undefined)
 			return reply.code(200).send(usr)
+		else if (usr !== undefined && (usr as any).string === "error.use.oauth")
+			return reply.code(403).send("error.use.oauth")
 		else
-			return reply.code(403).send({ skill: "issue" })
+			return reply.code(401).send({ skill: "issue" })
 	} catch (exception) {
 		if (typeof exception.code === "number")
 			return reply.code(exception.code).send(exception.string)
