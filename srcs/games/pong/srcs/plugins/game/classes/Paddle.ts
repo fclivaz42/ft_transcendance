@@ -279,11 +279,11 @@ export default class Paddle {
 		}
 		const score: Score = this._gameRoom.score;
 		let diff: number = score.p1 - score.p2;
-		if (fps === 1) {
-			console.log(`\nscore{ p1: ${this._gameRoom.score.p1}, p2: ${this._gameRoom.score.p2}}`);
-			console.log(`difference score: ${diff}`);
-			console.log(`AI power: ${DIFF_SCORE_PLAYER - diff > 0 ? DIFF_SCORE_PLAYER - diff : 0}`);
-		}
+		// if (fps === 1) {
+		// 	console.log(`\nscore{ p1: ${this._gameRoom.score.p1}, p2: ${this._gameRoom.score.p2}}`);
+		// 	console.log(`difference score: ${diff}`);
+		// 	console.log(`AI power: ${DIFF_SCORE_PLAYER - diff > 0 ? DIFF_SCORE_PLAYER - diff : 0}`);
+		// }
 		if (this._ball.getIsLaunched())
 			DIFF_SCORE_PLAYER - diff < 0 ? this.randMoove(fps, DIFF_SCORE_PLAYER) : this.randMoove(fps, diff);
 		this.iaAlgo(fps);
