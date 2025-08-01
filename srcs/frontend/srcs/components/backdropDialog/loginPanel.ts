@@ -95,26 +95,26 @@ export function createLoginPanel(options: LoginDialogOptions)
   passwordErrorFeedback.className = "text-sm text-red-400 ml-2 mt-1 hidden";
   loginPasswordContainer.appendChild(passwordErrorFeedback);
 
-    // Conteneur "remember me"
-  const rememberMeContainer = document.createElement("div");
-  rememberMeContainer.className = "flex items-center mt-2"; 
+  //   // Conteneur "remember me"
+  // const rememberMeContainer = document.createElement("div");
+  // rememberMeContainer.className = "flex items-center mt-2"; 
   
-  const rememberMeCheckbox = document.createElement("input");
-  rememberMeCheckbox.type = "checkbox";
-  rememberMeCheckbox.id = "rememberMe";
-  rememberMeCheckbox.className = `
-    mr-2 h-4 w-4 text-blue-600 bg-gray-800 border-gray-600 
-    rounded focus:ring-blue-500 dark:focus:ring-600 dark:ring-offset-gray-700 
-    focus:ring-2 dark:bg-gray-600 dark:border-gray-500 cursor-pointer
-  `.replace(/\s+/g, " ");
+  // const rememberMeCheckbox = document.createElement("input");
+  // rememberMeCheckbox.type = "checkbox";
+  // rememberMeCheckbox.id = "rememberMe";
+  // rememberMeCheckbox.className = `
+  //   mr-2 h-4 w-4 text-blue-600 bg-gray-800 border-gray-600 
+  //   rounded focus:ring-blue-500 dark:focus:ring-600 dark:ring-offset-gray-700 
+  //   focus:ring-2 dark:bg-gray-600 dark:border-gray-500 cursor-pointer
+  // `.replace(/\s+/g, " ");
 
-  const rememberMeLabel = document.createElement("label");
-  rememberMeLabel.htmlFor = "rememberMe";
-  rememberMeLabel.textContent = i18nHandler.getValue("panel.loginPanel.rememberMe");
-  rememberMeLabel.className = "text-gray-300 text-sm cursor-pointer";
+  // const rememberMeLabel = document.createElement("label");
+  // rememberMeLabel.htmlFor = "rememberMe";
+  // rememberMeLabel.textContent = i18nHandler.getValue("panel.loginPanel.rememberMe");
+  // rememberMeLabel.className = "text-gray-300 text-sm cursor-pointer";
 
-  rememberMeContainer.appendChild(rememberMeCheckbox);
-  rememberMeContainer.appendChild(rememberMeLabel);
+  // rememberMeContainer.appendChild(rememberMeCheckbox);
+  // rememberMeContainer.appendChild(rememberMeLabel);
     // Bouton de connexion
   const loginButton = document.createElement("button");
   loginButton.textContent = i18nHandler.getValue("panel.loginPanel.connexionButton");;
@@ -127,13 +127,7 @@ export function createLoginPanel(options: LoginDialogOptions)
   `.replace(/\s+/g, " ");
   loginButton.disabled = true;
 
-    // Liens bas de panneau ->vers autre panel
-  const switchToForgotPasswordLink = document.createElement("a");
-  switchToForgotPasswordLink.href = "#";
-  switchToForgotPasswordLink.textContent = i18nHandler.getValue("panel.loginPanel.link.forgotPasswordPanel");;
-  switchToForgotPasswordLink.className = "text-center text-blue-400 hover:text-blue-200 text-sm mt-1 cursor-pointer";
-//   loginPanel.appendChild(switchToForgotPasswordLink);
-
+  // Liens bas de panneau ->vers autre panel
   const switchToRegisterLink = document.createElement("a");
   switchToRegisterLink.href = "#";
   switchToRegisterLink.textContent = i18nHandler.getValue("panel.loginPanel.link.subscribePanel");
@@ -145,11 +139,10 @@ export function createLoginPanel(options: LoginDialogOptions)
 // ==============================
   loginForm.appendChild(loginDisplayNameContainer);
   loginForm.appendChild(loginPasswordContainer);
-  loginForm.appendChild(rememberMeContainer); 
+  // loginForm.appendChild(rememberMeContainer); 
   loginForm.appendChild(loginButton);
   loginPanel.appendChild(loginForm);
-    loginPanel.appendChild(switchToRegisterLink);
-  loginPanel.appendChild(switchToForgotPasswordLink);
+  loginPanel.appendChild(switchToRegisterLink);
   //le reste direct appele en dessous
 
 // 2.5. CONFIGURATION DES ÉCOUTEURS D'ÉVÉNEMENTS
@@ -210,9 +203,9 @@ export function createLoginPanel(options: LoginDialogOptions)
         // Récupération des valeurs du formulaire si valide
         const displayName = loginDisplayNameContainer.value;
         const password = loginPasswordContainer.value;
-        const rememberMe = rememberMeCheckbox.checked;
+        // const rememberMe = rememberMeCheckbox.checked;
 
-        options.onSubmit('login', { displayName, password, rememberMe });
+        options.onSubmit('login', { displayName, password });
     });
 
 // 2.6. INITIALISATION DE L'ÉTAT DU PANEL
@@ -235,8 +228,7 @@ updateFieldAppearance(loginPasswordContainer, passwordErrorFeedback, validateLog
     form: loginForm,
     displayNameInput: loginDisplayNameContainer,
     passwordInput: loginPasswordContainer,
-    rememberMeCheckbox: rememberMeCheckbox,
-    switchToForgotPasswordLink: switchToForgotPasswordLink,
+    // rememberMeCheckbox: rememberMeCheckbox,
     switchToRegisterLink: switchToRegisterLink,
     displayNameErrorFeedback: displayNameErrorFeedback,
     passwordErrorFeedback: passwordErrorFeedback,
