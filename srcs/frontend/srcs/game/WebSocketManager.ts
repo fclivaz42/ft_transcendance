@@ -70,12 +70,6 @@ export class WebSocketManager {
 					if (RoutingHandler.url.searchParams.get("room") === "local")
 						data = { type: "move2", payload: { direction: "down" } };
 					break;
-				case "o":
-					data = { type: "ia", payload: { direction: "p1" } };
-					break;
-				case "p":
-					data = { type: "ia", payload: { direction: "p2" } };
-					break;
 			}
 			if (data)
 				this.socket.send(JSON.stringify(data));
