@@ -38,11 +38,6 @@ const SOUNDS_CONFIG: Record<string, SoundConfig> =
         url: "/assets/sounds/miss.mp3",
         volume: 0.7
     },
-    Goal:
-    {
-        url: "/assets/sounds/goal.mp3",
-        volume: 0.7
-    }
 };
 
 export default class AudioManager
@@ -228,11 +223,6 @@ export default class AudioManager
     {
         const volume = Math.min(0.8, 0.3 + (velocity * 0.3));
         this.playBufferSound("wallBounce", volume);
-    }
-
-    public playGoalSound(volume?: number): void {
-        const finalVolume = volume !== undefined ? volume : SOUNDS_CONFIG.Goal.volume;
-        this.playBufferSound("Goal", finalVolume);
     }
 
     public playMissedSound(volume?: number): void {

@@ -30,7 +30,7 @@ export class GameField {
 
 	constructor(private engine: Engine) {
 		this.scene = new Scene(this.engine);
-		
+
 		this.glowLayer = new GlowLayer("glow", this.scene);
 		this.glowLayer.intensity = 0.8;
 	}
@@ -98,7 +98,7 @@ export class GameField {
 
 		this.gridTron = new GridTron(this.scene, gridConfig);
 		this.gridTron.create();
-		
+
 		// (bleu clair)
 		this.gridTron.setColorRGB(0.3, 0.6, 1);
 	}
