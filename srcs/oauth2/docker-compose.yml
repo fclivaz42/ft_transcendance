@@ -12,6 +12,7 @@ services:
       - sarifntw
     volumes:
       - sarif-libs:/libs
+      - ssl:/ssl
     depends_on:
       libs:
         condition: service_completed_successfully

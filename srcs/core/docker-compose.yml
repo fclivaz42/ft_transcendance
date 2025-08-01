@@ -16,6 +16,7 @@ services:
     networks:
       - sarifntw
     volumes:
+      - ssl:/ssl
       - data:/data
       - sarif-libs:/libs
       - sarif-frontend:/var/www/sarif-frontend

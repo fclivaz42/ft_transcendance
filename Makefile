@@ -13,6 +13,7 @@
 NAME = sarif
 
 DATADIR = data
+SSLDIR = ssl
 
 SHELL = /bin/bash
 
@@ -24,7 +25,15 @@ all: start
 
 build:
 	mkdir -p ${DATADIR}
+	mkdir -p ${SSLDIR}
 	docker compose -p ${NAME} -f ./srcs/docker-compose.yml build
+	@if [ ! -f "${SSLDIR}/sarif.crt" ] || [ ! -f "${SSLDIR}/sarif.key" ]; then \
+			echo "Generating self-signed certificate..."; \
+			openssl req -x509 -newkey rsa:2048 -nodes \
+					-keyout "${SSLDIR}/sarif.key" -out "${SSLDIR}/sarif.crt" -days 365 \
+					-subj "/C=CH/ST=Vaud/L=Lausanne/O=42/OU=42/CN=sarif.42lausanne.ch" \
+					-addext "subjectAltName=DNS:sarif.42lausanne.ch,DNS:*.sarif.42lausanne.ch"; \
+	fi
 
 up: build
 	API_KEY="$$($(GENERATOR))" docker compose -p ${NAME} -f ./srcs/docker-compose.yml up -d
@@ -33,7 +42,6 @@ down:
 	docker compose -p ${NAME} -f ./srcs/docker-compose.yml down -v
 
 start: up
-	mkdir -p ${DATADIR}
 	docker compose -p ${NAME} -f ./srcs/docker-compose.yml start
 
 stop:
@@ -50,6 +58,7 @@ prune:
 
 nuke: down prune
 	rm -rf ${DATADIR}
+	rm -rf ${SSLDIR}
 
 re: down all
 

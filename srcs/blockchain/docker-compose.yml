@@ -1,7 +1,6 @@
 services:
   blockchain:
     container_name: blockchain
-    image: sarif_blockchain
     networks:
       - sarifntw
     build:
@@ -16,6 +15,7 @@ services:
       - API_KEY
     volumes:
       - sarif-libs:/libs/
+      - ssl:/ssl
     restart: on-failure
     depends_on:
       libs:

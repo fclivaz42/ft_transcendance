@@ -18,6 +18,13 @@ networks:
     driver: bridge
 
 volumes:
+  ssl:
+    name: "SARIF_ssl"
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../ssl/
   data:
     name: "SARIF_data"
     driver: local
