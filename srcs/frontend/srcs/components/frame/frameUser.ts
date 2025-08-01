@@ -6,14 +6,13 @@ import { createButtonIcon } from "../buttons";
 import createUserAvatar from "../usermenu/userAvatar";
 
 export default async function createUserFrame(): Promise<HTMLDivElement> {
+		if (!UserHandler.isLogged)
+			throw new Error("notification.user.notLogged");
 	const searchParams = RoutingHandler.searchParams;
 	const template = document.createElement("template");
 	const user = await UserHandler.fetchUser(searchParams.get("playerId") || UserHandler.userId);
-	if (!user) {
-		if (!UserHandler.isLogged)
-			throw new Error("notification.user.notLogged");
+	if (!user)
 		throw new Error("notification.user.notFound");
-	}
 	let userStats: UserStats;
 	const isPrivate = user.Private && user.PlayerID !== UserHandler.userId;
 	if (!isPrivate) userStats = await UserHandler.fetchUserStats(user.PlayerID);

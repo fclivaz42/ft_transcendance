@@ -7,7 +7,7 @@ import { sanitizer } from "../../../helpers/sanitizer";
 function createGdprNoticeContent(dialogRef: BackdropDialog): HTMLDivElement {
 	const template = document.createElement("template");
 	template.innerHTML = `
-		<div class="flex flex-col items-center p-4 gap-4 max-w-[600px] w-full justify-center text-center select-none">
+		<div class="flex flex-col items-center p-4 gap-4 max-w-[600px] w-full justify-center text-center">
 			<h2 class="font-semibold text-2xl" data-i18n="panel.gdpr.title" class="text-xl">${sanitizer(i18nHandler.getValue("panel.gdpr.title"))}</h2>
 			<div class="flex flex-col items-start gap-y-8 my-8 w-full">
 				<div>

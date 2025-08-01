@@ -2,7 +2,9 @@
 import { createNavbar } from "../components/navbar/index.js";
 import { i18nHandler } from "../handlers/i18nHandler.js";
 import RoutingHandler from "../handlers/RoutingHandler.js";
+import UserHandler from "../handlers/UserHandler.js";
 import { mainManager } from "./MainManager.js";
+import NotificationManager from "./NotificationManager.js";
 import SidePanelManager from "./SidePanelManager.js";
 
 class NavbarManager {
@@ -48,6 +50,13 @@ class NavbarManager {
 					//panelId: "historySidePanel",
 					i18n: "navbar.history.label",
 					f: () => {
+						if (!UserHandler.isLogged) {
+							NotificationManager.notify({
+								message: i18nHandler.getValue("notification.user.notLogged"),
+								level: "warning",
+							});
+							return;
+						}
 						RoutingHandler.setRoute("/history");
 					}
 				},
@@ -57,6 +66,13 @@ class NavbarManager {
 					logo: "/assets/ui/profile-round-1342-svgrepo-com.svg",
 					i18n: "navbar.profile.label",
 					f: () => {
+						if (!UserHandler.isLogged) {
+							NotificationManager.notify({
+								message: i18nHandler.getValue("notification.user.notLogged"),
+								level: "warning",
+							});
+							return;
+						}
 						RoutingHandler.setRoute("/user");
 					}
 				},
