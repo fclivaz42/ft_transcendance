@@ -76,7 +76,7 @@ class Oauth2sdk {
 	 * @example apiRequest<Oauth2sdkLoginResponse>("get", "login")
 	 */
 	private async apiRequest<T>(method: "get" | "post", endpoint: string, params?: URLSearchParams): Promise<AxiosResponse<T>> {
-		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+		const httpsAgent = new https.Agent({ rejectUnauthorized:  !(process.env.IGNORE_TLS?.toLowerCase() === "true") });
 		const url = `${this._config.serverUrl}/oauth/${endpoint}${params ? `?${params.toString()}` : ""}`;
 		return axios({
 			httpsAgent,

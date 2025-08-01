@@ -23,12 +23,9 @@ services:
       - "443:443"
     build:
       context: .
-      args:
-        CERTPATH: ${CERTPATH}
-        KEYPATH: ${KEYPATH}
     env_file:
       - ../.env
-      - .env
+      #- .env
     environment:
       - API_KEY
       - TZ=Europe/Zurich

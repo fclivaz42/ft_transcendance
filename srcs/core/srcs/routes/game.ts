@@ -47,7 +47,7 @@ export default async function game_routes(fastify: FastifyInstance, options: Fas
 		url.searchParams.delete('userId');
 		url.searchParams.append('userId', token.sub);
 		const proxySocket = new WebSocket(url, {
-			agent: new https.Agent({ rejectUnauthorized: false }),
+			agent: new https.Agent({ rejectUnauthorized:  !(process.env.IGNORE_TLS?.toLowerCase() === "true") }),
 		});
 
 		proxySocket.on("open", () => {

@@ -9,9 +9,13 @@ services:
       args:
         PROVIDER: ${PROVIDER}
         PRIVATE_KEY: ${PRIVATE_KEY}
-    env_file: .env
+    env_file:
+      - ../.env
+      - .env
     environment:
       - API_KEY
+    volumes:
+      - sarif-libs:/libs/
     restart: on-failure
     depends_on:
       libs:

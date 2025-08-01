@@ -6,8 +6,8 @@ class ServerConfig {
 	private _port: number;
 	private _api_key: string;
 	private _cert: {
-		_keypath: string;
-		_certpath: string;
+		_KEY_PATH: string;
+		_CERT_PATH: string;
 	}
 
 	constructor() {
@@ -23,27 +23,27 @@ class ServerConfig {
 			Logger.info(`API_KEY for Authorization header: ${process.env.API_KEY}`)
 		}
 		this._api_key = process.env.API_KEY;
-		if (!process.env.KEYPATH || !process.env.CERTPATH) {
-			Logger.warn("Missing KEYPATH or CERTPATH env, using default paths.");
+		if (!process.env.KEY_PATH || !process.env.CERT_PATH) {
+			Logger.warn("Missing KEY_PATH or CERT_PATH env, using default paths: /etc/ssl/private/sarif.key and /etc/ssl/certs/sarif.crt");
 			this._cert = {
-				_keypath: "/etc/ssl/private/sarif.key",
-				_certpath: "/etc/ssl/certs/sarif.crt",
+				_KEY_PATH: "/etc/ssl/private/sarif.key",
+				_CERT_PATH: "/etc/ssl/certs/sarif.crt",
 			};
 		} else {
 			this._cert = {
-				_keypath: process.env.KEYPATH,
-				_certpath: process.env.CERTPATH,
+				_KEY_PATH: process.env.KEY_PATH,
+				_CERT_PATH: process.env.CERT_PATH,
 			};
 		}
-		Logger.warn(`Loading certificate and key from ${this._cert._certpath} and ${this._cert._keypath}`);
+		Logger.warn(`Loading certificate and key from ${this._cert._CERT_PATH} and ${this._cert._KEY_PATH}`);
 	}
 
 	public get port(): number { return this._port; }
 	public get api_key(): string { return this._api_key; }
-	public get cert(): { _keypath: string; _certpath: string } {
+	public get cert(): { _KEY_PATH: string; _CERT_PATH: string } {
 		return {
-			_keypath: this._cert._keypath,
-			_certpath: this._cert._certpath
+			_KEY_PATH: this._cert._KEY_PATH,
+			_CERT_PATH: this._cert._CERT_PATH
 		};
 	}
 }

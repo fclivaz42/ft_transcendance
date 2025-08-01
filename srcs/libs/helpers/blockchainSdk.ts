@@ -21,7 +21,7 @@ interface bc_sdk_options {
 export default class BlockchainSDK {
 
 	private api_key = process.env.API_KEY
-	private server_url = "http://blockchain:8080"
+	private server_url = "https://blockchain:8080"
 	private param_str = "{?PARAMS}"
 
 	constructor() { }
@@ -31,7 +31,7 @@ export default class BlockchainSDK {
 			if (!options.headers)
 				options.headers = {};
 		}
-		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+		const httpsAgent = new https.Agent({ rejectUnauthorized:  !(process.env.IGNORE_TLS?.toLowerCase() === "true") });
 
 		let url = `${this.server_url}/${route}`
 		if (endpoint)

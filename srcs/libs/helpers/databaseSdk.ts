@@ -39,7 +39,7 @@ interface comb {
 export default class DatabaseSDK {
 
 	private api_key = process.env.API_KEY
-	private server_url = "http://database:3000"
+	private server_url = "https://database:3000"
 	private param_str = "{?PARAMS}"
 	private bc_sdk = new BlockchainSDK();
 	private usr_sdk = new UsersSdk();
@@ -51,7 +51,7 @@ export default class DatabaseSDK {
 			if (!options.headers)
 				options.headers = {};
 		}
-		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+		const httpsAgent = new https.Agent({ rejectUnauthorized:  !(process.env.IGNORE_TLS?.toLowerCase() === "true") });
 
 		let url = `${this.server_url}/${table}`
 		if (endpoint)

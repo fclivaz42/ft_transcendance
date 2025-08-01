@@ -99,7 +99,7 @@ class UsersSdk {
 			if (!options.headers)
 				options.headers = {};
 		}
-		const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+		const httpsAgent = new https.Agent({ rejectUnauthorized: !(process.env.IGNORE_TLS?.toLowerCase() === "true") });
 		const url = `${this._config.serverUrl}/${options?.baseUrl || "users"}/${endpoint}`/*${options.params ? `?${options.params.toString()}` : ""}`*/;
 		return axios({
 			httpsAgent,
