@@ -18,13 +18,24 @@ interface bc_sdk_options {
 	body?: any
 }
 
-export default class BlockchainSDK {
+export interface BlockchainConfig {
+	api_key: string;
+	server_url: string;
+}
 
-	private api_key = process.env.API_KEY
-	private server_url = "https://blockchain:8080"
+export const default_config: BlockchainConfig = {
+	api_key: process.env.API_KEY || "",
+	server_url: process.env.BLOCKCHAIN_URL || "https://blockchain:8080"
+}
+
+export default class BlockchainSDK {
+	private _config: BlockchainConfig;
+
 	private param_str = "{?PARAMS}"
 
-	constructor() { }
+	constructor(config?: BlockchainConfig) {
+		this._config = config || default_config;
+	}
 
 	private async api_request<T>(method: "GET" | "POST", route: "add-match-score" | "add-tournament-score" | "deploy" | "match-score" | "tournament-match-score" | "tournament-scores", endpoint?: string, options?: bc_sdk_options): Promise<AxiosResponse<T>> {
 		if (options?.body) {
@@ -33,7 +44,7 @@ export default class BlockchainSDK {
 		}
 		const httpsAgent = new https.Agent({ rejectUnauthorized:  !(process.env.IGNORE_TLS?.toLowerCase() === "true") });
 
-		let url = `${this.server_url}/${route}`
+		let url = `${this._config.server_url}/${route}`
 		if (endpoint)
 			url = url + endpoint
 		if (endpoint && options?.params)
@@ -44,7 +55,7 @@ export default class BlockchainSDK {
 			url,
 			timeout: options?.timeout,
 			headers: {
-				Authorization: this.api_key,
+				Authorization: this._config.api_key,
 				...options?.headers,
 			},
 			data: options?.body,

@@ -6,11 +6,6 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import { httpReply } from "./httpResponse.ts";
 import type { Match, Match_complete } from "../interfaces/Match.ts";
 
-export interface UsersSdkConfig {
-	apiKey: string;
-	serverUrl: string;
-}
-
 export interface UsersSdkAuthorizeResponse {
 	/**
 	 * User ID
@@ -75,9 +70,14 @@ export interface UsersSdkOptions {
 	data?: any;
 }
 
+export interface UsersSdkConfig {
+	apiKey: string;
+	serverUrl: string;
+}
+
 export const defaultConfig: UsersSdkConfig = {
 	apiKey: process.env.API_KEY || "",
-	serverUrl: "https://usermanager:3000",
+	serverUrl: process.env.USERMANAGER_URL ||"https://usermanager:3000",
 }
 
 class UsersSdk {

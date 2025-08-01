@@ -57,7 +57,7 @@ export interface Oauth2sdkSessionResponse {
 
 export const defaultConfig: Oauth2sdkConfig = {
 	apiKey: process.env.API_KEY || "",
-	serverUrl: "https://oauth2:3000",
+	serverUrl: process.env.OAUTH2_URL || "https://oauth2:3000",
 }
 
 class Oauth2sdk {
