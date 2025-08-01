@@ -239,6 +239,30 @@
       "error": {
         "invalidCode": "Invalid code. Please try again."
       }
+    },
+    "gdpr": {
+      "title": "🔐 GDPR Privacy Notice",
+      "version": "2025-08-01",
+      "data": {
+        "title": "📝 Data Collection",
+        "message": "We collect your email address, display name, and profile picture linked to a unique identifier. This data is used solely for authentication and displaying your profile."
+      },
+      "rights": {
+        "title": "🔧 User Rights",
+        "message": "You can modify or delete your personal data at any time. Upon deletion, your unique identifier is retained for technical reasons (Blockchain module), but cannot be traced back to you."
+      },
+      "cookies": {
+        "title": "🍪 Cookies",
+        "message": "We use only essential cookies for authentication purposes. No tracking cookies are used."
+      },
+      "thirdParty": {
+        "title": "🤝 Third-Party Services",
+        "message": "We do not share your personal data with third parties. If you sign in with a third-party service (e.g., Google), we only receive your unique identifier, email address and display name. We do not store or share any other information obtained through these services."
+      },
+      "button": {
+        "accept": "Accept",
+        "decline": "Decline (exit)"
+      }
     }
   },
   "passwordStrength": {
