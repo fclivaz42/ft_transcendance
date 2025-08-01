@@ -10,17 +10,16 @@ export interface CustomInputContainer extends HTMLDivElement {
 }
 //sait quand l'input est focus, blur, ou change
 //ajout de listeners pour focus et blur -> panel va le gerer
-export function createInfoInput(labelName: string, inputName: string): CustomInputContainer {
+export function createInfoInput(labelName: string, inputName: string, autoComplete?: string): CustomInputContainer {
     const container = document.createElement('div') as CustomInputContainer;
     container.className = "relative w-full"; // `relative` est important pour positionner l'icône
-
-    
 
 	const input = createTextbox({
 		type: "text",
 		placeholder: labelName,
 		name: inputName,
 		id: inputName, // Important pour associer le label
+		autoComplete: autoComplete || "off", // Ajout de l'attribut autoComplete
 	});
     
     // --- NOUVEL ÉLÉMENT POUR L'ICÔNE D'ERREUR ---
