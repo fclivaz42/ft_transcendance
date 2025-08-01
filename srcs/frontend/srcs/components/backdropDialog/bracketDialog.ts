@@ -49,8 +49,6 @@ function createBracketRoundComponent(round: TournamentMatchStatus): HTMLDivEleme
 		});
 	}
 
-	console.log("hey");
-	console.log(round.p2);
 	if (round.p2) {
 		UserHandler.fetchUser(round.p2 || undefined).then((user) => {
 			if (!user)
@@ -68,7 +66,6 @@ function createBracketRoundComponent(round: TournamentMatchStatus): HTMLDivEleme
 
 export function createBracketComponent(bracket: TournamentMatchStatus[]): HTMLDivElement {
 	const template = document.createElement("template");
-	console.log(bracket);
 
 	template.innerHTML = `
 		<div id="pong-tournament-bracket" class="m-2 p-4">
