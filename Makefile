@@ -6,13 +6,12 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/22 22:04:45 by fclivaz           #+#    #+#              #
-#    Updated: 2025/05/01 02:29:44 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/08/02 01:32:58 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = sarif
 
-DATADIR = data
 SSLDIR = ssl
 
 SHELL = /bin/bash
@@ -24,7 +23,6 @@ ${NAME}: all
 all: start
 
 build:
-	mkdir -p ${DATADIR}
 	mkdir -p ${SSLDIR}
 	docker compose -p ${NAME} -f ./srcs/docker-compose.yml build
 	@if [ ! -f "${SSLDIR}/sarif.crt" ] || [ ! -f "${SSLDIR}/sarif.key" ]; then \
@@ -57,7 +55,6 @@ prune:
 	docker system prune -af
 
 nuke: down prune
-	rm -rf ${DATADIR}
 	rm -rf ${SSLDIR}
 
 re: down all

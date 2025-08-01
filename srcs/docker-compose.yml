@@ -28,7 +28,7 @@ volumes:
   data:
     name: "SARIF_data"
     driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ../data/
+    # driver_opts:
+    #   type: none
+    #   o: bind
+    #   device: ../data/
