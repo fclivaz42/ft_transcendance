@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/08/01 18:57:52 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/08/01 20:34:26 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -112,18 +112,6 @@ export default class DatabaseSDK {
 	}
 
 	private async validate_matchlist(matchlist: Array<Match>) {
-		for (const item of matchlist) {
-			let combd: comb = await this.validate_match(item)
-			Object.assign(item, combd.merged)
-			item.WPlayerID = combd.uarray[0]
-			item.LPlayerID = combd.uarray[1]
-		}
-	}
-
-	private async get_player_matchlist_from_uuid(user: UUIDv4): Promise<Array<Match_complete>> {
-		const matchlist: Array<Match> = await this.api_request<Array<Match>>("GET", "Matches", `/PlayerID/${this.param_str}`, { params: user })
-			.then(response => response.data)
-		// await this.validate_matchlist(matchlist)
 		await Promise.all(matchlist.map(async (item) => {
 			let combd: comb = await this.validate_match(item)
 			Object.assign(item, combd.merged)
@@ -137,6 +125,12 @@ export default class DatabaseSDK {
 				return 1;
 			return 0;
 		})
+	}
+
+	private async get_player_matchlist_from_uuid(user: UUIDv4): Promise<Array<Match_complete>> {
+		const matchlist: Array<Match> = await this.api_request<Array<Match>>("GET", "Matches", `/PlayerID/${this.param_str}`, { params: user })
+			.then(response => response.data)
+		await this.validate_matchlist(matchlist)
 		return matchlist as Array<Match_complete>
 	}
 
@@ -275,20 +269,7 @@ export default class DatabaseSDK {
 	public async get_matchlist(): Promise<Array<Match_complete>> {
 		const matchlist: Array<Match> = await this.api_request<Array<Match>>("GET", "Matches", "/multiget")
 			.then(response => response.data)
-		// await this.validate_matchlist(matchlist)
-		await Promise.all(matchlist.map(async (item) => {
-			let combd: comb = await this.validate_match(item)
-			Object.assign(item, combd.merged)
-			item.WPlayerID = combd.uarray[0]
-			item.LPlayerID = combd.uarray[1]
-		}));
-		matchlist.sort((a: Match, b: Match) => {
-			if (a.StartTime > b.StartTime)
-				return -1;
-			if (a.StartTime < b.StartTime)
-				return 1;
-			return 0;
-		})
+		await this.validate_matchlist(matchlist)
 		return matchlist as Array<Match_complete>
 	}
 
