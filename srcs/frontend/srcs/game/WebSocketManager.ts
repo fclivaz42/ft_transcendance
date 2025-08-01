@@ -23,17 +23,31 @@ export class WebSocketManager {
 		window.addEventListener('keyup', (event) => {
 			if (this.socket.readyState !== WebSocket.OPEN)
 				return;
-			if (event.key === 'w' || event.key === "s") {
-				this.socket.send(JSON.stringify({
-					type: "move",
-					payload: {
-						direction: "stop"
+			switch (event.key) {
+				case "w":
+				case "s":
+					this.socket.send(JSON.stringify({
+						type: "move",
+						payload: {
+							direction: "stop"
+						}
+					}));
+					break;
+				case "ArrowUp":
+				case "ArrowDown":
+					if (RoutingHandler.url.searchParams.get("room") === "local") {
+						this.socket.send(JSON.stringify({
+							type: "move2",
+							payload: {
+								direction: "stop"
+							}
+						}));
 					}
-				}))
-			};
+					break;
+			}
 		});
 
-		window.addEventListener('keypress', (event) => {
+		window.addEventListener('keydown', (event) => {
 			if (this.socket.readyState !== WebSocket.OPEN)
 				return;
 			let data: any | undefined;
@@ -46,6 +60,14 @@ export class WebSocketManager {
 					break;
 				case " ":
 					data = { type: "ball", payload: { direction: "launch" } };
+					break;
+				case "ArrowUp":
+					if (RoutingHandler.url.searchParams.get("room") === "local")
+						data = { type: "move2", payload: { direction: "up" } };
+					break;
+				case "ArrowDown":
+					if (RoutingHandler.url.searchParams.get("room") === "local")
+						data = { type: "move2", payload: { direction: "down" } };
 					break;
 				case "o":
 					data = { type: "ia", payload: { direction: "p1" } };

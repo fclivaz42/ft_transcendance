@@ -125,6 +125,7 @@ export default class TournamentBracket {
 
 	public markMatchResult(matchIndex: number, score: RoomScore) {
 		const matchup = this._matchups[matchIndex];
+		if (!matchup) return;
 		if (matchup.isComplete()) {
 			console.warn(`Match ${matchIndex} already completed.`);
 			return;

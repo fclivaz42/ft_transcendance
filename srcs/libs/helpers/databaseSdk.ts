@@ -6,13 +6,14 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/07/08 22:59:53 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/07/31 00:37:15 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
 import axios from "axios";
 import https from "https";
-import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import type { AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import { AxiosError } from "axios";
 import type * as fft from "fastify";
 import { default_users, type User } from "../interfaces/User.ts";
 import type { Match, Match_complete } from "../interfaces/Match.ts";
@@ -88,8 +89,23 @@ export default class DatabaseSDK {
 		else
 			merged = val_match
 		const uarray: User[] = [];
-		uarray[0] = this.usr_sdk.filterPublicUserData((await this.usr_sdk.getUser(merged.WPlayerID as string)).data) as User;
-		uarray[1] = this.usr_sdk.filterPublicUserData((await this.usr_sdk.getUser(merged.LPlayerID as string)).data) as User;
+		console.dir(merged)
+		try {
+			uarray[0] = this.usr_sdk.filterPublicUserData((await this.usr_sdk.getUser(merged.WPlayerID as string)).data) as User;
+		} catch (exception) {
+			if (exception instanceof AxiosError && exception.status === 404)
+				uarray[0] = default_users.Deleted as User;
+			else
+				throw exception;
+		}
+		try {
+			uarray[1] = this.usr_sdk.filterPublicUserData((await this.usr_sdk.getUser(merged.LPlayerID as string)).data) as User;
+		} catch (exception) {
+			if (exception instanceof AxiosError && exception.status === 404)
+				uarray[1] = default_users.Deleted as User;
+			else
+				throw exception;
+		}
 		return {
 			merged,
 			uarray
@@ -105,6 +121,13 @@ export default class DatabaseSDK {
 			item.WPlayerID = combd.uarray[0]
 			item.LPlayerID = combd.uarray[1]
 		}
+		matchlist.sort((a: Match, b: Match) => {
+			if (a.StartTime > b.StartTime)
+				return -1;
+			if (a.StartTime < b.StartTime)
+				return 1;
+			return 0;
+		})
 		return matchlist as Array<Match_complete>
 	}
 
@@ -249,6 +272,13 @@ export default class DatabaseSDK {
 			item.WPlayerID = combd.uarray[0]
 			item.LPlayerID = combd.uarray[1]
 		}
+		matchlist.sort((a: Match, b: Match) => {
+			if (a.StartTime > b.StartTime)
+				return -1;
+			if (a.StartTime < b.StartTime)
+				return 1;
+			return 0;
+		})
 		return matchlist as Array<Match_complete>
 	}
 
