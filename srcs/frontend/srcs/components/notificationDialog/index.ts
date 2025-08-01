@@ -1,4 +1,5 @@
 import NotificationDialog from "../../class/NotificationDialog";
+import { i18nHandler } from "../../handlers/i18nHandler";
 import { sanitizer } from "../../helpers/sanitizer";
 
 export const NotificationDialogLevels = [
@@ -11,7 +12,7 @@ export const NotificationDialogLevels = [
 export type NotificationDialogLevel = typeof NotificationDialogLevels[number];
 
 export interface NotificationProps {
-	title: string;
+	title?: string;
 	message?: string;
 	level: NotificationDialogLevel;
 }
@@ -19,6 +20,21 @@ export interface NotificationProps {
 export function createNotification(props: NotificationProps) {
 	const dialog = document.createElement("dialog", { is: "notification-dialog" }) as NotificationDialog;
 	dialog.setAttribute("role", "notification");
+	if (!props.title) {
+		switch (props.level) {
+			case "info":
+				props.title = i18nHandler.getValue("notification.generic.infoTitle");
+				break;
+			case "warning":
+				props.title = i18nHandler.getValue("notification.generic.warningTitle");
+				break;
+			case "error":
+				props.title = i18nHandler.getValue("notification.generic.errorTitle");
+				break;
+		}
+	}
+	if (!props.message)
+		props.message = i18nHandler.getValue("notification.generic.errorMessage");
 
 	dialog.classList.add(
 		"overflow-hidden",

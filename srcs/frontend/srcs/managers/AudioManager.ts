@@ -112,7 +112,7 @@ export default class AudioManager
         } 
         catch (error) 
         {
-            console.error("❌ Erreur lors du chargement d'un ou plusieurs sons:", error);
+            console.error("failed to load sounds: ", error);
         } 
         finally 
         {
@@ -128,7 +128,7 @@ export default class AudioManager
             this.initializeAudioContext(); 
             if (!this._audioContext) 
             {
-                return Promise.reject("AudioContext non disponible.");
+                return Promise.reject("AudioContext not available.");
             }
         }
         try 
@@ -145,7 +145,7 @@ export default class AudioManager
         } 
         catch (error) 
         {
-            console.error(`Erreur de chargement/décodage pour ${soundName} (${config.url}):`, error);
+            console.error(`Failed to load/decode ${soundName} (${config.url}):`, error);
             throw error;
         }
     }
@@ -157,14 +157,14 @@ export default class AudioManager
     {
         if (!this._enabled || !this._audioContext || this._audioContext.state !== 'running' || !this._masterGainNode)
         {
-            console.warn(` AudioManager désactivé ou AudioContext non prêt. Impossible de jouer ${soundName}.`);
+            console.warn(`AudioManager not ready for ${soundName}.`);
             return null;
         }
 
         const audioBuffer = this._audioBuffers.get(soundName);
         if (!audioBuffer) 
         {
-            console.warn(` AudioBuffer introuvable pour: ${soundName}.`);
+            console.warn(`AudioBuffer not found for: ${soundName}.`);
             return null;
         }
 
@@ -294,7 +294,7 @@ export default class AudioManager
             this._backgroundMusicNode.start(0);
         } catch (error) 
         {
-            console.error("❌ Erreur lors du démarrage de la musique de fond:", error);
+            console.error("Failed to start background music:", error);
         }
     }
 

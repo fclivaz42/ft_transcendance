@@ -54,8 +54,12 @@ class UserHandler {
 			this._updatingFriendList = true;
 			const friendListResp: Response | undefined = await fetch("/api/users/me/friends").catch(error => { console.error(error); return undefined; });
 			if (!friendListResp || !friendListResp.ok) {
-				console.warn("Failed to fetch friend list:", friendListResp?.statusText);
+				if (friendListResp?.status === 401 || friendListResp?.status === 403) {
+					this.clearUserData();
+					this.updateComponents();
+				}
 				this._friendList = [];
+				console.error("Failed to fetch friend list:", friendListResp?.statusText);
 				return;
 			}
 			this._friendList = await friendListResp.json() as Friends[];
@@ -71,7 +75,7 @@ class UserHandler {
 		while (this.isLogged && !this._updatingAliveStatus) {
 			this._updatingAliveStatus = true;
 			try {
-				await fetch("/api/users/me/alive", {
+				const res = await fetch("/api/users/me/alive", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -80,6 +84,13 @@ class UserHandler {
 						PlayerId: this._clientId,
 					}),
 				});
+				if (!res.ok) {
+					if (res.status === 401 || res.status === 403) {
+						this.clearUserData();
+						this.updateComponents();
+					}
+					throw new Error(res.statusText);
+				}
 			} catch (error) {
 				console.error("Failed to update alive status:", error);
 			}
@@ -134,9 +145,12 @@ class UserHandler {
 
 	public async fetchUser(playerId?: string): Promise<Users | undefined> {
 		if (playerId) {
+			if (this._friendList.find(friend => friend.PlayerID === playerId))
+				return this._friendList.find(friend => friend.PlayerID === playerId);
 			if (AiUsers.has(playerId)) {
 				const user = AiUsers.get(playerId)!;
-				user.DisplayName = i18nHandler.getValue(user.DisplayName);
+				if (user.DisplayName.includes("."))
+					user.DisplayName = i18nHandler.getValue(user.DisplayName);
 				return user;
 			}
 			if (playerId === this.userId) {
@@ -160,12 +174,24 @@ class UserHandler {
 		}
 		if (this._user)
 			return this._user;
-		const user = await fetch("/api/users/me");
-		if (!user.ok) {
-			console.warn("Failed to fetch user data:", user.statusText);
-			this.clearUserData();
-		}
-		else {
+		const user = await fetch("/api/users/me")
+			.then(response => {
+				if (!response.ok) {
+					if (response.status === 401 || response.status === 403) {
+						this.clearUserData();
+						this.updateComponents();
+						return undefined;
+					}
+					throw new Error(`Failed to fetch user data: ${response.statusText}`);
+				}
+				return response;
+			})
+			.catch(error => {
+				console.error(error);
+				this.clearUserData();
+				return undefined;
+			});
+		if (user) {
 			const userData = await user.json();
 			if (!userData || !userData.PlayerID || !userData.DisplayName || !userData.EmailAddress) {
 				console.warn("User data is incomplete or missing.", userData);
@@ -178,15 +204,14 @@ class UserHandler {
 				this.updateFriendList();
 				const avatarFile = await fetch("/api/users/me/picture");
 				if (avatarFile.ok) {
-					if (avatarFile.status === 200)
-						this._user.Avatar = "/api/users/me/picture";
+					this._user.Avatar = "/api/users/me/picture";
 				} else {
 					console.warn("Failed to fetch user avatar:", avatarFile.statusText);
 				}
 			}
 		}
 		this.updateComponents();
-		return this._user as Users;
+		return this._user;
 	}
 
 	private clearUserData() {
@@ -254,7 +279,8 @@ class UserHandler {
 	private async filterFriend(bot: Users): Promise<Friends> {
 		if (AiUsers.has(bot.PlayerID)) {
 			const friend = AiUsers.get(bot.PlayerID) as Friends;
-			friend.DisplayName = i18nHandler.getValue(friend.DisplayName);
+			if (friend.DisplayName.includes("."))
+				friend.DisplayName = i18nHandler.getValue(friend.DisplayName);
 			friend.isAlive = true;
 			return friend;
 		}
