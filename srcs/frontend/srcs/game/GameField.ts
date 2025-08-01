@@ -8,13 +8,15 @@ import { Ball } from "./game_components/Ball.js";
 import { Paddle } from "./game_components/Paddle.js";
 import { Wall } from "./game_components/Wall.js";
 
+import { GridTron } from "./effects/GridTron.js";
+import { GlowLayer } from "@babylonjs/core/Layers/glowLayer.js";
+import { Color3 } from "@babylonjs/core/Maths/math.color.js";
 import { InitPayload, UpdatePayload, CameraInitInfo, LightInitInfo } from "./types.js";
-import { GlowLayer } from "@babylonjs/core";
 
 // Temp values, overriding WebSocket info
 const ALPHA: number = Math.PI / 2;
 const BETA: number = Math.PI / 2;
-const RADIUS: number = -26;
+const RADIUS: number = -22;
 
 export class GameField {
 	public scene: Scene;
@@ -23,10 +25,14 @@ export class GameField {
 	private p2: Paddle | null = null;
 	private walls: Wall[] = [];
 
+	private glowLayer: GlowLayer;
+	private gridTron: GridTron | null = null;
+
 	constructor(private engine: Engine) {
 		this.scene = new Scene(this.engine);
-		// const glow = new GlowLayer("glow", this.scene);
-		// glow.intensity = 0.8;
+
+		this.glowLayer = new GlowLayer("glow", this.scene);
+		this.glowLayer.intensity = 0.8;
 	}
 
 	public init(payload: InitPayload["payload"]) {
@@ -42,7 +48,7 @@ export class GameField {
 		// skyboxMaterial.specularColor = new Color3(0, 0, 0); 
 		// skybox.material = skyboxMaterial;
 
-
+		this.createGridTronEffect();
 		this.ball = new Ball(this.scene, payload.ball);
 		this.p1 = new Paddle(this.scene, "p1", payload.p1);
 		this.p2 = new Paddle(this.scene, "p2", payload.p2);
@@ -77,5 +83,28 @@ export class GameField {
 		this.scene.activeCamera = camera;
 
 		new HemisphericLight("light", new Vector3(...lightInfo.direction), this.scene);
+	}
+	// --- Effect Grid  ---
+	private createGridTronEffect(): void {
+		const gridConfig = {
+			gameWidth: 13.5 * 2, // = 27.4
+			gameHeight: 15.7,
+			gameReferenceZ: 0,
+			gridTotalDepth: 40,
+			gridSize: 2,
+			lineWidth: 0.08,
+			emissiveColor: new Color3(0.1, 0.4, 0.6)
+		};
+
+		this.gridTron = new GridTron(this.scene, gridConfig);
+		this.gridTron.create();
+
+		// (bleu clair)
+		this.gridTron.setColorRGB(0.3, 0.6, 1);
+	}
+
+
+	public get grid(): GridTron | null {
+		return this.gridTron;
 	}
 }

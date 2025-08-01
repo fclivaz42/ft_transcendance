@@ -2,11 +2,11 @@ import { i18nHandler } from "../handlers/i18nHandler.js";
 import RoutingHandler from "../handlers/RoutingHandler.js";
 import NotificationManager from "../managers/NotificationManager.js";
 import PongGameManager from "../managers/PongGameManager.js";
-import { GameField } from "./GameField.js";
-import { ServerMessage, InitPayload, UpdatePayload } from "./types.js";
+import { ServerMessage, InitPayload, UpdatePayload, CollisionPayload } from "./types.js";
 
 type InitHandler = (payload: InitPayload["payload"]) => void;
 type UpdateHanlder = (payload: UpdatePayload["payload"]) => void;
+type CollisionHandler = (payload: CollisionPayload["payload"]) => void;
 
 export const PONG_HOST = `wss://${location.host}/api/game/`
 
@@ -16,6 +16,7 @@ export class WebSocketManager {
 	constructor(
 		private onInit: InitHandler,
 		private onUpdate: UpdateHanlder,
+		private onCollision: CollisionHandler,
 		private addr: string
 	) {
 		this.socket = new WebSocket(this.addr);
@@ -100,6 +101,9 @@ export class WebSocketManager {
 				case "tournament-score":
 				case "score":
 					PongGameManager.onScoreUpdate(msg.payload.score);
+					break;
+				case "collision":
+					this.onCollision(msg.payload);
 					break;
 				case "tournament-match-over":
 					PongGameManager.onTournamentMatchOver(msg.payload);
