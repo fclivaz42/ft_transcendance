@@ -131,7 +131,7 @@
       }
     }
   },
-"panel": {
+  "panel": {
     "usernameLabel": "Username",
     "passwordLabel": "Password",
     "emailLabel": "Email Address",
@@ -184,7 +184,7 @@
       "panelTitle": "Forgot Password",
       "sendButton": "Send Reset Link",
       "validation": {
-        "code" : "Please enter the code sent to your email.",
+        "code": "Please enter the code sent to your email.",
         "emailRequired": "Please enter your email.",
         "emailFormatError": "Please enter a valid email address."
       },
@@ -229,15 +229,16 @@
         "badPassword": "Bad password. Please try again."
       },
       "validation": {
-
         "confirmPasswordRequired": "Please confirm your new password."
-
       }
     },
     "2faPanel": {
       "title": "Two-Factor Authentication",
       "info": "A mail as been sent to your email with the 2FA code.\nPlease enter it below to verify your identity.",
-      "verify": "Verify"
+      "verify": "Verify",
+      "error": {
+        "invalidCode": "Invalid code. Please try again."
+      }
     }
   },
   "passwordStrength": {
