@@ -4,20 +4,15 @@ import { httpReply } from "../../../libs/helpers/httpResponse.ts";
 import { Logger } from "../../../libs/helpers/loggers.ts";
 import UsersSdk from "../../../libs/helpers/usersSdk.ts";
 import axios from "axios";
+import { checkParam } from "../helpers/checkParam.ts";
 
 
 const oauth2sdk = new Oauth2sdk();
 
 async function oauth_routes(app: FastifyInstance, opts: FastifyPluginOptions) {
   app.get('/login', async (req, rep) => {
-    const query = req.query as { client_id?: string ; user_id?: string };
-    if (!query.client_id) {
-      return httpReply({
-				detail: "Missing client_id query parameter. Please provide a client_id to identify the browser session.",
-				status: 400,
-				module: "oauth2",
-			}, rep, req);
-    }
+    const query = req.query as { client_id: string ; };
+		checkParam(query.client_id, 'string', 'client_id', req, rep);
 
     await oauth2sdk.getLogin(query.client_id)
 			.then(response => {
