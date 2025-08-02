@@ -21,7 +21,7 @@ services:
       - sarif-libs:/libs
       - sarif-frontend:/var/www/sarif-frontend
     ports:
-      - "443:443"
+      - "8443:443"
       #- "80:80" can be enabled with USE_TLS=false
     build:
       context: .

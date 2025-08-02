@@ -155,6 +155,11 @@ export interface TournamentInitPayload {
 	};
 }
 
+export interface CloseSocket {
+	type: "close-socket";
+	message: string
+}
+
 export interface TournamentPlayerConnected {
 	// used for tournament
 	type: "tournament-connect";

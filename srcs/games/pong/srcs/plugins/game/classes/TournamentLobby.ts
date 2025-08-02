@@ -279,6 +279,11 @@ export default class TournamentLobby {
 	}
 
 	public removePlayer(playerSession: PlayerSession): void {
+		if (this._waitTimer) {
+			console.log("Player left DURING the waittimer");
+			this._players = this._players.filter(p => p !== playerSession);
+			console.log(`Current Players: ${this._players.length} / ${this.MAX_PLAYERS}`);
+		}
 		playerSession.isAI = true;
 		// this._players = this._players.filter((p) => p !== playerSession);
 		// console.log(
