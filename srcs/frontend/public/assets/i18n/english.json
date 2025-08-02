@@ -139,7 +139,6 @@
     "emailLabel": "Email Address",
     "loginPanel": {
       "panelTitle": "Sign in",
-      "rememberMe": "Remember me",
       "connexionButton": "Sign in",
       "validation": {
         "usernameRequired": "Please enter your username.",
