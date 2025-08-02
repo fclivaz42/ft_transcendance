@@ -112,7 +112,7 @@ class UsersSdk {
 			data: options?.data,
 			params: options?.params,
 			responseType: options?.response_type,
-			validateStatus: (status => (status >= 200 && status < 300) || status === 401 || status === 403),
+			validateStatus: ((status: number) => (status >= 200 && status < 300) || status === 401 || status === 403),
 		});
 	}
 

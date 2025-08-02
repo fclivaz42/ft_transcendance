@@ -248,17 +248,21 @@ class UserHandler {
 	public async removeFriend(playerId: string): Promise<void> {
 		const response = await fetch(`/api/users/me/friends/${playerId}`, {
 			method: "DELETE",
+		}).catch(error => {
+			NotificationManager.notify({
+				level: "error",
+				message: i18nHandler.getValue("user.notification.deleteError"),
+			});
 		});
 		if (!response.ok) {
 			NotificationManager.notify({
 				level: "error",
-				title: i18nHandler.getValue("notification.generic.errorTitle"),
 				message: i18nHandler.getValue("user.notification.deleteError"),
 			});
-			throw new Error("Failed to remove friend");
+		} else {
+			this._friendList = this._friendList.filter(friend => friend.PlayerID !== playerId);
+			this.updateComponents();
 		}
-		this._friendList = this._friendList.filter(friend => friend.PlayerID !== playerId);
-		this.updateComponents();
 	}
 
 	public get friendList() {
@@ -307,7 +311,6 @@ class UserHandler {
 			if (res.status === 409) {
 				NotificationManager.notify({
 					level: "warning",
-					title: i18nHandler.getValue("notification.generic.warningTitle"),
 					message: i18nHandler.getValue("user.notification.alreadyExists")
 				});
 				throw new Error("You are already friends with this user.");
@@ -315,7 +318,6 @@ class UserHandler {
 			else if (res.status === 404) {
 				NotificationManager.notify({
 					level: "error",
-					title: i18nHandler.getValue("notification.generic.errorTitle"),
 					message: i18nHandler.getValue("user.notification.notFound"),
 				});
 				throw new Error("User not found.");
@@ -323,8 +325,7 @@ class UserHandler {
 			else {
 				NotificationManager.notify({
 					level: "error",
-					title: i18nHandler.getValue("notification.generic.errorTitle"),
-					message: i18nHandler.getValue("user.notification.add.error"),
+					message: i18nHandler.getValue("notification.generic.errorMessage"),
 				});
 				throw new Error("Failed to add friend due to an unknown error.");
 			}

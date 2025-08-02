@@ -1,6 +1,5 @@
 import { i18nHandler } from "../../handlers/i18nHandler";
 import RoutingHandler from "../../handlers/RoutingHandler";
-import createHeaderFrame from "./components/frameHeader";
 import type { MatchComplete } from "../../interfaces/Matches";
 import UserHandler from "../../handlers/UserHandler";
 import createUserAvatar from "../usermenu/userAvatar";

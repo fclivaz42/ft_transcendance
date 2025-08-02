@@ -65,8 +65,9 @@ export default class SidePanelManager {
 						removeClassContaining("bg-panel", btn.classList);
 				});
 				button.classList.add("bg-panel", "dark:bg-panel_dark");
-				if (document.getElementById(button.attributes.getNamedItem("data-panel")?.value || "")) return;
-				if (!button.attributes.getNamedItem("data-panel"))
+				const datapanel = button.attributes.getNamedItem("data-panel");
+				if (datapanel && datapanel.value && document.getElementById(datapanel.value)) return;
+				if (!datapanel)
 					clearPanels();
 				const panel = createSidePanelFromDataPanel(button.attributes);
 				if (!panel) return;
