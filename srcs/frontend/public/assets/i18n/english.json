@@ -28,7 +28,8 @@
     "computer": "AI",
     "join": {
       "error": {
-        "emptyRoomCode": "Please enter a room code."
+        "emptyRoomCode": "Please enter a room code.",
+        "roomNotFound": "Room not found. Please check the code and try again."
       },
       "title": "Join a private game",
       "description": "Enter the room code to join a private game.",
@@ -274,6 +275,10 @@
     "user": {
       "notLogged": "You are not logged in.",
       "notFound": "User not found."
+    },
+    "pong": {
+      "socketClose": "The game has been closed due to an error.",
+      "userDisconnected": "{user} has disconnected from the game."
     }
   },
   "errors": {
