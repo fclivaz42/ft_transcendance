@@ -69,7 +69,7 @@ class LoginDialogManager {
 					console.error(error);
 					NotificationManager.notify({
 						level: "error",
-						title: i18nHandler.getValue("generic.errorTitle"),
+						title: i18nHandler.getValue("notification.generic.errorTitle"),
 						message: i18nHandler.getValue("generic.errorMessage")
 					});
 				}
