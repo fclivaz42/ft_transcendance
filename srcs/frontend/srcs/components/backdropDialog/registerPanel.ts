@@ -20,7 +20,7 @@ export function createRegisterPanel(options: LoginDialogOptions) {
   registerPanel.className = `
     absolute inset-0
     flex flex-col gap-3
-    transition-transform duration-500 ease-in-out transform opacity-0
+    transition-transform duration-500 ease-in-out transform hidden
     w-full
     items-center
     pb-6
@@ -169,7 +169,7 @@ const validateRegisterConfirmPassword = (value: string) => {
           'hover:bg-green-700',
           'text-white',
           'cursor-pointer',
-          'opacity-100'
+          'block'
       );
     } else {
       registerButton.classList.add(
@@ -183,7 +183,7 @@ const validateRegisterConfirmPassword = (value: string) => {
           'hover:bg-green-700',
           'text-white',
           'cursor-pointer',
-          'opacity-100'
+          'block'
       );
     }
     return isFormValid;

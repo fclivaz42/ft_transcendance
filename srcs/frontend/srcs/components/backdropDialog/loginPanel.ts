@@ -22,7 +22,7 @@ export function createLoginPanel(options: LoginDialogOptions)
     loginPanel.className = `
         absolute inset-0
         flex flex-col gap-3
-        transition-transform duration-500 ease-in-out transform opacity-0
+        transition-transform duration-500 ease-in-out transform hidden
         w-full
         items-center
         pb-6
@@ -73,10 +73,10 @@ export function createLoginPanel(options: LoginDialogOptions)
 
         if (isFormValid) {
             loginButton.classList.remove('cursor-not-allowed', 'opacity-50');
-            loginButton.classList.add('hover:bg-blue-700', 'cursor-pointer', 'opacity-100');
+            loginButton.classList.add('hover:bg-blue-700', 'cursor-pointer', 'block');
         } else {
             loginButton.classList.add('cursor-not-allowed', 'opacity-50');
-            loginButton.classList.remove('hover:bg-blue-700', 'cursor-pointer', 'opacity-100');
+            loginButton.classList.remove('hover:bg-blue-700', 'cursor-pointer', 'block');
         }
         return isFormValid;
     };
