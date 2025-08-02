@@ -58,7 +58,7 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	if (userStatsProfile)
 		userStatsProfile.insertAdjacentElement("afterbegin", createUserAvatar({ disableClick: true, playerId: user.PlayerID, sizeClass: "w-40 h-40 mx-auto" }));
 
-	if (!isPrivate) {
+	if (!isPrivate && !user.isBot) {
 		const viewHistoryButton = createButtonIcon({
 			i18n: "user.matches.viewHistory",
 			addClasses: "w-fit mx-auto",

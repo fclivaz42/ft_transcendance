@@ -470,9 +470,25 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 				return reply.code(503).send('error.module.down')
 			return reply.code(500).send('error.internal.fail')
 		}
-		const token = usersSdk.unshowerCookie(request.headers.cookie)["token"];
 		const params = request.params as { uuid: string };
 		checkParam(params.uuid, 'string', 'uuid', request, reply);
+		const user = await usersSdk.getUser(params.uuid)
+			.then(response => response as AxiosResponse<User>)
+			.catch(err => {
+				httpReply({
+					detail: err.response?.data?.detail || err.response?.data || 'Failed to fetch user data',
+					status: err.status === 500 ? 503 : err.status || 503,
+					module: 'usermanager',
+				}, reply, request);
+				throw err;
+			});
+		if (user!.data.PlayerID!.length <= 3) {
+			return httpReply({
+				detail: "User is a bot",
+				status: 403,
+				module: "usermanager",
+			}, reply, request);
+		}
 		const userMatches = await usersSdk.getUserMatches(params.uuid)
 			.then(response => response)
 			.catch((err: any) => {
