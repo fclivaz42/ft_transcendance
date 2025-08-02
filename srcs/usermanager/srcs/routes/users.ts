@@ -41,8 +41,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		if (authorization)
 			return authorization;
 		const user: Partial<User> = request.body as Partial<User>;
-		user.LastAlive = Date.now();
-		const res = await db_sdk.update_user(user);
+		const res = await db_sdk.update_user({ PlayerID: user.PlayerID, LastAlive: Date.now() });
 		reply.code(200).send({ LastAlive: res.data.LastAlive });
 	});
 
@@ -134,7 +133,6 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 	});
 
 	app.post("/:uuid/friends", async (request, reply) => {
-		// TODO: Implement friend request logic better once dbSdk supports it
 		const authorization = checkRequestAuthorization(request, reply);
 		if (authorization)
 			return authorization;
@@ -156,7 +154,8 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 		}
 		user.FriendsList = user.FriendsList || [];
 		user.FriendsList.push(body.PlayerID);
-		const postFriends = await db_sdk.update_user(user)
+		const new_user: Partial<User> = { PlayerID: user.PlayerID, FriendsList: user.FriendsList }
+		const postFriends = await db_sdk.update_user(new_user)
 			.catch((err: any) => {
 				if (!axios.isAxiosError(err))
 					throw err;
@@ -184,7 +183,8 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 			}, reply, request);
 		}
 		user.FriendsList = user.FriendsList.filter((friendId: string) => friendId !== params.friendId);
-		const deleteFriends = await db_sdk.update_user(user)
+		const new_user: Partial<User> = { PlayerID: user.PlayerID, FriendsList: user.FriendsList }
+		const deleteFriends = await db_sdk.update_user(new_user)
 			.catch((err: any) => {
 				if (!axios.isAxiosError(err))
 					throw err;
