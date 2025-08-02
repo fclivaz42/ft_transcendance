@@ -7,6 +7,7 @@ export interface UserAvatarProps {
 	editable?: boolean;
 	playerId?: string;
 	disableClick?: boolean;
+	newWindow?: boolean;
 }
 
 export type UserAvatarType = HTMLDivElement & { firstChild: HTMLImageElement } | HTMLAnchorElement & { firstChild: HTMLImageElement };
@@ -34,7 +35,8 @@ export default function createUserAvatar(props: UserAvatarProps = {
 				img.setAttribute("data-user", "avatar");
 			if(!props.editable && !props.disableClick) {
 				anchor.href = `/user?playerId=${user!.PlayerID}`;
-				anchor.target = "_blank";
+				if (props.newWindow)
+					anchor.target = "_blank";
 			}
 			img.src = user!.Avatar || `https://placehold.co/100x100?text=${user.DisplayName.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
 		});
