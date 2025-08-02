@@ -278,7 +278,8 @@
     },
     "pong": {
       "socketClose": "The game has been closed due to an error.",
-      "userDisconnected": "{user} has disconnected from the game."
+      "userDisconnected": "{user} has disconnected from the game.",
+      "ignored": "Server has ignored your request.\nYou can only play one game at a time."
     }
   },
   "errors": {

@@ -180,6 +180,11 @@ export interface CloseSocket {
     message: string
 }
 
+export interface IgnoreSocket {
+	type: "ignored";
+	message: string;
+}
+
 export type ServerMessage = InitPayload
 							| UpdatePayload
 							| PlayerConnectedPayload
@@ -192,4 +197,5 @@ export type ServerMessage = InitPayload
 							| TournamentOverPayload
 							| PingResponsePayload
 							| PingRequestPayload
-							| CloseSocket;
+							| CloseSocket
+							| IgnoreSocket;

@@ -120,6 +120,9 @@ export class WebSocketManager {
 				case "disconnect":
 					PongGameManager.onUserDisconnect(msg.payload);
 					break;
+				case "ignored":
+					PongGameManager.onIgnored(msg.message);
+					break;
 				default:
 					console.warn("[WS] Unknown message type:", msg);
 					return;

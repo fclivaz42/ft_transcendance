@@ -5,7 +5,7 @@ import { WebSocketManager } from "../game/WebSocketManager.js";
 import { GameField } from "../game/GameField.js";
 import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
-import { CloseSocket, GameOverPayload, InitPayload, PingRequestPayload, PingResponsePayload, PlayerConnectedPayload, PlayerDisconnectedPayload, TournamentBracketStatusPayload, TournamentMatchOverPayload, TournamentMatchStatus, TournamentOverPayload } from "../game/types.js";
+import { CloseSocket, GameOverPayload, IgnoreSocket, InitPayload, PingRequestPayload, PingResponsePayload, PlayerConnectedPayload, PlayerDisconnectedPayload, TournamentBracketStatusPayload, TournamentMatchOverPayload, TournamentMatchStatus, TournamentOverPayload } from "../game/types.js";
 import UserHandler from "../handlers/UserHandler.js";
 import createUserAvatar from "../components/usermenu/userAvatar.js";
 import { Users } from "../interfaces/Users.js";
@@ -335,6 +335,14 @@ class PongGameManager {
 	public onTournamentOver(payload: TournamentOverPayload["payload"]) {
 		this.dialogRef = createBracketDialog(this.getBracket, "final", payload.winner);
 	};
+
+	public onIgnored(message: IgnoreSocket["message"]) {
+		RoutingHandler.setRoute("/", false);
+		NotificationManager.notify({
+			message: i18nHandler.getValue("notification.pong.ignored"),
+			level: "warning",
+		});
+	}
 }
 
 export default new PongGameManager();
