@@ -26,7 +26,7 @@ function appearanceSettings(sidePanel: HTMLElement) {
   });
   sidePanel.appendChild(toggleDarkMode);
 
-  const languages = ["English", "Spanish", "French", "Portuguese", "Russian"];
+  const languages = ["English", "French", "Portuguese", "Russian"];
 
   //const languageSelector = createSidePanelSelector(i18nHandler.getValue("navbar.settings.submenu.appearance.submenu.language"), languages);
   const languageSelector = createSidePanelSelector({

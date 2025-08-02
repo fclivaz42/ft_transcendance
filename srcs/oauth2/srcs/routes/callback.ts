@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import axios from "axios";
+import type { AxiosError, AxiosResponse } from "axios";
 import checkRequestAuthorization from "../managers/AuthorizationManager.ts";
 import { httpReply } from "../../../libs/helpers/httpResponse.ts";
 import type { OauthToken, OauthCallbackRequest } from "../interfaces/OauthInterfaces.ts";
@@ -66,7 +67,14 @@ export async function getCallback(req: FastifyRequest, rep: FastifyReply) {
 	await updateUser(token, await getMatchingOauthUser(token));
 	// log the user in using the OAuth ID
 	const userSdk = new UsersSdk();
-	const login = (await userSdk.postOauthLogin({ OAuthID: token.jwt_decode.subject })).data;
+	let login: any;
+	try {
+		login(await userSdk.postOauthLogin({ OAuthID: token.jwt_decode.subject })).data;
+	} catch (err: AxiosError) {
+		if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+			return rep.code(503).send('error.module.down')
+		return rep.code(500).send('error.internal.fail')
+	}
 	return rep.status(200).send({ ...login });
 }
 

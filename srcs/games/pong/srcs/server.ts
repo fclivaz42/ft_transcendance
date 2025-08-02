@@ -8,8 +8,8 @@ import Logger from "../../../libs/helpers/loggers.ts";
 
 if (!process.env.KEY_PATH ||
 	!process.env.CERT_PATH) {
-		throw new Error("KEY_PATH and CERT_PATH environment variables must be set to run the server with HTTPS.");
-	}
+	throw new Error("KEY_PATH and CERT_PATH environment variables must be set to run the server with HTTPS.");
+}
 
 const app = fastify({
 	logger: false,

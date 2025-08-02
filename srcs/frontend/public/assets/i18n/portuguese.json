@@ -1,0 +1,290 @@
+{
+  "generic": {
+    "loading": "Carregando...",
+    "deletedUser": "Usuário excluído"
+  },
+  "home": {
+    "title": "Bem-vindo ao SARIF's Pong!"
+  },
+  "tournament": {
+    "bracket": {
+      "quarterFinals": "Quartas de final",
+      "semiFinals": "Semifinais",
+      "finals": "Finals",
+      "winner": "Ganhador"
+    },
+    "waitingnext": "Esperando pela próxima partida ...",
+    "lost": "Esperando o fim do torneio ..."
+  },
+  "pong": {
+    "waitingPlayer": "Esperando que outro jogador se junte ...",
+    "waitingFriend": "Esperando que seu amigo se junte ...",
+    "computer": "AI",
+    "join": {
+      "error": {
+        "emptyRoomCode": "Por favor, insira um código da sala.",
+        "roomNotFound": "Espaço não encontrado. "
+      },
+      "title": "Junte-se a um jogo privado",
+      "description": "Digite o código da sala para participar de um jogo privado.",
+      "placeholder": "Código da sala",
+      "button": "Junte-se ao jogo"
+    },
+    "gameover": {
+      "title": "Game Over",
+      "loser": "Perdedor",
+      "winner": "Ganhador",
+      "playagain": "Jogue novamente",
+      "leave": "Saia do jogo"
+    },
+    "privateJoin": {
+      "roomCode": "Código da sala",
+      "copyUrl": "Copiar URL"
+    }
+  },
+  "history": {
+    "title": "História",
+    "subtitle": "História do {user}",
+    "empty": "Nenhum histórico disponível.",
+    "winner": "Ganhador",
+    "loser": "Perdedor",
+    "notchain": "Não acorrentado!",
+    "notification": {
+      "notchain": {
+        "title": "Combine não em blockchain",
+        "message": "Esta partida não está registrada na blockchain."
+      },
+      "private": {
+        "title": "Usuário privado",
+        "message": "Este usuário é privado. "
+      }
+    }
+  },
+  "user": {
+    "isPrivate": "Este usuário é privado.",
+    "friend": {
+      "addFriend": "Adicionar amigo",
+      "removeFriend": "Remova o amigo"
+    },
+    "matches": {
+      "total": "Total de correspondências",
+      "won": "Partidas vencidas",
+      "lost": "Partidas perdidas",
+      "viewHistory": "Ver história"
+    },
+    "notification": {
+      "alreadyExists": "Você já são amigos.",
+      "notFound": "Usuário não encontrado.",
+      "deleteError": "Falhou em excluir o amigo."
+    }
+  },
+  "header": {
+    "usermenu": {
+      "login": "Conecte-se",
+      "register": "Registrar",
+      "logout": "Logout"
+    }
+  },
+  "navbar": {
+    "home": {
+      "label": "Lar"
+    },
+    "pong": {
+      "label": "Pong",
+      "title": "Jogo de pong",
+      "submenu": {
+        "play": "Jogue agora",
+        "solo": "Modo solo",
+        "join": "Junte-se à sala",
+        "create": "Crie espaço",
+        "local": "Jogo local",
+        "tournament": "Torneio"
+      }
+    },
+    "friend": {
+      "label": "Amigos",
+      "title": "Lista de amigos",
+      "empty": "Você ainda não tem amigos."
+    },
+    "history": {
+      "label": "História",
+      "title": "História"
+    },
+    "profile": {
+      "label": "Perfil"
+    },
+    "settings": {
+      "label": "Configurações",
+      "title": "Configurações",
+      "submenu": {
+        "appearance": {
+          "title": "Aparência",
+          "submenu": {
+            "dark_mode": "Modo escuro",
+            "language": "Linguagem"
+          }
+        }
+      }
+    }
+  },
+  "panel": {
+    "usernameLabel": "Nome de usuário",
+    "passwordLabel": "Senha",
+    "emailLabel": "Endereço de email",
+    "loginPanel": {
+      "panelTitle": "Entrar",
+      "connexionButton": "Entrar",
+      "validation": {
+        "usernameRequired": "Por favor, digite seu nome de usuário.",
+        "passwordRequired": "A senha é necessária."
+      },
+      "link": {
+        "subscribePanel": "Crie uma conta!"
+      },
+      "notification": {
+        "loginErrorTitle": "Erro de login",
+        "loginErrorMessage": "Ocorreu um erro ao tentar fazer login.",
+        "loginBadCredentials": "Nome de usuário ou senha inválidos."
+      }
+    },
+    "registerPanel": {
+      "panelTitle": "Crie sua conta",
+      "confirmPasswordLabel": "Confirme sua senha",
+      "registerButton": "Continuar",
+      "validation": {
+        "usernameRequired": "Por favor, digite seu nome de usuário.",
+        "emailRequired": "Por favor, digite seu e-mail.",
+        "passwordRequired": "A senha é necessária.",
+        "confirmPasswordRequired": "Por favor, confirme sua senha.",
+        "passwordMismatch": "As senhas não correspondem.",
+        "lengthError": "Deve estar entre [3 - 14] caracteres.",
+        "charactersError": "O nome de usuário pode conter apenas [a-z], [0-9], [-].",
+        "emailFormatError": "Por favor, insira um endereço de e-mail válido.",
+        "emailIllegalCharacters": "O email contém caracteres inválidos."
+      },
+      "link": {
+        "loginPanel": "Já tem uma conta? "
+      },
+      "notification": {
+        "registerErrorTitle": "Erro de registro",
+        "registerErrorMessage": "Ocorreu um erro ao tentar se registrar.",
+        "registerCredentialTaken": "Este nome de usuário ou e-mail já foi recebido.",
+        "registerDisplayNameTaken": "Este nome de usuário já está levado.",
+        "registerEmailTaken": "Este e-mail já está registado.",
+        "registerPassMismatch": "As senhas não correspondem. "
+      }
+    },
+    "updateProfile": {
+      "title": "Editar perfil",
+      "fields": {
+        "usernameLabel": "Novo nome de usuário",
+        "emailLabel": "Novo endereço de e-mail",
+        "passwordLabel": "Nova Senha",
+        "confirmPasswordLabel": "Confirme nova senha"
+      },
+      "buttons": {
+        "save": "Salvar alterações",
+        "cancel": "Cancelar",
+        "logout": "Logout",
+        "public": "Tornar o perfil público",
+        "private": "Tornar o perfil privado",
+        "delete": "Excluir conta"
+      },
+      "delete": {
+        "title": "Excluir conta",
+        "passwordPlaceholder": "Senha atual",
+        "confirmButton": "Excluir",
+        "info": "*Nota: Esta ação é irreversível. "
+      },
+      "notification": {
+        "validationErrorTitle": "Erro de validação",
+        "validationErrorMessage": "Corrija os erros no formulário antes de enviar.",
+        "updateSuccessTitle": "Perfil atualizado",
+        "updateSuccessMessage": "Seu perfil foi atualizado com sucesso.",
+        "updateErrorTitle": "Erro de atualização do perfil",
+        "updateErrorMessage": "Ocorreu um erro ao tentar atualizar seu perfil.\nPor favor, tente novamente mais tarde.",
+        "networkErrorTitle": "Erro de rede",
+        "networkErrorMessage": "Não é possível conectar ao servidor. ",
+        "noChangesTitle": "Sem alterações",
+        "noChangesMessage": "Nenhuma alteração foi feita em seu perfil.",
+        "oauthNoPassword": "Nenhuma senha foi definida para esta conta.\nVocê pode definir uma senha em suas configurações de perfil.",
+        "badPassword": "Senha ruim. "
+      },
+      "validation": {
+        "confirmPasswordRequired": "Confirme sua nova senha."
+      }
+    },
+    "2faPanel": {
+      "title": "Autenticação de dois fatores",
+      "info": "Um e-mail foi enviado ao seu e-mail com o código 2FA.\nPor favor, insira-o abaixo para verificar sua identidade.",
+      "verify": "Verificar",
+      "error": {
+        "invalidCode": "Código inválido. "
+      }
+    },
+    "gdpr": {
+      "title": "🔐 Aviso de privacidade do GDPR",
+      "version": "2025-08-01",
+      "data": {
+        "title": "📝 Coleta de dados",
+        "message": "Coletamos seu endereço de e-mail, nome de exibição e imagem de perfil vinculada a um identificador exclusivo. "
+      },
+      "rights": {
+        "title": "🔧 Direitos do usuário",
+        "message": "Você pode modificar ou excluir seus dados pessoais a qualquer momento. "
+      },
+      "cookies": {
+        "title": "🍪 Cookies",
+        "message": "Utilizamos apenas cookies essenciais para fins de autenticação. "
+      },
+      "thirdParty": {
+        "title": "🤝 Serviços de terceiros",
+        "message": "Não compartilhamos seus dados pessoais com terceiros. "
+      },
+      "button": {
+        "accept": "Aceitar",
+        "decline": "Declínio (saída)"
+      }
+    }
+  },
+  "passwordStrength": {
+    "minLength": "Pelo menos 8 caracteres",
+    "hasUppercase": " Precisa de uma letra maiúscula",
+    "hasLowercase": "Precisa de uma letra minúscula",
+    "hasNumber": "Precisa de um número",
+    "hasSpecialChar": "Precisa de um personagem especial (!@#$%)"
+  },
+  "notification": {
+    "generic": {
+      "infoTitle": "Informações de login",
+      "errorTitle": "Erro",
+      "warningTitle": "Aviso",
+      "errorMessage": "Ocorreu um erro. "
+    },
+    "oauth2": {
+      "callbackError": "O login remoto falhou",
+      "noSession": "Nenhuma sessão encontrada. "
+    },
+    "user": {
+      "notLogged": "Você não está conectado.",
+      "notFound": "Usuário não encontrado."
+    },
+    "pong": {
+      "socketClose": "O jogo foi fechado devido a um erro.",
+      "userDisconnected": "{user} desconectou do jogo.",
+      "ignored": "O servidor ignorou sua solicitação.\nVocê só pode jogar um jogo ao mesmo tempo."
+    }
+  },
+  "errors": {
+    "http": {
+      "404": {
+        "title": "Opa! ",
+        "message": "A página que você está procurando não existe."
+      }
+    },
+    "unauthorized": "Acesso não autorizado. ",
+    "forbidden": "Acesso proibido. ",
+    "notFound": "Recurso não encontrado.",
+    "generic": "Ooops! "
+  }
+}

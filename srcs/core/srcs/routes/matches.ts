@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyPluginOptions } from "fastify";
 import UsersSdk from "../../../libs/helpers/usersSdk.ts";
 import axios from "axios";
+import { checkParam } from "../helpers/checkParam.ts";
 
 const usersSdk = new UsersSdk();
 
@@ -11,11 +12,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		await usersSdk.usersEnforceAuthorize(reply, request);
 
 		const params = request.params as { uuid: string };
+		checkParam(params.uuid, 'string', 'uuid', request, reply);
 		const match = await usersSdk.getMatchById(params.uuid)
 			.then(response => response)
 			.catch((err: any) => {
 				if (!axios.isAxiosError(err))
-					throw err;	
+					throw err;
+				if (err.code === 'ENOTFOUND' || err.code === 'EAI_AGAIN')
+					return reply.code(503).send('error.module.down')
 				return reply.code(err.response?.status || 500).send(
 					err.response?.data || {
 						detail: 'Failed to fetch user matches',
