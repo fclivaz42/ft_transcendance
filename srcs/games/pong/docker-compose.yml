@@ -14,4 +14,7 @@ services:
       libs:
         condition: service_completed_successfully
         restart: true
+      frontend-builder:
+        condition: service_completed_successfully
+        restart: true
     restart: on-failure

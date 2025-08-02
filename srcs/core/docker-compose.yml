@@ -6,7 +6,7 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/04 22:27:45 by fclivaz           #+#    #+#              #
-#    Updated: 2025/06/22 22:44:12 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/08/02 11:25:12 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,8 @@ services:
       - sarif-libs:/libs
       - sarif-frontend:/var/www/sarif-frontend
     ports:
-      - "443:443"
+      - "8443:443"
+      #- "443:443"
       #- "80:80" can be enabled with USE_TLS=false
     build:
       context: .

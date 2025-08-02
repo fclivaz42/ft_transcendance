@@ -20,9 +20,9 @@
   "homepage": "https://github.com/fclivaz42/ft_transcendance/tree/main#readme",
   "dependencies": {
     "@fastify/multipart": "^9.0.3",
-    "axios": "^1.9.0",
+    "axios": "^1.11.0",
     "dotenv": "^16.5.0",
-    "fastify": "^5.3.3",
+    "fastify": "^5.4.0",
     "nodemailer": "^7.0.3"
   },
   "devDependencies": {
