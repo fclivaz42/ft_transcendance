@@ -29,7 +29,7 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   dialogTitle.className = "text-2xl font-bold mb-2 text-center";
 
   const panelsContainer = document.createElement("div");
-  panelsContainer.className = "relative w-full flex flex-col items-center justify-center min-h-[280px]";
+  panelsContainer.className = "relative w-full flex flex-col items-center justify-center min-h-[280px] overscroll-none";
 
   // --- PANEL CREATION ---
   // Ensure all panel variables are destructured here, within the function's scope.
@@ -58,8 +58,8 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   dialog.appendChild(dialogTitle);
 
  
-  registerPanel.classList.add('opacity-0', 'translate-x-full'); // Hors écran à droite ou à gauche, selon le sens de la transition d'entrée
-  loginPanel.classList.add('opacity-0', 'translate-x-full');
+  registerPanel.classList.add('hidden', 'translate-x-full'); // Hors écran à droite ou à gauche, selon le sens de la transition d'entrée
+  loginPanel.classList.add('hidden', 'translate-x-full');
 
 
 
@@ -172,8 +172,8 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
         dialogTitle.textContent = i18nHandler.getValue("panel.registerPanel.panelTitle");
     } 
 
-    const hiddenClass = 'opacity-0';
-    const visibleClass = 'opacity-100';
+    const hiddenClass = 'hidden';
+    const visibleClass = 'block';
     const slideLeft = '-translate-x-full';
     const slideRight = 'translate-x-full';
     const slideIn = 'translate-x-0';
