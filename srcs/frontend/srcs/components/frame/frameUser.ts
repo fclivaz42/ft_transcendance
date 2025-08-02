@@ -90,12 +90,12 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 	});
 
 	removeFriendButton.onclick = async () => {
-		await UserHandler.removeFriend(user.PlayerID);
+		await UserHandler.removeFriend(user.PlayerID).catch(error => {});
 		RoutingHandler.setRoute(`/user?playerId=${user.PlayerID}`, false);
 	}
 
 	addFriendButton.onclick = async () => {
-		await UserHandler.addFriend(user.PlayerID);
+		await UserHandler.addFriend(user.PlayerID).catch(error => {});
 		RoutingHandler.setRoute(`/user?playerId=${user.PlayerID}`, false);
 	}
 
