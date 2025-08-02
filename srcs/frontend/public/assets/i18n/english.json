@@ -4,7 +4,13 @@
     "deletedUser": "Deleted User"
   },
   "home": {
-    "title": "Welcome to SARIF's Pong!"
+    "title": "Welcome to SARIF's Pong",
+    "guestButton": {
+      "label": "Jouer en Guest"
+    },
+    "accountButton": {
+      "label": "Utiliser un compte"
+    }
   },
   "tournament": {
     "bracket": {
@@ -133,7 +139,6 @@
     "emailLabel": "Email Address",
     "loginPanel": {
       "panelTitle": "Sign in",
-      "rememberMe": "Remember me",
       "connexionButton": "Sign in",
       "validation": {
         "usernameRequired": "Please enter your username.",
