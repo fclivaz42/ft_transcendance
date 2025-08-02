@@ -16,7 +16,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.sarif.rule=Host(`sarif.ruinformatique.ch`)"
       - "traefik.http.routers.sarif.tls=true"
-      - "traefik.http.services.sarif.loadbalancer.server.scheme=https"
 
     container_name: core
     networks:

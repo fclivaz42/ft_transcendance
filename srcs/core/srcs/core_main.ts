@@ -18,7 +18,7 @@ if (process.env.KEY_PATH === undefined || process.env.CERT_PATH === undefined) {
 }
 
 const fastify: fft.FastifyInstance = Fastify({
-	https: {
+	https: process.env.USE_TLS?.toLowerCase() === "false" ? false : {
 		key: fs.readFileSync(process.env.KEY_PATH),
 		cert: fs.readFileSync(process.env.CERT_PATH)
 	}
@@ -54,7 +54,7 @@ fastify.addHook('onSend', async (request, reply, payload) => {
 });
 
 
-fastify.listen({ port: 443, host: '::' }, (err) => {
+fastify.listen({ port: Number(process.env.PORT!), host: '::' }, (err) => {
 	if (err) {
 		fastify.log.error(err)
 		process.exit(1)

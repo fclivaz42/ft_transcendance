@@ -23,11 +23,11 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ../ssl/
+      device: /data/containers/ft_transcendance/ssl
   data:
     name: "SARIF_data"
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ../data/
+      device: /data/containers/ft_transcendance/db

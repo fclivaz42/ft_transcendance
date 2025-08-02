@@ -1,4 +1,22 @@
 #!/bin/sh
+
+if [ "$(echo "$USE_TLS" | tr '[:upper:]' '[:lower:]')" = "false" ]; then
+  echo "TLS is disabled."
+else
+  echo "TLS is enabled."
+fi
+
+if [ -z "$PORT" ]; then
+  echo "PORT environment variable is not set."
+  if [ "$(echo "$USE_TLS" | tr '[:upper:]' '[:lower:]')" = "false" ]; then
+    echo "Using PORT 80 (non-TLS mode)."
+    export PORT=80
+  else
+    echo "Using PORT 443 (TLS mode)."
+    export PORT=443
+  fi
+fi
+
 if [ -z "$CERT_PATH" ] || [ -z "$KEY_PATH" ]; then
   echo "CERT_PATH or KEY_PATH environment variable is not set."
   echo "Using default paths: /etc/ssl/certs/sarif.crt and /etc/ssl/private/sarif.key"
