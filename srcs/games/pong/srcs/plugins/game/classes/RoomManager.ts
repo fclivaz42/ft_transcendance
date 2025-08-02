@@ -63,6 +63,10 @@ export default class RoomManager {
 					room?.addPlayer(session);
 				} else {
 					console.log(`Room: ${roomId} not found.`);
+					session.send({
+						type: "close-socket",
+						message: "RoomID not found"
+					});
 					socket.close();
 				}
 				break;
