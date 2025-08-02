@@ -16,19 +16,18 @@ services:
     networks:
       - sarifntw
     volumes:
+      - ssl:/ssl
       - data:/data
       - sarif-libs:/libs
       - sarif-frontend:/var/www/sarif-frontend
     ports:
       - "443:443"
+      #- "80:80" can be enabled with USE_TLS=false
     build:
       context: .
-      args:
-        CERTPATH: ${CERTPATH}
-        KEYPATH: ${KEYPATH}
     env_file:
       - ../.env
-      - .env
+      #- .env
     environment:
       - API_KEY
       - TZ=Europe/Zurich

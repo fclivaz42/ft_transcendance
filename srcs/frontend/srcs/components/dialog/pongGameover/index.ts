@@ -37,7 +37,7 @@ async function createPongGameoverDialogContent(dialogRef: BackdropDialog, users:
 	const userAvatar: UserAvatarType[] = [];
 	for (const user of Object.values(users)) {
 		if (!user || user.PlayerID === "bot")
-			userAvatar.push(createUserAvatar({isComputer: true, sizeClass: "w-16 h-16"}));
+			userAvatar.push(createUserAvatar({sizeClass: "w-16 h-16"}));
 		else
 			userAvatar.push(createUserAvatar({playerId: user.PlayerID, sizeClass: "w-16 h-16"}));
 	}

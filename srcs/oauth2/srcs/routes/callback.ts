@@ -121,7 +121,7 @@ async function updateUser(token: OauthToken, matchingUser: User | undefined) {
 						throw new Error("Failed to create user after multiple attempts");
 					continue;
 				} else
-					throw new Error("Failed to create user");
+					throw error;
 			}
 		}
 	} else if (!matchingUser.OAuthID) {

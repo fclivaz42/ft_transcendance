@@ -145,8 +145,7 @@
         "passwordRequired": "Password is required."
       },
       "link": {
-        "subscribePanel": "Create an account!",
-        "forgotPasswordPanel": "Forgot password?"
+        "subscribePanel": "Create an account!"
       },
       "notification": {
         "loginErrorTitle": "Login Error",
@@ -164,7 +163,7 @@
         "passwordRequired": "Password is required.",
         "confirmPasswordRequired": "Please confirm your password.",
         "passwordMismatch": "Passwords do not match.",
-        "lengthError": "Must be between [3 - 20] characters.",
+        "lengthError": "Must be between [3 - 14] characters.",
         "charactersError": "Username can only contain [a-z], [0-9], [-].",
         "emailFormatError": "Please enter a valid email address.",
         "emailIllegalCharacters": "Email contains invalid characters."
@@ -179,18 +178,6 @@
         "registerDisplayNameTaken": "This username is already taken.",
         "registerEmailTaken": "This email is already registered.",
         "registerPassMismatch": "The passwords do not match. Please try again."
-      }
-    },
-    "forgotPasswordPanel": {
-      "panelTitle": "Forgot Password",
-      "sendButton": "Send Reset Link",
-      "validation": {
-        "code": "Please enter the code sent to your email.",
-        "emailRequired": "Please enter your email.",
-        "emailFormatError": "Please enter a valid email address."
-      },
-      "link": {
-        "loginPanel": "Remembered your password? Login"
       }
     },
     "updateProfile": {

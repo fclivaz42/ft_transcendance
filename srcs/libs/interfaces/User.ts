@@ -47,6 +47,7 @@ interface def_users {
 	AI6: d_user,
 	AI7: d_user,
 	AI8: d_user,
+	Local: d_user,
 }
 
 export const default_users: def_users = {
@@ -54,25 +55,25 @@ export const default_users: def_users = {
 		PlayerID: "P-0",
 		DisplayName: "bot1",
 		EmailAddress: "P-0",
-		Password: "0"
+		Password: "if you see this congrats you either have access to the code or the database."
 	},
 	"AI2": {
 		PlayerID: "P-1",
 		DisplayName: "bot2",
 		EmailAddress: "P-1",
-		Password: "0"
+		Password: "JUDGEMENT! DIE! PREPARE THYSELF! THY END IS NOW! CRUSH!"
 	},
 	"AI3": {
 		PlayerID: "P-2",
 		DisplayName: "bot3",
 		EmailAddress: "P-2",
-		Password: "0"
+		Password: "i spent so much time on this level."
 	},
 	"AI4": {
 		PlayerID: "P-3",
 		DisplayName: "bot4",
 		EmailAddress: "P-3",
-		Password: "0"
+		Password: "hakita what are you planning for this one?"
 	},
 	"AI5": {
 		PlayerID: "P-4",
@@ -102,6 +103,12 @@ export const default_users: def_users = {
 		PlayerID: "P-D",
 		DisplayName: "Deleted",
 		EmailAddress: "Deleted",
-		Password: "0"
+		Password: "i dont exist why are you trying to log in as me"
+	},
+	"Local": {
+		PlayerID: "P-L",
+		DisplayName: "Local",
+		EmailAddress: "Local",
+		Password: "bro why are you trying to log in as THE LOCAL PLAYER"
 	}
 }

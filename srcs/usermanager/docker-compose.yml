@@ -7,10 +7,12 @@ services:
       - API_KEY
     env_file:
       - .env
+      - ../.env
     networks:
       - sarifntw
     volumes:
       - sarif-libs:/libs/
+      - ssl:/ssl
     depends_on:
       libs:
         condition: service_completed_successfully

@@ -22,10 +22,10 @@ else
 fi
 echo "Ignoring TLS verification: ${IGNORE_TLS:-false}"
 
-echo "Starting usermanager service..."
+echo "Starting database service..."
 exec npm run start || {
   exitCode=$?
-  echo "Failed to start usermanager service."
+  echo "Failed to start database service."
   echo "Exiting with error code $exitCode"
   exit $exitCode
 }

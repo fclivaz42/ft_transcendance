@@ -14,6 +14,12 @@ export default async function initializeMatchesRoute(app: FastifyInstance, opts:
 		if (authorization)
 			return authorization;
 		const params = request.params as { uuid: string };
+		if (params[Object.keys(params)[0]] === "")
+			return httpReply({
+				detail: 'No Match ID given',
+				status: 400,
+				module: 'usermanager'
+			}, reply, request);
 		const resp = await dbSdk.get_match(params.uuid).catch(error => {
 			if (!axios.isAxiosError(error))
 				throw error;

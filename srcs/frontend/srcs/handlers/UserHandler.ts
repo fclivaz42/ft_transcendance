@@ -18,7 +18,7 @@ class UserHandler {
 	private _friendList: Friends[] = [];
 	private _updatingAliveStatus: boolean = false;
 	private _updatingFriendList: boolean = false;
-	private _publicUserCache = new FixedSizeMap<String, Users>(32);
+	private _publicUserCache = new FixedSizeMap<String, Users>(12);
 
 	constructor() {
 		let clientId = localStorage.getItem("clientId");
@@ -166,10 +166,8 @@ class UserHandler {
 				return undefined;
 			}
 			const userData = await user.json();
-			this._publicUserCache.set(playerId, userData as Users);
-			setTimeout(() => {
-				this._publicUserCache.delete(playerId!);
-			}, 60000);
+			if (!this._friendList.find(friend => friend.PlayerID === playerId))
+				this._publicUserCache.set(playerId, userData as Users);
 			return userData as Users;
 		}
 		if (this._user)
@@ -377,8 +375,10 @@ class UserHandler {
 			method: "PUT",
 			body: multipartFormdata,
 		});
-		if (!response.ok)
-			throw new Error(`Failed to update user data: ${response.statusText}`);
+		if (!response.ok) {
+			const body = await response.json();
+			throw new Error(body?.detail || `Failed to update user: ${response.statusText}`);
+		}
 		const updatedUser = await response.json() as Partial<Users>;
 		this._user = { ...this._user, ...updatedUser } as Users;
 		if (data.Avatar)

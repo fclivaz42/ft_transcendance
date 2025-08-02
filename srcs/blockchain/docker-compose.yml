@@ -1,7 +1,6 @@
 services:
   blockchain:
     container_name: blockchain
-    image: sarif_blockchain
     networks:
       - sarifntw
     build:
@@ -9,9 +8,14 @@ services:
       args:
         PROVIDER: ${PROVIDER}
         PRIVATE_KEY: ${PRIVATE_KEY}
-    env_file: .env
+    env_file:
+      - ../.env
+      - .env
     environment:
       - API_KEY
+    volumes:
+      - sarif-libs:/libs/
+      - ssl:/ssl
     restart: on-failure
     depends_on:
       libs:

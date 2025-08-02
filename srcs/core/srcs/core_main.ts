@@ -12,15 +12,15 @@ import websocketPlugin from '@fastify/websocket'
 import fastifyMultipart from '@fastify/multipart'
 import registerFrontendModule from './modules/frontend.ts'
 
-if (process.env.KEYPATH === undefined || process.env.CERTPATH === undefined) {
-	Logger.error("Keypath and/or Certpath are not defined. Exiting.")
+if (process.env.KEY_PATH === undefined || process.env.CERT_PATH === undefined) {
+	Logger.error("KEY_PATH and/or CERT_PATH are not defined. Exiting.")
 	process.exit(1)
 }
 
 const fastify: fft.FastifyInstance = Fastify({
-	https: {
-		key: fs.readFileSync(process.env.KEYPATH),
-		cert: fs.readFileSync(process.env.CERTPATH)
+	https: process.env.USE_TLS?.toLowerCase() === "false" ? false : {
+		key: fs.readFileSync(process.env.KEY_PATH),
+		cert: fs.readFileSync(process.env.CERT_PATH)
 	}
 })
 
@@ -54,7 +54,7 @@ fastify.addHook('onSend', async (request, reply, payload) => {
 });
 
 
-fastify.listen({ port: 443, host: '::' }, (err) => {
+fastify.listen({ port: Number(process.env.PORT!), host: '::' }, (err) => {
 	if (err) {
 		fastify.log.error(err)
 		process.exit(1)

@@ -11,6 +11,7 @@ import { createButton, createButtonIcon } from "../buttons";
 import createHeaderFrame from "../frame/components/frameHeader";
 import createLoadingFrame from "../frame/frameLoading";
 import createUserAvatar from "../usermenu/userAvatar";
+import AudioManager from "../../managers/AudioManager";
 
 function createBracketRoundComponent(round: TournamentMatchStatus): HTMLDivElement {
 	const template = document.createElement("template");
@@ -49,8 +50,6 @@ function createBracketRoundComponent(round: TournamentMatchStatus): HTMLDivEleme
 		});
 	}
 
-	console.log("hey");
-	console.log(round.p2);
 	if (round.p2) {
 		UserHandler.fetchUser(round.p2 || undefined).then((user) => {
 			if (!user)
@@ -68,7 +67,6 @@ function createBracketRoundComponent(round: TournamentMatchStatus): HTMLDivEleme
 
 export function createBracketComponent(bracket: TournamentMatchStatus[]): HTMLDivElement {
 	const template = document.createElement("template");
-	console.log(bracket);
 
 	template.innerHTML = `
 		<div id="pong-tournament-bracket" class="m-2 p-4">
@@ -141,6 +139,10 @@ export function createBracketDialog(bracket: TournamentMatchStatus[], status: "l
 		darkColor: "dark:bg-red-700 dark:hover:bg-red-800",
 	});
 	leaveButton.onclick = () => {
+		   const audioManager = AudioManager.getInstance();
+        if (audioManager) {
+            audioManager.stopBackgroundMusic(9); // 2 secondes de fade out
+        }
 		dialog.close();
 		RoutingHandler.setRoute("/");
 	}
@@ -166,6 +168,10 @@ export function createBracketDialog(bracket: TournamentMatchStatus[], status: "l
 				darkColor: "dark:bg-blue-700 dark:hover:bg-blue-800",
 			});
 			playAgain.onclick = () => {
+				const audioManager = AudioManager.getInstance();
+				if (audioManager) {
+					audioManager.stopBackgroundMusic(9); // 2 secondes de fade out
+				}
 				dialog.close();
 				RoutingHandler.setRoute("/pong?room=tournament", false);
 			}

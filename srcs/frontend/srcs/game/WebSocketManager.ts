@@ -8,7 +8,7 @@ type InitHandler = (payload: InitPayload["payload"]) => void;
 type UpdateHanlder = (payload: UpdatePayload["payload"]) => void;
 type CollisionHandler = (payload: CollisionPayload["payload"]) => void;
 
-export const PONG_HOST = `wss://${location.host}/api/game/`
+export const PONG_HOST = `ws${location.protocol === "https:" ? "s" : ""}://${location.host}/api/game/`
 
 export class WebSocketManager {
 	private socket: WebSocket;
