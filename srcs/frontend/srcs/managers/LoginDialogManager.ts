@@ -127,7 +127,7 @@ class LoginDialogManager {
 
     // 3. Création du <dialog> principal
 const dialog = createLoginDialog({
-   initialMode: 'register',//ordre 1er panel a s'afficher
+   initialMode: 'login',//ordre 1er panel a s'afficher
 	 onSubmit: handleAuthSubmit,
    onSwitchMode: handleSwitchMode
 });

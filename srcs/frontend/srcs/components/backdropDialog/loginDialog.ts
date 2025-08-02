@@ -63,8 +63,8 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
 
 
 
-  panelsContainer.appendChild(loginPanel);
   panelsContainer.appendChild(registerPanel);
+  panelsContainer.appendChild(loginPanel);
 
   dialog.appendChild(panelsContainer);
 	dialog.appendChild((() => {
@@ -266,7 +266,7 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   // Assure que le mode initial est configuré avec ou sans animation.
   // Pour le premier chargement du dialogue, il n'y a pas d'animation "d'entrée"
   // depuis un autre panneau. Le panneau s'affiche juste.
-  switchMode(options.initialMode, false); // false pour animate car c'est le premier affichage du dialogue.
+  switchMode(options.initialMode ?? 'login', false); // false pour animate car c'est le premier affichage du dialogue.
 
   return dialog;
 }
