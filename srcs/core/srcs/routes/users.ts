@@ -21,7 +21,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (request.method !== 'GET')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for authorization.' });
 
-		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		let authorization: any;
+		try {
+			authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 
 		return reply.code(authorization.status).send(authorization.data);
 	});
@@ -31,7 +38,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (request.method !== 'GET')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user data.' });
 
-		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		let authorization: any;
+		try {
+			authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 
 		const currentUser = await usersSdk.getUser(authorization.data.sub);
 
@@ -44,11 +58,18 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (request.method !== 'GET')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user picture.' });
 
-		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		let authorization: any;
+		try {
+			authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 
 		const userPicture = await usersSdk.getUserPicture(authorization.data.sub);
-		if (userPicture.status !== 200)
-			throw new Error(`Failed to fetch user picture: ${userPicture.statusText}`);
+		// if (userPicture.status !== 200)
+		// 	throw new Error(`Failed to fetch user picture: ${userPicture.statusText}`);
 		if (!userPicture.data)
 			return reply.code(404).send("User picture not found");
 		return reply.headers(userPicture.headers as any).send(userPicture.data);
@@ -58,7 +79,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (request.method !== 'GET')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user matches.' });
 
-		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		let authorization: any;
+		try {
+			authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 		const token = usersSdk.unshowerCookie(request.headers.cookie)["token"];
 		const userMatches = await usersSdk.getUserMatches(authorization.data.sub)
 			.then(response => response)
@@ -79,7 +107,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (request.method !== 'POST' && request.method !== 'GET')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only POST method is allowed for user alive status.' });
 
-		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		let authorization: any;
+		try {
+			authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 		const userId = authorization.data.sub;
 
 		if (request.method === 'GET') {
@@ -115,7 +150,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (request.method !== 'GET' && request.method !== 'POST')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user friends.' });
 
-		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		let authorization: any;
+		try {
+			authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 
 		if (request.method === 'POST') {
 			const body = request.body as { PlayerID: string };
@@ -151,7 +193,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (request.method !== 'DELETE')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only DELETE method is allowed for user friend removal.' });
 
-		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		let authorization: any;
+		try {
+			authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 		const params = request.params as { uuid: string };
 		checkParam(params.uuid, 'string', 'uuid', request, reply);
 		const removeFriend = await usersSdk.deleteUserFriend(authorization.data.sub, params.uuid)
@@ -179,14 +228,22 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			checkParam(body.DisplayName, 'string', 'DisplayName', request, reply);
 		else if (body.EmailAddress)
 			checkParam(body.EmailAddress, 'string', 'EmailAddress', request, reply);
-		else  {
+		else {
 			return httpReply({
 				module: 'usermanager',
 				detail: 'Either DisplayName or EmailAddress must be provided for login.',
 				status: 400,
 			}, reply, request);
 		}
-		const login = await usersSdk.postLogin(body);
+		let login: any;
+		try {
+			login = await usersSdk.postLogin(request.body as UserLoginProps);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
+
 		return reply.code(login.status).send(login.data);
 	});
 
@@ -220,8 +277,18 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only DELETE method is allowed for user deletion.' });
 		const { password } = request.body as { password?: string };
 		checkParam(password, 'string', 'password', request, reply);
-
-		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		if (!password)
+			return reply.code(401).send({ error: 'Unauthorized', message: 'Missing password.' });
+		if (typeof password !== "string")
+			return reply.code(401).send({ error: 'Unauthorized', message: 'Password is not a string.' });
+		let authorization: any;
+		try {
+			authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 		try {
 			await db_sdk.log_user(authorization.data.sub, "PlayerID", password as string)
 		} catch (exception) {
@@ -237,7 +304,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 	fastify.all('/update', async (request, reply) => {
 		if (!(request.method === 'PUT' || request.method === 'PATCH'))
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only PUT or PATCH method is allowed for user update.' });
-		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		let authorization: any;
+		try {
+			authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 		const userId = authorization.data.sub;
 		const formdata = new FormData();
 		for await (const part of request.parts()) {
@@ -286,7 +360,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const body = request.body as { ClientId: string, Code: string };
 		checkParam(body.ClientId, 'string', 'ClientId', request, reply);
 		checkParam(body.Code, 'string', 'Code', request, reply);
-		const resp = await usersSdk.post2FA(body);
+		let resp: any;
+		try {
+			resp = await usersSdk.post2FA(body);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 		if (resp.status !== 200)
 			return reply.code(resp.status).send(resp.data);
 		UsersSdk.showerCookie(reply, resp.data.token, resp.data.exp);
@@ -299,7 +380,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user data retrieval.' });
 		const params = request.params as { uuid: string };
 		checkParam(params.uuid, 'string', 'uuid', request, reply);
-		const userData = await usersSdk.getUser(params.uuid);
+		let userData: any;
+		try {
+			userData = await usersSdk.getUser(params.uuid);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 		if (userData.status !== 200)
 			return reply.code(userData.status).send(userData.data);
 		return reply.code(userData.status).send(usersSdk.filterPublicUserData(userData.data));
@@ -309,7 +397,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		if (request.method !== 'GET')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only POST or GET method is allowed for user alive status.' });
 
-		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		let authorization: any;
+		try {
+			authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 		const userId = authorization.data.sub;
 
 		const targetUser = request.params as { uuid: string };
@@ -342,7 +437,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user picture.' });
 		const params = request.params as { uuid: string };
 		checkParam(params.uuid, 'string', 'uuid', request, reply);
-		const userPicture = await usersSdk.getUserPicture(params.uuid);
+		let userPicture: any;
+		try {
+			userPicture = await usersSdk.getUserPicture(params.uuid);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 		if (userPicture.status !== 200)
 			return reply.code(userPicture.status).send(userPicture.data);
 		return reply.headers(userPicture.headers as any).send(userPicture.data);
@@ -360,7 +462,15 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 	fastify.all('/:uuid/matches', async (request, reply) => {
 		if (request.method !== 'GET')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user matches.' });
-		await usersSdk.usersEnforceAuthorize(reply, request);
+		let authorization: any;
+		try {
+			authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
+		const token = usersSdk.unshowerCookie(request.headers.cookie)["token"];
 		const params = request.params as { uuid: string };
 		checkParam(params.uuid, 'string', 'uuid', request, reply);
 		const userMatches = await usersSdk.getUserMatches(params.uuid)
@@ -381,7 +491,14 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 	fastify.all('/:uuid/stats', async (request, reply) => {
 		if (request.method !== 'GET')
 			return reply.code(405).send({ error: 'Method Not Allowed', message: 'Only GET method is allowed for user stats.' });
-		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		let authorization: any;
+		try {
+			authorization = await usersSdk.usersEnforceAuthorize(reply, request);
+		} catch (err: AxiosError) {
+			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
+				return reply.code(503).send('error.module.down')
+			return reply.code(500).send('error.internal.fail')
+		}
 		const params = request.params as { uuid: string };
 		checkParam(params.uuid, 'string', 'uuid', request, reply);
 		const userStats = await usersSdk.getUserStats(params.uuid)

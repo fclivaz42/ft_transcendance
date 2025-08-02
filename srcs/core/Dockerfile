@@ -11,7 +11,7 @@ RUN npm i
 
 COPY srcs/ ./srcs
 
-EXPOSE 80
+# EXPOSE 80
 EXPOSE 443
 
 COPY ./docker-entrypoint.sh ./docker-entrypoint.sh

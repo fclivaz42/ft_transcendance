@@ -17,7 +17,9 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 			.then(response => response)
 			.catch((err: any) => {
 				if (!axios.isAxiosError(err))
-					throw err;	
+					throw err;
+				if (err.code === 'ENOTFOUND' || err.code === 'EAI_AGAIN')
+					return reply.code(503).send('error.module.down')
 				return reply.code(err.response?.status || 500).send(
 					err.response?.data || {
 						detail: 'Failed to fetch user matches',
