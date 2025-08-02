@@ -77,7 +77,7 @@ export interface UsersSdkConfig {
 
 export const defaultConfig: UsersSdkConfig = {
 	apiKey: process.env.API_KEY || "",
-	serverUrl: process.env.USERMANAGER_URL ||"https://usermanager:3000",
+	serverUrl: process.env.USERMANAGER_URL || "https://usermanager:3000",
 }
 
 class UsersSdk {
@@ -402,7 +402,7 @@ class UsersSdk {
 		return this.apiRequest<UsersSdkAliveResponse>("get", `${uuid}/alive`);
 	}
 
-	public async post2FA(data: {Code: string, ClientId: string}): Promise<AxiosResponse<any>> {
+	public async post2FA(data: { Code: string, ClientId: string }): Promise<AxiosResponse<any>> {
 		return this.apiRequest<any>("post", "2fa", {
 			data
 		});
