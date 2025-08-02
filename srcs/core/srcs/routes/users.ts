@@ -27,7 +27,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 
 		return reply.code(authorization.status).send(authorization.data);
@@ -44,7 +44,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 
 		const currentUser = await usersSdk.getUser(authorization.data.sub);
@@ -64,7 +64,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 
 		const userPicture = await usersSdk.getUserPicture(authorization.data.sub);
@@ -85,7 +85,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 		const token = usersSdk.unshowerCookie(request.headers.cookie)["token"];
 		const userMatches = await usersSdk.getUserMatches(authorization.data.sub)
@@ -113,7 +113,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 		const userId = authorization.data.sub;
 
@@ -156,7 +156,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 
 		if (request.method === 'POST') {
@@ -199,7 +199,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return;
 		}
 		const params = request.params as { uuid: string };
 		checkParam(params.uuid, 'string', 'uuid', request, reply);
@@ -241,7 +241,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 
 		return reply.code(login.status).send(login.data);
@@ -287,7 +287,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 		try {
 			await db_sdk.log_user(authorization.data.sub, "PlayerID", password as string)
@@ -310,7 +310,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 		const userId = authorization.data.sub;
 		const formdata = new FormData();
@@ -366,7 +366,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 		if (resp.status !== 200)
 			return reply.code(resp.status).send(resp.data);
@@ -386,7 +386,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 		if (userData.status !== 200)
 			return reply.code(userData.status).send(userData.data);
@@ -403,7 +403,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 		const userId = authorization.data.sub;
 
@@ -443,7 +443,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 		if (userPicture.status !== 200)
 			return reply.code(userPicture.status).send(userPicture.data);
@@ -468,7 +468,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 		const params = request.params as { uuid: string };
 		checkParam(params.uuid, 'string', 'uuid', request, reply);
@@ -513,7 +513,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
-			return reply.code(500).send('error.internal.fail')
+			return
 		}
 		const params = request.params as { uuid: string };
 		checkParam(params.uuid, 'string', 'uuid', request, reply);

@@ -40,6 +40,13 @@ export default async function usersRegisterEndpoint(app: FastifyInstance, opts: 
 							module: "usermanager",
 						}, reply, request);
 					}
+					else if (error.response?.status === 503) {
+						return httpReply({
+							detail: error.response.data || "error.database.down",
+							status: 503,
+							module: "usermanager",
+						}, reply, request);
+					}
 				}
 				Logger.error("Error creating user:" + error);
 				return undefined;

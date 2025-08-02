@@ -6,7 +6,7 @@
 //   By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2025/06/25 19:14:30 by fclivaz           #+#    #+#             //
-//   Updated: 2025/08/01 20:34:26 by fclivaz          ###   LAUSANNE.ch       //
+//   Updated: 2025/08/03 00:54:24 by fclivaz          ###   LAUSANNE.ch       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -21,6 +21,7 @@ import type { Tournament_full, Tournament_lite, Tournament_metadata } from "../i
 import BlockchainSDK from "./blockchainSdk.ts";
 import UsersSdk from "./usersSdk.ts";
 import type { TXHash } from "./blockchainSdk.ts";
+import { httpReply } from "./httpResponse.ts";
 
 export type UUIDv4 = string
 
@@ -62,14 +63,14 @@ export default class DatabaseSDK {
 			if (!options.headers)
 				options.headers = {};
 		}
-		const httpsAgent = new https.Agent({ rejectUnauthorized:  !(process.env.IGNORE_TLS?.toLowerCase() === "true") });
+		const httpsAgent = new https.Agent({ rejectUnauthorized: !(process.env.IGNORE_TLS?.toLowerCase() === "true") });
 
 		let url = `${this._config.serverUrl}/${table}`
 		if (endpoint)
 			url = url + endpoint
 		if (endpoint && options?.params)
 			url = url.replace(this.param_str, options?.params)
-		return await axios({
+		return axios({
 			httpsAgent,
 			method,
 			url,
@@ -79,6 +80,10 @@ export default class DatabaseSDK {
 			},
 			data: options?.body,
 			responseType: options?.response_type
+		}).catch((err: AxiosError) => {
+			if (err.code === 'ENOTFOUND' || err.code === 'EAI_AGAIN')
+				err.status = 503;
+			throw err;
 		})
 	}
 

@@ -6,7 +6,7 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/22 22:04:45 by fclivaz           #+#    #+#              #
-#    Updated: 2025/08/02 01:32:58 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/08/03 00:07:29 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,7 +37,7 @@ up: build
 	API_KEY="$$($(GENERATOR))" docker compose -p ${NAME} -f ./srcs/docker-compose.yml up -d
 
 down:
-	docker compose -p ${NAME} -f ./srcs/docker-compose.yml down -v
+	docker compose -p ${NAME} -f ./srcs/docker-compose.yml down
 
 start: up
 	docker compose -p ${NAME} -f ./srcs/docker-compose.yml start
