@@ -13,6 +13,8 @@ import { codeUser } from './2FAreceipt.ts';
 import type { TwoFaLogUser } from './2FAreceipt.ts';
 import { config } from '../../managers/ConfigManager.ts';
 import EmailManager from '../../managers/EmailManager.ts';
+import { template } from './2FAreceipt.ts';
+import path from 'path';
 
 export default async function usersLoginEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.post("/login", async (request, reply) => {
@@ -71,6 +73,10 @@ export default async function usersLoginEndpoint(app: FastifyInstance, opts: Fas
 	});
 }
 
+function loadTemplate(code: string): string {
+	return template.replace('{{CODE_2FA}}', code);
+}
+
 const send2faVerification = async (email: string, id: string, user: string): Promise<void> => {
 	try {
 		let code: string;
@@ -83,7 +89,14 @@ const send2faVerification = async (email: string, id: string, user: string): Pro
 			from: config.SmtpConfig.from,
 			to: email,
 			subject: 'Your code 2FA',
-			text: `Your verification code is : ${code}`,
+			html: loadTemplate(code),
+			attachments: [
+				{
+					filename: 'Sarif_Industries_Logo.svg.png',
+					path: path.join(import.meta.dirname, 'images', 'SarifLogo.svg.png'),
+					cid: 'logoSarif'
+				}
+			]
 		};
 		EmailManager.sendMail(mailOptions).catch((err) => {
 			Logger.error(`Error sending 2FA email to ${email}: ${err}`);
