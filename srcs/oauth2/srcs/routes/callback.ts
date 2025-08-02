@@ -69,7 +69,7 @@ export async function getCallback(req: FastifyRequest, rep: FastifyReply) {
 	const userSdk = new UsersSdk();
 	let login: any;
 	try {
-		login(await userSdk.postOauthLogin({ OAuthID: token.jwt_decode.subject })).data;
+		login = (await userSdk.postOauthLogin({ OAuthID: token.jwt_decode.subject })).data;
 	} catch (err: AxiosError) {
 		if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 			return rep.code(503).send('error.module.down')

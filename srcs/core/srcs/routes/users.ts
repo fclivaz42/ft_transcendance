@@ -439,8 +439,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		checkParam(params.uuid, 'string', 'uuid', request, reply);
 		let userPicture: any;
 		try {
-			userPicture = await usersSdk.getUser(params.uuid);
-
+			userPicture = await usersSdk.getUserPicture(params.uuid);
 		} catch (err: AxiosError) {
 			if (err?.code === 'ENOTFOUND' || err?.code === 'EAI_AGAIN')
 				return reply.code(503).send('error.module.down')
