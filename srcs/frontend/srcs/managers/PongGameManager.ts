@@ -55,7 +55,8 @@ class PongGameManager {
 			if (!this.websocketManager || !this.websocketManager.socketInstance)
 				throw new Error("WebSocketManager or socket is not initialized.");
 			this.pingInterval.sentPing = Date.now();
-			this.websocketManager.socketInstance.send("ping!");
+			if (this.websocketManager.socketInstance.readyState !== WebSocket.OPEN)
+				this.websocketManager.socketInstance.send("ping!");
 			return;
 		}
 		this.pingInterval.ping = Date.now() - this.pingInterval.sentPing;
@@ -86,7 +87,8 @@ class PongGameManager {
 	public reset() {
 		this.started = false;
 		this.cleanupGame();
-		this.websocketManager?.close();
+		if (this.websocketManager && this.websocketManager.socketInstance.readyState === WebSocket.OPEN)
+			this.websocketManager.close();
 		this.engine?.dispose();
 	}
 
