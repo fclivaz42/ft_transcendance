@@ -3,6 +3,9 @@
     "loading": "Loading...",
     "deletedUser": "Deleted User"
   },
+  "home": {
+    "title": "Welcome to SARIF's Pong!"
+  },
   "tournament": {
     "bracket": {
       "quarterFinals": "Quarter Finals",
