@@ -57,6 +57,7 @@ class UserHandler {
 				if (friendListResp?.status === 401 || friendListResp?.status === 403) {
 					this.clearUserData();
 					this.updateComponents();
+					RoutingHandler.setRoute("/", false);
 				}
 				this._friendList = [];
 				console.error("Failed to fetch friend list:", friendListResp?.statusText);
@@ -88,13 +89,14 @@ class UserHandler {
 					if (res.status === 401 || res.status === 403) {
 						this.clearUserData();
 						this.updateComponents();
+						RoutingHandler.setRoute("/", false);
 					}
-					throw new Error(res.statusText);
+					return;
 				}
 			} catch (error) {
 				console.error("Failed to update alive status:", error);
 			}
-			await new Promise(resolve => setTimeout(resolve, 25000));
+			await new Promise(resolve => setTimeout(resolve, 10000));
 			this._updatingAliveStatus = false;
 		}
 	}
