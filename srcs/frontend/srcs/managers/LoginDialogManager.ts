@@ -136,7 +136,7 @@ const dialog = createLoginDialog({
 
     /*dialog.classList.add(
       "transition", "duration-300", "ease-out",
-      "opacity-0", "scale-95"
+      "hidden", "scale-95"
     );*/
     Object.assign(dialog.style, {
       maxWidth: "400px",
@@ -151,9 +151,8 @@ const dialog = createLoginDialog({
     // --- Logique d'affichage ---
     dialog.showModal();
     requestAnimationFrame(() => {
-      this.dialog!.classList.remove("opacity-0", "scale-95");
-      this.dialog!.classList.add("opacity-100", "scale-100");
-
+      this.dialog!.classList.remove("hidden", "scale-95");
+      this.dialog!.classList.add("block", "scale-100");
     });
   }
 }
