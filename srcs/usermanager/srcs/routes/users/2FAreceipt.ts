@@ -6,6 +6,8 @@ import axios from 'axios';
 import https from 'https';
 import DatabaseSDK from '../../../../libs/helpers/databaseSdk.ts';
 import FixedSizeMap from '../../../../libs/interfaces/FixedSizeMap.ts'
+import * as fs from 'fs';
+import path from 'path';
 
 interface TwoFaProps {
 	Code: string;
@@ -19,6 +21,9 @@ export interface TwoFaLogUser {
 }
 
 export var codeUser = new FixedSizeMap<string, TwoFaLogUser>(500);
+
+const emailPath = path.join(import.meta.dirname, '/email.html');
+export const template = fs.readFileSync(emailPath, 'utf8');
 
 export default async function twoFaReceiptEndpoint(app: FastifyInstance, opts: FastifyPluginOptions) {
 	app.post('/2fa', async (request, reply) => {
