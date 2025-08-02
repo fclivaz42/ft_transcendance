@@ -3,15 +3,6 @@
     "loading": "Loading...",
     "deletedUser": "Deleted User"
   },
-  "home": {
-    "title": "Welcome to SARIF's Pong",
-    "guestButton": {
-      "label": "Jouer en Guest"
-    },
-    "accountButton": {
-      "label": "Utiliser un compte"
-    }
-  },
   "tournament": {
     "bracket": {
       "quarterFinals": "Quarter Finals",
