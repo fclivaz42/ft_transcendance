@@ -2,19 +2,17 @@
 import { createDialog } from "./index.js";
 import { checkPasswordStrength, PasswordStrengthResult } from "../input/createPasswordInput.js";
 import { createPasswordStrengthList } from "../input/passwordStrengh.js";
-import { createLoginPanel, createRegisterPanel, createForgotPasswordPanel } from './index.js';
+import { createLoginPanel, createRegisterPanel } from './index.js';
 import { i18nHandler } from "../../handlers/i18nHandler.js";
 import { createGoogleLoginButton } from "./googleLoginButton.js";
 
 // Interfaces partagées pour la logique de dialogue
 export interface LoginDialogOptions {
-  initialMode: 'login' | 'register' | 'forgotPassword';
-  onSwitchMode: (mode: 'login' | 'register' | 'forgotPassword') => void;
+  initialMode: 'login' | 'register';
+  onSwitchMode: (mode: 'login' | 'register') => void;
 
-  onSubmit(mode: 'login', data: { displayName: string; password: string; rememberMe: boolean; }): void;
+  onSubmit(mode: 'login', data: { displayName: string; password: string; }): void;
   onSubmit(mode: 'register', data: { displayName: string; email: string; password: string; confirmPassword: string; }): void;
-
-  onForgotPasswordSubmit: (email: string, code: string) => void;
 }
 
 // --- Main Login Dialog Function ---
@@ -51,32 +49,23 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
     form: loginForm,
     displayNameInput: loginDisplayName,
     passwordInput: loginPasswordInput,
-    rememberMeCheckbox,
-    switchToForgotPasswordLink,
     switchToRegisterLink,
     displayNameErrorFeedback: loginDisplayNameErrorFeedback,
     passwordErrorFeedback: loginPasswordErrorFeedback,
   } = createLoginPanel(options);
 
-  const {
-    panel: forgotPasswordPanel,
-    form: forgotPasswordForm,
-    emailInput: forgotPasswordEmailInput,
-    codeInput: forgotPasswordCodeInput,
-    switchToLoginFromForgotLink
-  } = createForgotPasswordPanel(options);
 
   dialog.appendChild(dialogTitle);
 
  
   registerPanel.classList.add('opacity-0', 'translate-x-full'); // Hors écran à droite ou à gauche, selon le sens de la transition d'entrée
   loginPanel.classList.add('opacity-0', 'translate-x-full');
-  forgotPasswordPanel.classList.add('opacity-0', 'translate-x-full');
 
 
-  panelsContainer.appendChild(loginPanel);
+
   panelsContainer.appendChild(registerPanel);
-  panelsContainer.appendChild(forgotPasswordPanel);
+  panelsContainer.appendChild(loginPanel);
+
   dialog.appendChild(panelsContainer);
 	dialog.appendChild((() => {
 		const hr = document.createElement("hr");
@@ -163,7 +152,7 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   });
 
 
-  let currentMode: 'login' | 'register' | 'forgotPassword';
+  let currentMode: 'login' | 'register' ;
 
   const setPanelContainerHeight = (panel: HTMLElement) => {
 
@@ -173,7 +162,7 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   };
 
 
-  const switchMode = (mode: 'login' | 'register' | 'forgotPassword', animate = true) => {
+  const switchMode = (mode: 'login' | 'register' , animate = true) => {
     if (mode === currentMode) return;
 
     // Définir le titre du dialogue
@@ -181,9 +170,7 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
         dialogTitle.textContent = i18nHandler.getValue("panel.loginPanel.panelTitle");
     } else if (mode === 'register') {
         dialogTitle.textContent = i18nHandler.getValue("panel.registerPanel.panelTitle");
-    } else { // mode === 'forgotPassword'
-        dialogTitle.textContent = i18nHandler.getValue("panel.forgotPasswordPanel.panelTitle");
-    }
+    } 
 
     const hiddenClass = 'opacity-0';
     const visibleClass = 'opacity-100';
@@ -194,12 +181,12 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
     const addTransitions = () => {
         registerPanel.classList.add('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out');
         loginPanel.classList.add('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out');
-        forgotPasswordPanel.classList.add('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out');
+        
     };
     const removeTransitions = () => {
         registerPanel.classList.remove('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out');
         loginPanel.classList.remove('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out');
-        forgotPasswordPanel.classList.remove('transition-transform', 'transition-opacity', 'duration-500', 'ease-in-out');
+        
     };
 
     if (animate) {
@@ -209,15 +196,13 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
     }
 
     // Réinitialiser tous les panneaux à un état caché et hors écran (pour une transition propre)
-    [registerPanel, loginPanel, forgotPasswordPanel].forEach(panel => {
+    [registerPanel, loginPanel].forEach(panel => {
         panel.classList.remove(slideIn, slideLeft, slideRight, visibleClass, hiddenClass);
         // Important: Mettre tous les panneaux hors écran pour la transition d'entrée/sortie
         if (panel === loginPanel) {
-             panel.classList.add(mode === 'login' ? slideIn : (mode === 'register' ? slideRight : slideLeft));
+             panel.classList.add(mode === 'login' ? slideIn : slideRight);
         } else if (panel === registerPanel) {
-             panel.classList.add(mode === 'register' ? slideIn : (mode === 'login' ? slideLeft : slideRight));
-        } else if (panel === forgotPasswordPanel) {
-             panel.classList.add(mode === 'forgotPassword' ? slideIn : (mode === 'login' ? slideRight : slideLeft));
+             panel.classList.add(mode === 'register' ? slideIn : slideLeft);
         }
         panel.classList.add(hiddenClass); // Tous les panneaux sont initialement cachés
     });
@@ -231,9 +216,6 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
         } else if (mode === 'register') {
             registerPanel.classList.remove(hiddenClass, slideLeft, slideRight);
             registerPanel.classList.add(slideIn, visibleClass);
-        } else { // mode === 'forgotPassword'
-            forgotPasswordPanel.classList.remove(hiddenClass, slideLeft, slideRight);
-            forgotPasswordPanel.classList.add(slideIn, visibleClass);
         }
     });
 
@@ -254,7 +236,6 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
         let activePanel;
         if (mode === 'login') activePanel = loginPanel;
         else if (mode === 'register') activePanel = registerPanel;
-        else activePanel = forgotPasswordPanel;
 
         if (activePanel) {
             setPanelContainerHeight(activePanel);
@@ -267,20 +248,13 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   };
 
   // --- Event Listeners for Mode Switching ---
-  switchToForgotPasswordLink.addEventListener("click", (e: MouseEvent) => {
-    e.preventDefault();
-    switchMode('forgotPassword');
-  });
+
 
   registerSwitchToLoginLink.addEventListener("click", (e: MouseEvent) => {
     e.preventDefault();
     switchMode('login');
   });
 
-  switchToLoginFromForgotLink .addEventListener("click", (e: MouseEvent) => {
-    e.preventDefault();
-    switchMode('login');
-  });
 
   switchToRegisterLink.addEventListener("click", (e: MouseEvent) => {
     e.preventDefault();
@@ -292,7 +266,7 @@ export function createLoginDialog(options: LoginDialogOptions): HTMLDialogElemen
   // Assure que le mode initial est configuré avec ou sans animation.
   // Pour le premier chargement du dialogue, il n'y a pas d'animation "d'entrée"
   // depuis un autre panneau. Le panneau s'affiche juste.
-  switchMode(options.initialMode, false); // false pour animate car c'est le premier affichage du dialogue.
+  switchMode(options.initialMode ?? 'login', false); // false pour animate car c'est le premier affichage du dialogue.
 
   return dialog;
 }

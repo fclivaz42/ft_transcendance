@@ -3,7 +3,7 @@ import BackdropDialog from '../../class/BackdropDialog.js';
 
 export { createLoginPanel } from './loginPanel.js';
 export { createRegisterPanel } from './registerPanel.js';
-export { createForgotPasswordPanel } from './forgotPswPanel.js';
+
 
 export interface DialogProps {
   allowClose?: boolean;
