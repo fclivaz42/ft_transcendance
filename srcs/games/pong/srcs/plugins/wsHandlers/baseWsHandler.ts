@@ -25,14 +25,16 @@ interface ClientMessage {
 
 interface CreateWsHandlerParams {
 	mode:
-	| "remote"
-	| "friend_host"
-	| "friend_join"
-	| "local"
-	| "computer"
-	| "tournament";
+		| "remote"
+		| "friend_host"
+		| "friend_join"
+		| "local"
+		| "computer"
+		| "tournament";
 	manager: RoomManager | TournamentManager;
 }
+
+const activeUserSessions = new Set<string>();
 
 export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 	return (
@@ -51,7 +53,10 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 			return;
 		}
 
-		if (manager.getSession(query.userId)) {
+		if (
+			manager.getSession(query.userId) ||
+			activeUserSessions.has(query.userId)
+		) {
 			socket.send(
 				JSON.stringify({
 					type: "ignored",
@@ -63,6 +68,7 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 		}
 
 		let session: PlayerSession;
+		activeUserSessions.add(query.userId);
 
 		if (mode === "friend_join") {
 			if (!query.roomId) {
@@ -87,7 +93,7 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 		} else if (mode === "local") {
 			session = manager.assignPlayer(socket, {
 				userId: query.userId,
-				mode: "local"
+				mode: "local",
 			});
 		} else if (mode === "friend_host") {
 			session = manager.assignPlayer(socket, {
@@ -153,6 +159,7 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 
 		socket.on("close", () => {
 			console.log(`User: ${query.userId} disconnected.`);
+			activeUserSessions.delete(query.userId);
 			manager.removeSession(session);
 		});
 	};
