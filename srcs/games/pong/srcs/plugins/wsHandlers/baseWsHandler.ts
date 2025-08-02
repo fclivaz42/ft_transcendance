@@ -119,7 +119,6 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 				) {
 					let ball: Ball | undefined = session.getRoom()?.getGame().getBall();
 					ball?.launch();
-					ball?.setCurrSpeed(0.25); // potential problem! resets ball speed mid game :(
 				} else if (type === "move" && payload?.direction) {
 					const paddle = session.getPaddle();
 

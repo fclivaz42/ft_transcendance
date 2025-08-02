@@ -74,7 +74,7 @@ export default class RoomManager {
 				room = this.createRoom();
 				room.closed = true;
 				room.addPlayer(session);
-				const localPlayer = new PlayerSession(null, "P-0");
+				const localPlayer = new PlayerSession(null, "P-L");
 				localPlayer.isAI = false;
 				localPlayer.local = true;
 				room.addPlayer(localPlayer);
