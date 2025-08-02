@@ -175,6 +175,16 @@ export interface PingRequestPayload {
     }
 }
 
+export interface CloseSocket {
+    type: "close-socket";
+    message: string
+}
+
+export interface IgnoreSocket {
+	type: "ignored";
+	message: string;
+}
+
 export type ServerMessage = InitPayload
 							| UpdatePayload
 							| PlayerConnectedPayload
@@ -186,4 +196,6 @@ export type ServerMessage = InitPayload
 							| TournamentMatchOverPayload
 							| TournamentOverPayload
 							| PingResponsePayload
-							| PingRequestPayload;
+							| PingRequestPayload
+							| CloseSocket
+							| IgnoreSocket;

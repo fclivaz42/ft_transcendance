@@ -17,6 +17,7 @@ import { InitPayload, UpdatePayload, CameraInitInfo, LightInitInfo } from "./typ
 const ALPHA: number = Math.PI / 2;
 const BETA: number = Math.PI / 2;
 const RADIUS: number = -22;
+const GLOW_INTENSITY = 0.8;
 
 export class GameField {
 	public scene: Scene;
@@ -32,7 +33,7 @@ export class GameField {
 		this.scene = new Scene(this.engine);
 
 		this.glowLayer = new GlowLayer("glow", this.scene);
-		this.glowLayer.intensity = 0.8;
+		this.glowLayer.intensity = GLOW_INTENSITY;
 	}
 
 	public init(payload: InitPayload["payload"]) {
@@ -100,7 +101,8 @@ export class GameField {
 		this.gridTron.create();
 
 		// (bleu clair)
-		this.gridTron.setColorRGB(0.3, 0.6, 1);
+		this.gridTron.setColorRGB(0.3, 0.6, 0.8);
+		this.gridTron.setOpacity(0.7);
 	}
 
 

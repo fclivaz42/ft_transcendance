@@ -46,8 +46,8 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const authorization = await usersSdk.usersEnforceAuthorize(reply, request);
 
 		const userPicture = await usersSdk.getUserPicture(authorization.data.sub);
-		if (userPicture.status !== 200)
-			throw new Error(`Failed to fetch user picture: ${userPicture.statusText}`);
+		// if (userPicture.status !== 200)
+		// 	throw new Error(`Failed to fetch user picture: ${userPicture.statusText}`);
 		if (!userPicture.data)
 			return reply.code(404).send("User picture not found");
 		return reply.headers(userPicture.headers as any).send(userPicture.data);

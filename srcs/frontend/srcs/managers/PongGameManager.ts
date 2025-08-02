@@ -5,7 +5,7 @@ import { WebSocketManager } from "../game/WebSocketManager.js";
 import { GameField } from "../game/GameField.js";
 import { createPongCanvas } from "../components/frame/framePong.js";
 import { frameManager } from "./FrameManager.js";
-import { GameOverPayload, InitPayload, PingRequestPayload, PingResponsePayload, PlayerConnectedPayload, TournamentBracketStatusPayload, TournamentMatchOverPayload, TournamentMatchStatus, TournamentOverPayload } from "../game/types.js";
+import { CloseSocket, GameOverPayload, IgnoreSocket, InitPayload, PingRequestPayload, PingResponsePayload, PlayerConnectedPayload, PlayerDisconnectedPayload, TournamentBracketStatusPayload, TournamentMatchOverPayload, TournamentMatchStatus, TournamentOverPayload } from "../game/types.js";
 import UserHandler from "../handlers/UserHandler.js";
 import createUserAvatar from "../components/usermenu/userAvatar.js";
 import { Users } from "../interfaces/Users.js";
@@ -15,6 +15,8 @@ import { createBracketComponent, createBracketDialog } from "../components/backd
 import BackdropDialog from "../class/BackdropDialog.js";
 
 import AudioManager from "./AudioManager.js";
+import NotificationManager from "./NotificationManager.js";
+import { i18nHandler } from "../handlers/i18nHandler.js";
 
 function enforceDefined<T>(value: T | undefined, message: string): T {
 	if (!value)
@@ -250,6 +252,33 @@ class PongGameManager {
 		}
 	}
 
+	public onSocketClose(message: CloseSocket["message"]) {
+		let notificationMessage: string;
+		switch (message) {
+			case "RoomID not found":
+				notificationMessage = "pong.join.error.roomNotFound";
+				break;
+			default:
+				notificationMessage = "notification.pong.socketClose";
+				break;
+		}
+		RoutingHandler.setRoute("/", false);
+		NotificationManager.notify({
+			message: i18nHandler.getValue(notificationMessage || "notification.generic.errorMessage"),
+			level: "error",
+		});
+	}
+
+	public async onUserDisconnect(payload: PlayerDisconnectedPayload["payload"]) {
+		const player = await UserHandler.fetchUser(payload.playerID);
+		if (!player) return;
+
+		NotificationManager.notify({
+			message: i18nHandler.getValue("notification.pong.userDisconnected").replace("{user}", player.DisplayName),
+			level: "info",
+		});
+	}
+
 	public get getPlayers(): Record<"p1" | "p2", Users | undefined> {
 		if (!this.users)
 			throw new Error("Users are not initialized.");
@@ -306,6 +335,14 @@ class PongGameManager {
 	public onTournamentOver(payload: TournamentOverPayload["payload"]) {
 		this.dialogRef = createBracketDialog(this.getBracket, "final", payload.winner);
 	};
+
+	public onIgnored(message: IgnoreSocket["message"]) {
+		RoutingHandler.setRoute("/", false);
+		NotificationManager.notify({
+			message: i18nHandler.getValue("notification.pong.ignored"),
+			level: "warning",
+		});
+	}
 }
 
 export default new PongGameManager();

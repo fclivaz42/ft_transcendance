@@ -73,22 +73,32 @@ export default async function game_routes(fastify: FastifyInstance, options: Fas
 		});
 
 		proxySocket.on("error", (error) => {
-			Logger.error(`WebSocket error\n${error}`);
+			Logger.error(`WebSocket proxy error\n${error}`);
+			client.send(JSON.stringify({
+				type: "close-socket",
+				message: "Proxy closed",
+			}));
 			client.close(1011, JSON.stringify({ error: 'Internal Server Error', message: 'An error occurred while processing the WebSocket connection.' }));
 		});
 
 		client.on("error", (error) => {
-			Logger.error(`Client WebSocket error\n${error}`);
-			proxySocket.close(1011, 'Client error');
+			Logger.error(`Client client WebSocket error\n${error}`);
+			proxySocket.close(1011, JSON.stringify(error));
 		});
 
 		proxySocket.on("close", (code, reason) => {
-			Logger.error(`proxyClient for ${token.sub} closed with ${code}: ${reason}`)
-			client.close();
+			if (code === 1006) {
+				client.send(JSON.stringify({
+					type: "close-socket",
+					message: "Proxy closed",
+				}));
+			}
+			if (client.readyState === WebSocket.OPEN)
+				client.close();
 		});
 
 		client.on("close", (code, reason) => {
-			Logger.error(`Client ${token.sub} closed with ${code}: ${reason}`)
+			Logger.error(`Client ${token.sub} closed with ${code}: ${reason}`);
 			proxySocket.close();
 		});
 

@@ -114,6 +114,15 @@ export class WebSocketManager {
 				case "tournament-status":
 					PongGameManager.onBracketUpdate(msg.payload);
 					break;
+				case "close-socket":
+					PongGameManager.onSocketClose(msg.message);
+					break;
+				case "disconnect":
+					PongGameManager.onUserDisconnect(msg.payload);
+					break;
+				case "ignored":
+					PongGameManager.onIgnored(msg.message);
+					break;
 				default:
 					console.warn("[WS] Unknown message type:", msg);
 					return;

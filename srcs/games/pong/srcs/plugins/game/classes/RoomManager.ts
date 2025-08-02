@@ -63,6 +63,10 @@ export default class RoomManager {
 					room?.addPlayer(session);
 				} else {
 					console.log(`Room: ${roomId} not found.`);
+					session.send({
+						type: "close-socket",
+						message: "RoomID not found"
+					});
 					socket.close();
 				}
 				break;
@@ -70,7 +74,7 @@ export default class RoomManager {
 				room = this.createRoom();
 				room.closed = true;
 				room.addPlayer(session);
-				const localPlayer = new PlayerSession(null, "P-0");
+				const localPlayer = new PlayerSession(null, "P-L");
 				localPlayer.isAI = false;
 				localPlayer.local = true;
 				room.addPlayer(localPlayer);
