@@ -133,7 +133,6 @@
     "emailLabel": "Endereço de email",
     "loginPanel": {
       "panelTitle": "Entrar",
-      "rememberMe": "Lembre de mim",
       "connexionButton": "Entrar",
       "validation": {
         "usernameRequired": "Por favor, digite seu nome de usuário.",
