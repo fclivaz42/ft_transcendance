@@ -1,3 +1,4 @@
+import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler from "../../handlers/UserHandler";
 import { AiUsers } from "../../interfaces/AiUsers";
 import { userMenuManager } from "../../managers/UserMenuManager";
@@ -7,6 +8,7 @@ export interface UserAvatarProps {
 	editable?: boolean;
 	playerId?: string;
 	disableClick?: boolean;
+	newWindow?: boolean;
 }
 
 export type UserAvatarType = HTMLDivElement & { firstChild: HTMLImageElement } | HTMLAnchorElement & { firstChild: HTMLImageElement };
@@ -21,15 +23,8 @@ export default function createUserAvatar(props: UserAvatarProps = {
 	anchor.className = "select-none outline-none";
 
 	const img = document.createElement("img");
-	img.onerror = () => {
-		setTimeout(() => {
-      if (!img.complete || img.naturalWidth === 0)
-        img.src = "/assets/images/default_avatar.svg";
-    }, 1000);
-	};
 	img.alt = "User Avatar";
 	img.className = `select-none border-2 rounded-full object-cover ${props.sizeClass} bg-white`;
-	img.src = "/assets/images/default_avatar.svg";
 
 	if (props.playerId) {
 		UserHandler.fetchUser(props.playerId).then((user) => {
@@ -38,11 +33,17 @@ export default function createUserAvatar(props: UserAvatarProps = {
 			else if (user.PlayerID === UserHandler.userId)
 				img.setAttribute("data-user", "avatar");
 			if(!props.editable && !props.disableClick) {
-				anchor.href = `/user?playerId=${user!.PlayerID}`;
-				anchor.target = "_blank";
+				if (props.newWindow === true) {
+					anchor.href = `/user?playerId=${user!.PlayerID}`;
+					anchor.target = "_blank";
+				} else
+					anchor.onclick = () => RoutingHandler.setRoute(`/user?playerId=${user!.PlayerID}`);
 			}
+			img.onerror = () => img.src = "/assets/images/default_avatar.svg";
 			img.src = user?.Avatar || `https://placehold.co/100x100?text=${user.DisplayName.substring(0, 2) || "?"}&font=roboto&bg=cccccc`;
 		});
+	} else {
+		img.src = "/assets/images/default_avatar.svg";
 	}
 
 	anchor.appendChild(img);

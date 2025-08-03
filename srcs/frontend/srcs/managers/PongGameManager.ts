@@ -126,7 +126,7 @@ class PongGameManager {
 				this.users[identifier as "p1" | "p2"] = userData;
 				if (!userData) throw new Error(`User data for ${identifier} not found.`);
 				element.textContent = userData.DisplayName;
-				const newAvatar = createUserAvatar({ playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14" });
+				const newAvatar = createUserAvatar({ playerId: userData.PlayerID, sizeClass: "lg:w-20 lg:h-20 w-14 h-14", newWindow: true });
 				newAvatar.setAttribute("data-pong-avatar", identifier);
 				avatarElement?.replaceWith(newAvatar);
 				if (userData.isBot) {
