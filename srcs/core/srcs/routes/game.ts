@@ -98,7 +98,7 @@ export default async function game_routes(fastify: FastifyInstance, options: Fas
 		});
 
 		client.on("close", (code, reason) => {
-			Logger.error(`Client ${token.sub} closed with ${code}: ${reason}`);
+			Logger.warn(`Client ${token.sub} closed with ${code}: ${reason}`);
 			proxySocket.close();
 		});
 

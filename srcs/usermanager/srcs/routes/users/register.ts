@@ -28,21 +28,24 @@ export default async function usersRegisterEndpoint(app: FastifyInstance, opts: 
 			return resp;
 
 		const db_sdk = new DatabaseSDK();
+		let res_code: number = 500;
 
 		const user = await db_sdk.create_user(userRegister)
 			.then(response => response.data)
 			.catch(error => {
 				if (axios.isAxiosError(error)) {
 					if (error.response?.status === 409) {
-						return httpReply({
+						res_code = 409;
+						httpReply({
 							detail: error.response.data || "error.duplicate",
 							status: 409,
 							module: "usermanager",
 						}, reply, request);
 					}
-					else if (error.response?.status === 503) {
-						return httpReply({
-							detail: error.response.data || "error.database.down",
+					if (error.status === 503) {
+						res_code = 503;
+						httpReply({
+							detail: "error.database.down",
 							status: 503,
 							module: "usermanager",
 						}, reply, request);
@@ -54,7 +57,7 @@ export default async function usersRegisterEndpoint(app: FastifyInstance, opts: 
 		if (!user || !user.PlayerID) {
 			return httpReply({
 				detail: "User creation failed",
-				status: 500,
+				status: res_code,
 				module: "usermanager",
 			}, reply, request);
 		}
