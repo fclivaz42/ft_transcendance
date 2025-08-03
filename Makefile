@@ -6,7 +6,7 @@
 #    By: fclivaz <fclivaz@student.42lausanne.ch>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/22 22:04:45 by fclivaz           #+#    #+#              #
-#    Updated: 2025/08/03 00:07:29 by fclivaz          ###   LAUSANNE.ch        #
+#    Updated: 2025/08/03 02:03:58 by fclivaz          ###   LAUSANNE.ch        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,9 +52,11 @@ network:
 	docker network ls
 
 prune:
-	docker system prune -af
+	docker system prune -f
 
-nuke: down prune
+nuke: down
+	docker compose -p ${NAME} -f ./srcs/docker-compose.yml down -v --rmi all --remove-orphans
+	docker system prune -f
 	rm -rf ${SSLDIR}
 
 re: down all

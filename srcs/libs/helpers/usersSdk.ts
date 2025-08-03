@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import https from "https";
 import type { UserLoginOauthProps, UserLoginProps, UserRegisterProps, User } from "../interfaces/User.ts";
 import type { FastifyReply, FastifyRequest } from "fastify";
@@ -113,7 +114,12 @@ class UsersSdk {
 			params: options?.params,
 			responseType: options?.response_type,
 			validateStatus: ((status: number) => (status >= 200 && status < 300) || status === 401 || status === 403),
-		});
+		}).catch((err: AxiosError) => {
+			if (err.code === 'ENOTFOUND' || err.code === 'EAI_AGAIN') {
+				err.status = 503;
+			}
+			throw err;
+		})
 	}
 
 	/**
