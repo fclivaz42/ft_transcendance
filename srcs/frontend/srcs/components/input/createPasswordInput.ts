@@ -85,7 +85,7 @@ export function createPasswordInput(
     const eyeIcon = document.createElement("img");
     eyeIcon.src = "/assets/ui/eye-open.svg"; // <--- Chemin vers votre SVG pour l'œil ouvert
     eyeIcon.alt = "Afficher le mot de passe"; // Texte alternatif pour l'accessibilité
-    eyeIcon.className = "w-5 h-5"; // Taille de l'icône, ajustez si besoin
+    eyeIcon.className = "w-5 h-5"; // Taille de l'icône
 
     // Icône "œil barré" (cachée par défaut)
     const eyeSlashIcon = document.createElement("img");

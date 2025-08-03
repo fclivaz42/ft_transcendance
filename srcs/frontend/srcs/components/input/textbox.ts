@@ -17,9 +17,7 @@ export default function createTextbox(props: TextboxProps): HTMLInputElement {
 	textbox.id = props.id || "";
 	if (props.autoComplete) {
 		textbox.setAttribute("autocomplete", props.autoComplete);
-	} /*else {
-		textbox.setAttribute("autocomplete", "off");
-	}*/
+	}
 
 	return textbox;	
 }
