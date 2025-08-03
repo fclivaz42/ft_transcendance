@@ -11,8 +11,8 @@ export async function createPongCanvas(): Promise<HTMLDivElement> {
 	const template = document.createElement("template");
 
 	const playerAvatar: (UserAvatarType)[] = [
-		createUserAvatar({ sizeClass: "lg:w-20 lg:h-20 w-14 h-14" }),
-		createUserAvatar({ sizeClass: "lg:w-20 lg:h-20 w-14 h-14" })
+		createUserAvatar({ sizeClass: "lg:w-20 lg:h-20 w-14 h-14", newWindow: true }),
+		createUserAvatar({ sizeClass: "lg:w-20 lg:h-20 w-14 h-14", newWindow: true })
 	];
 	playerAvatar[0].setAttribute("data-pong-avatar", "p1");
 	playerAvatar[1].setAttribute("data-pong-avatar", "p2");
