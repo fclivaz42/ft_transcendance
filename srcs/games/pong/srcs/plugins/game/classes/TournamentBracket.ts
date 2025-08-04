@@ -46,7 +46,7 @@ export default class TournamentBracket {
 			this._matchups.push(new Matchup(0, matchIndex, p1, p2));
 		}
 		for (let i = 4; i < 7; i++) {
-			this._matchups.push(new Matchup(i == 6 ? 2 : 1, i, null, null));
+			this._matchups.push(new Matchup(i === 6 ? 2 : 1, i, null, null));
 		}
 	}
 

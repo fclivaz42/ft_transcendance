@@ -28,7 +28,7 @@ function clearPanels(animate: boolean = true): boolean {
 	const lastPanel = animator.children[0];
 	// remove the last panel after the animation is done
 	setTimeout(() => {
-		if (lastPanel == animator.children[0]) // only remove the last panel if it is still the same
+		if (lastPanel === animator.children[0]) // only remove the last panel if it is still the same
 			clearPanels(false);
 	}, 100);
 	return true;

@@ -121,7 +121,7 @@ export function createWsHandler({ mode, manager }: CreateWsHandlerParams) {
 				if (
 					type === "ball" &&
 					payload?.direction &&
-					payload.direction == "launch"
+					payload.direction === "launch"
 				) {
 					let ball: Ball | undefined = session.getRoom()?.getGame().getBall();
 					ball?.launch();

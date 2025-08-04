@@ -23,7 +23,7 @@ export function createNavbar(props: NavbarProps): HTMLElement {
   let bottomTrigger = false;
   props.buttons.forEach((button) => {
     if (!bottomTrigger) {
-      if (button.bottom == true)
+      if (button.bottom === true)
         bottomTrigger = true;
     } else {
       button.bottom = false;
