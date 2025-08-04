@@ -9,6 +9,7 @@ import { frameManager } from "../managers/FrameManager";
 import NotificationManager from "../managers/NotificationManager";
 import PongGameManager from "../managers/PongGameManager";
 import { i18nHandler } from "./i18nHandler";
+import UserHandler from "./UserHandler";
 
 const validRoutes: Record<string, () => HTMLElement | Promise<HTMLElement>> = {
 	"/": createHomeFrame,
@@ -90,6 +91,7 @@ class RoutingHandler {
 			console.warn(`Invalid route: ${url.pathname}`);
 			return;
 		}
+		UserHandler.clearCache();
 		if (save)
 			window.history.pushState({}, "", url);
 		else

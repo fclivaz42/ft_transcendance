@@ -2,6 +2,7 @@ import { i18nHandler } from "../../handlers/i18nHandler";
 import RoutingHandler from "../../handlers/RoutingHandler";
 import UserHandler, { UserStats } from "../../handlers/UserHandler";
 import { sanitizer } from "../../helpers/sanitizer";
+import { AiUsers } from "../../interfaces/AiUsers";
 import { createButtonIcon } from "../buttons";
 import createUserAvatar from "../usermenu/userAvatar";
 
@@ -10,12 +11,13 @@ export default async function createUserFrame(): Promise<HTMLDivElement> {
 			throw new Error("notification.user.notLogged");
 	const searchParams = RoutingHandler.searchParams;
 	const template = document.createElement("template");
-	const user = await UserHandler.fetchUser(searchParams.get("playerId") || UserHandler.userId);
-	if (!user)
+	const userStats: Partial<UserStats> = await UserHandler.fetchUserStats(searchParams.get("playerId") || UserHandler.userId);
+	if (!userStats.user)
 		throw new Error("notification.user.notFound");
-	let userStats: UserStats;
-	const isPrivate = user.Private && user.PlayerID !== UserHandler.userId;
-	if (!isPrivate) userStats = await UserHandler.fetchUserStats(user.PlayerID);
+	let user = userStats.user;
+	if (AiUsers.has(user.PlayerID))
+		user = AiUsers.get(user.PlayerID)!;
+	const isPrivate = userStats.isPrivate && user.PlayerID !== UserHandler.userId;
 	template.innerHTML = `
 		<div class="min-w-[500px] max-w-fit mx-auto flex flex-col gap-8 p-8 rounded-xl bg-panel dark:bg-panel_dark shadow-md">
 			<div id="userstats-profile" class="flex flex-col items-center justify-center gap-4">

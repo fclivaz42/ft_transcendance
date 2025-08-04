@@ -38,6 +38,7 @@ export interface UsersSdkToken extends UsersSdkAuthorizeResponse {
 }
 
 export interface UsersSdkStats {
+	user: Partial<User>;
 	wonMatches: number;
 	lostMatches: number;
 	totalMatches: number,
