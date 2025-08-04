@@ -12,6 +12,7 @@
 
 NAME = sarif
 
+DATADIR = data
 SSLDIR = ssl
 
 SHELL = /bin/bash
@@ -23,6 +24,7 @@ ${NAME}: all
 all: start
 
 build:
+	mkdir -p ${DATADIR}
 	mkdir -p ${SSLDIR}
 	docker compose -p ${NAME} -f ./srcs/docker-compose.yml build
 	@if [ ! -f "${SSLDIR}/sarif.crt" ] || [ ! -f "${SSLDIR}/sarif.key" ]; then \
@@ -57,6 +59,7 @@ prune:
 nuke: down
 	docker compose -p ${NAME} -f ./srcs/docker-compose.yml down -v --rmi all --remove-orphans
 	docker system prune -f
+	sudo rm -rf ${DATADIR}
 	rm -rf ${SSLDIR}
 
 re: down all

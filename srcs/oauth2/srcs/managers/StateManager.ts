@@ -49,7 +49,7 @@ class StateManager {
 	}
 
 	public initSession(state: string, token: OauthToken | null) {
-		const logged = !(token == null);
+		const logged = !(token === null);
 		const current_session: session = {
 			state,
 			client_id: this.states.get(state) ?? "",

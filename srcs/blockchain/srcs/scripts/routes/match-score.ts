@@ -33,7 +33,7 @@ export default async function module_routes(fastify: FastifyInstance, options: F
 		const { id } = request.params;
 		try {
 			const match: Match = await getMatchScore(currentContract, id);
-			if (match[0][1] == 0 && match[1][1] == 0)
+			if (match[0][1] === 0 && match[1][1] === 0)
 				throw ("");
 			return reply.code(200).send({
 				winner: match[0][0],

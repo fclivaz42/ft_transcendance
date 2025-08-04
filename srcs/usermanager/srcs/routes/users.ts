@@ -213,6 +213,7 @@ export default async function initializeRoute(app: FastifyInstance, opts: Fastif
 			lostMatches: matches.length - wonMatches.length,
 			totalMatches: matches.length,
 			isPrivate: user.data.Private === 1,
+			user: UsersSdk.filterPublicUserData(user.data),
 		} as UsersSdkStats);
 	});
 

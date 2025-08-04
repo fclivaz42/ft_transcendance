@@ -10,6 +10,8 @@ export interface UserStats {
 	wonMatches: number;
 	lostMatches: number;
 	totalMatches: number;
+	isPrivate: boolean;
+	user: Users;
 }
 
 class UserHandler {
@@ -255,7 +257,10 @@ class UserHandler {
 				level: "error",
 				message: i18nHandler.getValue("user.notification.deleteError"),
 			});
+			return undefined;
 		});
+		if (!response)
+			return;
 		if (!response.ok) {
 			NotificationManager.notify({
 				level: "error",
@@ -271,12 +276,14 @@ class UserHandler {
 		return this._friendList;
 	}
 
-	public async fetchUserStats(playerId?: string): Promise<UserStats> {
+	public async fetchUserStats(playerId?: string): Promise<Partial<UserStats>> {
 		if (!playerId)
 			playerId === this.userId
 		const stats = await fetch(`/api/users/${playerId}/stats`);
+		if (stats.status === 403)
+			return { isPrivate: true, user: playerId && playerId !== this.userId ? await this.fetchUser(playerId) : this._user };
 		if (!stats.ok)
-			throw new Error(`Failed to fetch user stats for playerId ${playerId}: ${stats.statusText}`);
+			throw new Error(`Failed to fetch user stats: ${stats.statusText}`);
 		return await stats.json() as UserStats;
 	}
 
@@ -289,7 +296,7 @@ class UserHandler {
 			return friend;
 		}
 		const friend = bot as Friends;
-		friend.isAlive = friend.LastAlive && Date.now() - friend.LastAlive < 30000 ? true : false;
+		friend.isAlive = friend.LastAlive && Date.now() - friend.LastAlive < 15000 ? true : false;
 		return friend;
 	}
 
@@ -388,6 +395,10 @@ class UserHandler {
 			this._user.Avatar = "/api/users/me/picture";
 		this.updateComponents();
 		return this._user;
+	}
+
+	public clearCache() {
+		this._publicUserCache = new FixedSizeMap<String, Users>(12);
 	}
 }
 
